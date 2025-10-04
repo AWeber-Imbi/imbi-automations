@@ -287,6 +287,25 @@ def extract_package_name_from_pyproject(
         raise RuntimeError(f'Failed to extract package name: {err}') from err
 
 
+def path_to_resource_url(
+    context: models.WorkflowContext, path: pathlib.Path | str
+) -> models.ResourceUrl:
+    """Convert a path to a relative URI."""
+    if isinstance(path, str):
+        path = pathlib.Path(path)
+    relative_path = path.relative_to(context.working_directory)
+    for resource_type in ['extracted', 'repository', 'workflow']:
+        if relative_path.parts[0] == resource_type:
+            # Join remaining path parts (everything after the resource type)
+            remaining_parts = relative_path.parts[1:]
+            if remaining_parts:
+                sub_path = pathlib.Path(*remaining_parts)
+            else:
+                sub_path = pathlib.Path('.')
+            return models.ResourceUrl(f'{resource_type}:///{sub_path}')
+    return models.ResourceUrl(f'file:///{relative_path}')
+
+
 def _find_init_py_from_context(
     context: models.WorkflowContext,
 ) -> models.ResourceUrl:
