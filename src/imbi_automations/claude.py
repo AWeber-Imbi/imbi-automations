@@ -16,7 +16,7 @@ import pydantic
 from anthropic import types as anthropic_types
 from claude_agent_sdk import types
 
-from imbi_automations import mixins, models, prompts, utils, version
+from imbi_automations import mixins, models, prompts, tracker, utils, version
 
 LOGGER = logging.getLogger(__name__)
 BASE_PATH = pathlib.Path(__file__).parent
@@ -58,6 +58,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             'workflow_name': context.workflow.configuration.name,
             'working_directory': self.context.working_directory,
         }
+        self.tracker = tracker.Tracker.get_instance()
         self._set_workflow_logger(self.context.workflow)
         self.client = self._create_client()
 
@@ -265,6 +266,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         elif isinstance(message, claude_agent_sdk.ResultMessage):
             if self.session_id != message.session_id:
                 self.session_id = message.session_id
+            self.tracker.add_claude_run(message)
             if message.is_error:
                 return models.AgentRun(
                     result=models.AgentRunResult.failure,

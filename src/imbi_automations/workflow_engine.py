@@ -21,6 +21,7 @@ from imbi_automations import (
     mixins,
     models,
     prompts,
+    tracker,
     workflow_filter,
 )
 
@@ -46,6 +47,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         self.configuration = config
         self.github = clients.GitHub.get_instance(config=config.github)
         self.last_error_path: pathlib.Path | None = None
+        self.tracker = tracker.Tracker.get_instance()
         self.workflow = workflow
         self.workflow_filter = workflow_filter.Filter(
             config, workflow, verbose
@@ -80,6 +82,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 'Remote workflow conditions not met for %s',
                 context.imbi_project.name,
             )
+            self.tracker.incr('workflow_remote_conditions_not_met')
             return False
 
         if self.workflow.configuration.git.clone:
@@ -89,12 +92,14 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 self.workflow.configuration.git.starting_branch,
                 self.workflow.configuration.git.depth,
             )
+            self.tracker.incr('repositories_cloned')
 
         if not self.condition_checker.check(
             context,
             self.workflow.configuration.condition_type,
             self.workflow.configuration.conditions,
         ):
+            self.tracker.incr('workflow_conditions_not_met')
             self.logger.info(
                 'Workflow conditions not met for %s', context.imbi_project.name
             )
@@ -112,14 +117,19 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 working_directory.cleanup()
                 return False
 
+            self.tracker.incr('actions_executed')
+            self.tracker.incr(f'actions_executed_{action.type}')
+
             if action.committable:
                 await self.committer.commit(context, action)
+                self.tracker.incr('actions_committed')
 
         if (
             self.workflow.configuration.github.create_pull_request
             and self.configuration.claude_code.enabled
         ):
             await self._create_pull_request(context)
+            self.tracker.incr('pull_requests_created')
         else:
             await git.push_changes(
                 working_directory=context.working_directory / 'repository',
@@ -225,7 +235,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         if action.filter and not await self.workflow_filter.filter_project(
             context.imbi_project, action.filter
         ):
-            self.logger.debug('Skipping %s due to project filter', action.name)
+            self.logger.debug('Skipping %s due to action filter', action.name)
+            self.tracker.incr('actions_filter_skipped')
+            self.tracker.incr(f'actions_filter_skipped_{action.type}')
             return
 
         if not self.condition_checker.check(
@@ -233,6 +245,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.workflow.configuration.condition_type,
             action.conditions,
         ):
+            self.tracker.incr('actions_condition_skipped')
+            self.tracker.incr(f'actions_condition_skipped_{action.type}')
             self.logger.debug(
                 'Skipping %s due to failed condition check', action.name
             )
@@ -242,6 +256,10 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.workflow.configuration.condition_type,
             action.conditions,
         ):
+            self.tracker.incr('actions_remote_condition_skipped')
+            self.tracker.incr(
+                f'actions_remote_condition_skipped_{action.type}'
+            )
             self._log_verbose_info(
                 'Skipping action %s due to failed condition check', action.name
             )

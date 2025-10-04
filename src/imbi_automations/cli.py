@@ -16,7 +16,7 @@ import typing
 import colorlog
 import pydantic
 
-from imbi_automations import controller, models, utils, version
+from imbi_automations import controller, models, tracker, utils, version
 
 LOGGER = logging.getLogger(__name__)
 
@@ -245,14 +245,18 @@ def main() -> None:
         )
     except RuntimeError as err:
         sys.stderr.write(f'ERROR: {err}\n')
+        tracker.report()
         sys.exit(1)
     try:
         success = asyncio.run(automation_controller.run())
     except KeyboardInterrupt:
         LOGGER.info('Interrupted, exiting')
+        tracker.report()
         sys.exit(2)
     except RuntimeError as err:
         sys.stderr.write(f'Error running automation: {err}\n')
+        tracker.report()
         sys.exit(3)
+    tracker.report()
     if not success:
         sys.exit(5)
