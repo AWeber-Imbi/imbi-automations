@@ -84,7 +84,10 @@ class ShellAction(mixins.WorkflowLoggerMixin):
         command_str = self._render_command(action, self.context)
 
         self.logger.debug(
-            '%s executing shell command: %s', action.name, command_str
+            '%s %s executing shell command: %s',
+            self.context.imbi_project.slug,
+            action.name,
+            command_str,
         )
 
         # Set working directory using resolve_path
@@ -107,7 +110,7 @@ class ShellAction(mixins.WorkflowLoggerMixin):
 
             self.logger.debug(
                 '%s %s shell command completed with exit code %d',
-                self.context.imbi_project.name,
+                self.context.imbi_project.slug,
                 action.name,
                 process.returncode,
             )
@@ -115,14 +118,14 @@ class ShellAction(mixins.WorkflowLoggerMixin):
             if stdout_str:
                 self.logger.debug(
                     '%s %s command stdout: %s',
-                    self.context.imbi_project.name,
+                    self.context.imbi_project.slug,
                     action.name,
                     stdout_str,
                 )
             if stderr_str:
                 self.logger.debug(
                     '%s %s command stderr: %s',
-                    self.context.imbi_project.name,
+                    self.context.imbi_project.slug,
                     action.name,
                     stderr_str,
                 )
@@ -133,7 +136,7 @@ class ShellAction(mixins.WorkflowLoggerMixin):
                     self.logger.debug(
                         '%s %s shell command failed with exit %d (ignored)\n'
                         'Command: %s\nOutput: %s',
-                        self.context.imbi_project.name,
+                        self.context.imbi_project.slug,
                         action.name,
                         process.returncode,
                         command_str,
@@ -143,7 +146,7 @@ class ShellAction(mixins.WorkflowLoggerMixin):
                     self.logger.error(
                         '%s %s shell command failed with exit %d\n'
                         'Command: %s\nOutput: %s',
-                        self.context.imbi_project.name,
+                        self.context.imbi_project.slug,
                         action.name,
                         process.returncode,
                         command_str,
@@ -180,7 +183,7 @@ class ShellAction(mixins.WorkflowLoggerMixin):
         if prompts.has_template_syntax(action.command):
             self.logger.debug(
                 '%s %s rendering templated command: %s',
-                self.context.imbi_project.name,
+                self.context.imbi_project.slug,
                 action.name,
                 action.command,
             )

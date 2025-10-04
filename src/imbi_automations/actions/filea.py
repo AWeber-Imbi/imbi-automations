@@ -60,7 +60,12 @@ class FileActions(mixins.WorkflowLoggerMixin):
         file_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.path)
         )
-        self.logger.debug('%s appending to file: %s', action.name, action.path)
+        self.logger.debug(
+            '%s %s appending to file: %s',
+            self.context.imbi_project.slug,
+            action.name,
+            action.path,
+        )
 
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -72,12 +77,18 @@ class FileActions(mixins.WorkflowLoggerMixin):
             else:
                 f.write(action.content)
 
-        self._log_verbose_info('%s appended to %s', action.name, action.path)
+        self._log_verbose_info(
+            '%s %s appended to %s',
+            self.context.imbi_project.slug,
+            action.name,
+            action.path,
+        )
 
     async def _execute_copy(self, action: models.WorkflowFileAction) -> None:
         """Execute copy file action with glob pattern support."""
         self.logger.debug(
-            '%s copying %s to %s',
+            '%s %s copying %s to %s',
+            self.context.imbi_project.slug,
             action.name,
             action.source,
             action.destination,
@@ -151,7 +162,8 @@ class FileActions(mixins.WorkflowLoggerMixin):
                 dest_file = dest_path / match.name
                 shutil.copy2(match, dest_file)
                 self.logger.debug(
-                    'Copied %s to %s',
+                    '%s copied %s to %s',
+                    self.context.imbi_project.slug,
                     utils.path_to_resource_url(self.context, match),
                     utils.path_to_resource_url(self.context, dest_file),
                 )
@@ -168,7 +180,12 @@ class FileActions(mixins.WorkflowLoggerMixin):
         file_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.path)
         )
-        self.logger.debug('%s deleting file: %s', action.name, action.path)
+        self.logger.debug(
+            '%s %s deleting file: %s',
+            self.context.imbi_project.slug,
+            action.name,
+            action.path,
+        )
 
         if file_path.exists():
             if file_path.is_file():
@@ -176,13 +193,15 @@ class FileActions(mixins.WorkflowLoggerMixin):
             elif file_path.is_dir():
                 shutil.rmtree(file_path)
             self._log_verbose_info(
-                '%s deleted %s',
+                '%s %s deleted %s',
+                self.context.imbi_project.slug,
                 action.name,
                 utils.path_to_resource_url(self.context, file_path),
             )
         else:
             self.logger.warning(
-                '%s did not find file to delete: %s',
+                '%s %s did not find file to delete: %s',
+                self.context.imbi_project.slug,
                 action.name,
                 utils.path_to_resource_url(self.context, file_path),
             )
@@ -194,7 +213,8 @@ class FileActions(mixins.WorkflowLoggerMixin):
         base_path = self.context.working_directory
 
         self._log_verbose_info(
-            '%s deleting files matching pattern: %s',
+            '%s %s deleting files matching pattern: %s',
+            self.context.imbi_project.slug,
             action.name,
             action.pattern,
         )
@@ -211,19 +231,26 @@ class FileActions(mixins.WorkflowLoggerMixin):
                 relative_path = file_path.relative_to(base_path)
                 if pattern.search(str(relative_path)):
                     self.logger.debug(
-                        'Deleting file matching pattern: %s', file_path
+                        '%s %s deleting file matching pattern: %s',
+                        self.context.imbi_project.slug,
+                        action.name,
+                        file_path,
                     )
                     file_path.unlink()
                     deleted_count += 1
 
         self._log_verbose_info(
-            '%s deleted %d files matching pattern', action.name, deleted_count
+            '%s %s deleted %d files matching pattern',
+            self.context.imbi_project.slug,
+            action.name,
+            deleted_count,
         )
 
     async def _execute_move(self, action: models.WorkflowFileAction) -> None:
         """Execute move file action."""
         self.logger.debug(
-            '%s copying %s to %s',
+            '%s %s moving %s to %s',
+            self.context.imbi_project.slug,
             action.name,
             action.source,
             action.destination,
@@ -253,7 +280,8 @@ class FileActions(mixins.WorkflowLoggerMixin):
     async def _execute_rename(self, action: models.WorkflowFileAction) -> None:
         """Execute rename file action."""
         self.logger.debug(
-            '%s renaming %s to %s',
+            '%s %s renaming %s to %s',
+            self.context.imbi_project.slug,
             action.name,
             action.source,
             action.destination,
@@ -285,7 +313,12 @@ class FileActions(mixins.WorkflowLoggerMixin):
         file_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.path)
         )
-        self.logger.debug('%s writing to file: %s', action.name, action.path)
+        self.logger.debug(
+            '%s %s writing to file: %s',
+            self.context.imbi_project.slug,
+            action.name,
+            action.path,
+        )
 
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -298,4 +331,9 @@ class FileActions(mixins.WorkflowLoggerMixin):
             with file_path.open('w', encoding=action.encoding) as f:
                 f.write(action.content)
 
-        self._log_verbose_info('%s wrote to %s', action.name, action.path)
+        self._log_verbose_info(
+            '%s %s wrote to %s',
+            self.context.imbi_project.slug,
+            action.name,
+            action.path,
+        )

@@ -46,7 +46,8 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             )
         if source_path.is_file():  # Single file template
             self.logger.debug(
-                '%s rendering template from %s to %s',
+                '%s %s rendering template from %s to %s',
+                self.context.imbi_project.slug,
                 action.name,
                 utils.path_to_resource_url(self.context, source_path),
                 utils.path_to_resource_url(self.context, destination_path),
@@ -63,7 +64,8 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
 
         # Directory of templates - glob everything
         self.logger.debug(
-            '%s rendering all templates from directory %s to %s',
+            '%s %s rendering all templates from directory %s to %s',
+            self.context.imbi_project.slug,
             action.name,
             utils.path_to_resource_url(self.context, source_path),
             utils.path_to_resource_url(self.context, destination_path),

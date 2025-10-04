@@ -156,14 +156,14 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
         """Check if a file contains the specified string"""
         if not file_path.is_file():
             self.logger.debug(
-                'File %s does not exist for contains check', condition.file
+                'file %s does not exist for contains check', condition.file
             )
             return False
         try:
             file_content = file_path.read_text(encoding='utf-8')
         except (OSError, UnicodeDecodeError) as exc:
             self.logger.warning(
-                'Failed to read file %s for contains check: %s',
+                'failed to read file %s for contains check: %s',
                 condition.file,
                 exc,
             )
@@ -176,7 +176,7 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
         """Check that a file exists & does not contain the specified string"""
         if not file_path.is_file():
             self.logger.debug(
-                'File %s does not exist for negative contains check',
+                'file %s does not exist for negative contains check',
                 condition.file,
             )
             return False
@@ -184,7 +184,7 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
             file_content = file_path.read_text(encoding='utf-8')
         except (OSError, UnicodeDecodeError) as exc:
             self.logger.warning(
-                'Failed to read file %s for negative contains check: %s',
+                'failed to read file %s for negative contains check: %s',
                 condition.file,
                 exc,
             )
@@ -288,7 +288,7 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
         # Only GitHub supports tree API for now
         if not isinstance(client, clients.GitHub):
             self.logger.warning(
-                'Glob patterns for remote_file_exists only supported '
+                'glob patterns for remote_file_exists only supported '
                 'for GitHub repositories, falling back to literal check'
             )
             content = await client.get_file_contents(context, pattern)
@@ -317,7 +317,7 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
 
         except (httpx.HTTPError, RuntimeError, ValueError) as exc:
             self.logger.warning(
-                'Failed to check glob pattern %s remotely: %s', pattern, exc
+                'failed to check glob pattern %s remotely: %s', pattern, exc
             )
             # Fall back to literal check
             content = await client.get_file_contents(context, pattern)

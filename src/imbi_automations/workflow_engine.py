@@ -79,8 +79,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.workflow.configuration.conditions,
         ):
             self.logger.info(
-                'Remote workflow conditions not met for %s',
-                context.imbi_project.name,
+                '%s remote workflow conditions not met',
+                context.imbi_project.slug,
             )
             self.tracker.incr('workflow_remote_conditions_not_met')
             return False
@@ -101,7 +101,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         ):
             self.tracker.incr('workflow_conditions_not_met')
             self.logger.info(
-                'Workflow conditions not met for %s', context.imbi_project.name
+                '%s workflow conditions not met', context.imbi_project.slug
             )
             return False
 
@@ -110,7 +110,10 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 await self._execute_action(context, action)
             except RuntimeError as exc:
                 self.logger.error(
-                    'Error executing action "%s": %s', action.name, exc
+                    '%s error executing action "%s": %s',
+                    context.imbi_project.slug,
+                    action.name,
+                    exc,
                 )
                 if self.configuration.preserve_on_error:
                     self._preserve_error_state(context, working_directory)
@@ -192,7 +195,11 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             working_directory=repository_dir,
             starting_commit=context.starting_commit,
         )
-        self.logger.debug('%i commits made in workflow', len(summary.commits))
+        self.logger.debug(
+            '%s %i commits made in workflow',
+            context.imbi_project.slug,
+            len(summary.commits),
+        )
 
         prompt = prompts.render(
             context,
@@ -235,7 +242,11 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         if action.filter and not await self.workflow_filter.filter_project(
             context.imbi_project, action.filter
         ):
-            self.logger.debug('Skipping %s due to action filter', action.name)
+            self.logger.debug(
+                '%s skipping %s due to action filter',
+                context.imbi_project.slug,
+                action.name,
+            )
             self.tracker.incr('actions_filter_skipped')
             self.tracker.incr(f'actions_filter_skipped_{action.type}')
             return
@@ -248,7 +259,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.tracker.incr('actions_condition_skipped')
             self.tracker.incr(f'actions_condition_skipped_{action.type}')
             self.logger.debug(
-                'Skipping %s due to failed condition check', action.name
+                '%s skipping %s due to failed condition check',
+                context.imbi_project.slug,
+                action.name,
             )
             return
         elif not await self.condition_checker.check_remote(
@@ -310,12 +323,17 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             )
             self.last_error_path = error_path
             self.logger.info(
-                'Preserved error state to %s for debugging', error_path
+                '%s preserved error state to %s for debugging',
+                context.imbi_project.slug,
+                error_path,
             )
         except OSError as exc:
             self.last_error_path = None
             self.logger.error(
-                'Failed to preserve error state to %s: %s', error_path, exc
+                '%s failed to preserve error state to %s: %s',
+                context.imbi_project.slug,
+                error_path,
+                exc,
             )
 
     def _git_clone_url(

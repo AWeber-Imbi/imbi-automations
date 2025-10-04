@@ -204,11 +204,21 @@ class Claude(mixins.WorkflowLoggerMixin):
                 ):
                     continue
                 elif isinstance(entry, claude_agent_sdk.TextBlock):
-                    self.logger.debug('%s: %s', message_type, entry.text)
+                    self.logger.debug(
+                        '%s %s: %s',
+                        self.context.imbi_project.slug,
+                        message_type,
+                        entry.text,
+                    )
                 else:
                     raise RuntimeError(f'Unknown message type: {type(entry)}')
         else:
-            self.logger.debug('%s: %s', message_type, content)
+            self.logger.debug(
+                '%s %s: %s',
+                self.context.imbi_project.slug,
+                message_type,
+                content,
+            )
 
     def _parse_agent_file(self, name: str) -> types.AgentDefinition:
         """Parse the agent file and return the agent.
@@ -260,7 +270,11 @@ class Claude(mixins.WorkflowLoggerMixin):
         if isinstance(message, claude_agent_sdk.AssistantMessage):
             self._log_message('Claude Assistant', message.content)
         elif isinstance(message, claude_agent_sdk.SystemMessage):
-            self.logger.debug('Claude System: %s', message.data)
+            self.logger.debug(
+                '%s Claude System: %s',
+                self.context.imbi_project.slug,
+                message.data,
+            )
         elif isinstance(message, claude_agent_sdk.UserMessage):
             self._log_message('Claude User', message.content)
         elif isinstance(message, claude_agent_sdk.ResultMessage):
@@ -279,7 +293,11 @@ class Claude(mixins.WorkflowLoggerMixin):
             try:
                 payload = utils.extract_json(message.result)
             except ValueError as err:
-                self.logger.error('Failed to parse JSON result: %s', err)
+                self.logger.error(
+                    '%s failed to parse JSON result: %s',
+                    self.context.imbi_project.slug,
+                    err,
+                )
                 return models.AgentRun(
                     result=models.AgentRunResult.failure,
                     errors=[f'Failed to parse JSON result: {err}'],

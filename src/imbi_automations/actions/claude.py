@@ -55,10 +55,11 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
         for cycle in range(1, action.max_cycles + 1):
             self._log_verbose_info(
-                'Claude Code cycle %d/%d for action %s',
+                '%s %s Claude Code cycle %d/%d',
+                self.context.imbi_project.slug,
+                action.name,
                 cycle,
                 action.max_cycles,
-                action.name,
             )
 
             # Warn when approaching max cycles
@@ -67,7 +68,8 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 and action.max_cycles > 5
             ):
                 self.logger.warning(
-                    'Action %s has used %d/%d cycles - approaching limit',
+                    '%s %s has used %d/%d cycles - approaching limit',
+                    self.context.imbi_project.slug,
                     action.name,
                     cycle,
                     action.max_cycles,
@@ -75,7 +77,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
             if await self._execute_cycle(action, cycle):
                 self.logger.debug(
-                    'Claude Code %s cycle %d successful', action.name, cycle
+                    '%s %s Claude Code cycle %d successful',
+                    self.context.imbi_project.slug,
+                    action.name,
+                    cycle,
                 )
                 success = True
                 break
@@ -90,8 +95,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             if failure_category:
                 error_msg += f' (category: {failure_category})'
                 self.logger.error(
-                    'Failure categorized as: %s - consider adjusting '
+                    '%s %s failure categorized as: %s - consider adjusting '
                     'workflow constraints',
+                    self.context.imbi_project.slug,
+                    action.name,
                     failure_category,
                 )
             raise RuntimeError(error_msg)
@@ -101,24 +108,40 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
     ) -> bool:
         for agent in [AgentType.task, AgentType.validator]:
             if agent == AgentType.validator and not action.validation_prompt:
-                self.logger.debug('No validation prompt, skipping')
+                self.logger.debug(
+                    '%s %s no validation prompt, skipping',
+                    self.context.imbi_project.slug,
+                    action.name,
+                )
                 continue
             self._log_verbose_info(
-                'Executing Claude Code %s agent %s in cycle %d',
-                agent,
+                '%s %s executing Claude Code %s agent in cycle %d',
+                self.context.imbi_project.slug,
                 action.name,
+                agent,
                 cycle,
             )
             prompt = self._get_prompt(action, agent)
-            self.logger.debug('Execute agent prompt: %s', prompt)
+            self.logger.debug(
+                '%s %s execute agent prompt: %s',
+                self.context.imbi_project.slug,
+                action.name,
+                prompt,
+            )
             run = await self.claude.agent_query(prompt)
-            self.logger.debug('Execute agent result: %r', run)
+            self.logger.debug(
+                '%s %s execute agent result: %r',
+                self.context.imbi_project.slug,
+                action.name,
+                run,
+            )
             if run.result == models.AgentRunResult.failure:
                 self.last_error = run
                 self.logger.error(
-                    'Claude Code %s agent %s failed in cycle %d',
-                    agent,
+                    '%s %s Claude Code %s agent failed in cycle %d',
+                    self.context.imbi_project.slug,
                     action.name,
+                    agent,
                     cycle,
                 )
                 return False

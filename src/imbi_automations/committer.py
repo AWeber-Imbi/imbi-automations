@@ -47,7 +47,9 @@ class Committer(mixins.WorkflowLoggerMixin):
     ) -> None:
         """Leverage Claude Code to commit changes."""
         self._log_verbose_info(
-            'Using Claude Code to commit changes for %s', action.name
+            '%s %s using Claude Code to commit changes',
+            context.imbi_project.slug,
+            action.name,
         )
         client = claude.Claude(self.configuration, context, self.verbose)
 
@@ -96,10 +98,24 @@ class Committer(mixins.WorkflowLoggerMixin):
                 commit_author=self.configuration.commit_author,
             )
         except RuntimeError as exc:
-            self.logger.error('git commit failed: %s', exc)
+            self.logger.error(
+                '%s %s git commit failed: %s',
+                context.imbi_project.slug,
+                action.name,
+                exc,
+            )
             raise
         else:
             if commit_sha:
-                self.logger.info('Committed changes: %s', commit_sha)
+                self.logger.info(
+                    '%s %s committed changes: %s',
+                    context.imbi_project.slug,
+                    action.name,
+                    commit_sha,
+                )
             else:
-                self.logger.info('No changes to commit')
+                self.logger.info(
+                    '%s %s no changes to commit',
+                    context.imbi_project.slug,
+                    action.name,
+                )

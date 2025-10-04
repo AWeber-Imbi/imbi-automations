@@ -61,7 +61,9 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
         project_id = self.context.imbi_project.id
 
         self.logger.info(
-            'Setting fact "%s" to "%s" for project %d (%s)',
+            '%s %s setting fact "%s" to "%s" for project %d (%s)',
+            self.context.imbi_project.slug,
+            action.name,
             action.fact_name,
             action.value,
             project_id,
@@ -76,13 +78,17 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 skip_validations=action.skip_validations,
             )
             self.logger.debug(
-                'Successfully updated fact "%s" for project %d',
+                '%s %s successfully updated fact "%s" for project %d',
+                self.context.imbi_project.slug,
+                action.name,
                 action.fact_name,
                 project_id,
             )
         except (httpx.HTTPError, ValueError, RuntimeError) as exc:
             self.logger.error(
-                'Failed to set fact "%s" for project %d: %s',
+                '%s %s failed to set fact "%s" for project %d: %s',
+                self.context.imbi_project.slug,
+                action.name,
                 action.fact_name,
                 project_id,
                 exc,

@@ -74,7 +74,6 @@ def render(
 
     if isinstance(source, pathlib.Path) and not template:
         template = source.read_text(encoding='utf-8')
-    LOGGER.debug('Template: %s', template)
     return env.from_string(template).render(**kwargs)
 
 
