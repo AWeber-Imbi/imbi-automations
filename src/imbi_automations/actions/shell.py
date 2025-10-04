@@ -158,5 +158,7 @@ class ShellAction(mixins.WorkflowLoggerMixin):
         """
         if prompts.has_template_syntax(command):
             self.logger.debug('Rendering templated command: %s', command)
-            return prompts.render(context, command, **context.model_dump())
+            return prompts.render(
+                context, template=command, **context.model_dump()
+            )
         return command
