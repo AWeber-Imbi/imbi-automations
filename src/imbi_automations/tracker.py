@@ -22,7 +22,8 @@ class Tracker:
         return cls._instance
 
     def add_claude_run(self, result: types.ResultMessage) -> None:
-        self.claude[f'subtype_{result.subtype}'] += 1
+        if hasattr(result, 'subtype'):
+            self.claude[f'subtype_{result.subtype}'] += 1
         self.claude['duration_ms'] += result.duration_ms
         self.claude['duration_api_ms'] += result.duration_api_ms
         self.claude['num_turns'] += result.num_turns
