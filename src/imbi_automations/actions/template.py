@@ -46,20 +46,27 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             )
         if source_path.is_file():  # Single file template
             self.logger.debug(
-                'Rendering template from %s to %s',
-                source_path,
-                destination_path,
+                '%s rendering template from %s to %s',
+                action.name,
+                utils.path_to_resource_url(self.context, source_path),
+                utils.path_to_resource_url(self.context, destination_path),
             )
             with destination_path.open('w', encoding='utf-8') as fh:
                 fh.write(prompts.render(self.context, source_path))
-            self._log_verbose_info('Rendered template to %s', destination_path)
+            self._log_verbose_info(
+                '%s rendered template from %s to %s',
+                action.name,
+                utils.path_to_resource_url(self.context, source_path),
+                utils.path_to_resource_url(self.context, destination_path),
+            )
             return
 
         # Directory of templates - glob everything
         self.logger.debug(
-            'Rendering all templates from directory %s to %s',
-            source_path,
-            destination_path,
+            '%s rendering all templates from directory %s to %s',
+            action.name,
+            utils.path_to_resource_url(self.context, source_path),
+            utils.path_to_resource_url(self.context, destination_path),
         )
         destination_path.mkdir(parents=True, exist_ok=True)
 
@@ -76,8 +83,9 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
                 file_count += 1
 
         self._log_verbose_info(
-            'Rendered %d templates from %s to %s',
+            '%s rendered %d templates from %s to %s',
+            action.name,
             file_count,
-            source_path,
-            destination_path,
+            utils.path_to_resource_url(self.context, source_path),
+            utils.path_to_resource_url(self.context, destination_path),
         )
