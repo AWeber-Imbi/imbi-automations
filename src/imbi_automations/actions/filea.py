@@ -177,11 +177,13 @@ class FileActions(mixins.WorkflowLoggerMixin):
                 shutil.rmtree(file_path)
             self._log_verbose_info(
                 '%s deleted %s',
+                action.name,
                 utils.path_to_resource_url(self.context, file_path),
             )
         else:
             self.logger.warning(
                 '%s did not find file to delete: %s',
+                action.name,
                 utils.path_to_resource_url(self.context, file_path),
             )
 
