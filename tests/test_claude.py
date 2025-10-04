@@ -26,6 +26,19 @@ def _test_response_validator(message: str) -> str:
     return 'Response is valid'
 
 
+def _create_mock_result_message_usage() -> dict:
+    """Create mock usage dict with all required fields for tracker."""
+    return {
+        'cache_creation': {},
+        'cache_creation_input_tokens': 0,
+        'cache_read_input_tokens': 0,
+        'input_tokens': 100,
+        'output_tokens': 50,
+        'service_tier': 'default',
+        'server_tool_use': {},
+    }
+
+
 class ResponseValidatorTestCase(unittest.TestCase):
     """Test cases for the response_validator function logic."""
 
@@ -173,6 +186,11 @@ class ClaudeTestCase(base.AsyncTestCase):
         message.session_id = 'test-session'
         message.result = json.dumps(valid_result)
         message.is_error = False
+        message.duration_ms = 1000
+        message.duration_api_ms = 800
+        message.num_turns = 1
+        message.total_cost_usd = 0.01
+        message.usage = _create_mock_result_message_usage()
 
         result = claude_instance._parse_message(message)
 
@@ -205,6 +223,11 @@ class ClaudeTestCase(base.AsyncTestCase):
         message.session_id = 'test-session'
         message.result = json_with_wrapper
         message.is_error = False
+        message.duration_ms = 1000
+        message.duration_api_ms = 800
+        message.num_turns = 1
+        message.total_cost_usd = 0.01
+        message.usage = _create_mock_result_message_usage()
 
         result = claude_instance._parse_message(message)
 
@@ -228,9 +251,15 @@ class ClaudeTestCase(base.AsyncTestCase):
             )
 
         message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
+        message.subtype = 'error'
         message.session_id = 'test-session'
         message.result = 'Error occurred'
         message.is_error = True
+        message.duration_ms = 1000
+        message.duration_api_ms = 800
+        message.num_turns = 1
+        message.total_cost_usd = 0.01
+        message.usage = _create_mock_result_message_usage()
 
         result = claude_instance._parse_message(message)
 
@@ -258,6 +287,11 @@ class ClaudeTestCase(base.AsyncTestCase):
         message.session_id = 'test-session'
         message.result = '{"invalid": json syntax'
         message.is_error = False
+        message.duration_ms = 1000
+        message.duration_api_ms = 800
+        message.num_turns = 1
+        message.total_cost_usd = 0.01
+        message.usage = _create_mock_result_message_usage()
 
         result = claude_instance._parse_message(message)
 
@@ -449,6 +483,11 @@ class ClaudeTestCase(base.AsyncTestCase):
         message.session_id = 'new-session'
         message.result = json.dumps(valid_result)
         message.is_error = False
+        message.duration_ms = 1000
+        message.duration_api_ms = 800
+        message.num_turns = 1
+        message.total_cost_usd = 0.01
+        message.usage = _create_mock_result_message_usage()
 
         result = claude_instance._parse_message(message)
 
@@ -479,6 +518,11 @@ class ClaudeTestCase(base.AsyncTestCase):
         message.session_id = 'same-session'
         message.result = json.dumps(valid_result)
         message.is_error = False
+        message.duration_ms = 1000
+        message.duration_api_ms = 800
+        message.num_turns = 1
+        message.total_cost_usd = 0.01
+        message.usage = _create_mock_result_message_usage()
 
         result = claude_instance._parse_message(message)
 

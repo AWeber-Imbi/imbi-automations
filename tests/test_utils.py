@@ -220,6 +220,334 @@ WORKDIR /app
         # Should extract the variable reference
         self.assertEqual(result, '${BASE_IMAGE}')
 
+    def test_compare_semver_with_build_numbers_build_upgrade(self) -> None:
+        """Test comparing versions with different build numbers."""
+        result = utils.compare_semver_with_build_numbers(
+            '3.9.18-0', '3.9.18-4'
+        )
+        self.assertTrue(result)
+
+    def test_compare_semver_with_build_numbers_semver_upgrade(self) -> None:
+        """Test comparing versions with different semantic versions."""
+        result = utils.compare_semver_with_build_numbers(
+            '3.9.17-4', '3.9.18-0'
+        )
+        self.assertTrue(result)
+
+    def test_compare_semver_with_build_numbers_no_upgrade(self) -> None:
+        """Test comparing when current is newer."""
+        result = utils.compare_semver_with_build_numbers(
+            '3.9.18-4', '3.9.18-0'
+        )
+        self.assertFalse(result)
+
+    def test_compare_semver_with_build_numbers_equal(self) -> None:
+        """Test comparing equal versions."""
+        result = utils.compare_semver_with_build_numbers(
+            '3.9.18-4', '3.9.18-4'
+        )
+        self.assertFalse(result)
+
+    def test_compare_semver_with_build_numbers_no_build(self) -> None:
+        """Test comparing versions without build numbers."""
+        result = utils.compare_semver_with_build_numbers('3.9.17', '3.9.18')
+        self.assertTrue(result)
+
+    def test_compare_semver_with_build_numbers_mixed(self) -> None:
+        """Test comparing with one build number and one without."""
+        result = utils.compare_semver_with_build_numbers('3.9.18', '3.9.18-1')
+        self.assertTrue(result)
+
+    def test_compare_semver_with_build_numbers_non_numeric_build(self) -> None:
+        """Test comparing with non-numeric build identifiers."""
+        result = utils.compare_semver_with_build_numbers(
+            '3.9.18-alpha', '3.9.18-beta'
+        )
+        self.assertFalse(result)  # Both treated as 0
+
+    def test_append_file_success(self) -> None:
+        """Test appending content to a file successfully."""
+        file_path = self.temp_path / 'test.txt'
+        file_path.write_text('initial content\n')
+
+        result = utils.append_file(str(file_path), 'appended content\n')
+
+        self.assertEqual(result, 'success')
+        self.assertEqual(
+            file_path.read_text(), 'initial content\nappended content\n'
+        )
+
+    def test_append_file_new_file(self) -> None:
+        """Test appending to a non-existent file creates it."""
+        file_path = self.temp_path / 'new_file.txt'
+
+        result = utils.append_file(str(file_path), 'new content\n')
+
+        self.assertEqual(result, 'success')
+        self.assertTrue(file_path.exists())
+        self.assertEqual(file_path.read_text(), 'new content\n')
+
+    def test_append_file_creates_parent_directory(self) -> None:
+        """Test appending to a file creates parent directories."""
+        file_path = self.temp_path / 'subdir' / 'test.txt'
+
+        result = utils.append_file(str(file_path), 'content\n')
+
+        self.assertEqual(result, 'success')
+        self.assertTrue(file_path.exists())
+        self.assertEqual(file_path.read_text(), 'content\n')
+
+    def test_resolve_path_repository_scheme(self) -> None:
+        """Test resolving path with repository:// scheme."""
+        result = utils.resolve_path(
+            self.context, models.ResourceUrl('repository:///file.txt')
+        )
+        expected = self.temp_path / 'repository' / 'file.txt'
+        self.assertEqual(result, expected)
+
+    def test_resolve_path_workflow_scheme(self) -> None:
+        """Test resolving path with workflow:// scheme."""
+        result = utils.resolve_path(
+            self.context, models.ResourceUrl('workflow:///template.j2')
+        )
+        expected = self.temp_path / 'workflow' / 'template.j2'
+        self.assertEqual(result, expected)
+
+    def test_resolve_path_extracted_scheme(self) -> None:
+        """Test resolving path with extracted:// scheme."""
+        result = utils.resolve_path(
+            self.context, models.ResourceUrl('extracted:///data.json')
+        )
+        expected = self.temp_path / 'extracted' / 'data.json'
+        self.assertEqual(result, expected)
+
+    def test_resolve_path_file_scheme(self) -> None:
+        """Test resolving path with file:// scheme."""
+        result = utils.resolve_path(
+            self.context, models.ResourceUrl('file:///local.txt')
+        )
+        expected = self.temp_path / 'local.txt'
+        self.assertEqual(result, expected)
+
+    def test_resolve_path_no_scheme(self) -> None:
+        """Test resolving path without scheme (requires file:// prefix)."""
+        result = utils.resolve_path(
+            self.context, models.ResourceUrl('file:///plain.txt')
+        )
+        expected = self.temp_path / 'plain.txt'
+        self.assertEqual(result, expected)
+
+    def test_resolve_path_with_subdirectories(self) -> None:
+        """Test resolving path with subdirectories."""
+        result = utils.resolve_path(
+            self.context,
+            models.ResourceUrl('repository:///src/module/file.py'),
+        )
+        expected = self.temp_path / 'repository' / 'src' / 'module' / 'file.py'
+        self.assertEqual(result, expected)
+
+    def test_resolve_path_none_raises(self) -> None:
+        """Test that None path raises ValueError."""
+        with self.assertRaises(ValueError) as ctx:
+            utils.resolve_path(self.context, None)
+        self.assertIn('Path cannot be None', str(ctx.exception))
+
+    def test_resolve_path_invalid_scheme_raises(self) -> None:
+        """Test that invalid scheme raises RuntimeError."""
+        with self.assertRaises(RuntimeError) as ctx:
+            utils.resolve_path(
+                self.context, models.ResourceUrl('invalid:///file.txt')
+            )
+        self.assertIn('Invalid path scheme', str(ctx.exception))
+
+    def test_sanitize_url_with_password(self) -> None:
+        """Test sanitizing URL with password."""
+        url = 'https://user:secret123@example.com/path'
+        result = utils.sanitize(url)
+        self.assertEqual(result, 'https://user:******@example.com/path')
+
+    def test_sanitize_url_without_password(self) -> None:
+        """Test sanitizing URL without password."""
+        url = 'https://example.com/path'
+        result = utils.sanitize(url)
+        self.assertEqual(result, 'https://example.com/path')
+
+    def test_sanitize_multiple_urls(self) -> None:
+        """Test sanitizing text with multiple URLs."""
+        text = 'Connect to https://user:pass@host1.com and ftp://admin:secret@host2.com'
+        result = utils.sanitize(text)
+        expected = 'Connect to https://user:******@host1.com and ftp://admin:******@host2.com'
+        self.assertEqual(result, expected)
+
+    def test_extract_json_plain_json(self) -> None:
+        """Test extracting plain JSON."""
+        response = '{"result": "success", "message": "Done"}'
+        result = utils.extract_json(response)
+        self.assertEqual(result, {'result': 'success', 'message': 'Done'})
+
+    def test_extract_json_with_json_code_block(self) -> None:
+        """Test extracting JSON from ```json code block."""
+        response = """Here is the result:
+```json
+{"result": "success", "data": [1, 2, 3]}
+```
+That's all!"""
+        result = utils.extract_json(response)
+        self.assertEqual(result, {'result': 'success', 'data': [1, 2, 3]})
+
+    def test_extract_json_with_generic_code_block(self) -> None:
+        """Test extracting JSON from generic ``` code block."""
+        response = """Response:
+```
+{"status": "ok"}
+```"""
+        result = utils.extract_json(response)
+        self.assertEqual(result, {'status': 'ok'})
+
+    def test_extract_json_embedded_in_text(self) -> None:
+        """Test extracting JSON embedded in text."""
+        response = 'The result is {"value": 42} and that is final.'
+        result = utils.extract_json(response)
+        self.assertEqual(result, {'value': 42})
+
+    def test_extract_json_nested_objects(self) -> None:
+        """Test extracting nested JSON objects."""
+        response = 'Here: {"outer": {"inner": "value"}} end'
+        result = utils.extract_json(response)
+        self.assertEqual(result, {'outer': {'inner': 'value'}})
+
+    def test_extract_json_invalid_raises(self) -> None:
+        """Test that invalid JSON raises ValueError."""
+        response = 'This has no JSON at all'
+        with self.assertRaises(ValueError) as ctx:
+            utils.extract_json(response)
+        self.assertIn('No valid JSON found', str(ctx.exception))
+
+    def test_path_to_resource_url_repository(self) -> None:
+        """Test converting repository path to resource URL."""
+        path = self.temp_path / 'repository' / 'src' / 'main.py'
+        result = utils.path_to_resource_url(self.context, path)
+        self.assertEqual(
+            result, models.ResourceUrl('repository:///src/main.py')
+        )
+
+    def test_path_to_resource_url_workflow(self) -> None:
+        """Test converting workflow path to resource URL."""
+        path = self.temp_path / 'workflow' / 'template.j2'
+        result = utils.path_to_resource_url(self.context, path)
+        self.assertEqual(result, models.ResourceUrl('workflow:///template.j2'))
+
+    def test_path_to_resource_url_extracted(self) -> None:
+        """Test converting extracted path to resource URL."""
+        path = self.temp_path / 'extracted' / 'data.json'
+        result = utils.path_to_resource_url(self.context, path)
+        self.assertEqual(result, models.ResourceUrl('extracted:///data.json'))
+
+    def test_path_to_resource_url_file(self) -> None:
+        """Test converting file path to resource URL."""
+        path = self.temp_path / 'other.txt'
+        result = utils.path_to_resource_url(self.context, path)
+        self.assertEqual(result, models.ResourceUrl('file:///other.txt'))
+
+    def test_path_to_resource_url_from_string(self) -> None:
+        """Test converting string path to resource URL."""
+        path_str = str(self.temp_path / 'repository' / 'file.py')
+        result = utils.path_to_resource_url(self.context, path_str)
+        self.assertEqual(result, models.ResourceUrl('repository:///file.py'))
+
+    def test_python_init_file_path_hatch(self) -> None:
+        """Test finding __init__.py with Hatch configuration."""
+        # Create pyproject.toml with Hatch config
+        repo_path = self.temp_path / 'repository'
+        repo_path.mkdir()
+        pyproject_path = repo_path / 'pyproject.toml'
+        pyproject_content = """
+[tool.hatch.build.targets.wheel]
+packages = ["mypackage"]
+"""
+        pyproject_path.write_text(pyproject_content)
+
+        result = utils.python_init_file_path(self.context)
+
+        self.assertEqual(
+            result, models.ResourceUrl('repository:///mypackage/__init__.py')
+        )
+
+    def test_python_init_file_path_poetry(self) -> None:
+        """Test finding __init__.py with Poetry configuration."""
+        # Create pyproject.toml with Poetry config
+        repo_path = self.temp_path / 'repository'
+        repo_path.mkdir()
+        pyproject_path = repo_path / 'pyproject.toml'
+        pyproject_content = """
+[tool.poetry]
+packages = [{include = "my_lib"}]
+"""
+        pyproject_path.write_text(pyproject_content)
+
+        result = utils.python_init_file_path(self.context)
+
+        self.assertEqual(
+            result, models.ResourceUrl('repository:///my_lib/__init__.py')
+        )
+
+    def test_python_init_file_path_setuptools(self) -> None:
+        """Test finding __init__.py with Setuptools configuration."""
+        # Create pyproject.toml with Setuptools config
+        repo_path = self.temp_path / 'repository'
+        repo_path.mkdir()
+        pyproject_path = repo_path / 'pyproject.toml'
+        pyproject_content = """
+[tool.setuptools]
+packages = ["my.package"]
+"""
+        pyproject_path.write_text(pyproject_content)
+
+        result = utils.python_init_file_path(self.context)
+
+        self.assertEqual(
+            result, models.ResourceUrl('repository:///my/package/__init__.py')
+        )
+
+    def test_python_init_file_path_fallback_src(self) -> None:
+        """Test fallback finding __init__.py in src/ directory."""
+        # Create __init__.py in src/mypackage/
+        repo_path = self.temp_path / 'repository'
+        src_path = repo_path / 'src' / 'mypackage'
+        src_path.mkdir(parents=True)
+        (src_path / '__init__.py').write_text('')
+
+        result = utils.python_init_file_path(self.context)
+
+        self.assertEqual(
+            result,
+            models.ResourceUrl('repository:///src/mypackage/__init__.py'),
+        )
+
+    def test_python_init_file_path_fallback_root(self) -> None:
+        """Test fallback finding __init__.py in root directory."""
+        # Create __init__.py in mypackage/ (no src/)
+        repo_path = self.temp_path / 'repository'
+        pkg_path = repo_path / 'mypackage'
+        pkg_path.mkdir(parents=True)
+        (pkg_path / '__init__.py').write_text('')
+
+        result = utils.python_init_file_path(self.context)
+
+        self.assertEqual(
+            result, models.ResourceUrl('repository:///mypackage/__init__.py')
+        )
+
+    def test_python_init_file_path_no_init_raises(self) -> None:
+        """Test that missing __init__.py raises RuntimeError."""
+        # Create empty repository directory
+        repo_path = self.temp_path / 'repository'
+        repo_path.mkdir()
+
+        with self.assertRaises(RuntimeError) as ctx:
+            utils.python_init_file_path(self.context)
+        self.assertIn('Could not find __init__.py', str(ctx.exception))
+
 
 if __name__ == '__main__':
     unittest.main()
