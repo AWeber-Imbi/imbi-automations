@@ -303,7 +303,7 @@ class Automation(mixins.WorkflowLoggerMixin):
         try:
             github_repository = await self._get_github_repository(project)
             self._log_verbose_info(
-                'Processing %s (%i)', project.name, project.id
+                'Processing Project %i - %s', project.id, project.slug
             )
 
             success = await self.workflow_engine.execute(
