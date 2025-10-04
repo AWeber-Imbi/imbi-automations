@@ -81,9 +81,11 @@ class ShellAction(mixins.WorkflowLoggerMixin):
 
         """
         # Render command if it contains templating
-        command_str = self._render_command(action.command, self.context)
+        command_str = self._render_command(action, self.context)
 
-        self.logger.debug('Executing shell command: %s', command_str)
+        self.logger.debug(
+            '%s executing shell command: %s', action.name, command_str
+        )
 
         # Set working directory using resolve_path
         cwd = utils.resolve_path(self.context, action.working_directory)
@@ -104,28 +106,45 @@ class ShellAction(mixins.WorkflowLoggerMixin):
             stderr_str = stderr.decode('utf-8') if stderr else ''
 
             self.logger.debug(
-                'Shell command completed with exit code %d', process.returncode
+                '%s %s shell command completed with exit code %d',
+                self.context.imbi_project.name,
+                action.name,
+                process.returncode,
             )
 
             if stdout_str:
-                self.logger.debug('Command stdout: %s', stdout_str)
+                self.logger.debug(
+                    '%s %s command stdout: %s',
+                    self.context.imbi_project.name,
+                    action.name,
+                    stdout_str,
+                )
             if stderr_str:
-                self.logger.debug('Command stderr: %s', stderr_str)
+                self.logger.debug(
+                    '%s %s command stderr: %s',
+                    self.context.imbi_project.name,
+                    action.name,
+                    stderr_str,
+                )
 
             if process.returncode != 0:
                 error_output = stderr_str if stderr_str else stdout_str
                 if action.ignore_errors:
-                    self.logger.info(
-                        'Shell command failed with exit code %d (ignored)\n'
+                    self.logger.debug(
+                        '%s %s shell command failed with exit %d (ignored)\n'
                         'Command: %s\nOutput: %s',
+                        self.context.imbi_project.name,
+                        action.name,
                         process.returncode,
                         command_str,
                         error_output,
                     )
                 else:
                     self.logger.error(
-                        'Shell command failed with exit code %d\n'
+                        '%s %s shell command failed with exit %d\n'
                         'Command: %s\nOutput: %s',
+                        self.context.imbi_project.name,
+                        action.name,
                         process.returncode,
                         command_str,
                         error_output,
@@ -144,21 +163,28 @@ class ShellAction(mixins.WorkflowLoggerMixin):
             raise RuntimeError(f'Command not found: {command_str}') from exc
 
     def _render_command(
-        self, command: str, context: models.WorkflowContext
+        self,
+        action: models.WorkflowShellAction,
+        context: models.WorkflowContext,
     ) -> str:
         """Render command template if it contains Jinja2 syntax.
 
         Args:
-            command: Command string that may contain templates
+            action: The action the command is being rendered for
             context: Workflow context for template variables
 
         Returns:
             Rendered command string
 
         """
-        if prompts.has_template_syntax(command):
-            self.logger.debug('Rendering templated command: %s', command)
-            return prompts.render(
-                context, template=command, **context.model_dump()
+        if prompts.has_template_syntax(action.command):
+            self.logger.debug(
+                '%s %s rendering templated command: %s',
+                self.context.imbi_project.name,
+                action.name,
+                action.command,
             )
-        return command
+            return prompts.render(
+                context, template=action.command, **context.model_dump()
+            )
+        return action.command
