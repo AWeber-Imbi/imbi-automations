@@ -4,7 +4,7 @@ import pathlib
 import re
 import shutil
 
-from imbi_automations import mixins, models, utils
+from imbi_automations import mixins, models, prompts, utils
 
 
 class FileActions(mixins.WorkflowLoggerMixin):
@@ -57,9 +57,10 @@ class FileActions(mixins.WorkflowLoggerMixin):
 
     async def _execute_append(self, action: models.WorkflowFileAction) -> None:
         """Execute append file action."""
-        file_path = utils.resolve_path(self.context, action.path)
-
-        self._log_verbose_info('Appending to file: %s', file_path)
+        file_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.path)
+        )
+        self.logger.debug('%s appending to file: %s', action.name, action.path)
 
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -71,25 +72,40 @@ class FileActions(mixins.WorkflowLoggerMixin):
             else:
                 f.write(action.content)
 
-        self._log_verbose_info('Successfully appended to %s', file_path)
+        self._log_verbose_info('%s appended to %s', action.name, action.path)
 
     async def _execute_copy(self, action: models.WorkflowFileAction) -> None:
         """Execute copy file action with glob pattern support."""
-        source_path = utils.resolve_path(self.context, action.source)
-        dest_path = utils.resolve_path(self.context, action.destination)
+        self.logger.debug(
+            '%s copying %s to %s',
+            action.name,
+            action.source,
+            action.destination,
+        )
+        source_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.source)
+        )
+        dest_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.destination)
+        )
 
         # Check if source contains glob patterns
         if any(char in str(source_path) for char in ['*', '?', '[']):
             await self._execute_copy_glob(source_path, dest_path)
         else:
             await self._execute_copy_single(source_path, dest_path)
+        self._log_verbose_info(
+            '%s copied from %s to %s',
+            action.name,
+            utils.path_to_resource_url(self.context, source_path),
+            utils.path_to_resource_url(self.context, dest_path),
+        )
 
+    @staticmethod
     async def _execute_copy_single(
-        self, source_path: pathlib.Path, dest_path: pathlib.Path
+        source_path: pathlib.Path, dest_path: pathlib.Path
     ) -> None:
         """Copy a single file or directory."""
-        self.logger.debug('Copying %s to %s', source_path, dest_path)
-
         if not source_path.exists():
             raise RuntimeError(f'Source file does not exist: {source_path}')
 
@@ -105,10 +121,6 @@ class FileActions(mixins.WorkflowLoggerMixin):
                 f'Source path is neither file nor directory: {source_path}'
             )
 
-        self.logger.debug(
-            'Successfully copied %s to %s', source_path, dest_path
-        )
-
     async def _execute_copy_glob(
         self, source: pathlib.Path, dest_path: pathlib.Path
     ) -> None:
@@ -120,8 +132,6 @@ class FileActions(mixins.WorkflowLoggerMixin):
         else:
             base_path = self.context.working_directory
             pattern = str(source)
-
-        self._log_verbose_info('Copying files matching pattern: %s', pattern)
 
         # Find matching files
         if pattern.startswith('**/'):
@@ -136,17 +146,15 @@ class FileActions(mixins.WorkflowLoggerMixin):
         dest_path.mkdir(parents=True, exist_ok=True)
 
         # Copy each matching file
-        copied_count = 0
         for match in matches:
             if match.is_file():
                 dest_file = dest_path / match.name
                 shutil.copy2(match, dest_file)
-                self.logger.debug('Copied %s to %s', match, dest_file)
-                copied_count += 1
-
-        self.logger.debug(
-            'Successfully copied %d files to %s', copied_count, dest_path
-        )
+                self.logger.debug(
+                    'Copied %s to %s',
+                    utils.path_to_resource_url(self.context, match),
+                    utils.path_to_resource_url(self.context, dest_file),
+                )
 
     async def _execute_delete(self, action: models.WorkflowFileAction) -> None:
         """Execute delete file action."""
@@ -157,17 +165,25 @@ class FileActions(mixins.WorkflowLoggerMixin):
 
     async def _delete_by_path(self, action: models.WorkflowFileAction) -> None:
         """Delete a specific file or directory by path."""
-        file_path = utils.resolve_path(self.context, action.path)
-        self._log_verbose_info('Deleting file/directory: %s', file_path)
+        file_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.path)
+        )
+        self.logger.debug('%s deleting file: %s', action.name, action.path)
 
         if file_path.exists():
             if file_path.is_file():
                 file_path.unlink()
             elif file_path.is_dir():
                 shutil.rmtree(file_path)
-            self._log_verbose_info('Successfully deleted %s', file_path)
+            self._log_verbose_info(
+                '%s deleted %s',
+                utils.path_to_resource_url(self.context, file_path),
+            )
         else:
-            self.logger.warning('File to delete does not exist: %s', file_path)
+            self.logger.warning(
+                '%s did not find file to delete: %s',
+                utils.path_to_resource_url(self.context, file_path),
+            )
 
     async def _delete_by_pattern(
         self, action: models.WorkflowFileAction
@@ -176,7 +192,9 @@ class FileActions(mixins.WorkflowLoggerMixin):
         base_path = self.context.working_directory
 
         self._log_verbose_info(
-            'Deleting files matching pattern: %s', action.pattern
+            '%s deleting files matching pattern: %s',
+            action.name,
+            action.pattern,
         )
 
         # Compile pattern if it's a string
@@ -197,15 +215,23 @@ class FileActions(mixins.WorkflowLoggerMixin):
                     deleted_count += 1
 
         self._log_verbose_info(
-            'Deleted %d files matching pattern', deleted_count
+            '%s deleted %d files matching pattern', action.name, deleted_count
         )
 
     async def _execute_move(self, action: models.WorkflowFileAction) -> None:
         """Execute move file action."""
-        source_path = utils.resolve_path(self.context, action.source)
-        dest_path = utils.resolve_path(self.context, action.destination)
-
-        self._log_verbose_info('Moving %s to %s', source_path, dest_path)
+        self.logger.debug(
+            '%s copying %s to %s',
+            action.name,
+            action.source,
+            action.destination,
+        )
+        source_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.source)
+        )
+        dest_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.destination)
+        )
 
         if not source_path.exists():
             raise RuntimeError(f'Source file does not exist: {source_path}')
@@ -216,15 +242,26 @@ class FileActions(mixins.WorkflowLoggerMixin):
         shutil.move(str(source_path), str(dest_path))
 
         self._log_verbose_info(
-            'Successfully moved %s to %s', source_path, dest_path
+            '%s moved %s to %s',
+            action.name,
+            utils.path_to_resource_url(self.context, source_path),
+            utils.path_to_resource_url(self.context, dest_path),
         )
 
     async def _execute_rename(self, action: models.WorkflowFileAction) -> None:
         """Execute rename file action."""
-        source_path = utils.resolve_path(self.context, action.source)
-        dest_path = utils.resolve_path(self.context, action.destination)
-
-        self._log_verbose_info('Renaming %s to %s', source_path, dest_path)
+        self.logger.debug(
+            '%s renaming %s to %s',
+            action.name,
+            action.source,
+            action.destination,
+        )
+        source_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.source)
+        )
+        dest_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.destination)
+        )
 
         if not source_path.exists():
             raise RuntimeError(f'Source file does not exist: {source_path}')
@@ -235,14 +272,18 @@ class FileActions(mixins.WorkflowLoggerMixin):
         source_path.rename(dest_path)
 
         self._log_verbose_info(
-            'Successfully renamed %s to %s', source_path, dest_path
+            '%s renamed %s to %s',
+            action.name,
+            utils.path_to_resource_url(self.context, source_path),
+            utils.path_to_resource_url(self.context, dest_path),
         )
 
     async def _execute_write(self, action: models.WorkflowFileAction) -> None:
         """Execute write file action."""
-        file_path = utils.resolve_path(self.context, action.path)
-
-        self._log_verbose_info('Writing to file: %s', file_path)
+        file_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.path)
+        )
+        self.logger.debug('%s writing to file: %s', action.name, action.path)
 
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -255,4 +296,4 @@ class FileActions(mixins.WorkflowLoggerMixin):
             with file_path.open('w', encoding=action.encoding) as f:
                 f.write(action.content)
 
-        self._log_verbose_info('Successfully wrote to %s', file_path)
+        self._log_verbose_info('%s wrote to %s', action.name, action.path)
