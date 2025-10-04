@@ -37,9 +37,6 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
         destination_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.destination)
         )
-        self.logger.debug(
-            'Dest Path: %r %r', action.destination, destination_path
-        )
         if not source_path.exists():
             raise RuntimeError(
                 f'Template source path does not exist: {source_path}'
@@ -55,7 +52,8 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             with destination_path.open('w', encoding='utf-8') as fh:
                 fh.write(prompts.render(self.context, source_path))
             self._log_verbose_info(
-                '%s rendered template from %s to %s',
+                '%s %s rendered template from %s to %s',
+                self.context.imbi_project.slug,
                 action.name,
                 utils.path_to_resource_url(self.context, source_path),
                 utils.path_to_resource_url(self.context, destination_path),
