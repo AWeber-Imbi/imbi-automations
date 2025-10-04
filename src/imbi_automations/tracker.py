@@ -40,7 +40,6 @@ class Tracker:
         ]
         self.claude['input_tokens'] += result.usage['input_tokens']
         self.claude['output_tokens'] += result.usage['output_tokens']
-        self.claude['server_tool_use'] += result.usage['server_tool_use']
         self.claude[f'service_tier_{result.usage["service_tier"]}'] += 1
         for key in result.usage['server_tool_use']:
             self.claude[f'cserver_tool_use_{key}'] += result.usage[
