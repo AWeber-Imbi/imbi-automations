@@ -31,18 +31,20 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             RuntimeError: If template rendering fails
 
         """
-        source_path = utils.resolve_path(self.context, action.source_path)
-        destination_path = utils.resolve_path(
-            self.context, action.destination_path
+        source_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.source)
         )
-
+        destination_path = utils.resolve_path(
+            self.context, prompts.render_path(self.context, action.destination)
+        )
+        self.logger.debug(
+            'Dest Path: %r %r', action.destination, destination_path
+        )
         if not source_path.exists():
             raise RuntimeError(
                 f'Template source path does not exist: {source_path}'
             )
-
-        if source_path.is_file():
-            # Single file template
+        if source_path.is_file():  # Single file template
             self.logger.debug(
                 'Rendering template from %s to %s',
                 source_path,

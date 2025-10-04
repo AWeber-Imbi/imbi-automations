@@ -262,10 +262,88 @@ def extract_json(response: str) -> dict[str, typing.Any]:
     raise ValueError(f'No valid JSON found in response: {response[:200]}...')
 
 
-def extract_package_name_from_pyproject_toml(path: pathlib.Path) -> str:
+def _read_pyproject_toml(
+    context: models.WorkflowContext,
+    path: models.ResourceUrl | str | None = None,
+) -> dict[str, typing.Any]:
+    """Read a pyproject.toml file from the workflow context."""
+    pyproject = resolve_path(context, path or 'repository:///pyproject.toml')
+    if not pyproject.exists():
+        raise FileNotFoundError('No pyproject.toml found')
+    elif not pyproject.is_file():
+        raise ValueError(f'Path is not a file: {pyproject}')
+    with pyproject.open('rb') as f:
+        return tomllib.load(f)
+
+
+def extract_package_name_from_pyproject(
+    context: models.WorkflowContext,
+    path: models.ResourceUrl | str | None = None,
+) -> str:
     """Extract the Python package name from a pyproject.toml file."""
-    if not path.is_file():
-        raise ValueError(f'Path is not a file: {path}')
-    with path.open('r') as f:
-        data = load_toml(f)
-    return data['package']['name']
+    try:
+        return _read_pyproject_toml(context, path)['package']['name']
+    except (FileNotFoundError, KeyError) as err:
+        raise RuntimeError(f'Failed to extract package name: {err}') from err
+
+
+def _find_init_py_from_context(
+    context: models.WorkflowContext,
+) -> models.ResourceUrl:
+    """Find the __init__.py file in the repository checkout."""
+    repo_path = pathlib.Path(context.working_directory) / 'repository'
+    for base in [repo_path / 'src', repo_path]:
+        inits = [
+            p for p in base.glob('*/__init__.py') if 'test' not in p.parts
+        ]
+        if inits:
+            relative_path = pathlib.Path(inits[0]).relative_to(repo_path)
+            path = models.ResourceUrl(f'repository:///{relative_path}')
+            LOGGER.debug('Found __init__.py file: %s', path)
+            return path
+    raise RuntimeError('Could not find __init__.py file in repository')
+
+
+def python_init_file_path(
+    context: models.WorkflowContext,
+) -> models.ResourceUrl:
+    """Return the path to a project's `__init__.py` file in the repository
+    checkout.
+
+    """
+    try:
+        pyproject = _read_pyproject_toml(context)
+    except (FileNotFoundError, KeyError) as err:
+        LOGGER.debug('Failed to read pyproject.toml: %s', err)
+        pyproject = {}
+
+    # Hatch
+    if 'tool' in pyproject and 'hatch' in pyproject['tool']:
+        build_pyproject = pyproject['tool']['hatch'].get('build', {})
+        targets = build_pyproject.get('targets', {})
+        wheel_pyproject = targets.get('wheel', {})
+        packages = wheel_pyproject.get('packages', [])
+        if packages:
+            LOGGER.debug('Hatch package path: %s', packages[0])
+            return models.ResourceUrl(
+                f'repository:///{packages[0]}/__init__.py'
+            )
+
+    # Poetry
+    elif 'tool' in pyproject and 'poetry' in pyproject['tool']:
+        packages = pyproject['tool']['poetry'].get('packages', [])
+        if packages:
+            pkg_path = packages[0].get('include', '')
+            LOGGER.debug('Poetry package path: %s', pkg_path)
+            return models.ResourceUrl(f'repository:///{pkg_path}/__init__.py')
+
+    # Setuptools
+    elif 'tool' in pyproject and 'setuptools' in pyproject['tool']:
+        packages = pyproject['tool']['setuptools'].get('packages', [])
+        if packages:
+            pkg_path = packages[0].replace('.', '/')
+            LOGGER.debug('Setuptools package path: %s', pkg_path)
+            return models.ResourceUrl(f'repository:///{pkg_path}/__init__.py')
+
+    # Fallback: heuristics
+    return _find_init_py_from_context(context)

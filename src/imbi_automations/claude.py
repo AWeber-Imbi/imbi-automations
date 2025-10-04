@@ -245,7 +245,9 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         return types.AgentDefinition(
             description=frontmatter.get('description', ''),
-            prompt=prompts.render(self.context, prompt, **self.prompt_kwargs),
+            prompt=prompts.render(
+                self.context, template=prompt, **self.prompt_kwargs
+            ),
             tools=tools,
             model=frontmatter.get('model', 'inherit'),
         )

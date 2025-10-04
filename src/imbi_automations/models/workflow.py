@@ -407,8 +407,8 @@ class WorkflowTemplateAction(WorkflowAction):
     """
 
     type: typing.Literal['template'] = 'template'
-    source_path: ResourceUrl
-    destination_path: ResourceUrl
+    source: ResourceUrl | str
+    destination: ResourceUrl | str
 
 
 class WorkflowUtilityCommands(enum.StrEnum):

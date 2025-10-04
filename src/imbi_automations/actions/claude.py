@@ -7,7 +7,7 @@ AI-powered code transformations.
 
 import enum
 import pathlib
-from email import utils
+from email import utils as email_utils
 
 from imbi_automations import claude, mixins, models, prompts
 
@@ -38,7 +38,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self.configuration = configuration
         self.context = context
         self.last_error: models.AgentRun | None = None
-        commit_author = utils.parseaddr(self.configuration.commit_author)
+        commit_author = email_utils.parseaddr(self.configuration.commit_author)
         self.prompt_kwargs = {
             'commit_author': self.configuration.commit_author,
             'commit_author_name': commit_author[0],
@@ -147,7 +147,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             data = dict(self.prompt_kwargs)
             data.update(self.context.model_dump())
             data.update({'action': action.model_dump()})
-            for key in {'source', 'destination'}:
+            for key in {'source', 'destination', 'template'}:
                 if key in data:
                     del data[key]
             prompt += prompts.render(self.context, prompt_file, **data)

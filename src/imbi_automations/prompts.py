@@ -14,10 +14,13 @@ import pydantic
 
 from imbi_automations import models, utils
 
+LOGGER = logging.getLogger(__name__)
+
 
 def render(
     context: models.WorkflowContext | None = None,
     source: models.ResourceUrl | pathlib.Path | str | None = None,
+    template: str | None = None,
     **kwargs: typing.Any,
 ) -> str | bytes:
     """Render a Jinja2 template with workflow context and variables.
@@ -25,6 +28,7 @@ def render(
     Args:
         context: Workflow context for global variables and path resolution.
         source: Template source as URL, path, or string content.
+        template: Template string to use instead of a source file.
         **kwargs: Additional variables to pass to template rendering.
 
     Returns:
@@ -33,32 +37,45 @@ def render(
     Raises:
         ValueError: If source is not provided.
     """
-    if not source:
-        raise ValueError('source is required')
+    if not source and not template:
+        raise ValueError('source or template is required')
+    if source and template:
+        raise ValueError('You can not specify both source and template')
     elif isinstance(source, pydantic.AnyUrl):
         source = utils.resolve_path(context, source)
+    if source and not isinstance(source, pathlib.Path):
+        raise RuntimeError(f'source is not a Path object: {type(source)}')
+
+    LOGGER.debug('Template: %s', template)
 
     env = jinja2.Environment(
         autoescape=False,  # noqa: S701
         undefined=jinja2.StrictUndefined,
     )
     if context:
-        env.globals['extract_image_from_dockerfile'] = (
-            lambda dockerfile: utils.extract_image_from_dockerfile(
-                context, dockerfile
-            )
+        env.globals.update(
+            {
+                'extract_image_from_dockerfile': (
+                    lambda dockerfile: utils.extract_image_from_dockerfile(
+                        context, dockerfile
+                    )
+                ),
+                'extract_package_name_from_pyproject': (
+                    lambda path: utils.extract_package_name_from_pyproject(
+                        context, path
+                    )
+                ),
+                'python_init_file_path': (
+                    lambda: utils.python_init_file_path(context)
+                ),
+            }
         )
-        env.globals['extract_package_name_from_pyproject_toml'] = (
-            lambda path: utils.extract_package_name_from_pyproject_toml(
-                utils.resolve_path(
-                    context, path or 'repository:///pyproject.toml'
-                )
-            )
-        )
-    if isinstance(source, pathlib.Path):
-        source = source.read_text(encoding='utf-8')
-    template = env.from_string(source)
-    return template.render(kwargs)
+        kwargs.update(context.model_dump())
+
+    if isinstance(source, pathlib.Path) and not template:
+        template = source.read_text(encoding='utf-8')
+    LOGGER.debug('Template: %s', template)
+    return env.from_string(template).render(**kwargs)
 
 
 def render_file(
@@ -70,6 +87,14 @@ def render_file(
     """Render a file from source to destination."""
     logging.info('Rendering %s to %s', source, destination)
     destination.write_text(render(context, source, **kwargs), encoding='utf-8')
+
+
+def render_path(
+    context: models.WorkflowContext, path: str | pydantic.AnyUrl
+) -> pydantic.AnyUrl:
+    if has_template_syntax(str(path)):
+        return models.ResourceUrl(render(context, template=str(path)))
+    return path
 
 
 def has_template_syntax(value: str) -> bool:
