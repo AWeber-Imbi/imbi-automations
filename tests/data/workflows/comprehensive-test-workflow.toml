@@ -222,8 +222,8 @@ timeout = 600
 [[actions]]
 name = "test-template-action"
 type = "template"
-source_path = "templates/docker/Dockerfile.j2"
-destination_path = "Dockerfile"
+source = "templates/docker/Dockerfile.j2"
+destination = "Dockerfile"
 
 # 9. Utility Actions - all command types
 
