@@ -301,7 +301,7 @@ async def commit_changes(
     if returncode != 0:
         # Check if it's just "nothing to commit"
         if 'nothing to commit' in stderr or 'nothing to commit' in stdout:
-            LOGGER.info('No changes to commit')
+            LOGGER.debug('No changes to commit')
             return ''
 
         raise RuntimeError(
