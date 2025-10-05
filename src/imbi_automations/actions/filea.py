@@ -29,7 +29,6 @@ class FileActions(mixins.WorkflowLoggerMixin):
         """Execute a file action based on the command type.
 
         Args:
-            context: Workflow context
             action: File action containing the command and parameters
 
         Raises:
