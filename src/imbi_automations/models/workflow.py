@@ -29,7 +29,13 @@ ResourceUrl: type[AnyUrl] = typing.Annotated[
     pydantic.AnyUrl,
     pydantic.BeforeValidator(_ensure_file_scheme),
     pydantic_core.core_schema.url_schema(
-        allowed_schemes=['extracted', 'repository', 'workflow', 'file']
+        allowed_schemes=[
+            'extracted',
+            'repository',
+            'workflow',
+            'file',
+            'external',
+        ]
     ),
 ]
 
@@ -645,3 +651,4 @@ class WorkflowContext(pydantic.BaseModel):
     imbi_project: imbi.ImbiProject
     working_directory: pathlib.Path | None = None
     starting_commit: str | None = None
+    has_repository_changes: bool = False

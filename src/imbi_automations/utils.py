@@ -140,14 +140,16 @@ def resolve_path(
         path_component = uri.path.lstrip('/')
 
     match uri.scheme:
+        case 'external':  # External to working directory
+            return pathlib.Path('/' + path_component)
         case 'extracted':
             return context.working_directory / str(uri.scheme) / path_component
+        case 'file':
+            return context.working_directory / path_component
         case 'repository':
             return context.working_directory / str(uri.scheme) / path_component
         case 'workflow':
             return context.working_directory / str(uri.scheme) / path_component
-        case 'file':
-            return context.working_directory / path_component
         case '':
             return context.working_directory / path_component
         case _:
@@ -293,7 +295,10 @@ def path_to_resource_url(
     """Convert a path to a relative URI."""
     if isinstance(path, str):
         path = pathlib.Path(path)
-    relative_path = path.relative_to(context.working_directory)
+    try:
+        relative_path = path.relative_to(context.working_directory)
+    except ValueError:
+        return models.ResourceUrl(f'external://{path}')
     for resource_type in ['extracted', 'repository', 'workflow']:
         if relative_path.parts[0] == resource_type:
             # Join remaining path parts (everything after the resource type)

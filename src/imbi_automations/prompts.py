@@ -8,6 +8,7 @@ workflow context support.
 import logging
 import pathlib
 import typing
+from urllib import parse
 
 import jinja2
 import pydantic
@@ -89,10 +90,13 @@ def render_file(
 
 
 def render_path(
-    context: models.WorkflowContext, path: str | pydantic.AnyUrl
+    context: models.WorkflowContext, path: pydantic.AnyUrl
 ) -> pydantic.AnyUrl:
-    if has_template_syntax(str(path)):
-        return models.ResourceUrl(render(context, template=str(path)))
+    path_str = parse.unquote(path.path)
+    if has_template_syntax(path_str):
+        value = render(context, template=path_str)
+        LOGGER.debug('Rendered path: %s', value)
+        return models.ResourceUrl(f'{path.scheme}://{value}')
     return path
 
 
