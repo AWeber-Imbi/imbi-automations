@@ -176,11 +176,12 @@ destination = "repository/config/new-config.yml"
 ```
 
 **Important Notes:**
-- `source` and `destination` are relative to working directory
-- Use `workflow/` prefix for files in your workflow directory
-- Use `repository/` prefix for files in the cloned git repository
+- `source` and `destination` use ResourceUrl schemes (e.g., `repository:///`, `workflow:///`)
+- Supported schemes: `repository:///`, `workflow:///`, `extracted:///`, `file:///`, `external:///`
+- `external:///` scheme allows writing to absolute paths outside working directory (for exports/extracts)
 - Glob patterns supported: `*`, `?`, `[...]`, `**/` for recursive
 - For glob patterns, destination must be a directory
+- When using `external:///`, set `committable = false` (no repository changes)
 
 #### Template Action Usage
 
@@ -485,6 +486,8 @@ The system includes 20 pre-built workflows organized by category:
 - **Async Optimization**: Full async/await implementation with concurrency controls
 - **Memory Optimization**: LRU caching for expensive operations
 - **Type Safety**: Comprehensive type hints and Pydantic models throughout
+- **External Scheme**: Added `external:///` ResourceUrl scheme for writing files outside working directory
+- **Repository Change Tracking**: Workflow engine tracks repository changes, skips push/PR when no changes made
 
 ### Future Enhancement Areas
 - **Transaction Rollback**: Atomic workflow operations with rollback capabilities
@@ -566,3 +569,38 @@ Shell actions use `subprocess_shell` instead of `subprocess_exec` to enable:
 - **Maintainability**: Cleaner separation with IMC handling all Imbi metadata
 - **Type Safety**: Comprehensive validation at parse time prevents runtime errors
 - **Performance**: 15-minute cache reduces API calls, subprocess_shell enables shell features
+
+### External Scheme and Repository Change Tracking (October 2025)
+
+**External Scheme** (`external:///`):
+- Allows writing files to absolute paths outside the temporary working directory
+- Useful for extracting configuration files, building collections, exporting reports
+- Example: `external:///tmp/extracted-configs/{{ imbi_project.slug }}/config.yaml`
+- Template variables are URL-decoded before rendering (e.g., `%7B%7B` → `{{`)
+- Set `committable = false` for actions using external scheme (no repo changes)
+
+**Repository Change Tracking**:
+- `WorkflowContext.has_repository_changes` tracks if any commits were made
+- `Committer.commit()` returns `bool` indicating if a commit was created
+- Workflow engine only pushes/creates PR when `has_repository_changes = True`
+- Prevents unnecessary git operations for extract-only workflows
+- Skips failed push attempts when no repository modifications occurred
+
+**Usage Example**:
+```toml
+# Extract configuration files for analysis
+[filter]
+project_types = ["apis", "consumers"]
+requires_github_identifier = true
+
+[[conditions]]
+remote_file_exists = "config.yaml"
+
+[[actions]]
+name = "extract-config"
+type = "file"
+command = "copy"
+source = "repository:///config.yaml"
+destination = "external:///tmp/project-configs/{{ imbi_project.slug }}/config.yaml"
+committable = false  # No repository changes, so don't try to commit
+```

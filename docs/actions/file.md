@@ -328,6 +328,9 @@ encoding = "utf-16"
 
 ## Path Resolution
 
+!!! info "Comprehensive Path Schemes Documentation"
+    For detailed information about all path schemes, including usage patterns, best practices, and troubleshooting, see the [Path Schemes](../path-schemes.md) guide.
+
 File actions support all ResourceUrl schemes:
 
 | Scheme | Base Directory | Use Case |
@@ -336,6 +339,7 @@ File actions support all ResourceUrl schemes:
 | `repository:///` | Cloned repository | Repository files |
 | `workflow:///` | Workflow resources | Template files |
 | `extracted:///` | Docker extracts | Extracted files |
+| `external:///` | Absolute path | Files outside working directory |
 
 **Examples:**
 
@@ -361,6 +365,14 @@ command = "copy"
 source = "extracted:///configs/app.yaml"
 destination = "repository:///config/app.yaml"
 
+# Repository to external location (extract/export files)
+[[actions]]
+type = "file"
+command = "copy"
+source = "repository:///config.yaml"
+destination = "external:///tmp/project-configs/{{ imbi_project.slug }}/config.yaml"
+committable = false
+
 # Simple paths (relative to working directory)
 [[actions]]
 type = "file"
@@ -368,6 +380,14 @@ command = "write"
 path = "temp-file.txt"  # Same as file:///temp-file.txt
 content = "temporary data"
 ```
+
+**Note:** The `external:///` scheme allows writing files to absolute paths outside the temporary working directory. This is useful for:
+- Extracting configuration files for analysis
+- Exporting reports or artifacts
+- Creating backups in known locations
+- Building collections of files from multiple repositories
+
+When using `external:///`, set `committable = false` as these operations don't modify the repository.
 
 ## Common Patterns
 

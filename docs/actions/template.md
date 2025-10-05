@@ -14,6 +14,9 @@ source_path = "template-file-or-directory"
 destination_path = "output-location"
 ```
 
+!!! info "Path Schemes"
+    Template actions use [path schemes](../path-schemes.md) for `source_path` and `destination_path`. See the [Path Schemes guide](../path-schemes.md) for details on all available schemes.
+
 ## Fields
 
 ### source_path (required)

@@ -13,6 +13,7 @@ nav:
     - Configuration: workflow-configuration.md
     - Filters: workflow-filters.md
     - Conditions: workflow-conditions.md
+    - Path Schemes: path-schemes.md
     - Actions:
       - actions/index.md
       - Callable: actions/callable.md
