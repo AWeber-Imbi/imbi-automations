@@ -57,7 +57,8 @@ def report() -> None:
         name = key.replace('_', ' ').title()
         sys.stdout.write(f'{name}: {obj.counter[key]}\n')
 
-    sys.stdout.write('\nClaude Usage Details:\n')
-    for key in sorted(obj.claude):
-        name = key.replace('_', ' ').title()
-        sys.stdout.write(f'{name}: {obj.claude[key]}\n')
+    if obj.claude:
+        sys.stdout.write('\nClaude Usage Details:\n')
+        for key in sorted(obj.claude):
+            name = key.replace('_', ' ').title()
+            sys.stdout.write(f'{name}: {obj.claude[key]}\n')
