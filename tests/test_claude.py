@@ -405,8 +405,12 @@ class ClaudeTestCase(base.AsyncTestCase):
         self.assertEqual(mock_debug.call_count, 2)
         mock_debug.assert_has_calls(
             [
-                mock.call('%s: %s', 'Test Type', 'First message'),
-                mock.call('%s: %s', 'Test Type', 'Second message'),
+                mock.call(
+                    '%s %s: %s', 'test-project', 'Test Type', 'First message'
+                ),
+                mock.call(
+                    '%s %s: %s', 'test-project', 'Test Type', 'Second message'
+                ),
             ]
         )
 
@@ -429,7 +433,7 @@ class ClaudeTestCase(base.AsyncTestCase):
             claude_instance._log_message('Test Type', 'Simple string message')
 
         mock_debug.assert_called_once_with(
-            '%s: %s', 'Test Type', 'Simple string message'
+            '%s %s: %s', 'test-project', 'Test Type', 'Simple string message'
         )
 
     def test_log_message_with_unknown_block_type(self) -> None:

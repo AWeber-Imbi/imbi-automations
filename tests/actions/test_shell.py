@@ -257,21 +257,30 @@ class ShellTestCase(base.AsyncTestCase):
     def test_render_command_no_templating(self) -> None:
         """Test command rendering when no templating is present."""
         command = 'echo "hello world"'
-        result = self.shell_executor._render_command(command, self.context)
+        action = models.WorkflowShellAction(
+            name='test-action', command=command
+        )
+        result = self.shell_executor._render_command(action, self.context)
         self.assertEqual(result, command)
 
     def test_render_command_with_templating(self) -> None:
         """Test command rendering with Jinja2 templating."""
         command = 'echo "Project: {{ imbi_project.name }}"'
-        result = self.shell_executor._render_command(command, self.context)
+        action = models.WorkflowShellAction(
+            name='test-action', command=command
+        )
+        result = self.shell_executor._render_command(action, self.context)
         self.assertEqual(result, 'echo "Project: test-project"')
 
     def test_render_command_template_error(self) -> None:
         """Test command rendering with template error."""
         command = 'echo "{{ nonexistent.field }}"'
+        action = models.WorkflowShellAction(
+            name='test-action', command=command
+        )
 
         with self.assertRaises(jinja2.exceptions.UndefinedError):
-            self.shell_executor._render_command(command, self.context)
+            self.shell_executor._render_command(action, self.context)
 
     @mock.patch('asyncio.create_subprocess_shell')
     async def test_execute_working_directory_fallback(
