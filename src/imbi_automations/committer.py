@@ -31,21 +31,30 @@ class Committer(mixins.WorkflowLoggerMixin):
 
     async def commit(
         self, context: models.WorkflowContext, action: models.WorkflowAction
-    ) -> None:
+    ) -> bool:
+        """Commit changes for an action.
+
+        Returns:
+            True if a commit was made, False if no changes to commit
+        """
         self._set_workflow_logger(context.workflow)
         if (
             action.ai_commit
             and self.configuration.ai_commits
             and self.configuration.claude_code.enabled
         ):
-            await self._claude_commit(context, action)
+            return await self._claude_commit(context, action)
         else:
-            await self._manual_commit(context, action)
+            return await self._manual_commit(context, action)
 
     async def _claude_commit(
         self, context: models.WorkflowContext, action: models.WorkflowAction
-    ) -> None:
-        """Leverage Claude Code to commit changes."""
+    ) -> bool:
+        """Leverage Claude Code to commit changes.
+
+        Returns:
+            True if a commit was made, False if no changes to commit
+        """
         self._log_verbose_info(
             '%s %s using Claude Code to commit changes',
             context.imbi_project.slug,
@@ -66,17 +75,20 @@ class Committer(mixins.WorkflowLoggerMixin):
         if run.result == models.AgentRunResult.failure:
             for phrase in ['no changes to commit', 'working tree is clean']:
                 if phrase in (run.message or '').lower():
-                    return None
+                    return False
             raise RuntimeError(f'Claude Code commit failed: {run.message}')
-        return None
+        return True
 
     async def _manual_commit(
         self, context: models.WorkflowContext, action: models.WorkflowAction
-    ) -> None:
+    ) -> bool:
         """Fallback commit implementation without Claude.
 
         - Stages all pending changes
         - Creates a commit with required format and trailer
+
+        Returns:
+            True if a commit was made, False if no changes to commit
         """
         repo_dir = context.working_directory / 'repository'
 
@@ -113,9 +125,11 @@ class Committer(mixins.WorkflowLoggerMixin):
                     action.name,
                     commit_sha,
                 )
+                return True
             else:
                 self.logger.info(
                     '%s %s no changes to commit',
                     context.imbi_project.slug,
                     action.name,
                 )
+                return False

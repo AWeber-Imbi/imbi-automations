@@ -124,21 +124,29 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.tracker.incr(f'actions_executed_{action.type}')
 
             if action.committable:
-                await self.committer.commit(context, action)
-                self.tracker.incr('actions_committed')
+                committed = await self.committer.commit(context, action)
+                if committed:
+                    context.has_repository_changes = True
+                    self.tracker.incr('actions_committed')
 
-        if (
-            self.workflow.configuration.github.create_pull_request
-            and self.configuration.claude_code.enabled
-        ):
-            await self._create_pull_request(context)
-            self.tracker.incr('pull_requests_created')
+        if context.has_repository_changes:
+            if (
+                self.workflow.configuration.github.create_pull_request
+                and self.configuration.claude_code.enabled
+            ):
+                await self._create_pull_request(context)
+                self.tracker.incr('pull_requests_created')
+            else:
+                await git.push_changes(
+                    working_directory=context.working_directory / 'repository',
+                    remote='origin',
+                    branch='main',
+                    set_upstream=True,
+                )
         else:
-            await git.push_changes(
-                working_directory=context.working_directory / 'repository',
-                remote='origin',
-                branch='main',
-                set_upstream=True,
+            self.logger.debug(
+                '%s no repository changes to push or create PR',
+                context.imbi_project.slug,
             )
 
         working_directory.cleanup()
