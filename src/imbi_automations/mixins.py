@@ -16,7 +16,7 @@ class WorkflowLoggerMixin:
     def __init__(
         self, verbose: bool = False, *args: typing.Any, **kwargs: typing.Any
     ) -> None:
-        self.logger: logging.Logger | None = None
+        self.logger: logging.Logger = logging.getLogger(__name__)
         self.verbose = verbose
         super().__init__(*args, **kwargs)
 

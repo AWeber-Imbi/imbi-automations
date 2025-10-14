@@ -7,6 +7,7 @@ AI-powered code transformations.
 
 import enum
 import pathlib
+import typing
 from email import utils as email_utils
 
 from imbi_automations import claude, mixins, models, prompts
@@ -149,9 +150,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         return True
 
     def _get_prompt(
-        self,
-        action: models.WorkflowAction | models.WorkflowClaudeAction,
-        agent: AgentType,
+        self, action: models.WorkflowClaudeAction, agent: AgentType
     ) -> str:
         """Return the rendered prompt for the given agent."""
         prompt = f'Use the "{agent}" agent to complete the following task:\n\n'
@@ -170,7 +169,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             raise RuntimeError(f'Unknown agent: {agent}')
 
         if prompt_file.suffix == '.j2':
-            data = dict(self.prompt_kwargs)
+            data: dict[str, typing.Any] = dict(self.prompt_kwargs)
             data.update(self.context.model_dump())
             data.update({'action': action.model_dump()})
             for key in {'source', 'destination', 'template'}:

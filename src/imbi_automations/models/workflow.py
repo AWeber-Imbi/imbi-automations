@@ -156,7 +156,7 @@ class WorkflowClaudeAction(WorkflowAction):
     """
 
     type: typing.Literal['claude'] = 'claude'
-    prompt: str | None
+    prompt: str
     validation_prompt: str | None = None
     max_cycles: int = 3
     ai_commit: bool = True
@@ -649,6 +649,6 @@ class WorkflowContext(pydantic.BaseModel):
     workflow: Workflow
     github_repository: github.GitHubRepository | None = None
     imbi_project: imbi.ImbiProject
-    working_directory: pathlib.Path | None = None
+    working_directory: pathlib.Path
     starting_commit: str | None = None
     has_repository_changes: bool = False

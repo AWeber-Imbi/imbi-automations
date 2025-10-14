@@ -23,7 +23,7 @@ def render(
     source: models.ResourceUrl | pathlib.Path | str | None = None,
     template: str | None = None,
     **kwargs: typing.Any,
-) -> str | bytes:
+) -> str:
     """Render a Jinja2 template with workflow context and variables.
 
     Args:
@@ -33,7 +33,7 @@ def render(
         **kwargs: Additional variables to pass to template rendering.
 
     Returns:
-        Rendered template as string or bytes.
+        Rendered template as string.
 
     Raises:
         ValueError: If source is not provided.

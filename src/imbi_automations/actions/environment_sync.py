@@ -10,17 +10,27 @@ import typing
 
 import httpx
 
-from imbi_automations import github, models
+from imbi_automations import clients, errors, models
 
 LOGGER = logging.getLogger(__name__)
+
+
+class SyncResult(typing.TypedDict):
+    """Result dictionary from environment synchronization."""
+
+    success: bool
+    created: list[str]
+    deleted: list[str]
+    errors: list[str]
+    total_operations: int
 
 
 async def sync_project_environments(
     org: str,
     repo: str,
     imbi_environments: list[str] | str,
-    github_client: github.GitHub,
-) -> dict[str, typing.Any]:
+    github_client: clients.GitHub,
+) -> SyncResult:
     """Synchronize environments between Imbi project and GitHub repository.
 
     This function ensures that the GitHub repository environments match the
@@ -44,7 +54,7 @@ async def sync_project_environments(
         - total_operations: int - Total number of operations performed
 
     """
-    result = {
+    result: SyncResult = {
         'success': False,
         'created': [],
         'deleted': [],
@@ -106,7 +116,7 @@ async def sync_project_environments(
                 github_env_list,
             )
 
-        except models.GitHubNotFoundError:
+        except errors.GitHubNotFoundError:
             LOGGER.error(
                 'Repository %s/%s not found during environment sync', org, repo
             )
