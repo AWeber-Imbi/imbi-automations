@@ -200,6 +200,12 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         '(saved to error-dir/<workflow>/<project>-<timestamp>)',
     )
     parser.add_argument(
+        '--cache-dir',
+        type=pathlib.Path,
+        default=pathlib.Path.home() / '.cache' / 'imbi-automations',
+        help='Directory for caching Imbi metadata',
+    )
+    parser.add_argument(
         '--error-dir',
         type=pathlib.Path,
         default=pathlib.Path('./errors'),
@@ -232,7 +238,9 @@ def main() -> None:
     config = load_configuration(args.config[0])
     args.config[0].close()
 
-    # Override config with CLI args for error preservation
+    # Override config with CLI args
+    if args.cache_dir:
+        config.cache_dir = args.cache_dir
     if args.preserve_on_error:
         config.preserve_on_error = True
     if args.error_dir:
