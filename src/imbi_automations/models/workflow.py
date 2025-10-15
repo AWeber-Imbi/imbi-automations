@@ -50,14 +50,12 @@ class WorkflowFilter(pydantic.BaseModel):
     (lowercase with underscores) to match OpenSearch data format.
     """
 
-    project_ids: set[int] = pydantic.Field(default_factory=set)
-    project_types: set[str] = pydantic.Field(default_factory=set)
-    project_facts: dict[str, str] = pydantic.Field(default_factory=dict)
-    project_environments: set[str] = pydantic.Field(default_factory=set)
+    project_ids: set[int] = set()
+    project_types: set[str] = set()
+    project_facts: dict[str, str] = {}
+    project_environments: set[str] = set()
     github_identifier_required: bool = False
-    github_workflow_status_exclude: set[str] = pydantic.Field(
-        default_factory=set
-    )
+    github_workflow_status_exclude: set[str] = set()
 
 
 class WorkflowActionTypes(enum.StrEnum):
@@ -103,9 +101,7 @@ class WorkflowAction(pydantic.BaseModel):
     type: WorkflowActionTypes = WorkflowActionTypes.callable
     ai_commit: bool = False
     commit_message: str | None = None
-    conditions: list['WorkflowCondition'] = pydantic.Field(
-        default_factory=list
-    )
+    conditions: list['WorkflowCondition'] = []
     condition_type: WorkflowConditionType = WorkflowConditionType.all
     committable: bool = True
     filter: WorkflowFilter | None = None
@@ -113,7 +109,7 @@ class WorkflowAction(pydantic.BaseModel):
     on_failure: str | None = None
     ignore_errors: bool = False
     timeout: int = 3600
-    data: dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+    data: dict[str, typing.Any] = {}
 
     @pydantic.model_validator(mode='after')
     def validate_commit_message(self) -> 'WorkflowAction':
@@ -143,8 +139,8 @@ class WorkflowCallableAction(WorkflowAction):
     type: typing.Literal['callable'] = 'callable'
     import_name: str = pydantic.Field(alias='import')
     callable: typing.Callable
-    args: list[typing.Any] = pydantic.Field(default_factory=list)
-    kwargs: dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+    args: list[typing.Any] = []
+    kwargs: dict[str, typing.Any] = {}
     ai_commit: bool = True
 
 
@@ -441,8 +437,8 @@ class WorkflowUtilityAction(WorkflowAction):
     type: typing.Literal['utility'] = 'utility'
     command: WorkflowUtilityCommands
     path: ResourceUrl | None = None
-    args: list[typing.Any] = pydantic.Field(default_factory=list)
-    kwargs: dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+    args: list[typing.Any] = []
+    kwargs: dict[str, typing.Any] = {}
 
 
 WorkflowActions = typing.Annotated[
@@ -612,8 +608,8 @@ class WorkflowConfiguration(pydantic.BaseModel):
     use_devcontainers: bool = False
 
     condition_type: WorkflowConditionType = WorkflowConditionType.all
-    conditions: list[WorkflowCondition] = pydantic.Field(default_factory=list)
-    actions: list[WorkflowActions] = pydantic.Field(default_factory=list)
+    conditions: list[WorkflowCondition] = []
+    actions: list[WorkflowActions] = []
 
 
 class WorkflowActionResult(pydantic.BaseModel):

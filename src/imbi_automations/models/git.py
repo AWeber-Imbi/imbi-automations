@@ -2,8 +2,6 @@
 
 import datetime
 
-import pydantic
-
 from . import base
 
 
@@ -28,8 +26,8 @@ class GitCommit(base.BaseModel):
     commit_date: datetime.datetime
     subject: str
     body: str
-    trailers: dict[str, str] = pydantic.Field(default_factory=dict)
-    files_changed: list[GitFileChange] = pydantic.Field(default_factory=list)
+    trailers: dict[str, str] = {}
+    files_changed: list[GitFileChange] = []
 
 
 class GitCommitSummary(base.BaseModel):
