@@ -301,7 +301,7 @@ The ImbiMetadataCache system caches Imbi metadata locally for improved performan
 
 ### Cache Location
 
-**Path:** `~/.cache/imbi-automations/metadata.json`
+**Path:** `~/.cache/imbi-automations/metadata.json` (configurable via `cache_dir` setting or `--cache-dir` CLI option)
 
 **TTL:** 15 minutes
 
@@ -314,12 +314,30 @@ The ImbiMetadataCache system caches Imbi metadata locally for improved performan
 
 ### Cache Behavior
 
-The metadata cache is automatically managed:
+The metadata cache is automatically managed and safe by default:
 
 - **First run**: Fetches all metadata from Imbi API
 - **Subsequent runs**: Uses cached data if less than 15 minutes old
 - **Expired cache**: Auto-refreshes from API
 - **Validation**: Enables parse-time validation of workflow filters
+- **Uninitialized**: Returns empty collections (graceful degradation)
+
+### Configuring Cache Location
+
+Override the default cache directory in configuration:
+
+```toml
+# Optional: Override cache directory
+cache_dir = "/custom/path/to/cache"
+```
+
+Or via CLI option:
+
+```bash
+imbi-automations config.toml workflows/workflow-name \
+  --cache-dir /tmp/imbi-cache \
+  --all-projects
+```
 
 ### Manual Cache Management
 

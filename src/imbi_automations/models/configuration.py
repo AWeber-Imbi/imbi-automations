@@ -111,6 +111,9 @@ class Configuration(pydantic.BaseModel):
     anthropic: AnthropicConfiguration = pydantic.Field(
         default_factory=AnthropicConfiguration
     )
+    cache_dir: pathlib.Path = (
+        pathlib.Path.home() / '.cache' / 'imbi-automations'
+    )
     claude_code: ClaudeCodeConfiguration = pydantic.Field(
         default_factory=ClaudeCodeConfiguration
     )

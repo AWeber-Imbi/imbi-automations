@@ -26,6 +26,7 @@ imbi-automations [-h] [-V] [--debug] [-v]
                  [--exit-on-error]
                  [--preserve-on-error]
                  [--error-dir DIR]
+                 [--cache-dir DIR]
                  [--start-from-project ID_OR_SLUG]
                  (--project-id ID |
                   --project-type SLUG |
@@ -384,6 +385,33 @@ imbi-automations config.toml workflows/test \
         ├── workflow/
         └── debug.log
 ```
+
+### --cache-dir DIR
+
+Specify directory for Imbi metadata cache storage.
+
+**Type:** Directory path
+**Default:** `~/.cache/imbi-automations`
+
+**Example:**
+```bash
+imbi-automations config.toml workflows/update \
+  --all-projects \
+  --cache-dir /tmp/imbi-cache
+```
+
+**Use Cases:**
+
+- Custom cache location for multi-user systems
+- Temporary cache for testing
+- Network-mounted cache for shared environments
+- CI/CD pipeline isolation
+
+**Cache Contents:**
+
+The cache directory will contain `metadata.json` with Imbi metadata including environments, project types, and fact type definitions. This cache is automatically refreshed every 15 minutes.
+
+**See Also:** [Configuration - Imbi Metadata Cache](configuration.md#imbi-metadata-cache)
 
 ### --debug
 
