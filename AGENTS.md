@@ -379,6 +379,7 @@ exclude_github_workflow_status = ["success"]
 - **Import organization**: Use module imports over direct class/function imports
 - **Logging**: Use module-level LOGGER, colored logging for CLI applications
 - **Error handling**: Use specific exception types, include context in log messages
+- **Pydantic defaults**: Use mutable default literals (e.g., `field: list[int] = []`) instead of `Field(default_factory=list)` for Pydantic v2 models
 
 ## Testing Infrastructure
 

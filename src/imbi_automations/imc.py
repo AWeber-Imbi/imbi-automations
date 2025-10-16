@@ -23,21 +23,11 @@ class CacheData(pydantic.BaseModel):
     last_updated: datetime.datetime = pydantic.Field(
         default_factory=lambda: datetime.datetime.now(tz=datetime.UTC)
     )
-    environments: list[imbi.ImbiEnvironment] = pydantic.Field(
-        default_factory=list
-    )
-    project_fact_types: list[imbi.ImbiProjectFactType] = pydantic.Field(
-        default_factory=list
-    )
-    project_fact_type_enums: list[imbi.ImbiProjectFactTypeEnum] = (
-        pydantic.Field(default_factory=list)
-    )
-    project_fact_type_ranges: list[imbi.ImbiProjectFactTypeRange] = (
-        pydantic.Field(default_factory=list)
-    )
-    project_types: list[imbi.ImbiProjectType] = pydantic.Field(
-        default_factory=list
-    )
+    environments: list[imbi.ImbiEnvironment] = []
+    project_fact_types: list[imbi.ImbiProjectFactType] = []
+    project_fact_type_enums: list[imbi.ImbiProjectFactTypeEnum] = []
+    project_fact_type_ranges: list[imbi.ImbiProjectFactTypeRange] = []
+    project_types: list[imbi.ImbiProjectType] = []
 
 
 class ImbiMetadataCache:
