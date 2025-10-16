@@ -548,6 +548,70 @@ packages = ["my.package"]
             utils.python_init_file_path(self.context)
         self.assertIn('Could not find __init__.py', str(ctx.exception))
 
+    def test_imbi_project_hash_contract(self) -> None:
+        # Two ImbiProject instances with identical content but different
+        # dict key ordering should have equal hashes since they compare
+        # as equal. This verifies the hash invariant: a == b implies
+        # hash(a) == hash(b).
+        #
+        # Create two projects with same data but different dict key order
+        project1 = models.ImbiProject(
+            id=123,
+            dependencies=None,
+            description='Test project',
+            environments=None,
+            facts={'language': 'Python', 'framework': 'FastAPI'},
+            identifiers={'github': 'org/repo', 'jira': 'PROJ'},
+            links={'docs': 'https://example.com', 'wiki': 'https://wiki.com'},
+            name='test-project',
+            namespace='test-namespace',
+            namespace_slug='test-namespace',
+            project_score=None,
+            project_type='API',
+            project_type_slug='api',
+            slug='test-project',
+            urls={
+                'prod': 'https://prod.com',
+                'staging': 'https://staging.com',
+            },
+            imbi_url='https://imbi.example.com/projects/123',
+        )
+
+        # Same data, but dict keys in different order
+        project2 = models.ImbiProject(
+            id=123,
+            dependencies=None,
+            description='Test project',
+            environments=None,
+            facts={'framework': 'FastAPI', 'language': 'Python'},
+            identifiers={'jira': 'PROJ', 'github': 'org/repo'},
+            links={'wiki': 'https://wiki.com', 'docs': 'https://example.com'},
+            name='test-project',
+            namespace='test-namespace',
+            namespace_slug='test-namespace',
+            project_score=None,
+            project_type='API',
+            project_type_slug='api',
+            slug='test-project',
+            urls={
+                'staging': 'https://staging.com',
+                'prod': 'https://prod.com',
+            },
+            imbi_url='https://imbi.example.com/projects/123',
+        )
+
+        # Verify equality works correctly (should be True)
+        self.assertEqual(
+            project1, project2, 'Projects with same data should be equal'
+        )
+
+        # Hash contract: a == b must imply hash(a) == hash(b)
+        self.assertEqual(
+            hash(project1),
+            hash(project2),
+            'Equal projects must have equal hashes (hash invariant)',
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
