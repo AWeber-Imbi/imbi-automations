@@ -97,8 +97,15 @@ class ImbiMetadataCache:
         self.config = config
         if self.cache_file.exists():
             with self.cache_file.open('r') as file:
+                st = self.cache_file.stat()
+                last_mod = datetime.datetime.fromtimestamp(
+                    st.st_mtime, tz=datetime.UTC
+                )
+
                 try:
-                    self.cache_data = CacheData.model_validate(json.load(file))
+                    data = json.load(file)
+                    data['last_updated'] = last_mod
+                    self.cache_data = CacheData.model_validate(data)
                 except (json.JSONDecodeError, pydantic.ValidationError) as err:
                     LOGGER.warning(
                         'Cache file corrupted, regenerating: %s', err
