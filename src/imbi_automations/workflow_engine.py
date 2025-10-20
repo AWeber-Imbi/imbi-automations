@@ -116,7 +116,11 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     exc,
                 )
                 if self.configuration.preserve_on_error:
-                    self._preserve_error_state(context, working_directory)
+                    self.last_error_path = self._preserve_working_directory(
+                        context,
+                        working_directory,
+                        self.configuration.error_dir,
+                    )
                 working_directory.cleanup()
                 return False
 
@@ -128,6 +132,19 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 if committed:
                     context.has_repository_changes = True
                     self.tracker.incr('actions_committed')
+
+        # Handle dry-run mode: preserve working directory and skip push/PR
+        if self.configuration.dry_run:
+            self.logger.info(
+                '%s dry-run mode: saving repository state to %s',
+                context.imbi_project.slug,
+                self.configuration.dry_run_dir,
+            )
+            self._preserve_working_directory(
+                context, working_directory, self.configuration.dry_run_dir
+            )
+            working_directory.cleanup()
+            return True
 
         if context.has_repository_changes:
             if (
@@ -296,16 +313,22 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         """
         return self.last_error_path
 
-    def _preserve_error_state(
+    def _preserve_working_directory(
         self,
         context: models.WorkflowContext,
         working_directory: tempfile.TemporaryDirectory,
-    ) -> None:
-        """Preserve working directory state on error for debugging.
+        target_base_dir: pathlib.Path,
+    ) -> pathlib.Path | None:
+        """Preserve working directory state to a specified directory.
 
         Args:
             context: Workflow execution context
             working_directory: Temporary directory to preserve
+            target_base_dir: Base directory for preservation (e.g., error_dir
+                or dry_run_dir)
+
+        Returns:
+            Path to preserved directory, or None if preservation failed
 
         """
         timestamp = datetime.datetime.now(tz=datetime.UTC).strftime(
@@ -314,35 +337,33 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         workflow_slug = context.workflow.slug or 'unknown'
         project_slug = context.imbi_project.slug
 
-        # Create error directory: errors/<workflow>/<project>-<timestamp>
-        error_path = (
-            self.configuration.error_dir
-            / workflow_slug
-            / f'{project_slug}-{timestamp}'
+        # Create target directory: <base>/<workflow>/<project>-<timestamp>
+        target_path = (
+            target_base_dir / workflow_slug / f'{project_slug}-{timestamp}'
         )
 
         try:
-            error_path.mkdir(parents=True, exist_ok=True)
+            target_path.mkdir(parents=True, exist_ok=True)
             shutil.copytree(
                 working_directory.name,
-                error_path,
+                target_path,
                 dirs_exist_ok=True,
                 symlinks=True,
             )
-            self.last_error_path = error_path
             self.logger.info(
-                '%s preserved error state to %s for debugging',
+                '%s preserved working directory to %s',
                 context.imbi_project.slug,
-                error_path,
+                target_path,
             )
+            return target_path
         except OSError as exc:
-            self.last_error_path = None
             self.logger.error(
-                '%s failed to preserve error state to %s: %s',
+                '%s failed to preserve working directory to %s: %s',
                 context.imbi_project.slug,
-                error_path,
+                target_path,
                 exc,
             )
+            return None
 
     def _git_clone_url(
         self, github_repository: models.GitHubRepository | None = None
