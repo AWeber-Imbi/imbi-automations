@@ -200,10 +200,22 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         '(saved to error-dir/<workflow>/<project>-<timestamp>)',
     )
     parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Save repository state to dry-run-dir instead of pushing '
+        'changes or creating pull requests',
+    )
+    parser.add_argument(
         '--cache-dir',
         type=pathlib.Path,
         default=pathlib.Path.home() / '.cache' / 'imbi-automations',
         help='Directory for caching Imbi metadata',
+    )
+    parser.add_argument(
+        '--dry-run-dir',
+        type=pathlib.Path,
+        default=pathlib.Path('./dry-runs'),
+        help='Directory to save repository state when --dry-run is used',
     )
     parser.add_argument(
         '--error-dir',
@@ -245,6 +257,10 @@ def main() -> None:
         config.preserve_on_error = True
     if args.error_dir:
         config.error_dir = args.error_dir
+    if args.dry_run:
+        config.dry_run = True
+    if args.dry_run_dir:
+        config.dry_run_dir = args.dry_run_dir
 
     LOGGER.info('Imbi Automations v%s starting', version)
     try:
