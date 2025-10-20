@@ -26,6 +26,8 @@ imbi-automations [-h] [-V] [--debug] [-v]
                  [--exit-on-error]
                  [--preserve-on-error]
                  [--error-dir DIR]
+                 [--dry-run]
+                 [--dry-run-dir DIR]
                  [--cache-dir DIR]
                  [--start-from-project ID_OR_SLUG]
                  (--project-id ID |
@@ -386,6 +388,115 @@ imbi-automations config.toml workflows/test \
         └── debug.log
 ```
 
+### --dry-run
+
+Execute workflows without pushing changes or creating pull requests.
+
+**Type:** Flag (boolean)
+**Default:** `false`
+
+**Example:**
+```bash
+imbi-automations config.toml workflows/update-deps \
+  --project-id 123 \
+  --dry-run
+```
+
+**Behavior:**
+
+When enabled, the workflow executes normally including:
+- Cloning repositories
+- Running all actions
+- Making file changes
+- Creating commits locally
+
+**But skips:**
+- Pushing commits to remote
+- Creating pull requests
+
+**Working directory is preserved to:** `./dry-runs/workflow-name/project-slug-timestamp/`
+
+**Use Cases:**
+
+- Testing workflows before production runs
+- Validating changes without affecting remote repositories
+- Reviewing commit messages and file changes
+- Debugging workflow logic safely
+- Training and demonstration
+
+**Example Output:**
+```bash
+Processing: my-project (123)
+✓ Cloned repository
+✓ Executed 5 actions
+✓ Created commit: "Update dependencies"
+🔍 dry-run mode: saving repository state to ./dry-runs
+✓ Completed: my-project (dry-run)
+```
+
+**Inspection:**
+```bash
+# View the commit that would have been pushed
+cd dry-runs/update-deps/my-project-20250103-143052/repository
+git log -1
+git show HEAD
+
+# View all changes
+git diff HEAD~1
+```
+
+**See Also:** [Debugging - Dry Run Mode](debugging.md#dry-run-mode)
+
+### --dry-run-dir DIR
+
+Specify directory for saving dry-run repository states.
+
+**Type:** Directory path
+**Default:** `./dry-runs`
+
+**Example:**
+```bash
+imbi-automations config.toml workflows/update \
+  --all-projects \
+  --dry-run \
+  --dry-run-dir /tmp/review-changes
+```
+
+**Directory Structure:**
+```
+/tmp/review-changes/
+└── workflow-name/
+    └── project-slug-20250103-143052/
+        ├── repository/        # Full git repository with commits
+        ├── workflow/          # Workflow files and templates
+        └── extracted/         # Docker extracted files (if any)
+```
+
+**Use Cases:**
+
+- Organize dry runs by date or workflow
+- Review changes across multiple projects
+- Share results with team for review
+- Temporary storage for CI/CD validation
+- Custom inspection pipelines
+
+**Example with Batch Review:**
+```bash
+# Run dry-run on all projects
+imbi-automations config.toml workflows/security-patch \
+  --all-projects \
+  --dry-run \
+  --dry-run-dir ./review/$(date +%Y%m%d)
+
+# Review all changes
+for dir in ./review/*/workflow-name/*/repository; do
+    echo "=== $(basename $(dirname $dir)) ==="
+    cd "$dir"
+    git log -1 --oneline
+    git diff HEAD~1 --stat
+done
+```
+
 ### --cache-dir DIR
 
 Specify directory for Imbi metadata cache storage.
@@ -507,6 +618,25 @@ imbi-automations config.toml workflows/new-workflow \
   --project-id 123 \
   --preserve-on-error \
   --debug
+```
+
+### Dry Run Testing
+
+Test workflow without making remote changes:
+
+```bash
+# Single project dry run
+imbi-automations config.toml workflows/new-feature \
+  --project-id 123 \
+  --dry-run \
+  --debug
+
+# Batch dry run for review
+imbi-automations config.toml workflows/update-all \
+  --all-projects \
+  --dry-run \
+  --dry-run-dir ./review \
+  --max-concurrency 5
 ```
 
 ### Batch Update with Debugging

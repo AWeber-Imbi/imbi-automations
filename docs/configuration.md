@@ -16,6 +16,8 @@ imbi-automations config.toml workflows/workflow-name --all-projects
 # Global Settings
 ai_commits = false
 commit_author = "Imbi Automations <noreply@example.com>"
+dry_run = false
+dry_run_dir = "./dry-runs"
 error_dir = "./errors"
 preserve_on_error = false
 
@@ -95,6 +97,70 @@ When `true`, temporary directories are not cleaned up after failures, allowing m
 ```toml
 preserve_on_error = true
 ```
+
+### dry_run
+
+Execute workflows without pushing changes or creating pull requests.
+
+**Type:** `boolean`
+**Default:** `false`
+
+When enabled, workflows execute completely (clone, actions, commits) but skip remote operations:
+
+```toml
+dry_run = true
+```
+
+**Behavior:**
+- ✓ Clones repositories
+- ✓ Runs all actions
+- ✓ Makes file changes
+- ✓ Creates commits locally
+- ✗ Skips pushing to remote
+- ✗ Skips creating pull requests
+
+**Use Cases:**
+- Testing new workflows safely
+- Validating changes before production runs
+- Reviewing commit messages and diffs
+- Training and demonstration
+- CI/CD validation pipelines
+
+Working directories are preserved to `dry_run_dir` for inspection.
+
+**Note:** Can be overridden by `--dry-run` CLI flag.
+
+### dry_run_dir
+
+Directory for saving repository state during dry-run executions.
+
+**Type:** `path`
+**Default:** `"./dry-runs"`
+
+```toml
+dry_run_dir = "./review-changes"
+```
+
+**Directory Structure:**
+```
+./review-changes/
+└── workflow-name/
+    └── project-slug-timestamp/
+        ├── repository/    # Full git repository with commits
+        ├── workflow/      # Workflow files and templates
+        └── extracted/     # Docker extracted files (if any)
+```
+
+**Example Inspection:**
+```bash
+# View commits that would have been pushed
+cd ./dry-runs/update-deps/my-project-20250103-143052/repository
+git log -1
+git show HEAD
+git diff HEAD~1
+```
+
+**Note:** Can be overridden by `--dry-run-dir` CLI flag.
 
 ## Anthropic Configuration
 
@@ -540,6 +606,23 @@ api_key = "${GITHUB_TOKEN}"
 api_key = "${IMBI_API_KEY}"
 hostname = "imbi.example.com"
 ```
+
+### With Dry Run Mode
+
+```toml
+# Enable dry-run globally for safe testing
+dry_run = true
+dry_run_dir = "./review-changes"
+
+[github]
+api_key = "${GITHUB_TOKEN}"
+
+[imbi]
+api_key = "${IMBI_API_KEY}"
+hostname = "imbi.example.com"
+```
+
+All workflows will execute but skip pushing and PR creation. Review changes in `./review-changes/` before disabling dry-run mode.
 
 ## Troubleshooting
 
