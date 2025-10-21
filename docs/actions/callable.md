@@ -169,9 +169,9 @@ args = [42, "hello"]
 [[actions]]
 name = "create-directory"
 type = "callable"
-callable = "pathlib:Path.mkdir"
+callable = "os:makedirs"
 args = ["{{ working_directory }}/output"]
-kwargs = {parents = true, exist_ok = true}
+kwargs = {exist_ok = true}
 committable = false
 ```
 
@@ -213,7 +213,7 @@ kwargs = {
 [[actions]]
 name = "update-project-fact"
 type = "callable"
-callable = "imbi_automations.clients.imbi:Imbi.set_fact"
+callable = "imbi_automations.clients.imbi:Imbi.set_project_fact"
 args = [
     123,                             # project_id (literal)
     "{{ workflow.slug }}",           # fact_name (template)

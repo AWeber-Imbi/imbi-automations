@@ -90,8 +90,8 @@ def render_file(
 
 
 def render_path(
-    context: models.WorkflowContext, path: pydantic.AnyUrl
-) -> pydantic.AnyUrl:
+    context: models.WorkflowContext, path: pydantic.AnyUrl | str
+) -> pydantic.AnyUrl | str:
     if isinstance(path, pydantic.AnyUrl):
         path_str = parse.unquote(path.path)
     elif isinstance(path, str):

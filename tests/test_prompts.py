@@ -9,8 +9,8 @@ import pydantic
 from imbi_automations import models, prompts
 
 
-class RenderPathTestCase(unittest.TestCase):
-    """Tests for render_path function."""
+class PromptsTestBase(unittest.TestCase):
+    """Base test class with shared fixtures for prompts tests."""
 
     def setUp(self) -> None:
         """Set up test fixtures."""
@@ -48,6 +48,10 @@ class RenderPathTestCase(unittest.TestCase):
     def tearDown(self) -> None:
         """Clean up test fixtures."""
         self.temp_dir.cleanup()
+
+
+class RenderPathTestCase(PromptsTestBase):
+    """Tests for render_path function."""
 
     def test_render_path_with_string_without_templates(self) -> None:
         """Test render_path with plain string (no templates)."""
@@ -129,45 +133,8 @@ class HasTemplateSyntaxTestCase(unittest.TestCase):
         self.assertFalse(prompts.has_template_syntax('text with % sign'))
 
 
-class RenderTestCase(unittest.TestCase):
+class RenderTestCase(PromptsTestBase):
     """Tests for render function."""
-
-    def setUp(self) -> None:
-        """Set up test fixtures."""
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.working_dir = pathlib.Path(self.temp_dir.name)
-        self.workflow = models.Workflow(
-            path=pathlib.Path('/workflows/test'),
-            configuration=models.WorkflowConfiguration(
-                name='test-workflow', actions=[]
-            ),
-        )
-        self.context = models.WorkflowContext(
-            workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
-                description='Test project',
-                environments=None,
-                facts=None,
-                identifiers=None,
-                links=None,
-                name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
-                slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
-            ),
-            working_directory=self.working_dir,
-        )
-
-    def tearDown(self) -> None:
-        """Clean up test fixtures."""
-        self.temp_dir.cleanup()
 
     def test_render_with_template_string(self) -> None:
         """Test render with template string."""
@@ -223,10 +190,8 @@ class RenderTestCase(unittest.TestCase):
             'URL: {{ workflow.configuration.name }}', encoding='utf-8'
         )
 
-        # Create ResourceUrl pointing to the template
-        source_url = models.ResourceUrl(
-            f'file:///{template_file.relative_to(self.working_dir)}'
-        )
+        # Create ResourceUrl pointing to the template (use filename only)
+        source_url = models.ResourceUrl(f'file:///{template_file.name}')
         result = prompts.render(self.context, source=source_url)
         self.assertEqual(result, 'URL: test-workflow')
 
@@ -237,45 +202,8 @@ class RenderTestCase(unittest.TestCase):
         self.assertIn('source is not a Path object', str(cm.exception))
 
 
-class RenderFileTestCase(unittest.TestCase):
+class RenderFileTestCase(PromptsTestBase):
     """Tests for render_file function."""
-
-    def setUp(self) -> None:
-        """Set up test fixtures."""
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.working_dir = pathlib.Path(self.temp_dir.name)
-        self.workflow = models.Workflow(
-            path=pathlib.Path('/workflows/test'),
-            configuration=models.WorkflowConfiguration(
-                name='test-workflow', actions=[]
-            ),
-        )
-        self.context = models.WorkflowContext(
-            workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
-                description='Test project',
-                environments=None,
-                facts=None,
-                identifiers=None,
-                links=None,
-                name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
-                slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
-            ),
-            working_directory=self.working_dir,
-        )
-
-    def tearDown(self) -> None:
-        """Clean up test fixtures."""
-        self.temp_dir.cleanup()
 
     def test_render_file(self) -> None:
         """Test render_file creates output file with rendered content."""

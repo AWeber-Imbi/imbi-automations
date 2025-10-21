@@ -2,7 +2,7 @@
 
 import asyncio
 
-from imbi_automations import mixins, models, prompts
+from imbi_automations import mixins, models, prompts, utils
 
 
 class DockerActions(mixins.WorkflowLoggerMixin):
@@ -66,11 +66,15 @@ class DockerActions(mixins.WorkflowLoggerMixin):
         )
         image = f'{image}:{action.tag}' if ':' not in image else image
 
-        # Build destination path in extracted directory
-        # Extract path component from ResourceUrl (strips scheme and slashes)
-        dest_filename = action.destination.path.lstrip('/')
-        dest_path = (
-            self.context.working_directory / 'extracted' / dest_filename
+        # Build destination path using resolve_path for proper scheme handling
+        # Convert file:// scheme to extracted:// for docker extract actions
+        dest_url = action.destination
+        if str(dest_url).startswith('file:///'):
+            dest_url = models.ResourceUrl(
+                str(dest_url).replace('file:///', 'extracted:///', 1)
+            )
+        dest_path = utils.resolve_path(
+            self.context, dest_url, default_scheme='extracted'
         )
         self._log_verbose_info(
             '%s %s extracting %s from container %s to %s',

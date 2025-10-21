@@ -38,15 +38,24 @@ class CallableAction(mixins.WorkflowLoggerMixin):
             if asyncio.iscoroutinefunction(action.callable):
                 await action.callable(*args, **kwargs)
             else:
-                action.callable(*args, **kwargs)
+                await asyncio.to_thread(action.callable, *args, **kwargs)
         except Exception as exc:
             self.logger.exception('Error invoking callable: %s', exc)
             raise RuntimeError(str(exc)) from exc
 
     def _process_arg(self, arg: typing.Any) -> typing.Any:
-        """Process an argument for use in a callable."""
+        """Process an argument for use in a callable.
+
+        Note: Templates only have access to workflow context variables,
+        not other args/kwargs, preventing circular dependencies.
+        """
+        # Render template strings first (produces string output)
         if isinstance(arg, str) and prompts.has_template_syntax(arg):
             arg = prompts.render(self.context, template=arg)
+
+        # Resolve ResourceUrl paths to filesystem paths
         if utils.has_path_scheme(arg):
             return utils.resolve_path(self.context, arg)
+
+        # Return rendered/processed value (not original input)
         return arg
