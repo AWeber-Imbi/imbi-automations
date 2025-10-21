@@ -207,6 +207,14 @@ def extract_package_name_from_pyproject(
         raise RuntimeError(f'Failed to extract package name: {err}') from err
 
 
+def has_path_scheme(path: models.ResourceUrl | pathlib.Path | str) -> bool:
+    """Check if a path has a scheme."""
+    for scheme in {'external', 'extracted', 'file', 'repository', 'workflow'}:
+        if str(path).startswith(f'{scheme}://'):
+            return True
+    return False
+
+
 def load_toml(toml_file: typing.TextIO) -> dict:
     """Load TOML data from a file-like object
 
