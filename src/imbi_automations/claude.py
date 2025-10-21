@@ -127,6 +127,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             ],
             cwd=self.context.working_directory,
             mcp_servers={'agent_tools': agent_tools},
+            model=self.configuration.claude_code.model,
             settings=str(settings),
             setting_sources=['local'],
             system_prompt=types.SystemPromptPreset(
