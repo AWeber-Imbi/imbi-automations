@@ -220,6 +220,53 @@ WORKDIR /app
         # Should extract the variable reference
         self.assertEqual(result, '${BASE_IMAGE}')
 
+    def test_extract_image_from_dockerfile_with_resource_url(self) -> None:
+        """Test extracting Docker image using ResourceUrl scheme."""
+        dockerfile_content = """FROM alpine:3.18
+RUN apk add --no-cache python3
+"""
+        # Create in repository subdirectory
+        repo_dir = self.temp_path / 'repository'
+        repo_dir.mkdir()
+        dockerfile_path = repo_dir / 'Dockerfile'
+        dockerfile_path.write_text(dockerfile_content)
+
+        result = utils.extract_image_from_dockerfile(
+            self.context, models.ResourceUrl('repository:///Dockerfile')
+        )
+
+        self.assertEqual(result, 'alpine:3.18')
+
+    def test_extract_image_from_dockerfile_with_string_path(self) -> None:
+        """Test extracting Docker image with string path (not Path object)."""
+        dockerfile_content = """FROM node:18-alpine
+WORKDIR /usr/src/app
+"""
+        dockerfile_path = self.temp_path / 'Dockerfile.node'
+        dockerfile_path.write_text(dockerfile_content)
+
+        # Pass as string instead of Path object
+        result = utils.extract_image_from_dockerfile(
+            self.context, 'Dockerfile.node'
+        )
+
+        self.assertEqual(result, 'node:18-alpine')
+
+    def test_extract_image_from_dockerfile_with_path_object(self) -> None:
+        """Test extracting Docker image with Path object."""
+        dockerfile_content = """FROM redis:7-alpine
+EXPOSE 6379
+"""
+        dockerfile_path = self.temp_path / 'Dockerfile.redis'
+        dockerfile_path.write_text(dockerfile_content)
+
+        # Pass as absolute Path object
+        result = utils.extract_image_from_dockerfile(
+            self.context, dockerfile_path
+        )
+
+        self.assertEqual(result, 'redis:7-alpine')
+
     def test_compare_semver_with_build_numbers_build_upgrade(self) -> None:
         """Test comparing versions with different build numbers."""
         result = utils.compare_semver_with_build_numbers(
@@ -359,6 +406,23 @@ WORKDIR /app
                 self.context, models.ResourceUrl('invalid:///file.txt')
             )
         self.assertIn('Invalid path scheme', str(ctx.exception))
+
+    def test_resolve_path_default_scheme(self) -> None:
+        """Test resolving path with default_scheme parameter."""
+        # Test with no scheme but default_scheme='repository'
+        result = utils.resolve_path(
+            self.context, 'config.yaml', default_scheme='repository'
+        )
+        expected = self.temp_path / 'repository' / 'config.yaml'
+        self.assertEqual(result, expected)
+
+    def test_resolve_path_default_scheme_file(self) -> None:
+        """Test resolving path with default_scheme='file'."""
+        result = utils.resolve_path(
+            self.context, 'data.json', default_scheme='file'
+        )
+        expected = self.temp_path / 'data.json'
+        self.assertEqual(result, expected)
 
     def test_sanitize_url_with_password(self) -> None:
         """Test sanitizing URL with password."""

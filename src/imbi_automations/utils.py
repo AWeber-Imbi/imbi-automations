@@ -116,7 +116,7 @@ def compare_semver_with_build_numbers(
 
 
 def extract_image_from_dockerfile(
-    context: models.WorkflowContext, path: pathlib.Path
+    context: models.WorkflowContext, path: pathlib.Path | str
 ) -> str | None:
     """Extract the Docker image name from a Dockerfile in the workflow context.
 
@@ -129,7 +129,14 @@ def extract_image_from_dockerfile(
 
     """
     LOGGER.debug('Extracting Docker image from %s', path)
-    dockerfile = context.working_directory / path
+    if has_path_scheme(path):
+        dockerfile = resolve_path(context, path)
+    elif isinstance(path, pathlib.Path) and path.is_absolute():
+        dockerfile = path
+    else:
+        # For strings and relative Path objects
+        dockerfile = context.working_directory / path
+
     if not dockerfile.exists():
         LOGGER.error('Dockerfile does not exist at %s', path)
         return 'ERROR: file_not_found'
@@ -327,7 +334,9 @@ def python_init_file_path(
 
 
 def resolve_path(
-    context: models.WorkflowContext, path: models.ResourceUrl | None
+    context: models.WorkflowContext,
+    path: models.ResourceUrl | None,
+    default_scheme: str = 'file',
 ) -> pathlib.Path:
     """Resolve a path relative to the workflow context working directory."""
     if path is None:
@@ -349,6 +358,9 @@ def resolve_path(
         path_component = str(pathlib.Path(uri.host) / uri.path.lstrip('/'))
     else:
         path_component = uri.path.lstrip('/')
+
+    if not uri.scheme and default_scheme:
+        uri = yarl.URL(f'{default_scheme}://{path_component}')
 
     match uri.scheme:
         case 'external':  # External to working directory
