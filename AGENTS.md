@@ -97,7 +97,7 @@ pre-commit run --all-files
 - **Utility Actions** (`actions/utility.py`): Helper operations for common workflow tasks
 
 #### Supporting Components
-- **Imbi Metadata Cache** (`imc.py`): Singleton cache (`ImbiMetadataCache`) for Imbi metadata (fact types, project types, environments) with 15-minute TTL
+- **Imbi Metadata Cache** (`imc.py`): Cache (`ImbiMetadataCache`) for Imbi metadata (fact types, project types, environments) with 15-minute TTL, explicitly initialized via async `refresh_from_cache()` method
 - **Git Operations** (`git.py`): Repository cloning, committing, and Git operations
 - **Environment Sync** (`environment_sync.py`): GitHub environment synchronization logic
 - **Condition Checker** (`condition_checker.py`): Workflow condition evaluation system
@@ -126,7 +126,12 @@ hostname = "imbi.example.com"
 
 [claude_code]
 executable = "claude"  # Optional, defaults to 'claude'
+
+# Optional: Override cache directory (default: ~/.cache/imbi-automations)
+cache_dir = "/custom/path/to/cache"
 ```
+
+The `cache_dir` setting can also be overridden via the `--cache-dir` CLI option.
 
 ### Transformation Architecture
 
@@ -374,6 +379,7 @@ exclude_github_workflow_status = ["success"]
 - **Import organization**: Use module imports over direct class/function imports
 - **Logging**: Use module-level LOGGER, colored logging for CLI applications
 - **Error handling**: Use specific exception types, include context in log messages
+- **Pydantic defaults**: Use mutable default literals (e.g., `field: list[int] = []`) instead of `Field(default_factory=list)` for Pydantic v2 models
 
 ## Testing Infrastructure
 
@@ -499,9 +505,9 @@ The system includes 20 pre-built workflows organized by category:
 ## Key Implementation Details
 
 ### Imbi Metadata Cache System
-The `ImbiMetadataCache` class (`imc.py`) provides singleton caching of Imbi metadata:
+The `ImbiMetadataCache` class (`imc.py`) provides caching of Imbi metadata with safe-by-default empty initialization:
 
-**Cached Data** (stored in `~/.cache/imbi-automations/metadata.json`):
+**Cached Data** (stored in `~/.cache/imbi-automations/metadata.json` by default):
 - **Environments**: All Imbi environments for filter validation
 - **Project Types**: All project type slugs with IDs
 - **Fact Types**: Complete fact type definitions with project_type_ids
@@ -509,16 +515,20 @@ The `ImbiMetadataCache` class (`imc.py`) provides singleton caching of Imbi meta
 - **Fact Type Ranges**: Min/max bounds for range-type facts
 
 **Features**:
+- **Safe by Default**: Cache is always populated (empty collections if not refreshed)
 - **15-minute TTL**: Auto-refreshes when expired
-- **Singleton Pattern**: One cache instance per process
+- **Optional Initialization**: Call `await cache.refresh_from_cache(cache_file, config)` to populate from disk/API
+- **Configurable Cache Location**: Override via `cache_dir` in config TOML or `--cache-dir` CLI option
 - **Parse-Time Validation**: Validates filters before workflow execution
 - **Handles Duplicates**: Multiple fact types with same name (different project types)
-- **Property Access**: `imc.project_type_slugs`, `imc.environments`, `imc.project_fact_type_names`
+- **Property Access**: `cache.project_type_slugs`, `cache.environments`, `cache.project_fact_type_names` (returns empty sets if unpopulated)
 
 **Usage in Validation**:
-- WorkflowFilter validates project_types and project_facts at parse time
+- Cache is refreshed at the start of `Automation.run()` before any validation
+- WorkflowFilter validates project_types and project_facts using the cache
 - Controller validates --project-type CLI argument before processing
 - Provides helpful suggestions for typos
+- If not refreshed, properties return empty sets (graceful degradation)
 
 ### Imbi Fact Management
 Project facts support three validation modes:
@@ -554,7 +564,9 @@ Shell actions use `subprocess_shell` instead of `subprocess_exec` to enable:
 
 **Major Changes**:
 - **GitLab Removal**: Removed all GitLab support (client, models, CLI args) - GitHub-only
-- **IMC Pattern**: Introduced singleton ImbiMetadataCache class for metadata caching
+- **IMC Pattern**: Introduced ImbiMetadataCache class with explicit async initialization for metadata caching
+- **Cache Initialization Fix**: Removed singleton pattern, added explicit `refresh_from_cache()` method called in `Automation.run()`
+- **Configurable Cache Directory**: Added `cache_dir` to Configuration model and `--cache-dir` CLI option
 - **Filter Validation**: Added parse-time validation for project_types, project_facts, and environments
 - **Imbi Actions**: Implemented set_project_fact with full enum/range/free-form support
 - **Shell Execution Fix**: Changed from subprocess_exec to subprocess_shell for glob support
@@ -566,9 +578,10 @@ Shell actions use `subprocess_shell` instead of `subprocess_exec` to enable:
 - **Simpler Codebase**: Removed ~2000 lines of unused GitLab code
 - **Faster Validation**: ImbiMetadataCache enables instant filter validation
 - **Better UX**: Helpful error messages with fuzzy-matched suggestions
-- **Maintainability**: Cleaner separation with IMC handling all Imbi metadata
+- **Maintainability**: Cleaner separation with IMC handling all Imbi metadata, no singleton complexity
 - **Type Safety**: Comprehensive validation at parse time prevents runtime errors
 - **Performance**: 15-minute cache reduces API calls, subprocess_shell enables shell features
+- **Explicit Initialization**: Clear async initialization point eliminates awkward lazy loading
 
 ### External Scheme and Repository Change Tracking (October 2025)
 

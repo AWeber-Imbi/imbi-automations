@@ -111,10 +111,15 @@ class Configuration(pydantic.BaseModel):
     anthropic: AnthropicConfiguration = pydantic.Field(
         default_factory=AnthropicConfiguration
     )
+    cache_dir: pathlib.Path = (
+        pathlib.Path.home() / '.cache' / 'imbi-automations'
+    )
     claude_code: ClaudeCodeConfiguration = pydantic.Field(
         default_factory=ClaudeCodeConfiguration
     )
     commit_author: str = 'Imbi Automations <noreply@aweber.com>'
+    dry_run: bool = False
+    dry_run_dir: pathlib.Path = pathlib.Path('./dry-runs')
     error_dir: pathlib.Path = pathlib.Path('./errors')
     git: GitConfiguration = pydantic.Field(default_factory=GitConfiguration)
     github: GitHubConfiguration | None = None

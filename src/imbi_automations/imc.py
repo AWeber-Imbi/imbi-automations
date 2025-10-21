@@ -5,8 +5,6 @@ import datetime
 import json
 import logging
 import pathlib
-import threading
-import typing
 
 import pydantic
 
@@ -18,9 +16,6 @@ LOGGER = logging.getLogger(__name__)
 # Cache configuration
 CACHE_TTL_MINUTES = 15
 
-# Thread-safe singleton lock
-_instance_lock = threading.Lock()
-
 
 class CacheData(pydantic.BaseModel):
     """Cache for data used by the application"""
@@ -28,78 +23,33 @@ class CacheData(pydantic.BaseModel):
     last_updated: datetime.datetime = pydantic.Field(
         default_factory=lambda: datetime.datetime.now(tz=datetime.UTC)
     )
-    environments: list[imbi.ImbiEnvironment]
-    project_fact_types: list[imbi.ImbiProjectFactType]
-    project_fact_type_enums: list[imbi.ImbiProjectFactTypeEnum]
-    project_fact_type_ranges: list[imbi.ImbiProjectFactTypeRange]
-    project_types: list[imbi.ImbiProjectType]
+    environments: list[imbi.ImbiEnvironment] = []
+    project_fact_types: list[imbi.ImbiProjectFactType] = []
+    project_fact_type_enums: list[imbi.ImbiProjectFactTypeEnum] = []
+    project_fact_type_ranges: list[imbi.ImbiProjectFactTypeRange] = []
+    project_types: list[imbi.ImbiProjectType] = []
 
 
 class ImbiMetadataCache:
-    """Singleton cache for Imbi metadata with automatic refresh."""
+    """Cache for Imbi metadata with automatic refresh.
 
-    instance: typing.Self | None = None
+    Cache is always populated (empty collections if not refreshed).
+    Call refresh_from_cache() to load data from disk or API.
+    """
 
-    def __init__(self, config: configuration.ImbiConfiguration) -> None:
-        self.cache_data: CacheData | None = None
-        self.cache_file = (
-            pathlib.Path.home()
-            / '.cache'
-            / 'imbi-automations'
-            / 'metadata.json'
-        )
-        self.config = config
-        self.imbi_client: clients.Imbi | None = None
+    def __init__(self) -> None:
+        """Initialize cache instance with empty data.
 
-    @classmethod
-    def get_instance(cls, config: configuration.Configuration) -> typing.Self:
-        """Get or create singleton instance (thread-safe).
-
-        Note: This synchronous method is for backward compatibility.
-        For new code, prefer using async initialization explicitly.
+        Cache starts with empty collections and can be used immediately.
+        Call refresh_from_cache() to populate with actual metadata.
         """
-        if not cls.instance:
-            with _instance_lock:
-                # Double-check pattern to prevent race condition
-                if not cls.instance:
-                    cls.instance = cls(config.imbi)
-                    # Note: Actual data loading is deferred to first use
-                    # to avoid blocking event loop
-                    try:
-                        asyncio.get_running_loop()
-                        # We're in async context - use async init instead
-                        LOGGER.warning(
-                            'get_instance() called from async context. '
-                            'Data will be loaded on first property access.'
-                        )
-                    except RuntimeError:
-                        # No event loop running - load from cache file only
-                        # This avoids event loop lifecycle conflicts
-                        cls.instance._load_from_file_sync()
-        return cls.instance
-
-    def _load_from_file_sync(self) -> None:
-        """Load cache data from file synchronously (no API calls)."""
-        if self.cache_file.exists():
-            with self.cache_file.open('r') as file:
-                try:
-                    self.cache_data = CacheData.model_validate(json.load(file))
-                    LOGGER.debug('Loaded cached Imbi metadata from file')
-                except (json.JSONDecodeError, pydantic.ValidationError) as err:
-                    LOGGER.warning(
-                        'Cache file corrupted, will refresh on first async '
-                        'use: %s',
-                        err,
-                    )
-                    # Delete corrupted cache file
-                    self.cache_file.unlink(missing_ok=True)
-        else:
-            LOGGER.debug('No cache file found, will load on first async use')
+        self.cache_data: CacheData = CacheData()
+        self.cache_file: pathlib.Path | None = None
+        self.config: configuration.ImbiConfiguration | None = None
+        self.imbi_client: clients.Imbi | None = None
 
     def is_cache_expired(self) -> bool:
         """Check if cache has expired (older than CACHE_TTL_MINUTES)."""
-        if not self.cache_data:
-            return True
         age = (
             datetime.datetime.now(tz=datetime.UTC)
             - self.cache_data.last_updated
@@ -133,12 +83,29 @@ class ImbiMetadataCache:
             project_type.slug for project_type in self.cache_data.project_types
         }
 
-    async def _load_data(self) -> None:
-        """Load the Imbi data from the API or cache file."""
+    async def refresh_from_cache(
+        self, cache_file: pathlib.Path, config: configuration.ImbiConfiguration
+    ) -> None:
+        """Initialize and refresh cache from file or API.
+
+        Args:
+            cache_file: Path to the metadata cache file
+            config: Imbi configuration for API access
+
+        """
+        self.cache_file = cache_file
+        self.config = config
         if self.cache_file.exists():
             with self.cache_file.open('r') as file:
+                st = self.cache_file.stat()
+                last_mod = datetime.datetime.fromtimestamp(
+                    st.st_mtime, tz=datetime.UTC
+                )
+
                 try:
-                    self.cache_data = CacheData.model_validate(json.load(file))
+                    data = json.load(file)
+                    data['last_updated'] = last_mod
+                    self.cache_data = CacheData.model_validate(data)
                 except (json.JSONDecodeError, pydantic.ValidationError) as err:
                     LOGGER.warning(
                         'Cache file corrupted, regenerating: %s', err
@@ -155,6 +122,7 @@ class ImbiMetadataCache:
         if not self.imbi_client:
             self.imbi_client = clients.Imbi.get_instance(config=self.config)
 
+        LOGGER.info('Fetching fresh Imbi metadata from API')
         (
             environments,
             project_fact_types,
@@ -179,3 +147,4 @@ class ImbiMetadataCache:
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
         with self.cache_file.open('w') as file:
             file.write(self.cache_data.model_dump_json())
+        LOGGER.debug('Cached Imbi metadata to %s', self.cache_file)

@@ -95,13 +95,15 @@ Comprehensive workflow definition including:
 
 #### Imbi Metadata Cache (`imc.py`)
 
-Singleton cache (`ImbiMetadataCache`) for Imbi metadata with 15-minute TTL:
+Cache (`ImbiMetadataCache`) for Imbi metadata with 15-minute TTL and safe-by-default design:
 
 - Caches environments, project types, fact types
+- Always initialized with empty collections (no `None` state)
 - Enables parse-time validation of workflow filters
-- Stored in `~/.cache/imbi-automations/metadata.json`
-- Auto-refreshes when expired
+- Stored in `~/.cache/imbi-automations/metadata.json` (configurable)
+- Auto-refreshes when expired via `refresh_from_cache()`
 - Provides fuzzy-matched suggestions for typos
+- Graceful degradation: returns empty sets when unpopulated
 
 #### Actions Dispatcher (`actions/__init__.py`)
 

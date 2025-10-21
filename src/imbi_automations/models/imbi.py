@@ -7,8 +7,6 @@ workflow targeting and context enrichment.
 
 import typing
 
-import pydantic
-
 from . import base
 
 
@@ -88,12 +86,12 @@ class ImbiProjectFactType(base.BaseModel):
     last_modified_by: str | None = None
     name: str
     description: str | None = None
-    project_type_ids: list[int] = pydantic.Field(default_factory=list)
+    project_type_ids: list[int] = []
     fact_type: typing.Literal['enum', 'range', 'free-form']
     data_type: typing.Literal[
         'boolean', 'date', 'decimal', 'integer', 'string', 'timestamp'
     ]
-    ui_options: list[str] = pydantic.Field(default_factory=list)
+    ui_options: list[str] = []
     weight: float = 0.0
 
 

@@ -29,4 +29,4 @@ class AgentRun(pydantic.BaseModel):
 
     result: AgentRunResult
     message: str | None = None
-    errors: list[str] = pydantic.Field(default_factory=list)
+    errors: list[str] = []

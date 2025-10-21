@@ -60,7 +60,7 @@ class Automation(mixins.WorkflowLoggerMixin):
         self.configuration = config
         self.counter = collections.Counter()
         self.logger = LOGGER
-        self.registry = imc.ImbiMetadataCache.get_instance(config)
+        self.registry = imc.ImbiMetadataCache()
         self.workflow = workflow
         self.workflow_engine = workflow_engine.WorkflowEngine(
             config=self.configuration, workflow=workflow, verbose=args.verbose
@@ -94,6 +94,12 @@ class Automation(mixins.WorkflowLoggerMixin):
             raise ValueError('No valid target argument provided')
 
     async def run(self) -> bool:
+        # Initialize Imbi metadata cache
+        cache_file = self.configuration.cache_dir / 'metadata.json'
+        await self.registry.refresh_from_cache(
+            cache_file, self.configuration.imbi
+        )
+
         self._validate_workflow_filters()
         match self.iterator:
             case AutomationIterator.github_repositories:
