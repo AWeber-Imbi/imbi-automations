@@ -85,7 +85,7 @@ pre-commit run --all-files
 - **Validators** (`models/validators.py`): Pydantic field validators
 
 #### Actions Layer (under `actions/`)
-- **Callable Actions** (`actions/callablea.py`): Direct method calls on client instances with dynamic kwargs
+- **Callable Actions** (`actions/callablea.py`): Direct Python function/method invocation with async support, template rendering, and dynamic args/kwargs
 - **Claude Actions** (`actions/claude.py`): AI-powered transformations using Claude Code SDK
 - **Docker Actions** (`actions/docker.py`): Docker container operations and file extractions
 - **File Actions** (`actions/filea.py`): File manipulation (copy with glob support, move, delete, regex replacement)
@@ -137,7 +137,7 @@ The `cache_dir` setting can also be overridden via the `--cache-dir` CLI option.
 
 The system supports multiple transformation types through the workflow action system:
 
-1. **Callable Actions** (`actions/callablea.py`): Direct method calls on client instances with dynamic kwargs
+1. **Callable Actions** (`actions/callablea.py`): Direct Python function/method invocation with async support, template rendering, and dynamic args/kwargs
 2. **Claude Actions** (`actions/claude.py`): Complex multi-file analysis and transformation using Claude Code SDK
 3. **Docker Actions** (`actions/docker.py`): Container-based file extraction and manipulation
 4. **File Actions** (`actions/filea.py`): Direct file manipulation (copy with glob patterns, move, delete, regex replacement)

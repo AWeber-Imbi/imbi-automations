@@ -145,7 +145,7 @@ Workflow condition evaluation:
 
 Specialized action handlers:
 
-- **Callable** (`actions/callablea.py`): Direct method calls on clients
+- **Callable** (`actions/callablea.py`): Direct Python function/method invocation with async support and template rendering
 - **Claude** (`actions/claude.py`): AI-powered transformations via Claude Code SDK
 - **Docker** (`actions/docker.py`): Container operations and file extraction
 - **File** (`actions/filea.py`): Copy (with globs), move, delete, regex replacement
@@ -187,16 +187,15 @@ type = "claude"
 ### Action Types
 
 #### 1. Callable Actions
-Direct method calls on client instances:
+Direct Python function/method invocation with async support:
 ```toml
 [[actions]]
+name = "update-fact"
 type = "callable"
-[actions.value]
-client = "github"
-method = "create_pull_request"
-[actions.value.kwargs]
-title = "{{ workflow_name }}"
-body = "Automated update"
+callable = "imbi_automations.clients.imbi:Imbi.set_fact"
+args = [123, "deployment_status", "completed"]
+kwargs = {notes = "{{ workflow.name }} finished"}
+ai_commit = true
 ```
 
 #### 2. Claude Code Integration

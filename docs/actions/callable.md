@@ -1,8 +1,8 @@
 # Callable Actions
 
-⚠️ **NOT IMPLEMENTED**: Callable actions raise `NotImplementedError`. This action type is currently a placeholder.
+✅ **IMPLEMENTED**: Callable actions are fully implemented and tested.
 
-Callable actions are intended to invoke Python callable objects (functions, methods, classes) dynamically with flexible arguments.
+Callable actions invoke Python callable objects (functions, methods, coroutines) dynamically with flexible arguments. This enables direct execution of Python code from workflows, including client methods, utility functions, and custom callables.
 
 ## Configuration
 
@@ -10,167 +10,501 @@ Callable actions are intended to invoke Python callable objects (functions, meth
 [[actions]]
 name = "action-name"
 type = "callable"
-import = "module.path.to.callable"
-callable = "function_or_class_name"
-args = []      # Optional positional arguments
-kwargs = {}    # Optional keyword arguments
-ai_commit = true  # Optional, default: true
+callable = "module.path:function_or_method_name"
+args = [1, "string", true]      # Optional positional arguments
+kwargs = {key = "value"}         # Optional keyword arguments
+ai_commit = true                 # Optional, default: true
 ```
 
 ## Fields
 
-### import (required)
-
-Python module path to import the callable from.
-
-**Type:** `string`
-
-**Field Name:** `import` (model field: `import_name`)
-
-
-**Example:** `"imbi_automations.clients.github"`
-
-
 ### callable (required)
 
-The callable object (function, method, or class) to invoke.
+Python import string specifying the callable to invoke. Uses Pydantic's `ImportString` format.
 
-**Type:** `Callable` (Python callable object)
+**Type:** `string` (ImportString format: `"module.path:callable_name"`)
 
+**Format:** `"package.module:function"` or `"package.module.submodule:ClassName.method"`
 
-**Note:** The model expects an actual callable object, not a string. The TOML configuration likely needs to reference importable callables by name.
+**Examples:**
+```toml
+# Function from module
+callable = "os.path:join"
+
+# Method from class
+callable = "imbi_automations.clients.github:GitHub.create_issue"
+
+# Async function
+callable = "asyncio:sleep"
+
+# Custom module
+callable = "my_package.utils:process_data"
+```
+
+**Import Resolution:**
+- The string before `:` is the module path to import
+- The string after `:` is the attribute name to retrieve from the module
+- Supports nested attributes (e.g., `Class.method`)
+- Automatically detects and awaits async callables (coroutines)
 
 ### args (optional)
 
-Positional arguments to pass to the callable.
+Positional arguments to pass to the callable. Arguments are passed in order.
 
-**Type:** `list`
+**Type:** `list[Any]`
 
 **Default:** `[]`
 
+**Supports:**
+- Primitive types (int, float, bool, string)
+- Lists and dictionaries
+- Jinja2 template strings (automatically rendered)
+- Mixed types
+
+**Template Rendering:**
+```toml
+args = [
+    42,                              # Literal integer
+    "{{ imbi_project.name }}",       # Template string (rendered)
+    true,                            # Literal boolean
+    "literal-string"                 # Literal string (no templates)
+]
+```
+
+**Important:** Positional argument order is preserved. Template strings are rendered before execution.
 
 ### kwargs (optional)
 
 Keyword arguments to pass to the callable.
 
-**Type:** `dict`
+**Type:** `dict[string, Any]`
 
 **Default:** `{}`
 
+**Supports:**
+- Same types as `args`
+- Jinja2 template rendering in string values
+- Nested structures
+
+**Template Rendering:**
+```toml
+[actions.kwargs]
+project_name = "{{ imbi_project.name }}"      # Template (rendered)
+project_id = 123                               # Literal integer
+enabled = true                                 # Literal boolean
+config = {nested = "value"}                    # Nested dict
+```
 
 ### ai_commit (optional)
 
-Whether to use AI-generated commit messages for changes.
+Whether to use AI-generated commit messages for repository changes made by this action.
 
 **Type:** `boolean`
 
 **Default:** `true`
 
+**Note:** Only relevant if the callable makes repository changes and `committable = true`.
 
-## Implementation Status
+## Template Context
 
-**Status:** ❌ Not implemented
+String arguments support Jinja2 templating with full workflow context:
 
-The implementation in `src/imbi_automations/actions/callablea.py` line 25 shows:
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `workflow` | Workflow configuration | `{{ workflow.slug }}` |
+| `imbi_project` | Imbi project data | `{{ imbi_project.name }}` |
+| `github_repository` | GitHub repository (if present) | `{{ github_repository.name }}` |
+| `working_directory` | Execution directory path | `{{ working_directory }}` |
+| `starting_commit` | Initial commit SHA | `{{ starting_commit }}` |
 
+**Template Detection:**
+- Only `string` values are checked for templates
+- Templates must contain `{{`, `{%`, or `{#` syntax
+- Non-string types (int, bool, list, dict) pass through unchanged
+- Strings without template syntax are not rendered
+
+## Async/Sync Detection
+
+The action automatically detects whether the callable is synchronous or asynchronous:
+
+**Async callables:**
 ```python
-async def execute(self, action: models.WorkflowCallableAction) -> None:
-    raise NotImplementedError('Callable actions not yet supported')
+async def my_async_function(arg1: int, arg2: str) -> None:
+    await asyncio.sleep(1)
+    # ... async work
 ```
 
-**Model Definition:** `src/imbi_automations/models/workflow.py:107-120`
-
-```python
-class WorkflowCallableAction(WorkflowAction):
-    type: typing.Literal['callable'] = 'callable'
-    import_name: str = pydantic.Field(alias='import')
-    callable: typing.Callable
-    args: list[typing.Any] = pydantic.Field(default_factory=list)
-    kwargs: dict[str, typing.Any] = pydantic.Field(default_factory=dict)
-    ai_commit: bool = True
+```toml
+[[actions]]
+name = "call-async"
+type = "callable"
+callable = "my_module:my_async_function"
+args = [42, "hello"]
+# Automatically awaited
 ```
 
-## Intended Usage Examples
+**Sync callables:**
+```python
+def my_sync_function(arg1: int, arg2: str) -> None:
+    # ... sync work
+    pass
+```
 
-**Note:** These examples show the intended usage once implemented. They will currently fail with `NotImplementedError`.
+```toml
+[[actions]]
+name = "call-sync"
+type = "callable"
+callable = "my_module:my_sync_function"
+args = [42, "hello"]
+# Executed directly (not awaited)
+```
+
+**Detection method:** Uses `asyncio.iscoroutinefunction()` to detect async callables.
+
+## Examples
+
+### Call Standard Library Function
+
+```toml
+[[actions]]
+name = "create-directory"
+type = "callable"
+callable = "pathlib:Path.mkdir"
+args = ["{{ working_directory }}/output"]
+kwargs = {parents = true, exist_ok = true}
+committable = false
+```
 
 ### Call GitHub Client Method
 
 ```toml
 [[actions]]
-name = "create-github-issue"
+name = "create-github-label"
 type = "callable"
-import = "imbi_automations.clients.github"
-callable = "GitHubClient.create_issue"
-
-[[actions.kwargs]]
-title = "Automated issue"
-body = "Issue created by workflow"
+callable = "imbi_automations.clients.github:GitHub.create_label"
+kwargs = {
+    name = "automated",
+    color = "00ff00",
+    description = "Created by automation"
+}
 ```
 
-### Call Imbi Client Method
+### Call Utility Function with Templates
 
 ```toml
 [[actions]]
-name = "update-project"
+name = "process-project-data"
 type = "callable"
-import = "imbi_automations.clients.imbi"
-callable = "ImbiClient.update_project_fact"
-
-[[actions.kwargs]]
-project_id = 123
-fact_name = "Automation Status"
-fact_value = "Updated"
+callable = "my_utils:process_data"
+args = [
+    "{{ imbi_project.slug }}",
+    "{{ imbi_project.project_type }}",
+    "{{ imbi_project.namespace }}"
+]
+kwargs = {
+    output_dir = "{{ working_directory }}/processed",
+    verbose = true
+}
 ```
 
-### Call Utility Function
+### Call Method with Mixed Arguments
 
 ```toml
 [[actions]]
-name = "parse-version"
+name = "update-project-fact"
 type = "callable"
-import = "semver"
-callable = "parse"
-args = ["1.2.3"]
+callable = "imbi_automations.clients.imbi:Imbi.set_fact"
+args = [
+    123,                             # project_id (literal)
+    "{{ workflow.slug }}",           # fact_name (template)
+    "completed"                      # fact_value (literal)
+]
 ```
 
-## Design Questions
-
-The current model definition has some unclear aspects:
-
-1. **Callable Type**: The `callable` field expects a `typing.Callable` object, but TOML configuration can only contain strings. How is this resolved?
-
-2. **Import Resolution**: How does `import` + `callable` get resolved to an actual callable object? Is `callable` a string name looked up in the imported module?
-
-3. **Client Access**: How would this access workflow clients (GitHub, Imbi) that are already instantiated in the workflow context?
-
-4. **Context Passing**: How would the callable receive workflow context (repository, project data, etc.)?
-
-These design questions suggest the feature may need additional planning before implementation.
-
-## Workarounds
-
-Until callable actions are implemented, use alternative approaches:
-
-1. **Client Operations**: Use specific action types (github, imbi) when they exist
-2. **Custom Logic**: Use shell actions to call Python scripts
-3. **Claude Actions**: Use Claude for complex operations requiring decision-making
-
-### Shell Action Alternative
+### Call Custom Function
 
 ```toml
 [[actions]]
-name = "custom-operation"
+name = "validate-config"
+type = "callable"
+callable = "validators.config:validate_yaml"
+args = ["{{ working_directory }}/repository/config.yaml"]
+kwargs = {
+    schema = "config-schema.json",
+    strict = true
+}
+ignore_errors = false
+```
+
+### Async Function Call
+
+```toml
+[[actions]]
+name = "async-api-call"
+type = "callable"
+callable = "my_api.client:fetch_data"
+args = ["https://api.example.com/data"]
+kwargs = {
+    timeout = 30,
+    retry = 3
+}
+# Automatically awaited due to async detection
+```
+
+## Advanced Usage
+
+### Complex Template Expressions
+
+```toml
+[[actions]]
+name = "conditional-processing"
+type = "callable"
+callable = "processors:handle_project"
+args = [
+    "{{ imbi_project.namespace }}/{{ imbi_project.name }}",
+    "{{ imbi_project.id | int }}",
+    "{% if imbi_project.id > 100 %}large{% else %}small{% endif %}"
+]
+```
+
+### Non-String Template Values
+
+```toml
+[[actions]]
+name = "structured-data"
+type = "callable"
+callable = "handlers:process_metadata"
+kwargs = {
+    project_name = "{{ imbi_project.name }}",  # Rendered template (string)
+    project_id = 123,                           # Literal integer (not rendered)
+    enabled = true,                             # Literal boolean (not rendered)
+    tags = ["api", "production"],               # Literal list (not rendered)
+    metadata = {
+        env = "prod",                           # Nested dict (not rendered)
+        region = "us-east-1"
+    }
+}
+```
+
+### Error Handling with ignore_errors
+
+```toml
+[[actions]]
+name = "optional-operation"
+type = "callable"
+callable = "optional_tasks:try_operation"
+args = ["{{ imbi_project.slug }}"]
+ignore_errors = true  # Continue workflow even if callable fails
+```
+
+### Conditional Execution
+
+```toml
+[[actions]]
+name = "python-only-task"
+type = "callable"
+callable = "python_utils:analyze_dependencies"
+args = ["{{ working_directory }}/repository"]
+
+# Only run for Python projects
+[[actions.conditions]]
+file_exists = "requirements.txt"
+```
+
+## Return Values
+
+**Important:** Callable actions execute for **side effects only**. Return values are **not captured** or made available to subsequent actions.
+
+If you need to capture output:
+1. Have the callable write to a file in the working directory
+2. Use a subsequent file action to read the output
+3. Use the `data` field to pass information between actions (if needed)
+
+Example:
+```toml
+[[actions]]
+name = "generate-report"
+type = "callable"
+callable = "reporters:generate_report"
+kwargs = {
+    project = "{{ imbi_project.slug }}",
+    output_file = "{{ working_directory }}/report.json"
+}
+
+[[actions]]
+name = "read-report"
 type = "shell"
-command = "python -c 'from mymodule import func; func()'"
+command = "cat {{ working_directory }}/report.json"
+```
+
+## Error Handling
+
+### Exception Handling
+
+All exceptions raised by callables are caught and wrapped in `RuntimeError`:
+
+```python
+# In callable
+def my_function():
+    raise ValueError("Something went wrong")
+
+# In workflow logs
+# RuntimeError: Something went wrong
+#   Caused by: ValueError: Something went wrong
+```
+
+The original exception is preserved via `__cause__` for debugging.
+
+### Logging
+
+**Debug logging:**
+```
+DEBUG: Executing my_module:my_function([1, 2], {'key': 'value'})
+```
+
+**Exception logging:**
+```
+ERROR: Error invoking callable: Something went wrong
+<full exception traceback>
+```
+
+### Ignore Errors
+
+```toml
+[[actions]]
+name = "best-effort-task"
+type = "callable"
+callable = "optional:task"
+ignore_errors = true  # Continue workflow even if callable raises exception
+```
+
+## Integration with Other Actions
+
+### Sequential Callable Chain
+
+```toml
+[[actions]]
+name = "fetch-data"
+type = "callable"
+callable = "api.client:fetch_project_data"
+args = ["{{ imbi_project.id }}"]
+
+[[actions]]
+name = "process-data"
+type = "callable"
+callable = "processors:transform_data"
+args = ["{{ working_directory }}/data.json"]
+
+[[actions]]
+name = "upload-results"
+type = "callable"
+callable = "api.client:upload_results"
+args = ["{{ working_directory }}/results.json"]
+```
+
+### Callable + Shell (Verification)
+
+```toml
+[[actions]]
+name = "run-python-script"
+type = "callable"
+callable = "scripts.migration:run_migration"
+kwargs = {db_url = "{{ config.database_url }}"}
+
+[[actions]]
+name = "verify-migration"
+type = "shell"
+command = "python scripts/verify.py"
 working_directory = "repository:///"
 ```
 
-## Implementation Notes
+### Callable + File (Data Processing)
 
-- Action type defined but not implemented
-- Raises `NotImplementedError` on execution
-- Model uses `typing.Callable` which may need runtime resolution
-- Field `import` aliased to `import_name` to avoid Python keyword
-- Intended for direct Python callable invocation with flexible arguments
-- AI commit enabled by default when implemented
+```toml
+[[actions]]
+name = "generate-config"
+type = "callable"
+callable = "config_gen:create_config"
+kwargs = {
+    project = "{{ imbi_project.slug }}",
+    output = "{{ working_directory }}/config.yaml"
+}
+
+[[actions]]
+name = "copy-to-repo"
+type = "file"
+command = "copy"
+source = "{{ working_directory }}/config.yaml"
+destination = "repository:///config/generated.yaml"
+```
+
+## Performance Considerations
+
+- **Import Time**: First call imports the module (cached thereafter)
+- **Execution Time**: Depends on callable implementation
+- **Async Overhead**: Minimal for properly async callables
+- **Template Rendering**: Only performed for string arguments with template syntax
+
+## Security Considerations
+
+- **Code Execution**: Callables execute with full Python interpreter access
+- **Import Safety**: Only import from trusted modules
+- **Argument Validation**: Callables should validate input arguments
+- **Error Information**: Exception messages may contain sensitive data
+
+## Best Practices
+
+### ✅ Do
+
+- Use callable actions for Python-native operations
+- Validate arguments in your callable implementations
+- Use templates for dynamic values
+- Document expected callable signatures
+- Handle exceptions gracefully in callables
+- Write to files for persistent output
+
+### ❌ Don't
+
+- Don't rely on return values (they're not captured)
+- Don't use for operations better suited to specialized actions (file, git, github)
+- Don't pass sensitive data in literal arguments (use environment variables or config)
+- Don't use blocking sync operations in async callables
+
+## Implementation Details
+
+- **Module:** `src/imbi_automations/actions/callablea.py`
+- **Model:** `src/imbi_automations/models/workflow.py:132-143`
+- **Tests:** `tests/actions/test_callable.py` (23 tests, full coverage)
+- **Import Format:** Uses Pydantic's `ImportString` validator
+- **Async Detection:** Uses `asyncio.iscoroutinefunction()`
+- **Template Rendering:** Uses `prompts.render()` with Jinja2
+- **Error Wrapping:** All exceptions wrapped in `RuntimeError` with original as `__cause__`
+
+## Migration from Shell Actions
+
+If you were using shell actions to run Python code, consider migrating to callable actions:
+
+**Before (shell action):**
+```toml
+[[actions]]
+name = "run-python"
+type = "shell"
+command = "python -c 'from mymodule import func; func(\"arg1\", \"arg2\")'"
+```
+
+**After (callable action):**
+```toml
+[[actions]]
+name = "run-python"
+type = "callable"
+callable = "mymodule:func"
+args = ["arg1", "arg2"]
+```
+
+**Benefits:**
+- Type safety and validation
+- Better error messages
+- No shell escaping issues
+- Template support for arguments
+- Async/await support
+- Cleaner syntax

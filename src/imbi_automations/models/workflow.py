@@ -137,8 +137,7 @@ class WorkflowCallableAction(WorkflowAction):
     """
 
     type: typing.Literal['callable'] = 'callable'
-    import_name: str = pydantic.Field(alias='import')
-    callable: typing.Callable
+    callable: pydantic.ImportString  # Expects "module.path:function_name"
     args: list[typing.Any] = []
     kwargs: dict[str, typing.Any] = {}
     ai_commit: bool = True
