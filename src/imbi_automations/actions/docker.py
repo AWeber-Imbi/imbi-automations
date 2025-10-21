@@ -60,23 +60,15 @@ class DockerActions(mixins.WorkflowLoggerMixin):
     ) -> None:
         """Execute docker extract command to copy files from container."""
         image = (
-            prompts.render(self.context, str(action.image))
+            prompts.render(self.context, template=str(action.image))
             if prompts.has_template_syntax(action.image)
             else action.image
         )
         image = f'{image}:{action.tag}' if ':' not in image else image
-        source_path = str(action.source)
-        # Extract destination URL path - yarl parses file://name as host,
-        # not path
-        dest_url = str(action.destination)
-        import yarl
 
-        dest_uri = yarl.URL(dest_url)
-        dest_filename = (
-            str(dest_uri.host + dest_uri.path.lstrip('/'))
-            if dest_uri.host
-            else dest_uri.path.lstrip('/')
-        )
+        # Build destination path in extracted directory
+        # Extract path component from ResourceUrl (strips scheme and slashes)
+        dest_filename = action.destination.path.lstrip('/')
         dest_path = (
             self.context.working_directory / 'extracted' / dest_filename
         )
@@ -84,7 +76,7 @@ class DockerActions(mixins.WorkflowLoggerMixin):
             '%s %s extracting %s from container %s to %s',
             self.context.imbi_project.slug,
             action.name,
-            source_path,
+            action.source,
             image,
             dest_path,
         )
@@ -102,7 +94,7 @@ class DockerActions(mixins.WorkflowLoggerMixin):
                 [
                     'docker',
                     'cp',
-                    f'{container_name}:{source_path}',
+                    f'{container_name}:{action.source}',
                     str(dest_path),
                 ],
                 action=action,
@@ -111,7 +103,7 @@ class DockerActions(mixins.WorkflowLoggerMixin):
                 '%s %s successfully extracted %s to %s',
                 self.context.imbi_project.slug,
                 action.name,
-                source_path,
+                action.source,
                 dest_path,
             )
         finally:
