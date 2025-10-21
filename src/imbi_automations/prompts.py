@@ -92,11 +92,19 @@ def render_file(
 def render_path(
     context: models.WorkflowContext, path: pydantic.AnyUrl
 ) -> pydantic.AnyUrl:
-    path_str = parse.unquote(path.path)
+    if isinstance(path, pydantic.AnyUrl):
+        path_str = parse.unquote(path.path)
+    elif isinstance(path, str):
+        path_str = path
+    else:
+        raise TypeError(f'Invalid path type: {type(path)}')
     if has_template_syntax(path_str):
         value = render(context, template=path_str)
         LOGGER.debug('Rendered path: %s', value)
-        return models.ResourceUrl(f'{path.scheme}://{value}')
+        if isinstance(path, pydantic.AnyUrl):
+            return models.ResourceUrl(f'{path.scheme}://{value}')
+        else:
+            return value
     return path
 
 
