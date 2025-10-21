@@ -20,6 +20,35 @@ from imbi_automations import models
 LOGGER = logging.getLogger(__name__)
 
 
+def append_file(file: str, value: str) -> str:
+    """Append a value to a file.
+
+    Args:
+        file: Path to the file to append to
+        value: Content to append to the file
+
+    Returns:
+        Status string: 'success' or 'failed'
+
+    """
+    try:
+        file_path = pathlib.Path(file)
+
+        # Create parent directory if it doesn't exist
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Append the value to the file
+        with open(file_path, 'a', encoding='utf-8') as f:
+            f.write(value)
+
+        LOGGER.debug('Successfully appended to file: %s', file)
+        return 'success'
+
+    except (OSError, UnicodeDecodeError) as exc:
+        LOGGER.error('Failed to append to file %s: %s', file, exc)
+        return 'failed'
+
+
 def copy(source: pathlib.Path, destination: pathlib.Path) -> None:
     """Copy a file from source to destination."""
     LOGGER.debug('Copying %s to %s', source, destination)
@@ -84,103 +113,6 @@ def compare_semver_with_build_numbers(
     else:
         # Semantic versions are equal, compare build numbers
         return current_build < target_build
-
-
-def append_file(file: str, value: str) -> str:
-    """Append a value to a file.
-
-    Args:
-        file: Path to the file to append to
-        value: Content to append to the file
-
-    Returns:
-        Status string: 'success' or 'failed'
-
-    """
-    try:
-        file_path = pathlib.Path(file)
-
-        # Create parent directory if it doesn't exist
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Append the value to the file
-        with open(file_path, 'a', encoding='utf-8') as f:
-            f.write(value)
-
-        LOGGER.debug('Successfully appended to file: %s', file)
-        return 'success'
-
-    except (OSError, UnicodeDecodeError) as exc:
-        LOGGER.error('Failed to append to file %s: %s', file, exc)
-        return 'failed'
-
-
-def resolve_path(
-    context: models.WorkflowContext, path: models.ResourceUrl | None
-) -> pathlib.Path:
-    """Resolve a path relative to the workflow context working directory."""
-    if path is None:
-        raise ValueError('Path cannot be None')
-    path_str = str(path)
-    if not isinstance(path_str, str):
-        raise TypeError(
-            f'str(path) returned {type(path_str)}, expected str. '
-            f'path type: {type(path)}, path value: {path!r}'
-        )
-    uri = yarl.URL(path_str)
-
-    # Handle yarl.URL parsing: scheme://path parses as host, not path
-    # When we have a host (e.g., repository://file.txt), yarl treats
-    # "file.txt" as the host, not the path. We need to reconstruct the
-    # path component from both host and path.
-    if uri.host:
-        # Use pathlib to ensure proper path separator when combining
-        path_component = str(pathlib.Path(uri.host) / uri.path.lstrip('/'))
-    else:
-        path_component = uri.path.lstrip('/')
-
-    match uri.scheme:
-        case 'external':  # External to working directory
-            return pathlib.Path('/' + path_component)
-        case 'extracted':
-            return context.working_directory / str(uri.scheme) / path_component
-        case 'file':
-            return context.working_directory / path_component
-        case 'repository':
-            return context.working_directory / str(uri.scheme) / path_component
-        case 'workflow':
-            return context.working_directory / str(uri.scheme) / path_component
-        case '':
-            return context.working_directory / path_component
-        case _:
-            raise RuntimeError(f'Invalid path scheme: {uri.scheme}')
-
-
-def sanitize(url: str | pydantic.AnyUrl) -> str:
-    """Mask passwords in URLs for security.
-
-    Args:
-        url: Input string that may contain URLs with passwords
-
-    Returns:
-        Text with passwords in URLs replaced with asterisks
-
-    """
-    pattern = re.compile(r'(\w+?://[^:@]+:)([^@]+)(@)')
-    return pattern.sub(r'\1******\3', str(url))
-
-
-def load_toml(toml_file: typing.TextIO) -> dict:
-    """Load TOML data from a file-like object
-
-    Args:
-        toml_file: The file-like object to load as TOML
-
-    Raises:
-        tomllib.TOMLDecodeError: If TOML parsing fails
-
-    """
-    return tomllib.loads(toml_file.read())
 
 
 def extract_image_from_dockerfile(
@@ -264,20 +196,6 @@ def extract_json(response: str) -> dict[str, typing.Any]:
     raise ValueError(f'No valid JSON found in response: {response[:200]}...')
 
 
-def _read_pyproject_toml(
-    context: models.WorkflowContext,
-    path: models.ResourceUrl | str | None = None,
-) -> dict[str, typing.Any]:
-    """Read a pyproject.toml file from the workflow context."""
-    pyproject = resolve_path(context, path or 'repository:///pyproject.toml')
-    if not pyproject.exists():
-        raise FileNotFoundError('No pyproject.toml found')
-    elif not pyproject.is_file():
-        raise ValueError(f'Path is not a file: {pyproject}')
-    with pyproject.open('rb') as f:
-        return tomllib.load(f)
-
-
 def extract_package_name_from_pyproject(
     context: models.WorkflowContext,
     path: models.ResourceUrl | str | None = None,
@@ -287,6 +205,19 @@ def extract_package_name_from_pyproject(
         return _read_pyproject_toml(context, path)['package']['name']
     except (FileNotFoundError, KeyError) as err:
         raise RuntimeError(f'Failed to extract package name: {err}') from err
+
+
+def load_toml(toml_file: typing.TextIO) -> dict:
+    """Load TOML data from a file-like object
+
+    Args:
+        toml_file: The file-like object to load as TOML
+
+    Raises:
+        tomllib.TOMLDecodeError: If TOML parsing fails
+
+    """
+    return tomllib.loads(toml_file.read())
 
 
 def path_to_resource_url(
@@ -326,6 +257,20 @@ def _find_init_py_from_context(
             LOGGER.debug('Found __init__.py file: %s', path)
             return path
     raise RuntimeError('Could not find __init__.py file in repository')
+
+
+def _read_pyproject_toml(
+    context: models.WorkflowContext,
+    path: models.ResourceUrl | str | None = None,
+) -> dict[str, typing.Any]:
+    """Read a pyproject.toml file from the workflow context."""
+    pyproject = resolve_path(context, path or 'repository:///pyproject.toml')
+    if not pyproject.exists():
+        raise FileNotFoundError('No pyproject.toml found')
+    elif not pyproject.is_file():
+        raise ValueError(f'Path is not a file: {pyproject}')
+    with pyproject.open('rb') as f:
+        return tomllib.load(f)
 
 
 def python_init_file_path(
@@ -371,3 +316,58 @@ def python_init_file_path(
 
     # Fallback: heuristics
     return _find_init_py_from_context(context)
+
+
+def resolve_path(
+    context: models.WorkflowContext, path: models.ResourceUrl | None
+) -> pathlib.Path:
+    """Resolve a path relative to the workflow context working directory."""
+    if path is None:
+        raise ValueError('Path cannot be None')
+    path_str = str(path)
+    if not isinstance(path_str, str):
+        raise TypeError(
+            f'str(path) returned {type(path_str)}, expected str. '
+            f'path type: {type(path)}, path value: {path!r}'
+        )
+    uri = yarl.URL(path_str)
+
+    # Handle yarl.URL parsing: scheme://path parses as host, not path
+    # When we have a host (e.g., repository://file.txt), yarl treats
+    # "file.txt" as the host, not the path. We need to reconstruct the
+    # path component from both host and path.
+    if uri.host:
+        # Use pathlib to ensure proper path separator when combining
+        path_component = str(pathlib.Path(uri.host) / uri.path.lstrip('/'))
+    else:
+        path_component = uri.path.lstrip('/')
+
+    match uri.scheme:
+        case 'external':  # External to working directory
+            return pathlib.Path('/' + path_component)
+        case 'extracted':
+            return context.working_directory / str(uri.scheme) / path_component
+        case 'file':
+            return context.working_directory / path_component
+        case 'repository':
+            return context.working_directory / str(uri.scheme) / path_component
+        case 'workflow':
+            return context.working_directory / str(uri.scheme) / path_component
+        case '':
+            return context.working_directory / path_component
+        case _:
+            raise RuntimeError(f'Invalid path scheme: {uri.scheme}')
+
+
+def sanitize(url: str | pydantic.AnyUrl) -> str:
+    """Mask passwords in URLs for security.
+
+    Args:
+        url: Input string that may contain URLs with passwords
+
+    Returns:
+        Text with passwords in URLs replaced with asterisks
+
+    """
+    pattern = re.compile(r'(\w+?://[^:@]+:)([^@]+)(@)')
+    return pattern.sub(r'\1******\3', str(url))
