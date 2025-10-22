@@ -14,7 +14,7 @@ class PromptsTestBase(unittest.TestCase):
 
     def setUp(self) -> None:
         """Set up test fixtures."""
-        self.temp_dir = tempfile.TemporaryDirectory()
+        self.temp_dir_name = self.enterContext(tempfile.TemporaryDirectory())
         self.working_dir = pathlib.Path(self.temp_dir.name)
         self.workflow = models.Workflow(
             path=pathlib.Path('/workflows/test'),
