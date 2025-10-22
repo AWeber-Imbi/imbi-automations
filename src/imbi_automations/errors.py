@@ -15,6 +15,12 @@ class ActionFailureException(Exception):
         )
 
 
+class ConfigurationError(Exception):
+    """Raised when there is a configuration error."""
+
+    pass
+
+
 class GitHubRateLimitError(Exception):
     """Raised when GitHub API rate limit is exceeded."""
 

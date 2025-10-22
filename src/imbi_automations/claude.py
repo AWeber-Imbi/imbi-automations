@@ -80,7 +80,13 @@ class Claude(mixins.WorkflowLoggerMixin):
                 anthropic_types.MessageParam(role='user', content=prompt)
             ],
         )
-        return message.content[0].text
+        if isinstance(message.content[0], anthropic_types.TextBlock):
+            return message.content[0].text
+        LOGGER.warning(
+            'Expected TextBlock response, got: %s',
+            message.content[0].__class__,
+        )
+        return ''
 
     def _create_client(self) -> claude_agent_sdk.ClaudeSDKClient:
         """Create the Claude SDK client, initializing the environment"""

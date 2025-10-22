@@ -223,6 +223,8 @@ class FileActions(mixins.WorkflowLoggerMixin):
             pattern = re.compile(action.pattern)
         else:
             pattern = action.pattern
+            if pattern is None:
+                return
 
         deleted_count = 0
         for file_path in base_path.rglob('*'):

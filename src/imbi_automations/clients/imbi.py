@@ -438,7 +438,7 @@ class Imbi(http.BaseURLHTTPClient):
         """
         facts = await self.get_project_facts(project_id)
         for fact in facts:
-            if fact.name == fact_name:
+            if fact.fact_name == fact_name:
                 return str(fact.value) if fact.value is not None else None
         return None
 
@@ -479,6 +479,8 @@ class Imbi(http.BaseURLHTTPClient):
         if not skip_validations:
             # Get project information to validate project type compatibility
             project = await self.get_project(project_id)
+            if not project:
+                raise ValueError(f'Project not found: {project_id}')
 
             # Validate that the fact type supports this project's type
             fact_types = await self.get_fact_types()

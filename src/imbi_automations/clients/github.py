@@ -30,6 +30,9 @@ class GitHub(http.BaseURLHTTPClient):
         config: models.Configuration,
         transport: httpx.BaseTransport | None = None,
     ) -> None:
+        if not config.github:
+            raise errors.ConfigurationError('GitHub configuration missing')
+
         super().__init__(transport)
         self._base_url = f'https://{config.github.hostname}'
         self.add_header(
@@ -44,14 +47,20 @@ class GitHub(http.BaseURLHTTPClient):
         self, project: models.ImbiProject
     ) -> models.GitHubRepository | None:
         """Get a repository by name/slug in a specific organization."""
-        project_id = project.identifiers.get(
-            self.configuration.imbi.github_identifier
+        if not self.configuration.imbi:
+            raise errors.ConfigurationError('Imbi configuration missing')
+
+        project_id = (
+            project.identifiers.get(self.configuration.imbi.github_identifier)
+            if project.identifiers
+            else None
         )
         if project_id:
             return await self._get_repository_by_id(project_id)
-        project_link = project.links.get(self.configuration.imbi.github_link)
-        if project_link:
-            return await self.get_repository_by_url(project_link)
+        if project.links:
+            link = project.links.get(self.configuration.imbi.github_link)
+            if link:
+                return await self.get_repository_by_url(link)
         return None
 
     async def _get_repository_by_id(
@@ -196,7 +205,10 @@ class GitHub(http.BaseURLHTTPClient):
             return environments
 
         except httpx.HTTPError as exc:
-            if exc.response.status_code == http.HTTPStatus.NOT_FOUND:
+            if (
+                isinstance(exc, httpx.HTTPStatusError)
+                and exc.response.status_code == http.HTTPStatus.NOT_FOUND
+            ):
                 LOGGER.debug('Repository %s/%s not found (404)', org, repo)
                 raise errors.GitHubNotFoundError(
                     f'Repository {org}/{repo} not found'
@@ -289,7 +301,10 @@ class GitHub(http.BaseURLHTTPClient):
             return True
 
         except httpx.HTTPError as exc:
-            if exc.response.status_code == http.HTTPStatus.NOT_FOUND:
+            if (
+                isinstance(exc, httpx.HTTPStatusError)
+                and exc.response.status_code == http.HTTPStatus.NOT_FOUND
+            ):
                 LOGGER.warning(
                     'Environment "%s" not found in %s/%s (already deleted?)',
                     environment_name,
@@ -621,7 +636,10 @@ class GitHub(http.BaseURLHTTPClient):
             return ''  # Empty file
 
         except httpx.HTTPError as exc:
-            if exc.response.status_code == 404:
+            if (
+                isinstance(exc, httpx.HTTPStatusError)
+                and exc.response.status_code == http.HTTPStatus.NOT_FOUND
+            ):
                 LOGGER.debug(
                     'File %s not found in %s/%s', file_path, org, repo
                 )
