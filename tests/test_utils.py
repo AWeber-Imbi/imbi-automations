@@ -2,6 +2,7 @@
 
 import pathlib
 import tempfile
+import textwrap
 import unittest
 
 from imbi_automations import models, utils
