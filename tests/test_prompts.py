@@ -14,8 +14,8 @@ class PromptsTestBase(unittest.TestCase):
 
     def setUp(self) -> None:
         """Set up test fixtures."""
-        self.temp_dir_name = self.enterContext(tempfile.TemporaryDirectory())
-        self.working_dir = pathlib.Path(self.temp_dir.name)
+        self.temp_dir = self.enterContext(tempfile.TemporaryDirectory())
+        self.working_dir = pathlib.Path(self.temp_dir)
         self.workflow = models.Workflow(
             path=pathlib.Path('/workflows/test'),
             configuration=models.WorkflowConfiguration(
@@ -44,10 +44,6 @@ class PromptsTestBase(unittest.TestCase):
             ),
             working_directory=self.working_dir,
         )
-
-    def tearDown(self) -> None:
-        """Clean up test fixtures."""
-        self.temp_dir.cleanup()
 
 
 class RenderPathTestCase(PromptsTestBase):

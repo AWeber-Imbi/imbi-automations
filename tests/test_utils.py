@@ -4,6 +4,7 @@ import pathlib
 import tempfile
 import textwrap
 import unittest
+import uuid
 
 from imbi_automations import models, utils
 
@@ -49,14 +50,33 @@ class UtilsTestCase(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp_dir.cleanup()
 
+    def write_temporary_file(
+        self, content: str, filename: str | None = None
+    ) -> pathlib.Path:
+        """Write content to a temporary file and return its path.
+
+        Args:
+            content: The content to write to the file
+            filename: Optional filename (defaults to random UUID)
+
+        Returns:
+            Path to the created temporary file
+        """
+        file_name = filename or str(uuid.uuid4())
+        file_path = self.temp_path / file_name
+        file_path.write_text(textwrap.dedent(content).lstrip('\n'))
+        return file_path
+
     def test_extract_image_from_dockerfile_simple(self) -> None:
         """Test extracting simple Docker image from Dockerfile."""
-        dockerfile_content = """FROM python:3.12
-RUN pip install requirements.txt
-COPY . /app
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            FROM python:3.12
+            RUN pip install requirements.txt
+            COPY . /app
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -66,12 +86,14 @@ COPY . /app
 
     def test_extract_image_from_dockerfile_with_tag(self) -> None:
         """Test extracting Docker image with tag."""
-        dockerfile_content = """FROM ubuntu:20.04
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            FROM ubuntu:20.04
+            ENV DEBIAN_FRONTEND=noninteractive
+            RUN apt-get update
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -81,15 +103,17 @@ RUN apt-get update
 
     def test_extract_image_from_dockerfile_multi_stage(self) -> None:
         """Test extracting Docker image from multi-stage build."""
-        dockerfile_content = """FROM node:18 AS builder
-WORKDIR /build
-COPY package.json .
+        self.write_temporary_file(
+            """
+            FROM node:18 AS builder
+            WORKDIR /build
+            COPY package.json .
 
-FROM nginx:alpine AS runtime
-COPY --from=builder /build/dist /usr/share/nginx/html
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+            FROM nginx:alpine AS runtime
+            COPY --from=builder /build/dist /usr/share/nginx/html
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -100,12 +124,14 @@ COPY --from=builder /build/dist /usr/share/nginx/html
 
     def test_extract_image_from_dockerfile_with_comments(self) -> None:
         """Test extracting Docker image with inline comments."""
-        dockerfile_content = """# Base image for Python application
-FROM python:3.11-slim  # Using slim variant for smaller size
-LABEL maintainer="test@example.com"
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            # Base image for Python application
+            FROM python:3.11-slim  # Using slim variant for smaller size
+            LABEL maintainer="test@example.com"
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -115,11 +141,13 @@ LABEL maintainer="test@example.com"
 
     def test_extract_image_from_dockerfile_case_insensitive(self) -> None:
         """Test extracting Docker image with different case."""
-        dockerfile_content = """from alpine:latest
-run apk add --no-cache python3
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            from alpine:latest
+            run apk add --no-cache python3
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -129,11 +157,13 @@ run apk add --no-cache python3
 
     def test_extract_image_from_dockerfile_with_registry(self) -> None:
         """Test extracting Docker image with custom registry."""
-        dockerfile_content = """FROM registry.example.com/myorg/python:3.12
-WORKDIR /app
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            FROM registry.example.com/myorg/python:3.12
+            WORKDIR /app
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -143,12 +173,14 @@ WORKDIR /app
 
     def test_extract_image_from_dockerfile_no_from_instruction(self) -> None:
         """Test extracting Docker image from file without FROM instruction."""
-        dockerfile_content = """# This is not a valid Dockerfile
-RUN echo "hello"
-COPY . /app
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            # This is not a valid Dockerfile
+            RUN echo "hello"
+            COPY . /app
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -158,8 +190,7 @@ COPY . /app
 
     def test_extract_image_from_dockerfile_empty_file(self) -> None:
         """Test extracting Docker image from empty file."""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text('')
+        self.write_temporary_file('', filename='Dockerfile')
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -169,12 +200,14 @@ COPY . /app
 
     def test_extract_image_from_dockerfile_comments_only(self) -> None:
         """Test extracting Docker image from file with only comments."""
-        dockerfile_content = """# This is a comment
-# FROM python:3.12 (commented out)
-# Another comment
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            # This is a comment
+            # FROM python:3.12 (commented out)
+            # Another comment
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -193,11 +226,13 @@ COPY . /app
 
     def test_extract_image_from_dockerfile_malformed_from(self) -> None:
         """Test extracting Docker image from malformed FROM instruction."""
-        dockerfile_content = """FROM
-RUN echo "hello"
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            FROM
+            RUN echo "hello"
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -207,12 +242,14 @@ RUN echo "hello"
 
     def test_extract_image_from_dockerfile_from_with_build_args(self) -> None:
         """Test extracting Docker image with build args in FROM."""
-        dockerfile_content = """ARG BASE_IMAGE=python:3.12
-FROM ${BASE_IMAGE}
-WORKDIR /app
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            ARG BASE_IMAGE=python:3.12
+            FROM ${BASE_IMAGE}
+            WORKDIR /app
+            """,
+            filename='Dockerfile',
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, pathlib.Path('Dockerfile')
@@ -223,15 +260,18 @@ WORKDIR /app
 
     def test_extract_image_from_dockerfile_with_resource_url(self) -> None:
         """Test extracting Docker image using ResourceUrl scheme."""
-        dockerfile_content = textwrap.dedent("""
-           FROM alpine:3.18
-           RUN apk add --no-cache python3
-        """)
         # Create in repository subdirectory
         repo_dir = self.temp_path / 'repository'
         repo_dir.mkdir()
         dockerfile_path = repo_dir / 'Dockerfile'
-        dockerfile_path.write_text(dockerfile_content)
+        dockerfile_path.write_text(
+            textwrap.dedent(
+                """
+                FROM alpine:3.18
+                RUN apk add --no-cache python3
+                """
+            ).lstrip('\n')
+        )
 
         result = utils.extract_image_from_dockerfile(
             self.context, models.ResourceUrl('repository:///Dockerfile')
@@ -241,11 +281,13 @@ WORKDIR /app
 
     def test_extract_image_from_dockerfile_with_string_path(self) -> None:
         """Test extracting Docker image with string path (not Path object)."""
-        dockerfile_content = """FROM node:18-alpine
-WORKDIR /usr/src/app
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile.node'
-        dockerfile_path.write_text(dockerfile_content)
+        self.write_temporary_file(
+            """
+            FROM node:18-alpine
+            WORKDIR /usr/src/app
+            """,
+            filename='Dockerfile.node',
+        )
 
         # Pass as string instead of Path object
         result = utils.extract_image_from_dockerfile(
@@ -256,11 +298,13 @@ WORKDIR /usr/src/app
 
     def test_extract_image_from_dockerfile_with_path_object(self) -> None:
         """Test extracting Docker image with Path object."""
-        dockerfile_content = """FROM redis:7-alpine
-EXPOSE 6379
-"""
-        dockerfile_path = self.temp_path / 'Dockerfile.redis'
-        dockerfile_path.write_text(dockerfile_content)
+        dockerfile_path = self.write_temporary_file(
+            """
+            FROM redis:7-alpine
+            EXPOSE 6379
+            """,
+            filename='Dockerfile.redis',
+        )
 
         # Pass as absolute Path object
         result = utils.extract_image_from_dockerfile(
