@@ -222,9 +222,10 @@ WORKDIR /app
 
     def test_extract_image_from_dockerfile_with_resource_url(self) -> None:
         """Test extracting Docker image using ResourceUrl scheme."""
-        dockerfile_content = """FROM alpine:3.18
-RUN apk add --no-cache python3
-"""
+        dockerfile_content = textwrap.dedent("""
+           FROM alpine:3.18
+           RUN apk add --no-cache python3
+        """)
         # Create in repository subdirectory
         repo_dir = self.temp_path / 'repository'
         repo_dir.mkdir()
