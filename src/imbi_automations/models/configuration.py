@@ -24,7 +24,7 @@ class AnthropicConfiguration(pydantic.BaseModel):
         default=os.environ.get('ANTHROPIC_API_KEY')
     )
     bedrock: bool = False
-    model: str = pydantic.Field(default='claude-4-5-haiku')
+    model: str = 'claude-4-5-haiku'
 
 
 class GitConfiguration(pydantic.BaseModel):
