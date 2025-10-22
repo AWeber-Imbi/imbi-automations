@@ -45,6 +45,8 @@ class Filter(mixins.WorkflowLoggerMixin):
         if (
             (
                 workflow_filter.github_identifier_required
+                and self.configuration.imbi
+                and project.identifiers
                 and not project.identifiers.get(
                     self.configuration.imbi.github_identifier
                 )
