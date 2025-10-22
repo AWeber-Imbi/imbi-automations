@@ -5,6 +5,7 @@
 !/.pre-commit-config.yaml
 /build
 /dist
+/dry-runs
 /env
 /errors
 /.venv

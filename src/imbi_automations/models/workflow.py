@@ -137,8 +137,7 @@ class WorkflowCallableAction(WorkflowAction):
     """
 
     type: typing.Literal['callable'] = 'callable'
-    import_name: str = pydantic.Field(alias='import')
-    callable: typing.Callable
+    callable: pydantic.ImportString  # Expects "module.path:function_name"
     args: list[typing.Any] = []
     kwargs: dict[str, typing.Any] = {}
     ai_commit: bool = True
@@ -183,7 +182,7 @@ class WorkflowDockerAction(validators.CommandRulesMixin, WorkflowAction):
     image: str
     tag: str = 'latest'
     path: ResourceUrl | None = None
-    source: pathlib.Path | None = None
+    source: str | pathlib.Path | None = None
     destination: ResourceUrl | None = None
     committable: bool = False
 
@@ -474,11 +473,11 @@ class WorkflowCondition(validators.ExclusiveGroupsMixin, pydantic.BaseModel):
     absence, and content matching with glob patterns and regex support.
     """
 
-    file_exists: ResourceUrl | None = None
-    file_not_exists: ResourceUrl | None = None
+    file_exists: ResourceUrl | str | None = None
+    file_not_exists: ResourceUrl | str | None = None
     file_contains: str | None = None
     file_doesnt_contain: str | None = None
-    file: ResourceUrl | None = None
+    file: ResourceUrl | str | None = None
 
     remote_client: WorkflowConditionRemoteClient = (
         WorkflowConditionRemoteClient.github

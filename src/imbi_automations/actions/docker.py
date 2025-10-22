@@ -2,7 +2,7 @@
 
 import asyncio
 
-from imbi_automations import mixins, models, prompts
+from imbi_automations import mixins, models, prompts, utils
 
 
 class DockerActions(mixins.WorkflowLoggerMixin):
@@ -60,31 +60,27 @@ class DockerActions(mixins.WorkflowLoggerMixin):
     ) -> None:
         """Execute docker extract command to copy files from container."""
         image = (
-            prompts.render(self.context, str(action.image))
+            prompts.render(self.context, template=str(action.image))
             if prompts.has_template_syntax(action.image)
             else action.image
         )
         image = f'{image}:{action.tag}' if ':' not in image else image
-        source_path = str(action.source)
-        # Extract destination URL path - yarl parses file://name as host,
-        # not path
-        dest_url = str(action.destination)
-        import yarl
 
-        dest_uri = yarl.URL(dest_url)
-        dest_filename = (
-            str(dest_uri.host + dest_uri.path.lstrip('/'))
-            if dest_uri.host
-            else dest_uri.path.lstrip('/')
-        )
-        dest_path = (
-            self.context.working_directory / 'extracted' / dest_filename
+        # Build destination path using resolve_path for proper scheme handling
+        # Convert file:// scheme to extracted:// for docker extract actions
+        dest_url = action.destination
+        if str(dest_url).startswith('file:///'):
+            dest_url = models.ResourceUrl(
+                str(dest_url).replace('file:///', 'extracted:///', 1)
+            )
+        dest_path = utils.resolve_path(
+            self.context, dest_url, default_scheme='extracted'
         )
         self._log_verbose_info(
             '%s %s extracting %s from container %s to %s',
             self.context.imbi_project.slug,
             action.name,
-            source_path,
+            action.source,
             image,
             dest_path,
         )
@@ -102,7 +98,7 @@ class DockerActions(mixins.WorkflowLoggerMixin):
                 [
                     'docker',
                     'cp',
-                    f'{container_name}:{source_path}',
+                    f'{container_name}:{action.source}',
                     str(dest_path),
                 ],
                 action=action,
@@ -111,7 +107,7 @@ class DockerActions(mixins.WorkflowLoggerMixin):
                 '%s %s successfully extracted %s to %s',
                 self.context.imbi_project.slug,
                 action.name,
-                source_path,
+                action.source,
                 dest_path,
             )
         finally:

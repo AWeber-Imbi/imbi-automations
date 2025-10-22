@@ -24,7 +24,7 @@ class AnthropicConfiguration(pydantic.BaseModel):
         default=os.environ.get('ANTHROPIC_API_KEY')
     )
     bedrock: bool = False
-    model: str = pydantic.Field(default='claude-3-5-haiku-latest')
+    model: str = 'claude-4-5-haiku'
 
 
 class GitConfiguration(pydantic.BaseModel):
@@ -82,13 +82,14 @@ class ImbiConfiguration(pydantic.BaseModel):
 class ClaudeCodeConfiguration(pydantic.BaseModel):
     """Claude Code SDK configuration.
 
-    Configures the Claude Code executable path, base prompt file, and
-    whether AI-powered transformations are enabled for workflows.
+    Configures the Claude Code executable path, base prompt file, model
+    selection, and whether AI-powered transformations are enabled.
     """
 
     executable: str = 'claude'  # Claude Code executable path
     base_prompt: pathlib.Path | None = None
     enabled: bool = True
+    model: str = pydantic.Field(default='claude-sonnet-4-5')
 
     def __init__(self, **kwargs: typing.Any) -> None:
         super().__init__(**kwargs)
