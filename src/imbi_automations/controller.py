@@ -273,7 +273,7 @@ class Automation(mixins.WorkflowLoggerMixin):
 
     async def _process_imbi_projects(self) -> bool:
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
-        projects = await client.get_all_projects()
+        projects = await client.get_projects()
         return await self._process_imbi_projects_common(projects)
 
     async def _process_imbi_projects_common(

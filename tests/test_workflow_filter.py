@@ -41,9 +41,11 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
             description='Test project',
             environments=[
                 models.ImbiEnvironment(
-                    name='Production', icon_class='fa-prod'
+                    name='Production', slug='production', icon_class='fa-prod'
                 ),
-                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
+                models.ImbiEnvironment(
+                    name='Staging', slug='staging', icon_class='fa-stage'
+                ),
             ],
             facts=None,
             identifiers=None,
@@ -77,9 +79,11 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
             description='Test project',
             environments=[
                 models.ImbiEnvironment(
-                    name='Production', icon_class='fa-prod'
+                    name='Production', slug='production', icon_class='fa-prod'
                 ),
-                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
+                models.ImbiEnvironment(
+                    name='Staging', slug='staging', icon_class='fa-stage'
+                ),
             ],
             facts=None,
             identifiers=None,
@@ -113,9 +117,11 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
             description='Test project',
             environments=[
                 models.ImbiEnvironment(
-                    name='Production', icon_class='fa-prod'
+                    name='Production', slug='production', icon_class='fa-prod'
                 ),
-                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
+                models.ImbiEnvironment(
+                    name='Staging', slug='staging', icon_class='fa-stage'
+                ),
             ],
             facts=None,
             identifiers=None,
@@ -148,9 +154,11 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
             description='Test project',
             environments=[
                 models.ImbiEnvironment(
-                    name='Production', icon_class='fa-prod'
+                    name='Production', slug='production', icon_class='fa-prod'
                 ),
-                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
+                models.ImbiEnvironment(
+                    name='Staging', slug='staging', icon_class='fa-stage'
+                ),
             ],
             facts=None,
             identifiers=None,
@@ -237,10 +245,12 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
             description='Test project',
             environments=[
                 models.ImbiEnvironment(
-                    name='Production', icon_class='fa-prod'
+                    name='Production', slug='production', icon_class='fa-prod'
                 ),
                 models.ImbiEnvironment(
-                    name='Testing Environment', icon_class='fa-test'
+                    name='Testing Environment',
+                    slug='testing-environment',
+                    icon_class='fa-test',
                 ),
             ],
             facts=None,

@@ -94,13 +94,34 @@ class TestImbiClient(base.AsyncTestCase):
             }
         }
 
-        self.http_client_side_effect = httpx.Response(
-            http.HTTPStatus.OK,
-            json=opensearch_data,
-            request=httpx.Request(
-                'POST', 'https://imbi.example.com/opensearch/projects'
+        # Mock responses: opensearch then get_environments
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=opensearch_data,
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
             ),
-        )
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
 
         result = await self.instance.get_project(123)
 
@@ -153,13 +174,41 @@ class TestImbiClient(base.AsyncTestCase):
             }
         }
 
-        self.http_client_side_effect = httpx.Response(
-            http.HTTPStatus.OK,
-            json=opensearch_data,
-            request=httpx.Request(
-                'POST', 'https://imbi.example.com/opensearch/projects'
+        # Mock responses: opensearch, then get_environments (2 projects)
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=opensearch_data,
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
             ),
-        )
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
 
         result = await self.instance.get_projects_by_type('api')
 
@@ -201,15 +250,36 @@ class TestImbiClient(base.AsyncTestCase):
             }
         }
 
-        self.http_client_side_effect = httpx.Response(
-            http.HTTPStatus.OK,
-            json=opensearch_data,
-            request=httpx.Request(
-                'POST', 'https://imbi.example.com/opensearch/projects'
+        # Mock responses: opensearch then get_environments
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=opensearch_data,
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
             ),
-        )
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
 
-        result = await self.instance.get_all_projects()
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
+
+        result = await self.instance.get_projects()
 
         self.assertEqual(len(result), 1)
         self.assertIsInstance(result[0], models.ImbiProject)
@@ -236,13 +306,34 @@ class TestImbiClient(base.AsyncTestCase):
             }
         }
 
-        self.http_client_side_effect = httpx.Response(
-            http.HTTPStatus.OK,
-            json=opensearch_data,
-            request=httpx.Request(
-                'POST', 'https://imbi.example.com/opensearch/projects'
+        # Mock responses: opensearch then get_environments
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=opensearch_data,
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
             ),
-        )
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
 
         result = await self.instance.search_projects_by_github_url(
             'https://github.com/testorg/test-repo'
@@ -360,13 +451,22 @@ class TestImbiClient(base.AsyncTestCase):
         self.assertIn('archived', result['_source']['exclude'])
         self.assertIn('query', result)
 
-    def test_add_imbi_url(self) -> None:
+    async def test_add_imbi_url(self) -> None:
         """Test adding Imbi URL to project data."""
         project_data = create_mock_project_data(
             555, 'URL Test Project', 'test', 'test', 'url-test-project'
         )
 
-        result = self.instance._add_imbi_url(project_data)
+        # Mock get_environments response
+        self.http_client_side_effect = httpx.Response(
+            http.HTTPStatus.OK,
+            json=[],
+            request=httpx.Request(
+                'GET', 'https://imbi.example.com/environments'
+            ),
+        )
+
+        result = await self.instance._add_imbi_url(project_data)
 
         self.assertIsInstance(result, models.ImbiProject)
         self.assertEqual(result.id, 555)
@@ -433,20 +533,47 @@ class TestImbiClient(base.AsyncTestCase):
         }
 
         # Mock responses for pagination
-        responses = [first_page_data, second_page_data]
-        call_count = 0
-
+        # Pattern: opensearch, 100x get_environments, opensearch, 1x env
         def mock_response(request: httpx.Request) -> httpx.Response:
-            nonlocal call_count
-            response_data = (
-                responses[call_count]
-                if call_count < len(responses)
-                else {'hits': {'hits': []}}
-            )
-            call_count += 1
-            return httpx.Response(
-                http.HTTPStatus.OK, json=response_data, request=request
-            )
+            # Check if this is an opensearch or environments request
+            if '/environments' in str(request.url):
+                # Return empty environments for all get_environments calls
+                return httpx.Response(
+                    http.HTTPStatus.OK, json=[], request=request
+                )
+            elif '/opensearch/projects' in str(request.url):
+                # Parse request body to check pagination
+                import json
+
+                body = json.loads(request.content)
+                from_param = body.get('from', 0)
+
+                if from_param == 0:
+                    # First page
+                    return httpx.Response(
+                        http.HTTPStatus.OK,
+                        json=first_page_data,
+                        request=request,
+                    )
+                elif from_param == 100:
+                    # Second page
+                    return httpx.Response(
+                        http.HTTPStatus.OK,
+                        json=second_page_data,
+                        request=request,
+                    )
+                else:
+                    # No more pages
+                    return httpx.Response(
+                        http.HTTPStatus.OK,
+                        json={'hits': {'hits': []}},
+                        request=request,
+                    )
+            else:
+                # Fallback
+                return httpx.Response(
+                    http.HTTPStatus.OK, json={}, request=request
+                )
 
         self.http_client_transport = httpx.MockTransport(mock_response)
         self.instance = imbi.Imbi(self.config, self.http_client_transport)
@@ -619,7 +746,7 @@ class TestImbiClient(base.AsyncTestCase):
             ),
         )
 
-        result = await self.instance.get_fact_types()
+        result = await self.instance.get_project_fact_types()
 
         self.assertEqual(len(result), 2)
         self.assertIsInstance(result[0], models.ImbiProjectFactType)
@@ -646,7 +773,7 @@ class TestImbiClient(base.AsyncTestCase):
             ),
         )
 
-        result = await self.instance.get_fact_type_id_by_name(
+        result = await self.instance.get_project_fact_type_id_by_name(
             'CI Pipeline Status'
         )
 
@@ -664,7 +791,7 @@ class TestImbiClient(base.AsyncTestCase):
             ),
         )
 
-        result = await self.instance.get_fact_type_id_by_name(
+        result = await self.instance.get_project_fact_type_id_by_name(
             'Nonexistent Fact'
         )
 
@@ -773,13 +900,20 @@ class TestImbiClient(base.AsyncTestCase):
             123, 'Test Project', 'test', 'api', 'test-project'
         )
 
-        # Mock responses: get project, then update identifier
+        # Mock responses: opensearch, get_environments, then update identifier
         responses = [
             httpx.Response(
                 http.HTTPStatus.OK,
                 json={'hits': {'hits': [project_data]}},
                 request=httpx.Request(
                     'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
                 ),
             ),
             httpx.Response(
@@ -802,7 +936,9 @@ class TestImbiClient(base.AsyncTestCase):
         self.instance = imbi.Imbi(self.config, self.http_client_transport)
 
         # Should not raise any exception
-        await self.instance.update_github_identifier(123, 'github', 12345)
+        await self.instance.update_project_github_identifier(
+            123, 'github', 12345
+        )
 
     async def test_update_github_identifier_same_value(self) -> None:
         """Test updating GitHub identifier with same value skips update."""
@@ -816,16 +952,39 @@ class TestImbiClient(base.AsyncTestCase):
             identifiers={'github': '12345'},
         )
 
-        self.http_client_side_effect = httpx.Response(
-            http.HTTPStatus.OK,
-            json={'hits': {'hits': [project_data]}},
-            request=httpx.Request(
-                'POST', 'https://imbi.example.com/opensearch/projects'
+        # Mock: opensearch, get_environments (update skipped - same value)
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'hits': {'hits': [project_data]}},
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
             ),
-        )
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
 
         # Should not make additional API call
-        await self.instance.update_github_identifier(123, 'github', 12345)
+        await self.instance.update_project_github_identifier(
+            123, 'github', 12345
+        )
 
     async def test_update_github_identifier_different_value(self) -> None:
         """Test updating GitHub identifier with different value."""
@@ -839,13 +998,20 @@ class TestImbiClient(base.AsyncTestCase):
             identifiers={'github': '54321'},
         )
 
-        # Mock responses: get project, then update identifier
+        # Mock responses: opensearch, get_environments, then update identifier
         responses = [
             httpx.Response(
                 http.HTTPStatus.OK,
                 json={'hits': {'hits': [project_data]}},
                 request=httpx.Request(
                     'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
                 ),
             ),
             httpx.Response(
@@ -868,7 +1034,9 @@ class TestImbiClient(base.AsyncTestCase):
         self.instance = imbi.Imbi(self.config, self.http_client_transport)
 
         # Should update identifier
-        await self.instance.update_github_identifier(123, 'github', 12345)
+        await self.instance.update_project_github_identifier(
+            123, 'github', 12345
+        )
 
     async def test_update_github_identifier_project_not_found(self) -> None:
         """Test updating GitHub identifier when project doesn't exist."""
@@ -881,7 +1049,9 @@ class TestImbiClient(base.AsyncTestCase):
         )
 
         with self.assertRaises(ValueError) as cm:
-            await self.instance.update_github_identifier(999, 'github', 12345)
+            await self.instance.update_project_github_identifier(
+                999, 'github', 12345
+            )
 
         self.assertIn('Project not found: 999', str(cm.exception))
 
@@ -901,13 +1071,49 @@ class TestImbiClient(base.AsyncTestCase):
             'Testing Environment',
         ]
 
-        self.http_client_side_effect = httpx.Response(
-            http.HTTPStatus.OK,
-            json={'hits': {'hits': [mock_project]}},
-            request=httpx.Request(
-                'POST', 'https://imbi.example.com/opensearch/projects'
+        # Mock environment data from API
+        env_data = [
+            {
+                'name': 'Production',
+                'slug': 'production',
+                'icon_class': 'fa-prod',
+            },
+            {'name': 'Staging', 'slug': 'staging', 'icon_class': 'fa-stage'},
+            {
+                'name': 'Testing Environment',
+                'slug': 'testing-environment',
+                'icon_class': 'fa-test',
+            },
+        ]
+
+        # Mock responses: opensearch for project, then get_environments
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'hits': {'hits': [mock_project]}},
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
             ),
-        )
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=env_data,
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
 
         project = await self.instance.get_project(123)
 
@@ -916,15 +1122,19 @@ class TestImbiClient(base.AsyncTestCase):
         # Verify environments are converted to ImbiEnvironment objects
         self.assertIsNotNone(project.environments)
         self.assertEqual(len(project.environments), 3)
+
+        # Convert set to sorted list for predictable testing
+        environments = sorted(project.environments, key=lambda e: e.name)
+
         # Check first environment
-        self.assertEqual(project.environments[0].name, 'Production')
-        self.assertEqual(project.environments[0].slug, 'production')
+        self.assertEqual(environments[0].name, 'Production')
+        self.assertEqual(environments[0].slug, 'production')
         # Check second environment
-        self.assertEqual(project.environments[1].name, 'Staging')
-        self.assertEqual(project.environments[1].slug, 'staging')
+        self.assertEqual(environments[1].name, 'Staging')
+        self.assertEqual(environments[1].slug, 'staging')
         # Check third environment
-        self.assertEqual(project.environments[2].name, 'Testing Environment')
-        self.assertEqual(project.environments[2].slug, 'testing-environment')
+        self.assertEqual(environments[2].name, 'Testing Environment')
+        self.assertEqual(environments[2].slug, 'testing-environment')
 
 
 if __name__ == '__main__':
