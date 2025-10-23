@@ -885,6 +885,40 @@ class TestImbiClient(base.AsyncTestCase):
 
         self.assertIn('Project not found: 999', str(cm.exception))
 
+    async def test_environment_names_converted_to_slugs(self) -> None:
+        """Test that environment names are converted to slugs."""
+        # Create mock project with environment names (not slugs)
+        mock_project = create_mock_project_data(
+            project_id=123,
+            name='Test Project',
+            namespace_slug='test-namespace',
+            project_type_slug='api',
+            slug='test-project',
+        )
+        mock_project['_source']['environments'] = [
+            'Production',
+            'Staging',
+            'Testing Environment',
+        ]
+
+        self.http_client_side_effect = httpx.Response(
+            http.HTTPStatus.OK,
+            json={'hits': {'hits': [mock_project]}},
+            request=httpx.Request(
+                'POST', 'https://imbi.example.com/opensearch/projects'
+            ),
+        )
+
+        project = await self.instance.get_project(123)
+
+        self.assertIsNotNone(project)
+        self.assertEqual(project.id, 123)
+        # Verify environments are converted to slugs
+        self.assertEqual(
+            project.environments,
+            ['production', 'staging', 'testing-environment'],
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

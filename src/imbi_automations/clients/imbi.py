@@ -93,6 +93,13 @@ class Imbi(http.BaseURLHTTPClient):
     ) -> models.ImbiProject:
         value = project['_source'].copy()
         value['imbi_url'] = f'{self.base_url}/ui/projects/{value["id"]}'
+
+        # Convert environment names to slugs (lowercase, spaces → hyphens)
+        if value.get('environments'):
+            value['environments'] = [
+                env.lower().replace(' ', '-') for env in value['environments']
+            ]
+
         return models.ImbiProject.model_validate(value)
 
     async def _opensearch_projects(
