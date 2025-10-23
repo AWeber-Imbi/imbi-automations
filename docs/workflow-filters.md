@@ -23,6 +23,7 @@ Filters are defined in the `[filter]` section of `config.toml`:
 project_ids = [123, 456, 789]
 project_types = ["api", "consumer"]
 project_facts = {"Programming Language" = "Python 3.12"}
+project_environments = ["production", "staging"]
 github_identifier_required = true
 github_workflow_status_exclude = ["success"]
 ```
@@ -141,6 +142,46 @@ project_facts = {"programming_language" = "Python 3.9"}
 - `Database` - e.g., "PostgreSQL", "MongoDB"
 - `Message Queue` - e.g., "RabbitMQ", "SQS"
 - `Deployment Platform` - e.g., "Kubernetes", "ECS"
+
+### project_environments
+
+Filter by Imbi project environments.
+
+**Type:** `list[string]`
+
+**Default:** `[]` (no environment filtering)
+
+
+**Environment matching:**
+
+- Supports both environment names ("Production") and slugs ("production")
+- ALL specified environments must be present in project (AND logic)
+- Matches against both `name` and `slug` fields of `ImbiEnvironment` objects
+
+```toml
+[filter]
+project_environments = ["production", "staging"]
+```
+
+Only projects with BOTH production AND staging environments will be included.
+
+**Real-world example:**
+```toml
+[filter]
+project_environments = ["Production", "Staging", "Development"]
+```
+
+**Why this filter?** Target only projects with complete environment configurations for deployment workflows.
+
+**Flexible matching:**
+```toml
+# These are all equivalent:
+project_environments = ["Production"]
+project_environments = ["production"]
+project_environments = ["PRODUCTION"]
+```
+
+The filter checks against both the original environment name and the auto-generated slug.
 
 ### github_identifier_required
 
