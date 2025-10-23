@@ -7,8 +7,6 @@ workflow targeting and context enrichment.
 
 import typing
 
-import pydantic
-
 from . import base
 
 
@@ -20,25 +18,9 @@ class ImbiEnvironment(base.BaseModel):
     """
 
     name: str
-    slug: str | None = None
+    slug: str
     icon_class: str
     description: str | None = None
-
-    @pydantic.model_validator(mode='after')
-    def _set_slug(self) -> 'ImbiEnvironment':
-        """Auto-generate slug from name if not provided.
-
-        Converts to lowercase, removes special characters, and normalizes
-        multiple spaces/hyphens to single hyphens.
-        """
-        if not self.slug:
-            import re
-
-            # Convert to lowercase and replace non-alphanumeric with hyphens
-            slug = re.sub(r'[^a-z0-9]+', '-', self.name.lower())
-            # Strip leading/trailing hyphens
-            self.slug = slug.strip('-')
-        return self
 
 
 class ImbiProjectLink(base.BaseModel):
