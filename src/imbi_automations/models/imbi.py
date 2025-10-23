@@ -7,15 +7,29 @@ workflow targeting and context enrichment.
 
 import typing
 
+import pydantic
+
 from . import base
 
 
 class ImbiEnvironment(base.BaseModel):
-    """Imbi environment with metadata."""
+    """Imbi environment with metadata.
+
+    The slug field is auto-generated from the name if not provided,
+    converting to lowercase and replacing spaces with hyphens.
+    """
 
     name: str
+    slug: str | None = None
     icon_class: str
     description: str | None = None
+
+    @pydantic.model_validator(mode='after')
+    def _set_slug(self) -> 'ImbiEnvironment':
+        """Auto-generate slug from name if not provided."""
+        if not self.slug:
+            self.slug = self.name.lower().replace(' ', '-')
+        return self
 
 
 class ImbiProjectLink(base.BaseModel):
@@ -37,12 +51,15 @@ class ImbiProject(base.BaseModel):
 
     Complete project definition including dependencies, facts, identifiers
     for external systems, and links to related services.
+
+    The environments field contains environment slugs (lowercase, hyphenated)
+    that correspond to ImbiEnvironment.slug values.
     """
 
     id: int
     dependencies: list[int] | None
     description: str | None
-    environments: list[str] | None
+    environments: list[str] | None  # Contains environment slugs
     facts: dict[str, typing.Any] | None
     identifiers: dict[str, typing.Any] | None
     links: dict[str, str] | None

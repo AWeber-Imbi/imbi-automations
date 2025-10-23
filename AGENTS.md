@@ -99,7 +99,6 @@ pre-commit run --all-files
 #### Supporting Components
 - **Imbi Metadata Cache** (`imc.py`): Cache (`ImbiMetadataCache`) for Imbi metadata (fact types, project types, environments) with 15-minute TTL, explicitly initialized via async `refresh_from_cache()` method
 - **Git Operations** (`git.py`): Repository cloning, committing, and Git operations
-- **Environment Sync** (`environment_sync.py`): GitHub environment synchronization logic
 - **Condition Checker** (`condition_checker.py`): Workflow condition evaluation system
 - **Per-Project Logging** (`per_project_logging.py`): Project-specific log file management
 - **Utilities** (`utils.py`): Configuration loading, directory management, URL sanitization
