@@ -1136,6 +1136,86 @@ class TestImbiClient(base.AsyncTestCase):
         self.assertEqual(environments[2].name, 'Testing Environment')
         self.assertEqual(environments[2].slug, 'testing-environment')
 
+    async def test_environment_slug_matching(self) -> None:
+        """Test environment matching by slug instead of name."""
+        # Create mock project with environment slugs (not names)
+        mock_project = create_mock_project_data(
+            project_id=124,
+            name='Slug Test Project',
+            namespace_slug='test-namespace',
+            project_type_slug='api',
+            slug='slug-test-project',
+        )
+        # Use slugs in the project data instead of names
+        mock_project['_source']['environments'] = [
+            'production',
+            'staging',
+            'testing-environment',
+        ]
+
+        # Mock environment data from API
+        env_data = [
+            {
+                'name': 'Production',
+                'slug': 'production',
+                'icon_class': 'fa-prod',
+            },
+            {'name': 'Staging', 'slug': 'staging', 'icon_class': 'fa-stage'},
+            {
+                'name': 'Testing Environment',
+                'slug': 'testing-environment',
+                'icon_class': 'fa-test',
+            },
+        ]
+
+        # Mock responses: opensearch for project, then get_environments
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'hits': {'hits': [mock_project]}},
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=env_data,
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
+
+        project = await self.instance.get_project(124)
+
+        self.assertIsNotNone(project)
+        self.assertEqual(project.id, 124)
+        # Verify environments matched by slug
+        self.assertIsNotNone(project.environments)
+        self.assertEqual(len(project.environments), 3)
+
+        # Convert set to sorted list for predictable testing
+        environments = sorted(project.environments, key=lambda e: e.name)
+
+        # Verify all three environments were matched by slug
+        self.assertEqual(environments[0].name, 'Production')
+        self.assertEqual(environments[0].slug, 'production')
+        self.assertEqual(environments[1].name, 'Staging')
+        self.assertEqual(environments[1].slug, 'staging')
+        self.assertEqual(environments[2].name, 'Testing Environment')
+        self.assertEqual(environments[2].slug, 'testing-environment')
+
 
 if __name__ == '__main__':
     unittest.main()

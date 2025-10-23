@@ -575,16 +575,17 @@ class Imbi(http.BaseURLHTTPClient):
     ) -> models.ImbiProject:
         value = project['_source'].copy()
         value['imbi_url'] = f'{self.base_url}/ui/projects/{value["id"]}'
-
         environments = set({})
         imbi_environments = await self.get_environments()
         for environment in value.get('environments') or []:
             for imbi_environment in imbi_environments:
-                if environment == imbi_environment.name:
+                if (
+                    environment == imbi_environment.name
+                    or environment == imbi_environment.slug
+                ):
                     environments.add(imbi_environment)
         if environments:
             value['environments'] = environments
-
         return models.ImbiProject.model_validate(value)
 
     async def _opensearch_projects(
