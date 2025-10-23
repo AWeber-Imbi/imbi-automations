@@ -115,9 +115,8 @@ class ImbiMetadataCache:
         self.config = config
         if self.cache_file.exists():
             with self.cache_file.open('r') as file:
-                st = self.cache_file.stat()
                 last_mod = datetime.datetime.fromtimestamp(
-                    st.st_mtime, tz=datetime.UTC
+                    self.cache_file.stat().st_mtime, tz=datetime.UTC
                 )
                 try:
                     data = json.load(file)

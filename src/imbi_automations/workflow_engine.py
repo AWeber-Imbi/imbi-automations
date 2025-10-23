@@ -108,7 +108,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 enumerate(self.workflow.configuration.actions)
             )
 
-        # Skip remote condition checks if resuming (already passed once)
+        # Skip condition checks if resuming
         if (
             not self.resume_state
             and not await self.condition_checker.check_remote(
@@ -150,6 +150,15 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         for idx, action in actions_to_run:
             try:
                 await self._execute_action(context, action)
+
+                self.tracker.incr('actions_executed')
+                self.tracker.incr(f'actions_executed_{action.type}')
+
+                if action.committable:
+                    committed = await self.committer.commit(context, action)
+                    if committed:
+                        context.has_repository_changes = True
+                        self.tracker.incr('actions_committed')
             except Exception as exc:  # noqa: BLE001 - preserve_on_error must handle all exceptions
                 self.logger.error(
                     '%s error executing action "%s": %s',
@@ -179,15 +188,6 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     )
                 working_directory.cleanup()
                 return False
-
-            self.tracker.incr('actions_executed')
-            self.tracker.incr(f'actions_executed_{action.type}')
-
-            if action.committable:
-                committed = await self.committer.commit(context, action)
-                if committed:
-                    context.has_repository_changes = True
-                    self.tracker.incr('actions_committed')
 
         # Handle dry-run mode: preserve working directory and skip push/PR
         if self.configuration.dry_run:
