@@ -78,6 +78,8 @@ pre-commit run --all-files
   - **Filter Validation**: Automatic validation of project_types and project_facts against ImbiMetadataCache
 - **GitHub** (`models/github.py`): GitHub repository and API response models
 - **Imbi** (`models/imbi.py`): Imbi project management system models including fact types, environments, and project types
+  - **ImbiEnvironment**: Environment model with auto-slug generation (sanitizes special chars, normalizes spaces)
+  - **ImbiProject**: Project model with `environments: list[ImbiEnvironment]` for type-safe environment handling
 - **Claude** (`models/claude.py`): Claude Code integration models
 - **SonarQube** (`models/sonarqube.py`): SonarQube integration models
 - **Git** (`models/git.py`): Git operation models
@@ -90,7 +92,7 @@ pre-commit run --all-files
 - **Docker Actions** (`actions/docker.py`): Docker container operations and file extractions
 - **File Actions** (`actions/filea.py`): File manipulation (copy with glob support, move, delete, regex replacement)
 - **Git Actions** (`actions/git.py`): Git operations (revert, extract, branch management)
-- **GitHub Actions** (`actions/github.py`): GitHub-specific operations and integrations
+- **GitHub Actions** (`actions/github.py`): GitHub-specific operations and integrations (sync_environments command)
 - **Imbi Actions** (`actions/imbi.py`): Imbi project fact management (set_project_fact command)
 - **Shell Actions** (`actions/shell.py`): Shell command execution with glob expansion via subprocess_shell
 - **Template Actions** (`actions/template.py`): Jinja2 template rendering with full workflow context
@@ -99,7 +101,6 @@ pre-commit run --all-files
 #### Supporting Components
 - **Imbi Metadata Cache** (`imc.py`): Cache (`ImbiMetadataCache`) for Imbi metadata (fact types, project types, environments) with 15-minute TTL, explicitly initialized via async `refresh_from_cache()` method
 - **Git Operations** (`git.py`): Repository cloning, committing, and Git operations
-- **Environment Sync** (`environment_sync.py`): GitHub environment synchronization logic
 - **Condition Checker** (`condition_checker.py`): Workflow condition evaluation system
 - **Per-Project Logging** (`per_project_logging.py`): Project-specific log file management
 - **Utilities** (`utils.py`): Configuration loading, directory management, URL sanitization
@@ -593,6 +594,32 @@ Project facts support three validation modes:
    - Example: Custom notes, timestamps, version strings
 
 **Data Types Supported**: boolean, date, decimal, integer, string, timestamp
+
+### GitHub Environment Synchronization
+The GitHub Actions module syncs repository environments with Imbi project definitions:
+
+**Implementation** (`actions/github.py:_sync_environments`):
+- Extracts environment slugs from `ImbiProject.environments` (list of `ImbiEnvironment` objects)
+- Compares with existing GitHub repository environments via API
+- Creates missing environments in GitHub
+- Deletes extra environments from GitHub (not in Imbi)
+- Uses slugified names for consistent matching (lowercase, hyphenated)
+
+**Environment Slug Generation** (`models/imbi.py:ImbiEnvironment._set_slug`):
+- Auto-generates slug from name if not provided by API
+- Converts to lowercase and sanitizes special characters
+- Normalizes consecutive spaces/hyphens to single hyphens
+- Strips leading/trailing hyphens
+- Examples:
+  - "Production" → "production"
+  - "Test  Multiple   Spaces" → "test-multiple-spaces"
+  - "Prod (US/East)" → "prod-us-east"
+
+**Filter Support** (`workflow_filter.py:_filter_environments`):
+- Filters projects by environment using both name and slug matching
+- Supports configuration with either "Production" or "production"
+- Checks if filter value matches any environment's name OR slug
+- All filter environments must be present in project (AND logic)
 
 ### Shell Actions
 Shell actions use `subprocess_shell` instead of `subprocess_exec` to enable:

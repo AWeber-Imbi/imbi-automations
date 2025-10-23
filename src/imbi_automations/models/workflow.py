@@ -346,6 +346,7 @@ class WorkflowGitHubAction(WorkflowAction):
 
     type: typing.Literal['github'] = 'github'
     command: WorkflowGitHubCommand
+    committable: bool = False
 
 
 class WorkflowImbiCommands(enum.StrEnum):
