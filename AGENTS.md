@@ -444,8 +444,7 @@ imbi-automations config.toml workflows/my-workflow --resume ./errors/my-workflow
 - **Directory Management**: Automatic parent directory creation with proper error handling
 - **Authentication**: Secret string handling for API keys in configuration
 - **Pattern-Aware File Detection**: GitHub client supports both exact file paths and regex patterns for workflow file detection
-- **Resumable Processing**: `--start-from-project` CLI option allows resuming batch processing from a specific project slug
-- **Workflow Resumability**: Full workflow resume capability via `--resume` flag with MessagePack-serialized state files (`.state`) containing all context needed to retry failed actions
+- **Resumable Processing**: `--start-from-project` CLI option allows resuming batch processing from a specific project slug; `--resume` flag provides full workflow resume capability (see Workflow Resumability section for details)
 
 ## Dependencies
 
