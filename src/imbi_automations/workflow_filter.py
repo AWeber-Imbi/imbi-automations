@@ -84,11 +84,18 @@ class Filter(mixins.WorkflowLoggerMixin):
     def _filter_environments(
         project: models.ImbiProject, workflow_filter: models.WorkflowFilter
     ) -> models.ImbiProject | None:
-        """Filter projects based on environments."""
+        """Filter projects based on environments.
+
+        Checks against both environment name and slug to support both
+        'Production' and 'production' in configuration.
+        """
         if not project.environments:
             return None
         for env in workflow_filter.project_environments:
-            if env not in project.environments:
+            # Check if filter value matches any environment name or slug
+            if env not in [
+                e.name for e in project.environments
+            ] and env not in [e.slug for e in project.environments]:
                 return None
         return project
 
