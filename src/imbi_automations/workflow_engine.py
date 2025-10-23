@@ -534,9 +534,14 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             Reconstructed WorkflowContext with restored state
 
         Raises:
-            RuntimeError: If workflow symlink missing in preserved directory
+            RuntimeError: If resume_state is None or workflow symlink missing
 
         """
+        if self.resume_state is None:
+            raise RuntimeError(
+                'resume_state must be set when restoring context'
+            )
+
         working_directory_path = pathlib.Path(working_directory)
 
         # Workflow symlink should already exist in preserved dir
@@ -555,12 +560,12 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         return models.WorkflowContext(
             workflow=self.workflow,
             github_repository=(
-                github_repository or self.resume_state.github_repository  # type: ignore[union-attr]
+                github_repository or self.resume_state.github_repository
             ),
             imbi_project=project,
-            starting_commit=self.resume_state.starting_commit,  # type: ignore[union-attr]
+            starting_commit=self.resume_state.starting_commit,
             working_directory=working_directory_path,
-            has_repository_changes=self.resume_state.has_repository_changes,  # type: ignore[union-attr]
+            has_repository_changes=self.resume_state.has_repository_changes,
         )
 
     def _cleanup_resume_state(self, state: models.ResumeState) -> None:
