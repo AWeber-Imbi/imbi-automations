@@ -16,8 +16,6 @@ command = "sync_environments"
 
 ### sync_environments
 
-**Status:** ❌ Not yet implemented (raises NotImplementedError)
-
 Synchronize GitHub repository environments with Imbi project environments.
 
 **Example:**
@@ -28,16 +26,28 @@ type = "github"
 command = "sync_environments"
 ```
 
-**Planned Behavior:**
+**Behavior:**
 
-- Read environments from Imbi project
-- Create/update GitHub repository environments
-- Synchronize environment variables and secrets
-- Maintain environment protection rules
+- Reads environment data from Imbi project (`imbi_project.environments: list[ImbiEnvironment]`)
+- Extracts slugs from `ImbiEnvironment` objects (auto-generated from names)
+- Compares with existing GitHub repository environments
+- Creates missing environments in GitHub
+- Deletes extra environments from GitHub (not in Imbi)
+- Uses slugified names (lowercase, special chars sanitized, normalized hyphens)
+- Operations sorted alphabetically for deterministic behavior
+- Logs all operations (created, deleted, errors)
+- Raises error if sync fails
+
+**Slug Generation:**
+- Environment names are automatically converted to URL-safe slugs
+- Special characters (parentheses, slashes, etc.) are replaced with hyphens
+- Multiple consecutive spaces/hyphens normalized to single hyphens
+- Examples:
+  - "Production" → "production"
+  - "Test  Multiple   Spaces" → "test-multiple-spaces"
+  - "Prod (US/East)" → "prod-us-east"
 
 ## Common Use Cases
-
-**Note:** These examples show the intended usage once `sync_environments` is implemented.
 
 ### Environment Synchronization
 
@@ -65,20 +75,26 @@ type = "github"
 command = "sync_environments"
 ```
 
-## Implementation Status
+## Implementation Notes
 
-Currently, the GitHub action type is defined but not implemented:
+The GitHub action implementation:
 
-- `sync_environments`: Raises `NotImplementedError`
+- Requires GitHub API access with environment management permissions
+- Uses authenticated GitHub client from workflow configuration
+- Respects GitHub API rate limits
+- Provides idempotent operations (safe to re-run)
+- Integrates with Imbi project environment configuration
+- No repository cloning needed (API-only operations)
+- Skips projects with no environments defined in Imbi
 
-The action type exists in the codebase but will error when executed. This is likely a placeholder for future functionality.
+**Type Safety:**
+- Uses `ImbiEnvironment` model objects (not plain strings) for type-safe environment handling
+- Each environment has `name`, `slug`, `icon_class`, and optional `description` fields
+- Slug auto-generation handled by Pydantic validator in the model
+- Imbi client creates `ImbiEnvironment` objects from API environment name strings
 
-## Planned Implementation Notes
-
-When implemented, the action would:
-
-- Require GitHub API access with appropriate permissions
-- Use authenticated GitHub client from workflow context
-- Respect GitHub API rate limits
-- Provide idempotent operations (safe to re-run)
-- Integrate with Imbi project environment configuration
+**Filter Support:**
+- Workflow filters can target specific environments using `project_environments` field
+- Supports both environment names ("Production") and slugs ("production")
+- Filter checks against both `name` and `slug` fields for flexibility
+- Example: `project_environments = ["production", "staging"]` in workflow config

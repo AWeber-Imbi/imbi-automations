@@ -93,6 +93,18 @@ class Imbi(http.BaseURLHTTPClient):
     ) -> models.ImbiProject:
         value = project['_source'].copy()
         value['imbi_url'] = f'{self.base_url}/ui/projects/{value["id"]}'
+
+        # Convert environment names to ImbiEnvironment objects
+        if value.get('environments'):
+            value['environments'] = [
+                models.ImbiEnvironment(
+                    name=env,
+                    icon_class='',
+                    # slug will auto-generate from name via validator
+                )
+                for env in value['environments']
+            ]
+
         return models.ImbiProject.model_validate(value)
 
     async def _opensearch_projects(

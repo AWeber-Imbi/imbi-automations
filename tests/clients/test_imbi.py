@@ -885,6 +885,47 @@ class TestImbiClient(base.AsyncTestCase):
 
         self.assertIn('Project not found: 999', str(cm.exception))
 
+    async def test_environment_names_converted_to_objects(self) -> None:
+        """Test environment names converted to ImbiEnvironment objects."""
+        # Create mock project with environment names (not objects)
+        mock_project = create_mock_project_data(
+            project_id=123,
+            name='Test Project',
+            namespace_slug='test-namespace',
+            project_type_slug='api',
+            slug='test-project',
+        )
+        mock_project['_source']['environments'] = [
+            'Production',
+            'Staging',
+            'Testing Environment',
+        ]
+
+        self.http_client_side_effect = httpx.Response(
+            http.HTTPStatus.OK,
+            json={'hits': {'hits': [mock_project]}},
+            request=httpx.Request(
+                'POST', 'https://imbi.example.com/opensearch/projects'
+            ),
+        )
+
+        project = await self.instance.get_project(123)
+
+        self.assertIsNotNone(project)
+        self.assertEqual(project.id, 123)
+        # Verify environments are converted to ImbiEnvironment objects
+        self.assertIsNotNone(project.environments)
+        self.assertEqual(len(project.environments), 3)
+        # Check first environment
+        self.assertEqual(project.environments[0].name, 'Production')
+        self.assertEqual(project.environments[0].slug, 'production')
+        # Check second environment
+        self.assertEqual(project.environments[1].name, 'Staging')
+        self.assertEqual(project.environments[1].slug, 'staging')
+        # Check third environment
+        self.assertEqual(project.environments[2].name, 'Testing Environment')
+        self.assertEqual(project.environments[2].slug, 'testing-environment')
+
 
 if __name__ == '__main__':
     unittest.main()
