@@ -131,7 +131,8 @@ class Automation(mixins.WorkflowLoggerMixin):
             True if workflow completed successfully, False otherwise
 
         Raises:
-            RuntimeError: If .state file not found or workflow incompatible
+            RuntimeError: If .state file not found, workflow path invalid,
+                or workflow configuration incompatible
 
         """
         state_file = self.args.resume / '.state'
@@ -158,6 +159,20 @@ class Automation(mixins.WorkflowLoggerMixin):
             state.failed_action_name,
             state.failed_action_index,
         )
+
+        # Validate workflow path from state file exists and is valid
+        if not state.workflow_path.exists():
+            raise RuntimeError(
+                f'Workflow path from state file does not exist: '
+                f'{state.workflow_path}'
+            )
+
+        state_config_file = state.workflow_path / 'config.toml'
+        if not state_config_file.exists():
+            raise RuntimeError(
+                f'Workflow from state file missing config.toml: '
+                f'{state_config_file}'
+            )
 
         # Validate workflow compatibility
         if state.workflow_path != self.workflow.path:
