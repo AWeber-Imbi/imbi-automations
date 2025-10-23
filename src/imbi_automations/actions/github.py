@@ -65,15 +65,6 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
             ]
         )
 
-        # Skip sync if no environments in Imbi
-        if not imbi_environment_slugs:
-            self._log_verbose_info(
-                '%s %s skipping environment sync: no environments in Imbi',
-                self.context.imbi_project.slug,
-                action.name,
-            )
-            return
-
         self._log_verbose_info(
             '%s %s syncing environments for %s/%s: %s',
             self.context.imbi_project.slug,
