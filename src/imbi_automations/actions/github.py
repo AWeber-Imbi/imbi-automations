@@ -62,7 +62,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         )
 
         # Log start of sync
-        self.logger.info(
+        self._log_verbose_info(
             '%s %s syncing environments for %s/%s: %s',
             self.context.imbi_project.slug,
             action.name,
@@ -73,7 +73,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
 
         # Check if project has environments to sync
         if not imbi_environment_slugs:
-            self.logger.info(
+            self._log_verbose_info(
                 '%s %s no environments defined in Imbi, skipping sync',
                 self.context.imbi_project.slug,
                 action.name,
@@ -225,7 +225,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
                 try:
                     await github_client.delete_environment(org, repo, env_name)
                     result['deleted'].append(env_name)
-                    self.logger.info(
+                    self._log_verbose_info(
                         'Deleted environment "%s" from %s/%s',
                         env_name,
                         org,
@@ -244,7 +244,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
                 try:
                     await github_client.create_environment(org, repo, env_name)
                     result['created'].append(env_name)
-                    self.logger.info(
+                    self._log_verbose_info(
                         'Created environment "%s" in %s/%s',
                         env_name,
                         org,
