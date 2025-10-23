@@ -20,11 +20,18 @@ class AnthropicConfiguration(pydantic.BaseModel):
     configurable model selection and API key from environment variables.
     """
 
-    api_key: pydantic.SecretStr | None = pydantic.Field(
-        default=os.environ.get('ANTHROPIC_API_KEY')
-    )
+    api_key: pydantic.SecretStr | None = None
     bedrock: bool = False
     model: str = 'claude-4-5-haiku'
+
+    @pydantic.model_validator(mode='before')
+    @classmethod
+    def _set_api_key_from_env(cls, data: typing.Any) -> typing.Any:
+        if isinstance(data, dict) and 'api_key' not in data:
+            env_key = os.environ.get('ANTHROPIC_API_KEY')
+            if env_key:
+                data['api_key'] = env_key
+        return data
 
 
 class GitConfiguration(pydantic.BaseModel):
