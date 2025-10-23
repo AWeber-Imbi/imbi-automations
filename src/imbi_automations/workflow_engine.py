@@ -158,15 +158,16 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     exc,
                 )
                 if self.configuration.preserve_on_error:
-                    # Pass action index for state file
-                    completed_indices = (
-                        list(range(0, idx))
-                        if not self.resume_state
-                        else self.resume_state.completed_action_indices
-                        + list(
+                    # Calculate completed indices for this execution
+                    if not self.resume_state:
+                        # First run: all actions before failure
+                        completed_indices = list(range(0, idx))
+                    else:
+                        # Resume: only actions from failed_action_index to idx
+                        # (don't accumulate from previous runs)
+                        completed_indices = list(
                             range(self.resume_state.failed_action_index, idx)
                         )
-                    )
                     self.last_error_path = self._preserve_working_directory(
                         context,
                         working_directory,
