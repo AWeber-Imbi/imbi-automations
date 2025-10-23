@@ -52,10 +52,13 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         org, repo = self.context.github_repository.full_name.split('/', 1)
 
         # Get environment slugs from Imbi project
-        # These are lowercase, hyphenated versions of environment names
+        # Extract slug from each ImbiEnvironment object
         # Sort for consistent ordering in logs and operations
-        imbi_environments = sorted(
-            self.context.imbi_project.environments or []
+        imbi_environment_slugs = sorted(
+            [
+                env.slug
+                for env in (self.context.imbi_project.environments or [])
+            ]
         )
 
         # Log start of sync
@@ -65,11 +68,11 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
             action.name,
             org,
             repo,
-            imbi_environments,
+            imbi_environment_slugs,
         )
 
         # Check if project has environments to sync
-        if not imbi_environments:
+        if not imbi_environment_slugs:
             self.logger.info(
                 '%s %s no environments defined in Imbi, skipping sync',
                 self.context.imbi_project.slug,
@@ -84,7 +87,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         result = await self._sync_project_environments(
             org=org,
             repo=repo,
-            imbi_environments=imbi_environments,
+            imbi_environments=imbi_environment_slugs,
             github_client=github_client,
         )
 

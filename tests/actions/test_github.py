@@ -39,7 +39,15 @@ class GitHubActionsTestCase(base.AsyncTestCase):
             id=123,
             dependencies=None,
             description='Test project',
-            environments=['development', 'staging', 'production'],
+            environments=[
+                models.ImbiEnvironment(
+                    name='Development', icon_class='fa-dev'
+                ),
+                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
+                models.ImbiEnvironment(
+                    name='Production', icon_class='fa-prod'
+                ),
+            ],
             facts=None,
             identifiers=None,
             links=None,
@@ -405,7 +413,15 @@ class GitHubActionsTestCase(base.AsyncTestCase):
             id=123,
             dependencies=None,
             description='Test project',
-            environments=['staging', 'production', 'development'],
+            environments=[
+                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
+                models.ImbiEnvironment(
+                    name='Production', icon_class='fa-prod'
+                ),
+                models.ImbiEnvironment(
+                    name='Development', icon_class='fa-dev'
+                ),
+            ],
             facts=None,
             identifiers=None,
             links=None,

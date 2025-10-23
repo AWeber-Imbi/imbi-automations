@@ -52,14 +52,14 @@ class ImbiProject(base.BaseModel):
     Complete project definition including dependencies, facts, identifiers
     for external systems, and links to related services.
 
-    The environments field contains environment slugs (lowercase, hyphenated)
-    that correspond to ImbiEnvironment.slug values.
+    The environments field contains ImbiEnvironment objects with both
+    name and slug properties.
     """
 
     id: int
     dependencies: list[int] | None
     description: str | None
-    environments: list[str] | None  # Contains environment slugs
+    environments: list[ImbiEnvironment] | None
     facts: dict[str, typing.Any] | None
     identifiers: dict[str, typing.Any] | None
     links: dict[str, str] | None

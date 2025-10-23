@@ -885,9 +885,9 @@ class TestImbiClient(base.AsyncTestCase):
 
         self.assertIn('Project not found: 999', str(cm.exception))
 
-    async def test_environment_names_converted_to_slugs(self) -> None:
-        """Test that environment names are converted to slugs."""
-        # Create mock project with environment names (not slugs)
+    async def test_environment_names_converted_to_objects(self) -> None:
+        """Test environment names converted to ImbiEnvironment objects."""
+        # Create mock project with environment names (not objects)
         mock_project = create_mock_project_data(
             project_id=123,
             name='Test Project',
@@ -913,11 +913,18 @@ class TestImbiClient(base.AsyncTestCase):
 
         self.assertIsNotNone(project)
         self.assertEqual(project.id, 123)
-        # Verify environments are converted to slugs
-        self.assertEqual(
-            project.environments,
-            ['production', 'staging', 'testing-environment'],
-        )
+        # Verify environments are converted to ImbiEnvironment objects
+        self.assertIsNotNone(project.environments)
+        self.assertEqual(len(project.environments), 3)
+        # Check first environment
+        self.assertEqual(project.environments[0].name, 'Production')
+        self.assertEqual(project.environments[0].slug, 'production')
+        # Check second environment
+        self.assertEqual(project.environments[1].name, 'Staging')
+        self.assertEqual(project.environments[1].slug, 'staging')
+        # Check third environment
+        self.assertEqual(project.environments[2].name, 'Testing Environment')
+        self.assertEqual(project.environments[2].slug, 'testing-environment')
 
 
 if __name__ == '__main__':
