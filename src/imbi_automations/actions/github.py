@@ -196,25 +196,13 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
                 result['errors'].append(error_msg)
                 return result
 
-            # Calculate differences using case-insensitive comparison
-            # Create mapping of lowercase names to actual names for both sides
-            imbi_env_map = {env.lower(): env for env in imbi_environments}
-            github_env_map = {env.lower(): env for env in github_env_list}
+            # Calculate differences (slugs are already lowercase)
+            imbi_env_set = set(imbi_environments)
+            github_env_set = set(github_env_list)
 
-            # Find environments to create/delete using lowercase keys
-            imbi_keys = set(imbi_env_map.keys())
-            github_keys = set(github_env_map.keys())
-
-            keys_to_create = imbi_keys - github_keys
-            keys_to_delete = github_keys - imbi_keys
-
-            # Map back to actual environment names and sort for consistency
-            environments_to_create = sorted(
-                [imbi_env_map[key] for key in keys_to_create]
-            )
-            environments_to_delete = sorted(
-                [github_env_map[key] for key in keys_to_delete]
-            )
+            # Find environments to create/delete and sort for consistency
+            environments_to_create = sorted(imbi_env_set - github_env_set)
+            environments_to_delete = sorted(github_env_set - imbi_env_set)
 
             self.logger.debug(
                 'Environment sync plan for %s/%s: create=%s, delete=%s',

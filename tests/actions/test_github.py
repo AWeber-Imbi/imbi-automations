@@ -264,25 +264,25 @@ class GitHubActionsTestCase(base.AsyncTestCase):
 
         self.assertIn('Environment sync failed', str(ctx.exception))
 
-    async def test_sync_environments_case_insensitive(self) -> None:
-        """Test sync handles case-insensitive environment matching."""
+    async def test_sync_environments_exact_match(self) -> None:
+        """Test sync with exact slug matches (no creates/deletes)."""
         action = models.WorkflowGitHubAction(
             name='sync-envs',
             type='github',
             command=models.WorkflowGitHubCommand.sync_environments,
         )
 
-        # Mock GitHub client with different case
+        # Mock GitHub client with exact slug matches
         mock_github_client = mock.AsyncMock()
         mock_github_client.get_repository_environments.return_value = [
             models.GitHubEnvironment(
-                id=1, name='Development', created_at='2024-01-01T00:00:00Z'
+                id=1, name='development', created_at='2024-01-01T00:00:00Z'
             ),
             models.GitHubEnvironment(
-                id=2, name='STAGING', created_at='2024-01-01T00:00:00Z'
+                id=2, name='staging', created_at='2024-01-01T00:00:00Z'
             ),
             models.GitHubEnvironment(
-                id=3, name='Production', created_at='2024-01-01T00:00:00Z'
+                id=3, name='production', created_at='2024-01-01T00:00:00Z'
             ),
         ]
 
@@ -292,7 +292,7 @@ class GitHubActionsTestCase(base.AsyncTestCase):
         ):
             await self.github_actions.execute(action)
 
-        # Should not create or delete (all match case-insensitively)
+        # Should not create or delete (all match exactly)
         mock_github_client.create_environment.assert_not_called()
         mock_github_client.delete_environment.assert_not_called()
 

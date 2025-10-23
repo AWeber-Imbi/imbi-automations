@@ -30,11 +30,12 @@ command = "sync_environments"
 
 **Behavior:**
 
-- Reads environments from Imbi project (`imbi_project.environments`)
+- Reads environment slugs from Imbi project (`imbi_project.environments`)
 - Compares with existing GitHub repository environments
 - Creates missing environments in GitHub
 - Deletes extra environments from GitHub (not in Imbi)
-- Uses case-insensitive comparison
+- Uses slugified names (lowercase, hyphens instead of spaces)
+- Operations sorted alphabetically for deterministic behavior
 - Logs all operations (created, deleted, errors)
 - Raises error if sync fails
 
