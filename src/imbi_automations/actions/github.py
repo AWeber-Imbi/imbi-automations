@@ -127,7 +127,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         repo: str,
         imbi_environments: list[str],
         github_client: clients.GitHub,
-    ) -> dict[str, typing.Any]:
+    ) -> SyncProjectResults:
         """Synchronize environments between Imbi project and GitHub repository.
 
         This function ensures that the GitHub repository environments match the
