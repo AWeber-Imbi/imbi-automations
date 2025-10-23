@@ -9,6 +9,7 @@ import copy
 import logging
 import typing
 
+import async_lru
 import httpx
 
 from imbi_automations import models
@@ -36,6 +37,7 @@ class Imbi(http.BaseURLHTTPClient):
         self._base_url = f'https://{config.hostname}'
         self.add_header('Private-Token', config.api_key.get_secret_value())
 
+    @async_lru.alru_cache(maxsize=1)
     async def get_environments(self) -> list[models.ImbiEnvironment]:
         """Get all project fact types.
 
