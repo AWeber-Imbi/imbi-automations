@@ -7,6 +7,14 @@ import httpx
 from imbi_automations import clients, errors, mixins, models
 
 
+class SyncProjectResults(typing.TypedDict):
+    success: bool
+    created: list[str]
+    deleted: list[str]
+    errors: list[str]
+    total_operations: int
+
+
 class GitHubActions(mixins.WorkflowLoggerMixin):
     """Executes GitHub-specific operations via API integration.
 
@@ -160,7 +168,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
             - total_operations: int - Total number of operations performed
 
         """
-        result: dict[str, typing.Any] = {
+        result: SyncProjectResults = {
             'success': False,
             'created': [],
             'deleted': [],
