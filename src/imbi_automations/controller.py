@@ -63,13 +63,27 @@ class Automation(mixins.WorkflowLoggerMixin):
         self.logger = LOGGER
         self.registry = imc.ImbiMetadataCache()
         self.workflow = workflow
-        self.workflow_engine = workflow_engine.WorkflowEngine(
-            config=self.configuration, workflow=workflow, verbose=args.verbose
-        )
+        self._workflow_engine: workflow_engine.WorkflowEngine | None = None
         self.workflow_filter = workflow_filter.Filter(
             config, workflow, args.verbose
         )
         self._set_workflow_logger(workflow)
+
+    @property
+    def workflow_engine(self) -> workflow_engine.WorkflowEngine:
+        """Lazy-initialize workflow engine when first accessed.
+
+        Returns:
+            WorkflowEngine instance (created on first access)
+
+        """
+        if self._workflow_engine is None:
+            self._workflow_engine = workflow_engine.WorkflowEngine(
+                config=self.configuration,
+                workflow=self.workflow,
+                verbose=self.args.verbose,
+            )
+        return self._workflow_engine
 
     @property
     def iterator(self) -> AutomationIterator | None:
@@ -192,8 +206,8 @@ class Automation(mixins.WorkflowLoggerMixin):
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
         project = await client.get_project(state.project_id)
 
-        # Create workflow engine with resume state
-        engine = workflow_engine.WorkflowEngine(
+        # Initialize workflow engine with resume state
+        self._workflow_engine = workflow_engine.WorkflowEngine(
             config=self.configuration,
             workflow=self.workflow,
             verbose=self.args.verbose,
@@ -201,7 +215,9 @@ class Automation(mixins.WorkflowLoggerMixin):
         )
 
         # Execute with resume
-        success = await engine.execute(project, state.github_repository)
+        success = await self.workflow_engine.execute(
+            project, state.github_repository
+        )
 
         if success:
             self.logger.info(
