@@ -58,7 +58,15 @@ class ImbiMetadataCache:
 
     @property
     def environments(self) -> set[str]:
-        return {env.name.lower() for env in self.cache_data.environments}
+        return self.environment_slugs + self.environment_names
+
+    @property
+    def environment_names(self) -> set[str]:
+        return {env.name for env in self.cache_data.environments}
+
+    @property
+    def environment_slugs(self) -> set[str]:
+        return {env.slug for env in self.cache_data.environments}
 
     @property
     def project_fact_type_names(self) -> set[str]:
@@ -75,6 +83,16 @@ class ImbiMetadataCache:
             datum.value
             for datum in self.cache_data.project_fact_type_enums
             if datum.fact_type_id in fact_type_ids
+        }
+
+    @property
+    def project_types(self) -> set[str]:
+        return self.project_type_names + self.project_type_slugs
+
+    @property
+    def project_type_names(self) -> set[str]:
+        return {
+            project_type.name for project_type in self.cache_data.project_types
         }
 
     @property

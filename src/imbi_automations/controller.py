@@ -19,6 +19,7 @@ from imbi_automations import (
     mixins,
     models,
     per_project_logging,
+    utils,
     workflow_engine,
     workflow_filter,
 )
@@ -71,7 +72,7 @@ class Automation(mixins.WorkflowLoggerMixin):
         self._set_workflow_logger(workflow)
 
     @property
-    def iterator(self) -> AutomationIterator:
+    def iterator(self) -> AutomationIterator | None:
         """Determine the iterator type based on CLI arguments.
 
         Returns:
@@ -79,8 +80,7 @@ class Automation(mixins.WorkflowLoggerMixin):
 
         """
         if self.args.resume:
-            # Resume mode doesn't use iterator pattern
-            return None  # type: ignore[return-value]
+            return None
         elif self.args.project_id:
             return AutomationIterator.imbi_project
         elif self.args.project_type:
@@ -103,11 +103,11 @@ class Automation(mixins.WorkflowLoggerMixin):
             cache_file, self.configuration.imbi
         )
 
-        # Handle resume mode separately
         if self.args.resume:
             return await self._resume_from_state()
 
         self._validate_workflow_filters()
+
         match self.iterator:
             case AutomationIterator.github_repositories:
                 return await self._process_github_repositories()
@@ -121,6 +121,8 @@ class Automation(mixins.WorkflowLoggerMixin):
                 return await self._process_imbi_project()
             case AutomationIterator.imbi_projects:
                 return await self._process_imbi_projects()
+            case _:
+                self.logger.debug('No target type specified, exiting')
 
     async def _resume_from_state(self) -> bool:
         """Resume workflow from preserved error state.
@@ -165,9 +167,6 @@ class Automation(mixins.WorkflowLoggerMixin):
                 self.workflow.path,
             )
 
-        # Warn about config changes
-        from imbi_automations import utils
-
         current_hash = utils.hash_configuration(self.configuration)
         if state.configuration_hash != current_hash:
             self.logger.warning(
@@ -175,7 +174,6 @@ class Automation(mixins.WorkflowLoggerMixin):
                 'Resume may behave unexpectedly.'
             )
 
-        # Load the Imbi project
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
         project = await client.get_project(state.project_id)
 
@@ -266,88 +264,12 @@ class Automation(mixins.WorkflowLoggerMixin):
         return await self._process_workflow_from_imbi_project(project)
 
     async def _process_imbi_project_type(self) -> bool:
-        # Validate project type slug if cache available
         self._validate_project_type_slug(self.args.project_type)
 
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
         projects = await client.get_projects_by_type(self.args.project_type)
         self.logger.debug('Found %d total active projects', len(projects))
         return await self._process_imbi_projects_common(projects)
-
-    def _validate_workflow_filters(self) -> None:
-        """Validate workflow filters against cache if available."""
-        if not self.workflow.configuration.filter:
-            return
-        wfilter = self.workflow.configuration.filter
-        LOGGER.debug('Validating workflow filters: %r', wfilter.model_dump())
-
-        LOGGER.debug(
-            '%r > %r = %r',
-            wfilter.project_types,
-            self.registry.project_type_slugs,
-            wfilter.project_types <= self.registry.project_type_slugs,
-        )
-
-        if (
-            wfilter.project_types
-            and wfilter.project_types - self.registry.project_type_slugs
-        ):
-            missing = wfilter.project_types - self.registry.project_type_slugs
-            invalid = ', '.join(missing)
-            if len(missing) > 1:
-                raise RuntimeError(f'{invalid} are not valid project types')
-            raise RuntimeError(f'{invalid} is not a valid project type')
-
-        if (
-            wfilter.project_environments
-            and {env.lower() for env in wfilter.project_environments}
-            - self.registry.environments
-        ):
-            missing = {
-                env.lower() for env in wfilter.project_environments
-            } - self.registry.environments
-            invalid = ', '.join(missing)
-            if len(missing) > 1:
-                raise RuntimeError(f'{invalid} are not valid environments')
-            raise RuntimeError(f'{invalid} is not a valid environment')
-
-        # Skip out early if no project facts are specified
-        if not wfilter.project_facts:
-            return
-
-        # First check all the keys
-        fact_names = set(wfilter.project_facts.keys())
-        if fact_names - self.registry.project_fact_type_names:
-            missing = fact_names - self.registry.project_fact_type_names
-            invalid = ', '.join(missing)
-            if len(missing) > 1:
-                raise RuntimeError(
-                    f'{invalid} are not valid project fact types'
-                )
-            raise RuntimeError(f'{invalid} is not a valid project fact type')
-
-        # Check the values
-        for name in fact_names:
-            if wfilter.project_facts[
-                name
-            ] not in self.registry.project_fact_type_values(name):
-                raise RuntimeError(
-                    f'Invalid value for fact type {name}: '
-                    f'"{wfilter.project_facts[name]}"'
-                )
-
-    def _validate_project_type_slug(self, slug: str) -> None:
-        """Validate project type slug against cache if available.
-
-        Args:
-            slug: Project type slug to validate
-
-        Raises:
-            RuntimeError: If slug is invalid
-
-        """
-        if slug not in self.registry.project_type_slugs:
-            raise RuntimeError(f'Invalid project type slug `{slug}`')
 
     async def _process_imbi_projects(self) -> bool:
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
@@ -386,46 +308,127 @@ class Automation(mixins.WorkflowLoggerMixin):
     async def _process_workflow_from_imbi_project(
         self, project: models.ImbiProject
     ) -> bool:
-        # Set up per-project log capture if error preservation is enabled
-        log_capture = None
-        token = None
+        self._log_verbose_info(
+            'Processing Project %i - %s', project.id, project.slug
+        )
+        github_repository = await self._get_github_repository(project)
+
         if self.configuration.preserve_on_error:
             log_capture = per_project_logging.ProjectLogCapture(project.id)
             token = log_capture.start()
+        else:
+            log_capture, token = None, None
 
         try:
-            github_repository = await self._get_github_repository(project)
-            self._log_verbose_info(
-                'Processing Project %i - %s', project.id, project.slug
-            )
-
-            success = await self.workflow_engine.execute(
+            if not await self.workflow_engine.execute(
                 project, github_repository
-            )
-
-            if not success:
-                # Write debug logs to error directory
-                if log_capture:
+            ):
+                if log_capture:  # Write debug logs to error directory
                     error_path = self.workflow_engine.get_last_error_path()
                     if error_path:
                         log_capture.write_to_file(error_path / 'debug.log')
                         self.logger.info(
                             'Wrote debug logs to %s', error_path / 'debug.log'
                         )
-
                 if self.args.exit_on_error:
                     raise RuntimeError(
-                        f'Workflow execution failed for {project.name} '
-                        f'({project.id}) - check logs above for details'
+                        f'Workflow failed for {project.name} ({project.id})'
                     )
-                # Error details already logged by workflow_engine
                 return False
 
             self._log_verbose_info(
                 'Completed processing %s (%i)', project.name, project.id
             )
             return True
-        finally:
-            # Always cleanup log capture to prevent memory leaks
+        finally:  # Always cleanup log capture to prevent memory leaks
             if log_capture and token:
                 log_capture.cleanup(token)
+
+    def _validate_workflow_filter_environments(self) -> None:
+        """Validate workflow filter environments against cache if available.
+
+        :raises: RuntimeError
+
+        """
+        self._validate_workflow_filter_set_values(
+            'environments',
+            self.workflow.configuration.filter.project_environments,
+            self.registry.environments,
+        )
+
+    def _validate_workflow_filter_project_facts(self) -> None:
+        """Validate workflow filter project facts against cache if available.
+
+        :raises: RuntimeError
+
+        """
+        self._validate_workflow_filter_set_values(
+            'project fact type',
+            set(self.workflow.configuration.filter.project_facts.keys()),
+            self.registry.project_fact_type_names,
+        )
+        for name in self.workflow.configuration.filter.project_facts:
+            if self.workflow.configuration.filter.project_facts[
+                name
+            ] not in self.registry.project_fact_type_values(name):
+                value = self.workflow.configuration.filter.project_facts[name]
+                raise RuntimeError(
+                    f'Invalid value for fact type {name}: "{value}"'
+                )
+
+    def _validate_workflow_filter_project_types(self) -> None:
+        """Validate workflow filter environments against Imbi values
+
+        :raises: RuntimeError
+
+        """
+        self._validate_workflow_filter_set_values(
+            'project type',
+            set(self.workflow.configuration.filter.project_types),
+            set(self.registry.project_types),
+        )
+
+    def _validate_workflow_filter_set_values(
+        self, field: str, filter: set[str], expectations: set[str]
+    ) -> None:
+        """Raise a RuntimeError if a filter value is invalid."""
+        if filter and filter - expectations:
+            missing = filter - expectations
+            invalid = ', '.join(missing)
+            if len(missing) > 1:
+                raise RuntimeError(f'{invalid} are not valid {field}s')
+            raise RuntimeError(f'{invalid} is not a valid {field}')
+
+    def _validate_workflow_filters(self) -> None:
+        """Validate workflow filters against cache if available."""
+        if not self.workflow.configuration.filter:
+            return
+        LOGGER.debug(
+            'Validating workflow filters: %r',
+            self.workflow.configuration.filter.model_dump(),
+        )
+
+        LOGGER.debug(
+            '%r > %r = %r',
+            self.workflow.configuration.filter.project_types,
+            self.registry.project_type_slugs,
+            self.workflow.configuration.filter.project_types
+            <= self.registry.project_type_slugs,
+        )
+
+        self._validate_workflow_filter_environments()
+        self._validate_workflow_filter_project_facts()
+        self._validate_workflow_filter_project_types()
+
+    def _validate_project_type_slug(self, slug: str) -> None:
+        """Validate project type slug against Imbi data if available.
+
+        Args:
+            slug: Project type slug to validate
+
+        Raises:
+            RuntimeError: If slug is invalid
+
+        """
+        if slug not in self.registry.project_type_slugs:
+            raise RuntimeError(f'Invalid project type slug `{slug}`')
