@@ -471,5 +471,8 @@ class GitHubActionsTestCase(base.AsyncTestCase):
 
         # Verify order by checking call arguments
         calls = mock_github_client.create_environment.call_args_list
-        env_names = [call[0][2] for call in calls]  # Third positional arg
+        env_names = [
+            call.args[2] if call.args else call.kwargs['env_name']
+            for call in calls
+        ]
         self.assertEqual(env_names, ['development', 'production', 'staging'])

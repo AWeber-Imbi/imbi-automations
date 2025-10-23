@@ -60,5 +60,12 @@ class ImbiEnvironmentTestCase(unittest.TestCase):
         env = models.ImbiEnvironment(
             name='Test  Multiple   Spaces', icon_class='fa-test'
         )
-        # Multiple spaces get replaced with multiple hyphens
-        self.assertEqual(env.slug, 'test--multiple---spaces')
+        # Multiple spaces normalized to single hyphen
+        self.assertEqual(env.slug, 'test-multiple-spaces')
+
+    def test_slug_with_special_characters(self) -> None:
+        """Test slug generation sanitizes special characters."""
+        env = models.ImbiEnvironment(
+            name='Prod (US/East)', icon_class='fa-test'
+        )
+        self.assertEqual(env.slug, 'prod-us-east')
