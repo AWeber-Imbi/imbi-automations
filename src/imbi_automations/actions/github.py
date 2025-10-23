@@ -200,6 +200,10 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
                 return result
 
             # Calculate differences (slugs are already lowercase)
+            # Note: Using sets here deduplicates any identical slugs.
+            # This is expected behavior - Imbi should not allow duplicate
+            # environment names in a project, but if it does, we sync
+            # the unique set of slugs to GitHub.
             imbi_env_set = set(imbi_environments)
             github_env_set = set(github_env_list)
 
@@ -278,7 +282,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
 
             return result
 
-        except (ValueError, RuntimeError, KeyError) as exc:
+        except (ValueError, RuntimeError) as exc:
             error_msg = f'Unexpected error during environment sync: {exc}'
             self.logger.error(error_msg)
             result['errors'].append(error_msg)
