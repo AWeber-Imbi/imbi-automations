@@ -89,12 +89,10 @@ class ClaudeCodeConfiguration(pydantic.BaseModel):
     executable: str = 'claude'  # Claude Code executable path
     base_prompt: pathlib.Path | None = None
     enabled: bool = True
-    model: str = pydantic.Field(default='claude-sonnet-4-5')
+    model: str = pydantic.Field(default='claude-haiku-4-5')
 
     def __init__(self, **kwargs: typing.Any) -> None:
         super().__init__(**kwargs)
-        # Set default base_prompt to claude.md in prompts directory
-        # if not specified
         if self.base_prompt is None:
             self.base_prompt = (
                 pathlib.Path(__file__).parent / 'prompts' / 'claude.md'

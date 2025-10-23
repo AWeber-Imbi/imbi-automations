@@ -150,7 +150,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         for idx, action in actions_to_run:
             try:
                 await self._execute_action(context, action)
-            except RuntimeError as exc:
+            except Exception as exc:  # noqa: BLE001 - preserve_on_error must handle all exceptions
                 self.logger.error(
                     '%s error executing action "%s": %s',
                     context.imbi_project.slug,
