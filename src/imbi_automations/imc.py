@@ -58,7 +58,7 @@ class ImbiMetadataCache:
 
     @property
     def environments(self) -> set[str]:
-        return self.environment_slugs + self.environment_names
+        return self.environment_slugs.union(self.environment_names)
 
     @property
     def environment_names(self) -> set[str]:
@@ -87,7 +87,7 @@ class ImbiMetadataCache:
 
     @property
     def project_types(self) -> set[str]:
-        return self.project_type_names + self.project_type_slugs
+        return self.project_type_names.union(self.project_type_slugs)
 
     @property
     def project_type_names(self) -> set[str]:
