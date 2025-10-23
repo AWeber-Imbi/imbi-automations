@@ -62,7 +62,7 @@ docs = [
   "mkdocs>=1.5,<2",
   "mkdocs-material>9.5,<10",
   "mkdocs-autorefs",
-  "mkdocstrings[python]>=0.26,<0.27",
+  "mkdocstrings[python]>=0.26,<0.31",
   "mkdocstrings-python-xref>=1.6,<2"
 ]
 
