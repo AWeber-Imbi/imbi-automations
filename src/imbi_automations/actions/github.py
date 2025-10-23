@@ -56,12 +56,8 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         if not self.context.github_repository:
             raise ValueError('No GitHub repository in workflow context')
 
-        # Extract org and repo from GitHub repository
         org, repo = self.context.github_repository.full_name.split('/', 1)
 
-        # Get environment slugs from Imbi project
-        # Extract slug from each ImbiEnvironment object
-        # Sort for consistent ordering in logs and operations
         imbi_environment_slugs = sorted(
             [
                 env.slug
@@ -69,7 +65,6 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
             ]
         )
 
-        # Log start of sync
         self._log_verbose_info(
             '%s %s syncing environments for %s/%s: %s',
             self.context.imbi_project.slug,
@@ -78,15 +73,6 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
             repo,
             imbi_environment_slugs,
         )
-
-        # Check if project has environments to sync
-        if not imbi_environment_slugs:
-            self._log_verbose_info(
-                '%s %s no environments defined in Imbi, skipping sync',
-                self.context.imbi_project.slug,
-                action.name,
-            )
-            return
 
         # Create GitHub client
         github_client = clients.GitHub(self.configuration)
