@@ -78,7 +78,10 @@ class Automation(mixins.WorkflowLoggerMixin):
             AutomationIterator enum value corresponding to the target type
 
         """
-        if self.args.project_id:
+        if self.args.resume:
+            # Resume mode doesn't use iterator pattern
+            return None  # type: ignore[return-value]
+        elif self.args.project_id:
             return AutomationIterator.imbi_project
         elif self.args.project_type:
             return AutomationIterator.imbi_project_type
@@ -100,6 +103,10 @@ class Automation(mixins.WorkflowLoggerMixin):
             cache_file, self.configuration.imbi
         )
 
+        # Handle resume mode separately
+        if self.args.resume:
+            return await self._resume_from_state()
+
         self._validate_workflow_filters()
         match self.iterator:
             case AutomationIterator.github_repositories:
@@ -114,6 +121,86 @@ class Automation(mixins.WorkflowLoggerMixin):
                 return await self._process_imbi_project()
             case AutomationIterator.imbi_projects:
                 return await self._process_imbi_projects()
+
+    async def _resume_from_state(self) -> bool:
+        """Resume workflow from preserved error state.
+
+        Returns:
+            True if workflow completed successfully, False otherwise
+
+        Raises:
+            RuntimeError: If .state file not found or workflow incompatible
+
+        """
+        state_file = self.args.resume / '.state'
+
+        if not state_file.exists():
+            raise RuntimeError(
+                f'No .state file found in {self.args.resume}. '
+                f'Expected: {state_file}'
+            )
+
+        # Load and validate state
+        try:
+            state = models.ResumeState.from_msgpack(state_file.read_bytes())
+        except Exception as exc:
+            raise RuntimeError(
+                f'Failed to load resume state from {state_file}: {exc}'
+            ) from exc
+
+        self.logger.info(
+            'Resuming workflow "%s" for project %s from action "%s" '
+            '(index %d)',
+            state.workflow_slug,
+            state.project_slug,
+            state.failed_action_name,
+            state.failed_action_index,
+        )
+
+        # Validate workflow compatibility
+        if state.workflow_path != self.workflow.path:
+            self.logger.warning(
+                'Resume state workflow path (%s) differs from current (%s)',
+                state.workflow_path,
+                self.workflow.path,
+            )
+
+        # Warn about config changes
+        from imbi_automations import utils
+
+        current_hash = utils.hash_configuration(self.configuration)
+        if state.configuration_hash != current_hash:
+            self.logger.warning(
+                'Configuration has changed since error occurred. '
+                'Resume may behave unexpectedly.'
+            )
+
+        # Load the Imbi project
+        client = clients.Imbi.get_instance(config=self.configuration.imbi)
+        project = await client.get_project(state.project_id)
+
+        # Create workflow engine with resume state
+        engine = workflow_engine.WorkflowEngine(
+            config=self.configuration,
+            workflow=self.workflow,
+            verbose=self.args.verbose,
+            resume_state=state,
+        )
+
+        # Execute with resume
+        success = await engine.execute(project, state.github_repository)
+
+        if success:
+            self.logger.info(
+                'Successfully resumed and completed workflow for %s',
+                state.project_slug,
+            )
+        else:
+            self.logger.error(
+                'Workflow resume failed for %s', state.project_slug
+            )
+
+        return success
 
     async def _filter_projects(
         self, projects: list[models.ImbiProject]

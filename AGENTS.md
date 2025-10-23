@@ -370,6 +370,51 @@ requires_github_identifier = true
 exclude_github_workflow_status = ["success"]
 ```
 
+### Workflow Resumability
+
+When workflows fail with `--preserve-on-error` enabled, the system creates a `.state` file in the error directory containing all context needed to resume execution from the point of failure.
+
+**State File Format:**
+- **Format**: MessagePack binary serialization (`.state` file)
+- **Purpose**: Discourage manual editing while remaining debuggable with tools
+- **Location**: `<error-dir>/<workflow>/<project>-<timestamp>/.state`
+
+**Resume Usage:**
+```bash
+# Run workflow with error preservation
+imbi-automations config.toml workflows/my-workflow --project-id 123 --preserve-on-error
+
+# If workflow fails, resume from the error directory
+imbi-automations config.toml workflows/my-workflow --resume ./errors/my-workflow/test-project-20251023-150000
+```
+
+**Resume State Contents:**
+- Workflow identification (slug, path)
+- Project information (ID, slug)
+- Execution state (failed action index, completed action indices)
+- WorkflowContext restoration data (starting commit, repository changes flag, GitHub repository model)
+- Error details (message, timestamp)
+- Configuration hash (to detect config changes between runs)
+
+**Resume Behavior:**
+- **Reuses preserved directory**: Maintains exact state including temporary files/artifacts
+- **Retries failed action**: Starts from the action that failed, not the next one
+- **Skips condition checks**: Remote and local conditions already validated in original run
+- **Skips git clone**: Repository already cloned in preserved state
+- **Configuration change detection**: Warns if configuration hash differs from original run
+- **Automatic cleanup**: Successfully resumed states are cleaned up after completion
+
+**Benefits:**
+- **Debug failed workflows**: Preserved state includes full working directory for investigation
+- **Retry after external fixes**: Address network issues, API limits, or dependencies and retry
+- **No re-execution of successful actions**: Only retries from point of failure
+- **Per-project debug logs**: When using `--preserve-on-error`, debug logs written to `debug.log` in error directory
+
+**Limitations:**
+- Resume must be from same machine (absolute paths in preserved state)
+- Resume is single-project only (no `--all-projects` with `--resume`)
+- Configuration changes between runs may cause unexpected behavior (warning issued)
+
 ## Code Style and Standards
 
 - **Line length**: 79 characters (enforced by ruff)
@@ -399,6 +444,7 @@ exclude_github_workflow_status = ["success"]
 - **Authentication**: Secret string handling for API keys in configuration
 - **Pattern-Aware File Detection**: GitHub client supports both exact file paths and regex patterns for workflow file detection
 - **Resumable Processing**: `--start-from-project` CLI option allows resuming batch processing from a specific project slug
+- **Workflow Resumability**: Full workflow resume capability via `--resume` flag with MessagePack-serialized state files (`.state`) containing all context needed to retry failed actions
 
 ## Dependencies
 
@@ -409,6 +455,7 @@ exclude_github_workflow_status = ["success"]
 - `colorlog`: Colored logging for CLI applications
 - `httpx`: Modern async HTTP client
 - `jinja2`: Template engine for file generation and variable substitution
+- `msgpack`: MessagePack serialization for resume state files
 - `pydantic`: Data validation and configuration management
 - `rich`: Rich text and progress displays
 - `semver`: Semantic versioning utilities

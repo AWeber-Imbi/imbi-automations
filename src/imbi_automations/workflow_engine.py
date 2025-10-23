@@ -37,6 +37,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         config: models.Configuration,
         workflow: models.Workflow,
         verbose: bool = False,
+        resume_state: models.ResumeState | None = None,
     ) -> None:
         super().__init__(verbose)
         self.actions = actions.Actions(config, verbose)
@@ -47,6 +48,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         self.configuration = config
         self.github = clients.GitHub.get_instance(config=config.github)
         self.last_error_path: pathlib.Path | None = None
+        self.resume_state = resume_state
         self.tracker = tracker.Tracker.get_instance()
         self.workflow = workflow
         self.workflow_filter = workflow_filter.Filter(
@@ -67,16 +69,53 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         project: models.ImbiProject,
         github_repository: models.GitHubRepository | None = None,
     ) -> bool:
-        """Execute the workflow."""
-        working_directory = tempfile.TemporaryDirectory()
-        context = self._setup_workflow_run(
-            project, working_directory.name, github_repository
-        )
+        """Execute the workflow (or resume from saved state)."""
+        if self.resume_state:
+            # Resume mode: reuse preserved directory (don't auto-cleanup)
+            working_directory = tempfile.TemporaryDirectory(delete=False)
 
-        if not await self.condition_checker.check_remote(
-            context,
-            self.workflow.configuration.condition_type,
-            self.workflow.configuration.conditions,
+            # Copy preserved state to new temp location
+            shutil.copytree(
+                self.resume_state.preserved_directory_path,
+                working_directory.name,
+                dirs_exist_ok=True,
+                symlinks=True,
+            )
+
+            # Restore context from saved state
+            context = self._restore_workflow_context(
+                working_directory.name, project, github_repository
+            )
+
+            # Determine which actions to run (from failed action onwards)
+            actions_to_run = list(
+                enumerate(self.workflow.configuration.actions)
+            )[self.resume_state.failed_action_index :]
+
+            self.logger.info(
+                '%s resuming from action "%s" (index %d)',
+                context.imbi_project.slug,
+                self.resume_state.failed_action_name,
+                self.resume_state.failed_action_index,
+            )
+        else:
+            # Normal mode: fresh temporary directory
+            working_directory = tempfile.TemporaryDirectory()
+            context = self._setup_workflow_run(
+                project, working_directory.name, github_repository
+            )
+            actions_to_run = list(
+                enumerate(self.workflow.configuration.actions)
+            )
+
+        # Skip remote condition checks if resuming (already passed once)
+        if (
+            not self.resume_state
+            and not await self.condition_checker.check_remote(
+                context,
+                self.workflow.configuration.condition_type,
+                self.workflow.configuration.conditions,
+            )
         ):
             self.logger.info(
                 '%s remote workflow conditions not met',
@@ -85,7 +124,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.tracker.incr('workflow_remote_conditions_not_met')
             return False
 
-        if self.workflow.configuration.git.clone:
+        # Clone only if needed and not resuming
+        if self.workflow.configuration.git.clone and not self.resume_state:
             context.starting_commit = await git.clone_repository(
                 context.working_directory,
                 self._git_clone_url(github_repository),
@@ -94,7 +134,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             )
             self.tracker.incr('repositories_cloned')
 
-        if not self.condition_checker.check(
+        # Skip local condition checks if resuming
+        if not self.resume_state and not self.condition_checker.check(
             context,
             self.workflow.configuration.condition_type,
             self.workflow.configuration.conditions,
@@ -105,7 +146,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             )
             return False
 
-        for action in self.workflow.configuration.actions:
+        # Execute actions (all actions for normal mode, remaining for resume)
+        for idx, action in actions_to_run:
             try:
                 await self._execute_action(context, action)
             except RuntimeError as exc:
@@ -116,10 +158,23 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     exc,
                 )
                 if self.configuration.preserve_on_error:
+                    # Pass action index for state file
+                    completed_indices = (
+                        list(range(0, idx))
+                        if not self.resume_state
+                        else self.resume_state.completed_action_indices
+                        + list(
+                            range(self.resume_state.failed_action_index, idx)
+                        )
+                    )
                     self.last_error_path = self._preserve_working_directory(
                         context,
                         working_directory,
                         self.configuration.error_dir,
+                        failed_action_index=idx,
+                        failed_action_name=action.name,
+                        completed_action_indices=completed_indices,
+                        error_message=str(exc),
                     )
                 working_directory.cleanup()
                 return False
@@ -165,6 +220,10 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 '%s no repository changes to push or create PR',
                 context.imbi_project.slug,
             )
+
+        # Clean up successfully resumed state
+        if self.resume_state:
+            self._cleanup_resume_state(self.resume_state)
 
         working_directory.cleanup()
         return True
@@ -318,14 +377,25 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         context: models.WorkflowContext,
         working_directory: tempfile.TemporaryDirectory,
         target_base_dir: pathlib.Path,
+        failed_action_index: int | None = None,
+        failed_action_name: str | None = None,
+        completed_action_indices: list[int] | None = None,
+        error_message: str | None = None,
     ) -> pathlib.Path | None:
         """Preserve working directory state to a specified directory.
+
+        When error information is provided (failed_action_index, etc.), also
+        creates a .state file for workflow resumability.
 
         Args:
             context: Workflow execution context
             working_directory: Temporary directory to preserve
             target_base_dir: Base directory for preservation (e.g., error_dir
                 or dry_run_dir)
+            failed_action_index: Optional index of failed action (for .state)
+            failed_action_name: Optional name of failed action (for .state)
+            completed_action_indices: Optional list of completed indices
+            error_message: Optional error message for .state file
 
         Returns:
             Path to preserved directory, or None if preservation failed
@@ -355,6 +425,41 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 context.imbi_project.slug,
                 target_path,
             )
+
+            # Create .state file if error information provided
+            if (
+                failed_action_index is not None
+                and failed_action_name is not None
+            ):
+                from imbi_automations import utils
+
+                state = models.ResumeState(
+                    workflow_slug=workflow_slug,
+                    workflow_path=context.workflow.path,
+                    project_id=context.imbi_project.id,
+                    project_slug=project_slug,
+                    failed_action_index=failed_action_index,
+                    failed_action_name=failed_action_name,
+                    completed_action_indices=completed_action_indices or [],
+                    starting_commit=context.starting_commit,
+                    has_repository_changes=context.has_repository_changes,
+                    github_repository=context.github_repository,
+                    error_message=error_message or 'Unknown error',
+                    error_timestamp=datetime.datetime.now(tz=datetime.UTC),
+                    preserved_directory_path=target_path,
+                    configuration_hash=utils.hash_configuration(
+                        self.configuration
+                    ),
+                )
+
+                state_file = target_path / '.state'
+                state_file.write_bytes(state.to_msgpack())
+                self.logger.info(
+                    '%s created resume state file: %s',
+                    context.imbi_project.slug,
+                    state_file,
+                )
+
             return target_path
         except OSError as exc:
             self.logger.error(
@@ -411,3 +516,68 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             starting_commit=None,
             working_directory=working_directory,
         )
+
+    def _restore_workflow_context(
+        self,
+        working_directory: str,
+        project: models.ImbiProject,
+        github_repository: models.GitHubRepository | None,
+    ) -> models.WorkflowContext:
+        """Restore WorkflowContext from resume state.
+
+        Args:
+            working_directory: Path to restored working directory
+            project: ImbiProject instance (loaded fresh from API)
+            github_repository: Optional GitHub repository model
+
+        Returns:
+            Reconstructed WorkflowContext with restored state
+
+        Raises:
+            RuntimeError: If workflow symlink missing in preserved directory
+
+        """
+        working_directory_path = pathlib.Path(working_directory)
+
+        # Workflow symlink should already exist in preserved dir
+        workflow_path = working_directory_path / 'workflow'
+        if not workflow_path.exists():
+            raise RuntimeError(
+                f'Workflow symlink not found in preserved directory: '
+                f'{workflow_path}'
+            )
+
+        # Ensure extracted directory exists
+        extracted_path = working_directory_path / 'extracted'
+        if not extracted_path.exists():
+            extracted_path.mkdir(exist_ok=True)
+
+        return models.WorkflowContext(
+            workflow=self.workflow,
+            github_repository=(
+                github_repository or self.resume_state.github_repository  # type: ignore[union-attr]
+            ),
+            imbi_project=project,
+            starting_commit=self.resume_state.starting_commit,  # type: ignore[union-attr]
+            working_directory=working_directory_path,
+            has_repository_changes=self.resume_state.has_repository_changes,  # type: ignore[union-attr]
+        )
+
+    def _cleanup_resume_state(self, state: models.ResumeState) -> None:
+        """Clean up successfully resumed state directory.
+
+        Args:
+            state: ResumeState with preserved directory path
+
+        """
+        try:
+            if state.preserved_directory_path.exists():
+                shutil.rmtree(state.preserved_directory_path)
+                self.logger.info(
+                    'Cleaned up resume state directory: %s',
+                    state.preserved_directory_path,
+                )
+        except OSError as exc:
+            self.logger.warning(
+                'Failed to clean up resume state directory: %s', exc
+            )

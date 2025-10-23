@@ -172,6 +172,13 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         action='store_true',
         help='Process all GitHub repositories across all organizations',
     )
+    target_group.add_argument(
+        '--resume',
+        type=pathlib.Path,
+        metavar='ERROR_DIR',
+        help='Resume from previous error state directory '
+        '(looks for .state file inside)',
+    )
 
     parser.add_argument(
         '--start-from-project',
