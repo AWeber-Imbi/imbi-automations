@@ -147,11 +147,13 @@ class WorkflowClaudeAction(WorkflowAction):
     """Action for AI-powered code transformations using Claude Code SDK.
 
     Executes complex multi-file analysis and transformation with prompt-based
-    instructions, validation cycles, and AI-generated commit messages.
+    instructions, optional planning phase, validation cycles, and AI-generated
+    commit messages.
     """
 
     type: typing.Literal['claude'] = 'claude'
-    prompt: str
+    task_prompt: str
+    planning_prompt: str | None = None
     validation_prompt: str | None = None
     max_cycles: int = 3
     ai_commit: bool = True

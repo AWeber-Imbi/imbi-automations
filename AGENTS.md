@@ -483,6 +483,61 @@ All Claude Code actions follow standards defined in the `prompts/CLAUDE.md` file
 - **Error Details**: Include specific, actionable error information in failure files
 - **Failure Restart**: Actions with `on_failure = "action-name"` will restart from the specified action when failure files are detected (up to 3 attempts per action)
 
+### Planning Agent Feature
+
+Claude actions support an optional planning phase using a dedicated planning agent that analyzes the codebase before the task agent executes changes.
+
+**Configuration:**
+```toml
+[[actions]]
+name = "update-python-version"
+type = "claude"
+planning_prompt = "prompts/planning.md.j2"  # Optional - enables planning phase
+task_prompt = "prompts/task.md.j2"          # Required - task instructions
+validation_prompt = "prompts/validate.md.j2"  # Optional - validation instructions
+max_cycles = 3
+```
+
+**Execution Flow (per cycle):**
+1. **Planning Phase** (if `planning_prompt` is set):
+   - Planning agent analyzes codebase using Read, Glob, Grep, Bash tools (read-only)
+   - Creates structured todo list with specific, actionable tasks
+   - Provides analysis/observations about codebase structure and dependencies
+   - Returns JSON with `result`, `plan` (array of tasks), and `analysis` (context)
+
+2. **Task Phase**:
+   - Task agent receives the plan injected into the task prompt
+   - Executes changes following the structured plan
+   - Has full context from planning agent's analysis
+
+3. **Validation Phase** (if `validation_prompt` is set):
+   - Validator agent checks the task agent's work
+   - Returns success/failure with error details
+
+**Key Behaviors:**
+- **Plan Reset**: Task plan is cleared and regenerated at the start of each cycle
+- **Fresh Planning**: Each cycle gets a new plan based on current repository state
+- **Failure Handling**: Planning failures abort the cycle immediately
+- **Plan Injection**: Plan is injected into task prompt similar to validation error injection
+
+**Planning Agent Response Schema:**
+```json
+{
+  "result": "success",
+  "plan": [
+    "First specific task to complete",
+    "Second specific task to complete"
+  ],
+  "analysis": "Observations about codebase structure, patterns, dependencies, and potential challenges"
+}
+```
+
+**Benefits:**
+- **Better Context**: Planning agent explores codebase before task agent makes changes
+- **Structured Execution**: Task agent follows clear, ordered steps
+- **Adaptability**: New plan created each cycle adapts to repository changes
+- **Separation of Concerns**: Read-only analysis separate from write operations
+
 ## Available Workflows
 
 The system includes 20 pre-built workflows organized by category:
