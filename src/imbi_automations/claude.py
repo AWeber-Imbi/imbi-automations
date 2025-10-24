@@ -8,6 +8,7 @@ workflows and direct Anthropic API queries.
 import json
 import logging
 import pathlib
+import typing
 from email import utils as email_utils
 
 import anthropic
@@ -173,16 +174,48 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         # Create custom settings.json - disable all global settings
         settings = claude_dir / 'settings.json'
+        settings_config = {
+            'hooks': {},
+            'outputStyle': 'json',
+            'settingSources': ['project', 'local'],
+        }
+
+        # Add git configuration if signing is enabled
+        if self.configuration.git.gpg_sign:
+            git_config: dict[str, typing.Any] = {'commit': {'gpgsign': True}}
+
+            # Add format specification (required for SSH signing)
+            if self.configuration.git.gpg_format:
+                git_config['gpg'] = {
+                    'format': self.configuration.git.gpg_format
+                }
+
+            # Add signing key
+            if self.configuration.git.signing_key:
+                git_config['user'] = {
+                    'signingkey': self.configuration.git.signing_key
+                }
+
+            # Add SSH program (for SSH signing with 1Password, etc.)
+            if self.configuration.git.ssh_program:
+                if 'gpg' not in git_config:
+                    git_config['gpg'] = {}
+                git_config['gpg']['ssh'] = {
+                    'program': self.configuration.git.ssh_program
+                }
+
+            # Add GPG program (for traditional GPG signing)
+            if self.configuration.git.gpg_program:
+                if 'gpg' not in git_config:
+                    git_config['gpg'] = {}
+                git_config['gpg']['program'] = (
+                    self.configuration.git.gpg_program
+                )
+
+            settings_config['git'] = git_config
+
         settings.write_text(
-            json.dumps(
-                {
-                    'hooks': {},
-                    'outputStyle': 'json',
-                    'settingSources': ['project', 'local'],
-                },
-                indent=2,
-            ),
-            encoding='utf-8',
+            json.dumps(settings_config, indent=2), encoding='utf-8'
         )
 
         with settings.open('r', encoding='utf-8') as f:

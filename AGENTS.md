@@ -128,11 +128,25 @@ hostname = "imbi.example.com"
 [claude_code]
 executable = "claude"  # Optional, defaults to 'claude'
 
+[git]
+# Optional: Configure commit signing for Claude Code actions
+# When enabled, git commits made by Claude Code will be signed
+gpg_sign = true                    # Enable commit signing (default: false)
+gpg_format = "ssh"                 # Format: 'gpg', 'ssh', 'x509', 'openpgp' (required for SSH signing)
+signing_key = "ssh-ed25519 AAAA..."  # Your SSH public key or GPG key ID
+ssh_program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"  # SSH signing program (for SSH format)
+# gpg_program = "gpg"              # GPG program path (for GPG format)
+
 # Optional: Override cache directory (default: ~/.cache/imbi-automations)
 cache_dir = "/custom/path/to/cache"
 ```
 
 The `cache_dir` setting can also be overridden via the `--cache-dir` CLI option.
+
+**Git Signing Configuration:**
+- **SSH Signing** (1Password, ssh-agent): Set `gpg_sign=true`, `gpg_format="ssh"`, provide your SSH public key in `signing_key`, and optionally specify `ssh_program` for custom signing programs like 1Password's op-ssh-sign.
+- **GPG Signing**: Set `gpg_sign=true`, `gpg_format="gpg"` (or omit, as GPG is the default), provide your GPG key ID in `signing_key`, and optionally specify `gpg_program` path.
+- **Note**: Git signing configuration only applies to commits made by Claude Code actions. Manual git operations and commits made through other actions use the standard git configuration.
 
 ### Transformation Architecture
 

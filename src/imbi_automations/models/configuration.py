@@ -30,10 +30,16 @@ class AnthropicConfiguration(pydantic.BaseModel):
 class GitConfiguration(pydantic.BaseModel):
     """Git configuration for repository operations.
 
-    Controls git commit behavior including additional arguments for signing.
+    Controls git commit behavior including signing with GPG or SSH keys.
+    Supports multiple signing formats: 'gpg', 'ssh', 'x509', 'openpgp'.
     """
 
     commit_args: str = ''
+    gpg_sign: bool = False
+    gpg_format: str | None = None
+    signing_key: str | None = None
+    ssh_program: str | None = None
+    gpg_program: str | None = None
 
 
 class GitHubConfiguration(pydantic.BaseModel):
