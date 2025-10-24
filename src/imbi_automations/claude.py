@@ -382,35 +382,21 @@ class Claude(mixins.WorkflowLoggerMixin):
     @claude_agent_sdk.tool(
         name='submit_task_response',
         description='Submit task execution result (task agents only)',
-        input_schema={
-            'type': 'object',
-            'properties': {
-                'result': {
-                    'type': 'string',
-                    'enum': ['success', 'failure'],
-                    'description': 'Task execution result',
-                },
-                'message': {
-                    'type': 'string',
-                    'description': 'Optional completion message',
-                },
-                'errors': {
-                    'type': 'array',
-                    'items': {'type': 'string'},
-                    'description': 'List of errors (for failures)',
-                },
-            },
-            'required': ['result'],
-        },
+        input_schema=str,
     )
-    def _submit_task_response(self, **kwargs: typing.Any) -> str:
-        """Submit task agent response."""
-        LOGGER.debug('submit_task_response tool invoked with: %r', kwargs)
+    def _submit_task_response(self, response_json: str) -> str:
+        """Submit task agent response.
+
+        Args:
+            response_json: JSON string with result, message, errors fields
+        """
+        LOGGER.debug('submit_task_response invoked: %r', response_json)
         try:
-            response = models.AgentRun.model_validate(kwargs)
+            data = json.loads(response_json)
+            response = models.AgentRun.model_validate(data)
             self._submitted_response = response
             return 'Task response submitted successfully'
-        except pydantic.ValidationError as exc:
+        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
             error_msg = f'Invalid task response: {exc}'
             LOGGER.error(error_msg)
             return error_msg
@@ -418,35 +404,21 @@ class Claude(mixins.WorkflowLoggerMixin):
     @claude_agent_sdk.tool(
         name='submit_validation_response',
         description='Submit validation result (validation agents only)',
-        input_schema={
-            'type': 'object',
-            'properties': {
-                'result': {
-                    'type': 'string',
-                    'enum': ['success', 'failure'],
-                    'description': 'Validation result',
-                },
-                'message': {
-                    'type': 'string',
-                    'description': 'Optional validation message',
-                },
-                'errors': {
-                    'type': 'array',
-                    'items': {'type': 'string'},
-                    'description': 'List of validation errors',
-                },
-            },
-            'required': ['result'],
-        },
+        input_schema=str,
     )
-    def _submit_validation_response(self, **kwargs: typing.Any) -> str:
-        """Submit validation agent response."""
-        LOGGER.debug('submit_validation_response invoked: %r', kwargs)
+    def _submit_validation_response(self, response_json: str) -> str:
+        """Submit validation agent response.
+
+        Args:
+            response_json: JSON string with result, message, errors fields
+        """
+        LOGGER.debug('submit_validation_response invoked: %r', response_json)
         try:
-            response = models.AgentRun.model_validate(kwargs)
+            data = json.loads(response_json)
+            response = models.AgentRun.model_validate(data)
             self._submitted_response = response
             return 'Validation response submitted successfully'
-        except pydantic.ValidationError as exc:
+        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
             error_msg = f'Invalid validation response: {exc}'
             LOGGER.error(error_msg)
             return error_msg
@@ -454,35 +426,21 @@ class Claude(mixins.WorkflowLoggerMixin):
     @claude_agent_sdk.tool(
         name='submit_plan',
         description='Submit planning result (planning agents only)',
-        input_schema={
-            'type': 'object',
-            'properties': {
-                'result': {
-                    'type': 'string',
-                    'enum': ['success', 'failure'],
-                    'description': 'Planning result',
-                },
-                'plan': {
-                    'type': 'array',
-                    'items': {'type': 'string'},
-                    'description': 'List of tasks (simple strings)',
-                },
-                'analysis': {
-                    'type': 'string',
-                    'description': 'Analysis and context',
-                },
-            },
-            'required': ['result', 'plan', 'analysis'],
-        },
+        input_schema=str,
     )
-    def _submit_plan(self, **kwargs: typing.Any) -> str:
-        """Submit planning agent response."""
-        LOGGER.debug('submit_plan tool invoked with: %r', kwargs)
+    def _submit_plan(self, plan_json: str) -> str:
+        """Submit planning agent response.
+
+        Args:
+            plan_json: JSON string with result, plan, analysis fields
+        """
+        LOGGER.debug('submit_plan tool invoked with: %r', plan_json)
         try:
-            response = models.AgentRun.model_validate(kwargs)
+            data = json.loads(plan_json)
+            response = models.AgentRun.model_validate(data)
             self._submitted_response = response
             return 'Plan submitted successfully'
-        except pydantic.ValidationError as exc:
+        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
             error_msg = f'Invalid plan format: {exc}'
             LOGGER.error(error_msg)
             return error_msg

@@ -27,34 +27,25 @@ You are a validation specialist in an automated workflow system.
 
 **You MUST call `mcp__agent_tools__submit_validation_response` to complete.**
 
-**DO NOT output JSON as text. Use the tool.**
+**Pass a JSON string to the tool.**
 
 ### How to Submit
 
 Success:
 ```
-mcp__agent_tools__submit_validation_response(
-  result="success",
-  message="Validation passed - all requirements met"
-)
+mcp__agent_tools__submit_validation_response('{"result": "success", "message": "Validation passed - all requirements met"}')
 ```
 
 Failure:
 ```
-mcp__agent_tools__submit_validation_response(
-  result="failure",
-  errors=[
-    "Base image version incorrect: found 3.9, expected 3.12 in Dockerfile:1",
-    "Missing health check configuration in Docker Compose"
-  ]
-)
+mcp__agent_tools__submit_validation_response('{"result": "failure", "errors": ["Base image version incorrect: found 3.9, expected 3.12 in Dockerfile:1", "Missing health check configuration"]}')
 ```
 
-**Parameters:**
+**JSON Format:**
 - `result` REQUIRED: "success" or "failure"
 - `message` optional - validation summary
 - `errors` optional array - specific errors with locations (file:line)
-- Call the tool once when validation is complete
+- Call the tool once when validation is complete with a single JSON string argument
 
 ## VALIDATION GUIDELINES
 
