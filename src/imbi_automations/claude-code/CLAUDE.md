@@ -10,70 +10,54 @@ The work you will be performing will primarily be in the `repository` directory.
 
 # Output Instructions
 
-You must respond in JSON format indicating task success/failure or validation results.
+**CRITICAL: You MUST use the `mcp__agent_tools__submit_response` tool to submit your final response.**
 
-Each agent type (planning, task, validator) may have its own specific JSON schema defined in its agent instructions. Always follow the schema specified in your agent-specific instructions.
+Do NOT output JSON as text. Use the tool to submit structured data.
 
-## Specific Behaviors
+## How to Submit Your Response
 
-1. Respond with ONLY the JSON object following the schema from your agent instructions
-2. No markdown code fences
-3. No explanatory text
-4. Validate using `mcp__agent_tools__response_validator` tool
-5. Strictly match schema structure and types
+1. **Complete your task** using the available tools (Read, Write, Edit, Bash, etc.)
+2. **Submit your result** by calling `mcp__agent_tools__submit_response` with:
+   - `result`: "success" or "failure" (required)
+   - `message`: Optional description
+   - `errors`: Array of error strings (for failures)
+   - `plan`: Array of task strings (planning agents only)
+   - `analysis`: Analysis text (planning agents only)
 
-### Default JSON Schema
+## Tool Usage Examples
 
-If your agent instructions don't specify a different schema, use this default format:
-
-```json
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "type": "object",
-  "properties": {
-    "result": {
-      "type": "string",
-      "enum": ["success", "failure"]
-    },
-    "message": {
-      "type": "string"
-    },
-    "errors": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    }
-  },
-  "required": ["result"],
-  "additionalProperties": false
-}
-```
-
-## Examples
-
-### Valid Examples
+### Task/Validation Agents
 
 Success:
-```json
-{"result": "success", "message": "Created requested program"}
+```
+mcp__agent_tools__submit_response(
+  result="success",
+  message="Created requested program"
+)
 ```
 
-Failure with errors:
-```json
-{
-  "result": "failure",
-  "errors": [
-    "Missing 'requests' in [project.dependencies]",
-    "Version configuration missing required 'pattern' field"
-  ]
-}
+Failure:
+```
+mcp__agent_tools__submit_response(
+  result="failure",
+  errors=["Missing 'requests' in [project.dependencies]", "Invalid version format"]
+)
 ```
 
-### Invalid Examples
+### Planning Agents
 
-Wrong field: `{"status": "passed"}`
-Wrong enum: `{"result": "SUCCESS"}`
-Not JSON: `VALIDATION_PASSED`
-Extra text: Markdown or explanations before/after JSON
-Wrong types: `{"message": ["array instead of string"]}`
+Success with plan:
+```
+mcp__agent_tools__submit_response(
+  result="success",
+  plan=["Update Python version in pyproject.toml", "Update Dockerfile base image"],
+  analysis="Repository uses Python 3.9 in multiple locations"
+)
+```
+
+## Important Notes
+
+- **Always use the tool** - Never output JSON as text in your response
+- **One submission only** - Call submit_response once when you're done
+- **Tool validates automatically** - The tool will validate your response format
+- **Backwards compatibility** - Old JSON text responses still work but tool submission is preferred

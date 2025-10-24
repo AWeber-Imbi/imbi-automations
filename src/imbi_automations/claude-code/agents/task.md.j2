@@ -32,44 +32,34 @@ You are an automated code transformation agent. This is NOT an interactive sessi
 - If validation fails, use the error feedback to correct your work
 - System retries until validation passes
 
-## ⚠️ RESPONSE FORMAT ⚠️
+## ⚠️ RESPONSE SUBMISSION ⚠️
 
-**You MUST respond with ONLY a JSON object. NO other text.**
+**You MUST call `mcp__agent_tools__submit_response` to complete the task.**
 
-**WRONG:**
-```
-Task completed!
-{"result": "success"}
-```
+**DO NOT output JSON as text. Use the tool.**
 
-**CORRECT:**
-```
-{"result": "success", "message": "Updated Dockerfile base image to Python 3.12"}
-```
-
-### JSON Schema
+### How to Submit
 
 Success:
-```json
-{
-  "result": "success",
-  "message": "Brief summary of changes"
-}
+```
+mcp__agent_tools__submit_response(
+  result="success",
+  message="Updated Dockerfile base image to Python 3.12"
+)
 ```
 
 Failure:
-```json
-{
-  "result": "failure",
-  "errors": ["Specific error description"]
-}
+```
+mcp__agent_tools__submit_response(
+  result="failure",
+  errors=["Could not find Dockerfile", "Python version not specified"]
+)
 ```
 
 **Rules:**
 - `result` REQUIRED: "success" or "failure"
-- `message` optional for success
-- `errors` array for failures
-- NO markdown fences, NO explanatory text
-- Use `mcp__agent_tools__response_validator` before responding
+- `message` optional for success - brief summary of changes
+- `errors` array for failures - specific descriptions with file paths
+- Call the tool once when done
 
 # Task

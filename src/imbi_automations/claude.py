@@ -61,9 +61,13 @@ class Claude(mixins.WorkflowLoggerMixin):
         }
         self.tracker = tracker.Tracker.get_instance()
         self._set_workflow_logger(self.context.workflow)
+        self._submitted_response: models.AgentRun | models.AgentPlan | None = (
+            None
+        )
         self.client = self._create_client()
 
     async def agent_query(self, prompt: str) -> models.AgentRun:
+        self._submitted_response = None  # Reset for each query
         await self.client.connect()
         await self.client.query(prompt)
         response = await self._response()
@@ -95,7 +99,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         LOGGER.debug('Claude Code settings: %s', settings)
 
         agent_tools = claude_agent_sdk.create_sdk_mcp_server(
-            'agent_tools', version, [self._response_validator]
+            'agent_tools', version, [self._submit_response]
         )
 
         system_prompt = (BASE_PATH / 'claude-code' / 'CLAUDE.md').read_text()
@@ -130,7 +134,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'WebFetch',
                 'WebSearch',
                 'SlashCommand',
-                'mcp__agent_tools__response_validator',
+                'mcp__agent_tools__submit_response',
             ],
             cwd=self.context.working_directory,
             mcp_servers={'agent_tools': agent_tools},
@@ -357,6 +361,10 @@ class Claude(mixins.WorkflowLoggerMixin):
             if response and isinstance(response, models.AgentRun):
                 return response
 
+        # Check if agent submitted response via tool (preferred method)
+        if self._submitted_response:
+            return self._submitted_response
+
         return models.AgentRun(
             result=models.AgentRunResult.failure,
             message='Unspecified failure',
@@ -364,34 +372,56 @@ class Claude(mixins.WorkflowLoggerMixin):
         )
 
     @claude_agent_sdk.tool(
-        name='response_validator',
-        description='Validate the response format from for the final message',
-        input_schema=str,
+        name='submit_response',
+        description='Submit the final agent response (required)',
+        input_schema={
+            'type': 'object',
+            'properties': {
+                'result': {
+                    'type': 'string',
+                    'enum': ['success', 'failure'],
+                    'description': 'Task execution result',
+                },
+                'message': {
+                    'type': 'string',
+                    'description': 'Optional success/failure description',
+                },
+                'errors': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'description': 'List of specific errors (for failures)',
+                },
+                'plan': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'description': 'Task plan (planning agents only)',
+                },
+                'analysis': {
+                    'type': 'string',
+                    'description': 'Analysis context (planning agents only)',
+                },
+            },
+            'required': ['result'],
+        },
     )
-    def _response_validator(self, message: str) -> str:
-        """Use to format the result of an agent run.
+    def _submit_response(self, **kwargs: typing.Any) -> str:
+        """Submit the final agent response.
 
-        Validates against both AgentRun (task/validator agents) and AgentPlan
-        (planning agents) schemas.
+        Accepts either AgentRun format (task/validation agents) or planning
+        format with plan/analysis fields. Validates and stores the response
+        for retrieval by the workflow engine.
         """
-        LOGGER.debug('Validator tool invoked')
-        try:
-            payload = json.loads(message)
-        except json.JSONDecodeError:
-            return 'Payload not validate as JSON'
+        LOGGER.debug('submit_response tool invoked with: %r', kwargs)
 
-        # Try AgentPlan first (planning agents)
+        # Validate as AgentRun (handles both task/validation and planning)
+        # Planning agents include plan/analysis as extra fields
         try:
-            models.AgentPlan.model_validate(payload)
-            return 'Response is valid'
-        except pydantic.ValidationError:
-            pass  # Try AgentRun next
-
-        # Try AgentRun (task/validator agents)
-        try:
-            models.AgentRun.model_validate(payload)
-            return 'Response is valid'
+            response = models.AgentRun.model_validate(kwargs)
+            self._submitted_response = response
+            if 'plan' in kwargs:
+                return 'Planning response submitted successfully'
+            return 'Response submitted successfully'
         except pydantic.ValidationError as exc:
-            return str(exc)
-
-        return 'Response is valid'
+            error_msg = f'Invalid response format: {exc}'
+            LOGGER.error(error_msg)
+            return error_msg

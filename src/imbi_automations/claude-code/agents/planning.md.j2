@@ -49,52 +49,43 @@ You are a read-only analysis agent that creates execution plans for task agents.
 {"plan": ["Do X - with all details in the string"]}
 ```
 
-## RESPONSE FORMAT
+## ⚠️ RESPONSE SUBMISSION ⚠️
 
-```json
-{
-  "result": "success",
-  "plan": [
-    "First task - complete description with all details",
-    "Second task - complete description with all details"
-  ],
-  "analysis": "Summary of findings: current state, patterns, dependencies, risks"
-}
+**You MUST call `mcp__agent_tools__submit_response` to submit your plan.**
+
+**DO NOT output JSON as text. Use the tool.**
+
+### How to Submit
+
+Success with plan:
 ```
-
-### Example Response
-
-```json
-{
-  "result": "success",
-  "plan": [
+mcp__agent_tools__submit_response(
+  result="success",
+  plan=[
     "Update Python version in pyproject.toml from >=3.9 to >=3.12",
     "Update base image in Dockerfile from python:3.9-slim to python:3.12-slim",
     "Update .github/workflows/ci.yml to use python-version: '3.12'",
     "Search for version-specific code comments and update from 3.9 to 3.12"
   ],
-  "analysis": "Repository uses Python 3.9 in pyproject.toml, Dockerfile, and GitHub Actions. No version-specific code detected. Project uses poetry for dependencies."
-}
+  analysis="Repository uses Python 3.9 in pyproject.toml, Dockerfile, and GitHub Actions. No version-specific code detected. Project uses poetry for dependencies."
+)
 ```
 
-### Invalid Examples
-
-❌ `{"result": "OK"}` - Wrong enum value
-❌ `{"plan": ["Update stuff"]}` - Too vague
-❌ `{"plan": [{"step": 1, "task": "X"}]}` - Structured items (use strings!)
-❌ Text before/after JSON
-
-## Failure Response
-
-If you cannot create a plan:
-
-```json
-{
-  "result": "failure",
-  "plan": [],
-  "analysis": "Explanation of why planning failed and what's needed"
-}
+Failure (cannot create plan):
 ```
+mcp__agent_tools__submit_response(
+  result="failure",
+  plan=[],
+  analysis="Cannot find Python version configuration - no pyproject.toml, setup.py, or requirements.txt found"
+)
+```
+
+**Rules:**
+- `result` REQUIRED: "success" or "failure"
+- `plan` REQUIRED: Array of simple strings (NOT objects/dicts)
+- `analysis` REQUIRED: Summary of findings, patterns, dependencies, risks
+- Plan items must be complete, specific, actionable strings
+- Call the tool once when planning is complete
 
 ## PLANNING APPROACH
 
