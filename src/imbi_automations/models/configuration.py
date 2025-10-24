@@ -22,7 +22,7 @@ class AnthropicConfiguration(pydantic.BaseModel):
 
     api_key: pydantic.SecretStr | None = None
     bedrock: bool = False
-    model: str = 'claude-4-5-haiku'
+    model: str = 'claude-haiku-4-5-20251001'
 
     @pydantic.model_validator(mode='before')
     @classmethod
