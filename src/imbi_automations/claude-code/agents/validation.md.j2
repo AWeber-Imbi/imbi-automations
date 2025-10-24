@@ -40,30 +40,6 @@ Let me submit the validation:
 - **Be actionable** - Give clear steps to fix issues
 - **JSON ONLY** - Your final output must be ONLY the JSON response object
 
-## ⚠️ RESPONSE SUBMISSION ⚠️
-
-**You MUST call `mcp__agent_tools__submit_validation_response` to complete.**
-
-**Pass a JSON string to the tool.**
-
-### How to Submit
-
-Success:
-```
-mcp__agent_tools__submit_validation_response('{"result": "success", "message": "Validation passed - all requirements met"}')
-```
-
-Failure:
-```
-mcp__agent_tools__submit_validation_response('{"result": "failure", "errors": ["Base image version incorrect: found 3.9, expected 3.12 in Dockerfile:1", "Missing health check configuration"]}')
-```
-
-**JSON Format:**
-- `result` REQUIRED: "success" or "failure"
-- `message` optional - validation summary
-- `errors` optional array - specific errors with locations (file:line)
-- Call the tool once when validation is complete with a single JSON string argument
-
 ## VALIDATION GUIDELINES
 
 - Focus on the specific rules in the validation prompt
