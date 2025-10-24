@@ -81,7 +81,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
             )
 
         action = models.WorkflowClaudeAction(
-            name='test-action', type='claude', prompt='test-prompt.j2'
+            name='test-action', type='claude', task_prompt='test-prompt.j2'
         )
 
         # Create Jinja2 template file
@@ -118,7 +118,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         action = models.WorkflowClaudeAction(
             name='test-action',
             type='claude',
-            prompt='test-prompt.md',
+            task_prompt='test-prompt.md',
             validation_prompt='test-validation.md',
         )
 
@@ -159,7 +159,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         action = models.WorkflowClaudeAction(
             name='test-action',
             type='claude',
-            prompt='test-prompt.md',
+            task_prompt='test-prompt.md',
             validation_prompt='test-validation.md',
         )
 
@@ -202,7 +202,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
             )
 
         action = models.WorkflowClaudeAction(
-            name='test-action', type='claude', prompt='test-prompt.md'
+            name='test-action', type='claude', task_prompt='test-prompt.md'
         )
 
         (self.working_directory / 'workflow' / 'test-prompt.md').write_text(
@@ -239,7 +239,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         action = models.WorkflowClaudeAction(
             name='test-action',
             type='claude',
-            prompt='test-prompt.md',
+            task_prompt='test-prompt.md',
             max_cycles=3,
         )
 
@@ -279,7 +279,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         action = models.WorkflowClaudeAction(
             name='test-action',
             type='claude',
-            prompt='test-prompt.md',
+            task_prompt='test-prompt.md',
             max_cycles=2,
         )
 
@@ -328,7 +328,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         action = models.WorkflowClaudeAction(
             name='test-action',
             type='claude',
-            prompt='test-prompt.md',
+            task_prompt='test-prompt.md',
             max_cycles=3,
         )
 

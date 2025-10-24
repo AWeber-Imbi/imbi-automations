@@ -79,7 +79,7 @@ remote_file = "Dockerfile"
 [[actions]]
 name = "test-claude-action"
 type = "claude"
-prompt = "prompts/main-prompt.md"
+task_prompt = "prompts/main-prompt.md"
 validation_prompt = "prompts/validation-prompt.md"
 max_cycles = 5
 timeout = 1800

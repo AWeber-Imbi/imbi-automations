@@ -30,3 +30,15 @@ class AgentRun(pydantic.BaseModel):
     result: AgentRunResult
     message: str | None = None
     errors: list[str] = []
+
+
+class AgentPlan(pydantic.BaseModel):
+    """Claude planning agent result with structured plan and analysis.
+
+    Contains the execution result, a list of planned tasks for the task agent
+    to complete, and optional analysis/observations about the codebase.
+    """
+
+    result: AgentRunResult
+    plan: list[str] = []
+    analysis: str | None = None

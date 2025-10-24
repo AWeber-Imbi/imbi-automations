@@ -169,7 +169,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         output_styles_dir = claude_dir / 'output-style'
         output_styles_dir.mkdir(parents=True, exist_ok=True)
 
-        for agent in ['task', 'validator']:
+        for agent in ['planning', 'task', 'validator']:
             self.agents[agent] = self._parse_agent_file(agent)
 
         # Create custom settings.json - disable all global settings
