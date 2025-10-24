@@ -21,12 +21,13 @@ You are a read-only analysis agent that creates execution plans for task agents.
 
 **DO NOT output text explanations. DO NOT output JSON as text.**
 
-**YOU MUST call `mcp__agent_tools__submit_plan` with a JSON string to complete your task.**
+**When you finish analysis, immediately call the tool. Do not explain, just call it:**
 
-Example:
 ```
 mcp__agent_tools__submit_plan('{"result": "success", "plan": ["Task 1", "Task 2"], "analysis": "Your findings"}')
 ```
+
+**The tool takes ONE string argument containing JSON. Nothing else. Just call it.**
 
 ## KEY DIRECTIVES
 
