@@ -1,6 +1,6 @@
 """Claude Code action implementation for AI-powered transformations.
 
-Executes Claude Code actions using agent-based workflows (task/validator) with
+Executes Claude Code actions using agent-based workflows (task/validation) with
 prompt templating, failure detection, and restart capabilities for reliable
 AI-powered code transformations.
 """
@@ -18,13 +18,13 @@ class AgentType(enum.StrEnum):
 
     planning = 'planning'
     task = 'task'
-    validator = 'validator'
+    validation = 'validation'
 
 
 class ClaudeAction(mixins.WorkflowLoggerMixin):
     """Executes AI-powered code transformations using Claude Code SDK.
 
-    Manages agent-based workflows with task/validator cycles, prompt
+    Manages agent-based workflows with task/validation cycles, prompt
     templating, and automatic restart on failure detection.
     """
 
@@ -118,7 +118,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             agents.append(AgentType.planning)
         agents.append(AgentType.task)
         if action.validation_prompt:
-            agents.append(AgentType.validator)
+            agents.append(AgentType.validation)
 
         for agent in agents:
             self._log_verbose_info(
@@ -154,10 +154,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     )
                     self.task_plan = None
                     return False
-                elif agent == AgentType.validator:
+                elif agent == AgentType.validation:
                     self.last_error = run
                     self.logger.error(
-                        '%s %s Claude Code validator agent failed in cycle %d',
+                        '%s %s Claude Code validator failed in cycle %d',
                         self.context.imbi_project.slug,
                         action.name,
                         cycle,
@@ -199,8 +199,8 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     self.task_plan = None
                     return False
 
-            # Clear last_error on successful task/validator run
-            if agent in (AgentType.task, AgentType.validator):
+            # Clear last_error on successful task/validation run
+            if agent in (AgentType.task, AgentType.validation):
                 self.last_error = None
 
         return True
@@ -223,7 +223,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 / 'workflow'
                 / action.task_prompt
             )
-        elif agent == AgentType.validator:
+        elif agent == AgentType.validation:
             prompt_file = (
                 self.context.working_directory
                 / 'workflow'
