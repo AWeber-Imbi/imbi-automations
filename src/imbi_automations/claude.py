@@ -364,14 +364,29 @@ class Claude(mixins.WorkflowLoggerMixin):
         input_schema=str,
     )
     def _response_validator(self, message: str) -> str:
-        """Use to format the result of an agent run."""
+        """Use to format the result of an agent run.
+
+        Validates against both AgentRun (task/validator agents) and AgentPlan
+        (planning agents) schemas.
+        """
         LOGGER.debug('Validator tool invoked')
         try:
             payload = json.loads(message)
         except json.JSONDecodeError:
             return 'Payload not validate as JSON'
+
+        # Try AgentPlan first (planning agents)
+        try:
+            models.AgentPlan.model_validate(payload)
+            return 'Response is valid'
+        except pydantic.ValidationError:
+            pass  # Try AgentRun next
+
+        # Try AgentRun (task/validator agents)
         try:
             models.AgentRun.model_validate(payload)
+            return 'Response is valid'
         except pydantic.ValidationError as exc:
             return str(exc)
+
         return 'Response is valid'

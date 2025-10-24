@@ -14,15 +14,30 @@ from tests import base
 
 
 def _test_response_validator(message: str) -> str:
-    """Test helper function that replicates response_validator logic."""
+    """Test helper function that replicates response_validator logic.
+
+    Validates against both AgentRun (task/validator agents) and AgentPlan
+    (planning agents) schemas.
+    """
     try:
         payload = json.loads(message)
     except json.JSONDecodeError:
         return 'Payload not validate as JSON'
+
+    # Try AgentPlan first (planning agents)
+    try:
+        models.AgentPlan.model_validate(payload)
+        return 'Response is valid'
+    except pydantic.ValidationError:
+        pass  # Try AgentRun next
+
+    # Try AgentRun (task/validator agents)
     try:
         models.AgentRun.model_validate(payload)
+        return 'Response is valid'
     except pydantic.ValidationError as exc:
         return str(exc)
+
     return 'Response is valid'
 
 
@@ -71,6 +86,77 @@ class ResponseValidatorTestCase(unittest.TestCase):
         result = _test_response_validator(json_message)
 
         self.assertIn('validation error', result)
+
+    def test_response_validator_planning_agent_response(self) -> None:
+        """Test response_validator accepts planning agent responses."""
+        planning_payload = {
+            'result': 'success',
+            'plan': ['Task 1', 'Task 2', 'Task 3'],
+            'analysis': 'Detailed analysis',
+        }
+        json_message = json.dumps(planning_payload)
+
+        result = _test_response_validator(json_message)
+
+        self.assertEqual(result, 'Response is valid')
+
+    def test_response_validator_planning_agent_structured_analysis(
+        self,
+    ) -> None:
+        """Test response_validator with structured analysis."""
+        planning_payload = {
+            'result': 'success',
+            'plan': ['Task 1', 'Task 2'],
+            'analysis': {
+                'original_base_image': 'python:3.9-slim',
+                'target_base_image': 'python:3.12-slim',
+                'apk_packages': ['musl-dev', 'gcc'],
+            },
+        }
+        json_message = json.dumps(planning_payload)
+
+        result = _test_response_validator(json_message)
+
+        self.assertEqual(result, 'Response is valid')
+
+
+class AgentPlanTestCase(unittest.TestCase):
+    """Test cases for AgentPlan model."""
+
+    def test_agent_plan_string_analysis(self) -> None:
+        """Test AgentPlan with string analysis."""
+        plan = models.AgentPlan(
+            result=models.AgentRunResult.success,
+            plan=['Task 1', 'Task 2'],
+            analysis='Simple string analysis',
+        )
+        self.assertEqual(plan.analysis, 'Simple string analysis')
+
+    def test_agent_plan_dict_analysis(self) -> None:
+        """Test AgentPlan with dict analysis (auto-serialized)."""
+        analysis_dict = {
+            'base_image': 'python:3.9',
+            'packages': ['gcc', 'musl-dev'],
+        }
+        plan = models.AgentPlan(
+            result=models.AgentRunResult.success,
+            plan=['Task 1'],
+            analysis=analysis_dict,
+        )
+        # Should be serialized to JSON string
+        self.assertIsInstance(plan.analysis, str)
+        # Should be valid JSON
+        parsed = json.loads(plan.analysis)
+        self.assertEqual(parsed['base_image'], 'python:3.9')
+
+    def test_agent_plan_none_analysis(self) -> None:
+        """Test AgentPlan with None analysis."""
+        plan = models.AgentPlan(
+            result=models.AgentRunResult.success,
+            plan=['Task 1'],
+            analysis=None,
+        )
+        self.assertIsNone(plan.analysis)
 
 
 class ClaudeTestCase(base.AsyncTestCase):
@@ -234,6 +320,65 @@ class ClaudeTestCase(base.AsyncTestCase):
         self.assertIsInstance(result, models.AgentRun)
         self.assertEqual(result.result, models.AgentRunResult.success)
         self.assertEqual(result.message, 'Operation completed')
+
+    def test_parse_message_planning_agent_with_extra_fields(self) -> None:
+        """Test _parse_message preserves planning agent extra fields."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # Planning agent response with plan and analysis fields
+        planning_result = {
+            'result': 'success',
+            'plan': ['Task 1', 'Task 2', 'Task 3'],
+            'analysis': 'Detailed analysis of the codebase',
+        }
+
+        json_response = f'```json\n{json.dumps(planning_result)}\n```'
+
+        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
+        message.session_id = 'test-session'
+        message.result = json_response
+        message.is_error = False
+        message.duration_ms = 1000
+        message.duration_api_ms = 800
+        message.num_turns = 1
+        message.total_cost_usd = 0.01
+        message.usage = _create_mock_result_message_usage()
+
+        result = claude_instance._parse_message(message)
+
+        # Verify AgentRun received the data
+        self.assertIsInstance(result, models.AgentRun)
+        self.assertEqual(result.result, models.AgentRunResult.success)
+
+        # Verify extra fields are preserved
+        self.assertIsNotNone(result.model_extra)
+        self.assertIn('plan', result.model_extra)
+        self.assertIn('analysis', result.model_extra)
+        self.assertEqual(
+            result.model_extra['plan'], ['Task 1', 'Task 2', 'Task 3']
+        )
+        self.assertEqual(
+            result.model_extra['analysis'], 'Detailed analysis of the codebase'
+        )
+
+        # Verify conversion to AgentPlan works
+        plan_data = {**result.model_dump(), **(result.model_extra or {})}
+        agent_plan = models.AgentPlan.model_validate(plan_data)
+        self.assertEqual(len(agent_plan.plan), 3)
+        self.assertEqual(
+            agent_plan.analysis, 'Detailed analysis of the codebase'
+        )
 
     def test_parse_message_result_message_error(self) -> None:
         """Test _parse_message with error ResultMessage."""

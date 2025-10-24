@@ -104,6 +104,8 @@ You must respond with a JSON object following this schema:
 }
 ```
 
+**CRITICAL**: The `plan` field must be an array of **simple strings**, NOT objects or dictionaries. Each string should be a complete, self-contained task description. Do not use structured formats like `{"step": 1, "task": "...", "details": "..."}` - instead, put all information directly in the string.
+
 ### Valid Example
 
 ```json
@@ -125,8 +127,11 @@ You must respond with a JSON object following this schema:
 ❌ Missing required fields: `{"result": "success"}`
 ❌ Wrong enum value: `{"result": "OK", "plan": []}`
 ❌ Vague tasks: `{"result": "success", "plan": ["Update stuff", "Fix things"]}`
+❌ Structured plan items: `{"result": "success", "plan": [{"step": 1, "task": "Do something"}]}`
 ❌ Not JSON: Plain text response
 ❌ Extra text: Markdown or explanations before/after JSON
+
+**IMPORTANT**: Each plan item MUST be a simple string, not an object or dictionary. Put all details directly in the string.
 
 ## FAILURE HANDLING
 

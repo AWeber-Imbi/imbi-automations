@@ -80,6 +80,34 @@ If template variables are not available in your context, use actual values from 
 
 ## RESPONSE FORMAT
 
+You MUST respond with ONLY a JSON object in this exact format:
 
+```json
+{
+  "result": "success",
+  "message": "Brief summary of changes made"
+}
+```
+
+Or for failures:
+
+```json
+{
+  "result": "failure",
+  "errors": [
+    "Specific error 1 that prevented completion",
+    "Specific error 2 that prevented completion"
+  ]
+}
+```
+
+### Important Response Rules
+
+- **result** field is REQUIRED and must be either "success" or "failure"
+- **message** field is optional for success cases - use to summarize what was done
+- **errors** field should be used for failures and contain an array of specific error descriptions
+- NO markdown code fences around the JSON
+- NO explanatory text before or after the JSON
+- Use the `mcp__agent_tools__response_validator` tool to validate your JSON before responding
 
 ---

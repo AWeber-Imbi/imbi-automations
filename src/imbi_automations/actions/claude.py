@@ -179,10 +179,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             # Store planning result for task agent
             if agent == AgentType.planning:
                 # Parse the planning result into AgentPlan model
+                # Merge explicit fields with model_extra
                 try:
-                    self.task_plan = models.AgentPlan.model_validate(
-                        run.model_dump()
-                    )
+                    plan_data = {**run.model_dump(), **(run.model_extra or {})}
+                    self.task_plan = models.AgentPlan.model_validate(plan_data)
                     self.logger.debug(
                         '%s %s planning agent created plan with %d tasks',
                         self.context.imbi_project.slug,
