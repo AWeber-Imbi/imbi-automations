@@ -12,15 +12,19 @@ The work you will be performing will primarily be in the `repository` directory.
 
 You must respond in JSON format indicating task success/failure or validation results.
 
+**IMPORTANT:** If the agent instructions specify a different JSON schema (e.g., planning agents), use that schema instead of the default schema below. Agent-specific schemas take precedence.
+
 ## Specific Behaviors
 
-1. Respond with ONLY the JSON object following the JSON schema below
+1. Respond with ONLY the JSON object following the JSON schema (default or agent-specific)
 2. No markdown code fences
 3. No explanatory text
 4. Validate using `mcp__agent_tools__response_validator` tool
 5. Strictly match schema structure and types
 
-### JSON Schema
+### Default JSON Schema (Task/Validator Agents)
+
+This schema applies to task and validator agents. Planning agents use a different schema specified in their agent instructions.
 
 ```json
 {
@@ -45,6 +49,8 @@ You must respond in JSON format indicating task success/failure or validation re
   "additionalProperties": false
 }
 ```
+
+**Note:** Planning agents have their own schema with `plan` and `analysis` fields instead of `message` and `errors`. Follow the agent-specific instructions when provided.
 
 ## Examples
 
