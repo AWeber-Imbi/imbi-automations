@@ -61,9 +61,13 @@ class Claude(mixins.WorkflowLoggerMixin):
         }
         self.tracker = tracker.Tracker.get_instance()
         self._set_workflow_logger(self.context.workflow)
+        self._submitted_response: models.AgentRun | models.AgentPlan | None = (
+            None
+        )
         self.client = self._create_client()
 
     async def agent_query(self, prompt: str) -> models.AgentRun:
+        self._submitted_response = None  # Reset for each query
         await self.client.connect()
         await self.client.query(prompt)
         response = await self._response()
@@ -95,7 +99,13 @@ class Claude(mixins.WorkflowLoggerMixin):
         LOGGER.debug('Claude Code settings: %s', settings)
 
         agent_tools = claude_agent_sdk.create_sdk_mcp_server(
-            'agent_tools', version, [self._response_validator]
+            'agent_tools',
+            version,
+            [
+                self._submit_task_response,
+                self._submit_validation_response,
+                self._submit_plan,
+            ],
         )
 
         system_prompt = (BASE_PATH / 'claude-code' / 'CLAUDE.md').read_text()
@@ -130,7 +140,9 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'WebFetch',
                 'WebSearch',
                 'SlashCommand',
-                'mcp__agent_tools__response_validator',
+                'mcp__agent_tools__submit_task_response',
+                'mcp__agent_tools__submit_validation_response',
+                'mcp__agent_tools__submit_plan',
             ],
             cwd=self.context.working_directory,
             mcp_servers={'agent_tools': agent_tools},
@@ -169,8 +181,13 @@ class Claude(mixins.WorkflowLoggerMixin):
         output_styles_dir = claude_dir / 'output-style'
         output_styles_dir.mkdir(parents=True, exist_ok=True)
 
-        for agent in ['planning', 'task', 'validator']:
-            self.agents[agent] = self._parse_agent_file(agent)
+        # Import AgentType from actions.claude to iterate agent types
+        from imbi_automations.actions import claude as claude_actions
+
+        for agent_type in claude_actions.AgentType:
+            self.agents[agent_type.value] = self._parse_agent_file(
+                agent_type.value
+            )
 
         # Create custom settings.json - disable all global settings
         settings = claude_dir / 'settings.json'
@@ -352,6 +369,10 @@ class Claude(mixins.WorkflowLoggerMixin):
             if response and isinstance(response, models.AgentRun):
                 return response
 
+        # Check if agent submitted response via tool (preferred method)
+        if self._submitted_response:
+            return self._submitted_response
+
         return models.AgentRun(
             result=models.AgentRunResult.failure,
             message='Unspecified failure',
@@ -359,19 +380,67 @@ class Claude(mixins.WorkflowLoggerMixin):
         )
 
     @claude_agent_sdk.tool(
-        name='response_validator',
-        description='Validate the response format from for the final message',
+        name='submit_task_response',
+        description='Submit task execution result (task agents only)',
         input_schema=str,
     )
-    def _response_validator(self, message: str) -> str:
-        """Use to format the result of an agent run."""
-        LOGGER.debug('Validator tool invoked')
+    def _submit_task_response(self, response_json: str) -> str:
+        """Submit task agent response.
+
+        Args:
+            response_json: JSON string with result, message, errors fields
+        """
+        LOGGER.debug('submit_task_response invoked: %r', response_json)
         try:
-            payload = json.loads(message)
-        except json.JSONDecodeError:
-            return 'Payload not validate as JSON'
+            data = json.loads(response_json)
+            response = models.AgentRun.model_validate(data)
+            self._submitted_response = response
+            return 'Task response submitted successfully'
+        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
+            error_msg = f'Invalid task response: {exc}'
+            LOGGER.error(error_msg)
+            return error_msg
+
+    @claude_agent_sdk.tool(
+        name='submit_validation_response',
+        description='Submit validation result (validation agents only)',
+        input_schema=str,
+    )
+    def _submit_validation_response(self, response_json: str) -> str:
+        """Submit validation agent response.
+
+        Args:
+            response_json: JSON string with result, message, errors fields
+        """
+        LOGGER.debug('submit_validation_response invoked: %r', response_json)
         try:
-            models.AgentRun.model_validate(payload)
-        except pydantic.ValidationError as exc:
-            return str(exc)
-        return 'Response is valid'
+            data = json.loads(response_json)
+            response = models.AgentRun.model_validate(data)
+            self._submitted_response = response
+            return 'Validation response submitted successfully'
+        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
+            error_msg = f'Invalid validation response: {exc}'
+            LOGGER.error(error_msg)
+            return error_msg
+
+    @claude_agent_sdk.tool(
+        name='submit_plan',
+        description='Submit planning result (planning agents only)',
+        input_schema=str,
+    )
+    def _submit_plan(self, plan_json: str) -> str:
+        """Submit planning agent response.
+
+        Args:
+            plan_json: JSON string with result, plan, analysis fields
+        """
+        LOGGER.debug('submit_plan tool invoked with: %r', plan_json)
+        try:
+            data = json.loads(plan_json)
+            response = models.AgentRun.model_validate(data)
+            self._submitted_response = response
+            return 'Plan submitted successfully'
+        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
+            error_msg = f'Invalid plan format: {exc}'
+            LOGGER.error(error_msg)
+            return error_msg

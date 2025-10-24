@@ -1,6 +1,6 @@
 """Claude Code action implementation for AI-powered transformations.
 
-Executes Claude Code actions using agent-based workflows (task/validator) with
+Executes Claude Code actions using agent-based workflows (task/validation) with
 prompt templating, failure detection, and restart capabilities for reliable
 AI-powered code transformations.
 """
@@ -18,13 +18,13 @@ class AgentType(enum.StrEnum):
 
     planning = 'planning'
     task = 'task'
-    validator = 'validator'
+    validation = 'validation'
 
 
 class ClaudeAction(mixins.WorkflowLoggerMixin):
     """Executes AI-powered code transformations using Claude Code SDK.
 
-    Manages agent-based workflows with task/validator cycles, prompt
+    Manages agent-based workflows with task/validation cycles, prompt
     templating, and automatic restart on failure detection.
     """
 
@@ -39,6 +39,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self.claude = claude.Claude(configuration, context, verbose)
         self.configuration = configuration
         self.context = context
+        self.has_planning_prompt: bool = False
         self.last_error: models.AgentRun | None = None
         self.task_plan: models.AgentPlan | None = None
         commit_author = email_utils.parseaddr(self.configuration.commit_author)
@@ -110,15 +111,17 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self, action: models.WorkflowClaudeAction, cycle: int
     ) -> bool:
         # Reset task_plan at the start of each cycle
+        self.has_planning_prompt = False
         self.task_plan = None
 
         # Build agent execution sequence
         agents = []
         if action.planning_prompt:
             agents.append(AgentType.planning)
+            self.has_planning_prompt = True
         agents.append(AgentType.task)
         if action.validation_prompt:
-            agents.append(AgentType.validator)
+            agents.append(AgentType.validation)
 
         for agent in agents:
             self._log_verbose_info(
@@ -154,10 +157,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     )
                     self.task_plan = None
                     return False
-                elif agent == AgentType.validator:
+                elif agent == AgentType.validation:
                     self.last_error = run
                     self.logger.error(
-                        '%s %s Claude Code validator agent failed in cycle %d',
+                        '%s %s Claude Code validator failed in cycle %d',
                         self.context.imbi_project.slug,
                         action.name,
                         cycle,
@@ -176,18 +179,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     self.task_plan = None
                     return False
 
-            # Store planning result for task agent
             if agent == AgentType.planning:
-                # Parse the planning result into AgentPlan model
                 try:
                     self.task_plan = models.AgentPlan.model_validate(
-                        run.model_dump()
-                    )
-                    self.logger.debug(
-                        '%s %s planning agent created plan with %d tasks',
-                        self.context.imbi_project.slug,
-                        action.name,
-                        len(self.task_plan.plan),
+                        {**run.model_dump(), **(run.model_extra or {})}
                     )
                 except (ValueError, KeyError, TypeError) as exc:
                     self.logger.error(
@@ -198,9 +193,15 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     )
                     self.task_plan = None
                     return False
+                self.logger.debug(
+                    '%s %s planning agent created plan with %d tasks',
+                    self.context.imbi_project.slug,
+                    action.name,
+                    len(self.task_plan.plan),
+                )
 
-            # Clear last_error on successful task/validator run
-            if agent in (AgentType.task, AgentType.validator):
+            # Clear last_error on successful task/validation run
+            if agent in (AgentType.task, AgentType.validation):
                 self.last_error = None
 
         return True
@@ -223,7 +224,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 / 'workflow'
                 / action.task_prompt
             )
-        elif agent == AgentType.validator:
+        elif agent == AgentType.validation:
             prompt_file = (
                 self.context.working_directory
                 / 'workflow'
@@ -243,20 +244,11 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         else:
             prompt += prompt_file.read_text(encoding='utf-8')
 
-        # Inject plan if available (for task agent only)
-        if agent == AgentType.task and self.task_plan:
-            prompt_file = (
-                pathlib.Path(__file__).parent / 'prompts' / 'with-plan.md.j2'
-            )
-            return prompts.render(
-                self.context,
-                prompt_file,
-                plan=self.task_plan.model_dump(),
-                original_prompt=prompt,
-            )
-
-        # Inject validation errors if available (for task agent only)
-        if agent == AgentType.task and self.last_error:
+        if (agent == AgentType.planning and self.last_error) or (
+            agent == AgentType.task
+            and not self.has_planning_prompt
+            and self.last_error
+        ):
             prompt_file = (
                 pathlib.Path(__file__).parent / 'prompts' / 'last-error.md.j2'
             )
@@ -264,6 +256,16 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 self.context,
                 prompt_file,
                 last_error=self.last_error.model_dump_json(indent=2),
+                original_prompt=prompt,
+            )
+        elif agent == AgentType.task and self.task_plan:
+            prompt_file = (
+                pathlib.Path(__file__).parent / 'prompts' / 'with-plan.md.j2'
+            )
+            return prompts.render(
+                self.context,
+                prompt_file,
+                plan=self.task_plan.model_dump(),
                 original_prompt=prompt,
             )
 
