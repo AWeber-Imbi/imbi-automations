@@ -58,7 +58,15 @@ class ImbiMetadataCache:
 
     @property
     def environments(self) -> set[str]:
-        return {env.name.lower() for env in self.cache_data.environments}
+        return self.environment_slugs.union(self.environment_names)
+
+    @property
+    def environment_names(self) -> set[str]:
+        return {env.name for env in self.cache_data.environments}
+
+    @property
+    def environment_slugs(self) -> set[str]:
+        return {env.slug for env in self.cache_data.environments}
 
     @property
     def project_fact_type_names(self) -> set[str]:
@@ -75,6 +83,16 @@ class ImbiMetadataCache:
             datum.value
             for datum in self.cache_data.project_fact_type_enums
             if datum.fact_type_id in fact_type_ids
+        }
+
+    @property
+    def project_types(self) -> set[str]:
+        return self.project_type_names.union(self.project_type_slugs)
+
+    @property
+    def project_type_names(self) -> set[str]:
+        return {
+            project_type.name for project_type in self.cache_data.project_types
         }
 
     @property
@@ -97,28 +115,30 @@ class ImbiMetadataCache:
         self.config = config
         if self.cache_file.exists():
             with self.cache_file.open('r') as file:
-                st = self.cache_file.stat()
                 last_mod = datetime.datetime.fromtimestamp(
-                    st.st_mtime, tz=datetime.UTC
+                    self.cache_file.stat().st_mtime, tz=datetime.UTC
                 )
-
                 try:
                     data = json.load(file)
-                    data['last_updated'] = last_mod
-                    self.cache_data = CacheData.model_validate(data)
-                except (json.JSONDecodeError, pydantic.ValidationError) as err:
+                except json.JSONDecodeError as err:
                     LOGGER.warning(
                         'Cache file corrupted, regenerating: %s', err
                     )
-                    # Delete corrupted cache file
                     self.cache_file.unlink(missing_ok=True)
                 else:
-                    # Check if cache is still fresh
-                    if not self.is_cache_expired():
-                        LOGGER.debug('Using cached Imbi metadata')
-                        return
+                    data['last_updated'] = last_mod
+                    try:
+                        self.cache_data = CacheData.model_validate(data)
+                    except pydantic.ValidationError as err:
+                        LOGGER.warning(
+                            'Cache file corrupted, regenerating: %s', err
+                        )
+                        self.cache_file.unlink(missing_ok=True)
+                    else:
+                        if not self.is_cache_expired():
+                            LOGGER.debug('Using cached Imbi metadata')
+                            return
 
-        # Get or create Imbi client for this event loop
         if not self.imbi_client:
             self.imbi_client = clients.Imbi.get_instance(config=self.config)
 
@@ -136,7 +156,6 @@ class ImbiMetadataCache:
             self.imbi_client.get_project_fact_type_ranges(),
             self.imbi_client.get_project_types(),
         )
-
         self.cache_data = CacheData(
             environments=environments,
             project_fact_types=project_fact_types,

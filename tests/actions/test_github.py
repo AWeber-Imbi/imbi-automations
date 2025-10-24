@@ -41,11 +41,13 @@ class GitHubActionsTestCase(base.AsyncTestCase):
             description='Test project',
             environments=[
                 models.ImbiEnvironment(
-                    name='Development', icon_class='fa-dev'
+                    name='Development', slug='development', icon_class='fa-dev'
                 ),
-                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
                 models.ImbiEnvironment(
-                    name='Production', icon_class='fa-prod'
+                    name='Staging', slug='staging', icon_class='fa-stage'
+                ),
+                models.ImbiEnvironment(
+                    name='Production', slug='production', icon_class='fa-prod'
                 ),
             ],
             facts=None,
@@ -138,8 +140,8 @@ class GitHubActionsTestCase(base.AsyncTestCase):
         )
 
     async def test_sync_environments_no_environments_in_imbi(self) -> None:
-        """Test sync skips when Imbi project has no environments."""
-        # Create context with no environments
+        """Test sync with None environments deletes all GitHub envs."""
+        # Create context with no environments (None)
         imbi_project_no_envs = models.ImbiProject(
             id=123,
             dependencies=None,
@@ -176,8 +178,13 @@ class GitHubActionsTestCase(base.AsyncTestCase):
             command=models.WorkflowGitHubCommand.sync_environments,
         )
 
-        # Mock GitHub client
+        # Mock GitHub client with existing environments
         mock_github_client = mock.AsyncMock()
+        mock_github_client.get_repository_environments.return_value = [
+            models.GitHubEnvironment(
+                id=1, name='old-env', created_at='2024-01-01T00:00:00Z'
+            )
+        ]
 
         with mock.patch(
             'imbi_automations.actions.github.clients.GitHub',
@@ -185,10 +192,12 @@ class GitHubActionsTestCase(base.AsyncTestCase):
         ):
             await github_actions_no_envs.execute(action)
 
-        # Verify no GitHub API calls were made
-        mock_github_client.get_repository_environments.assert_not_called()
+        # Should fetch environments and delete the existing one
+        mock_github_client.get_repository_environments.assert_called_once()
+        mock_github_client.delete_environment.assert_called_once_with(
+            'test-org', 'test-repo', 'old-env'
+        )
         mock_github_client.create_environment.assert_not_called()
-        mock_github_client.delete_environment.assert_not_called()
 
     async def test_sync_environments_no_github_repository(self) -> None:
         """Test sync raises error when no GitHub repository in context."""
@@ -382,8 +391,16 @@ class GitHubActionsTestCase(base.AsyncTestCase):
             command=models.WorkflowGitHubCommand.sync_environments,
         )
 
-        # Mock GitHub client
+        # Mock GitHub client with existing environments
         mock_github_client = mock.AsyncMock()
+        mock_github_client.get_repository_environments.return_value = [
+            models.GitHubEnvironment(
+                id=1, name='old-env-1', created_at='2024-01-01T00:00:00Z'
+            ),
+            models.GitHubEnvironment(
+                id=2, name='old-env-2', created_at='2024-01-01T00:00:00Z'
+            ),
+        ]
 
         with mock.patch(
             'imbi_automations.actions.github.clients.GitHub',
@@ -391,8 +408,10 @@ class GitHubActionsTestCase(base.AsyncTestCase):
         ):
             await github_actions_empty.execute(action)
 
-        # Should skip because empty list is treated as no environments
-        mock_github_client.get_repository_environments.assert_not_called()
+        # Should fetch environments and delete all existing ones
+        mock_github_client.get_repository_environments.assert_called_once()
+        self.assertEqual(mock_github_client.delete_environment.call_count, 2)
+        mock_github_client.create_environment.assert_not_called()
 
     async def test_execute_unsupported_command(self) -> None:
         """Test execute raises error for unsupported command."""
@@ -414,12 +433,14 @@ class GitHubActionsTestCase(base.AsyncTestCase):
             dependencies=None,
             description='Test project',
             environments=[
-                models.ImbiEnvironment(name='Staging', icon_class='fa-stage'),
                 models.ImbiEnvironment(
-                    name='Production', icon_class='fa-prod'
+                    name='Staging', slug='staging', icon_class='fa-stage'
                 ),
                 models.ImbiEnvironment(
-                    name='Development', icon_class='fa-dev'
+                    name='Production', slug='production', icon_class='fa-prod'
+                ),
+                models.ImbiEnvironment(
+                    name='Development', slug='development', icon_class='fa-dev'
                 ),
             ],
             facts=None,

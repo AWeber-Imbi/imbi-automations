@@ -36,6 +36,7 @@ from .imbi import (
     ImbiProjectLink,
     ImbiProjectType,
 )
+from .resume_state import ResumeState
 from .workflow import (
     ResourceUrl,
     Workflow,
@@ -103,6 +104,7 @@ __all__ = [
     'ImbiProjectType',
     'ImbiProjectLink',
     'ResourceUrl',
+    'ResumeState',
     'Workflow',
     'WorkflowAction',
     'WorkflowActions',

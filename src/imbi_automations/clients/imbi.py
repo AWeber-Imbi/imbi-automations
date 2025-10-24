@@ -9,6 +9,7 @@ import copy
 import logging
 import typing
 
+import async_lru
 import httpx
 
 from imbi_automations import models
@@ -36,11 +37,195 @@ class Imbi(http.BaseURLHTTPClient):
         self._base_url = f'https://{config.hostname}'
         self.add_header('Private-Token', config.api_key.get_secret_value())
 
+    @async_lru.alru_cache(maxsize=1)
+    async def get_environments(self) -> list[models.ImbiEnvironment]:
+        """Get all project fact types.
+
+        Returns:
+            List of all project fact types
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        response = await self.get('/environments')
+        response.raise_for_status()
+        return [
+            models.ImbiEnvironment.model_validate(datum)
+            for datum in response.json()
+        ]
+
     async def get_project(self, project_id: int) -> models.ImbiProject | None:
         result = await self._opensearch_projects(
             self._search_project_id(project_id)
         )
         return result[0] if result else None
+
+    async def get_project_fact_type_enums(
+        self,
+    ) -> list[models.ImbiProjectFactTypeEnum]:
+        """Get all of the project fact types.
+
+        Returns:
+            List of project fact type enums
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        response = await self.get('/project-fact-type-enums')
+        response.raise_for_status()
+        return [
+            models.ImbiProjectFactTypeEnum.model_validate(fact)
+            for fact in response.json()
+        ]
+
+    async def get_project_fact_type_id_by_name(
+        self, fact_name: str
+    ) -> int | None:
+        """Get fact type ID by name.
+
+        Args:
+            fact_name: Name of the fact type
+
+        Returns:
+            Fact type ID or None if not found
+
+        """
+        fact_types = await self.get_project_fact_types()
+        for fact_type in fact_types:
+            if fact_type.name == fact_name:
+                return fact_type.id
+        return None
+
+    async def get_project_fact_type_ranges(
+        self,
+    ) -> list[models.ImbiProjectFactTypeRange]:
+        """Get all of the project fact types.
+
+        Returns:
+            List of project fact type ranges
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        response = await self.get('/project-fact-type-ranges')
+        response.raise_for_status()
+        return [
+            models.ImbiProjectFactTypeRange.model_validate(fact)
+            for fact in response.json()
+        ]
+
+    async def get_project_fact_types(self) -> list[models.ImbiProjectFactType]:
+        """Get all of the project fact types.
+
+        Returns:
+            List of project fact types
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        response = await self.get('/project-fact-types')
+        response.raise_for_status()
+        return [
+            models.ImbiProjectFactType.model_validate(fact)
+            for fact in response.json()
+        ]
+
+    async def get_project_fact_value(
+        self, project_id: int, fact_name: str
+    ) -> str | None:
+        """Get current value of a specific project fact.
+
+        Args:
+            project_id: Imbi project ID
+            fact_name: Name of the fact to retrieve
+
+        Returns:
+            Current fact value or None if not set
+
+        """
+        facts = await self.get_project_facts(project_id)
+        for fact in facts:
+            if fact.fact_name == fact_name:
+                return str(fact.value) if fact.value is not None else None
+        return None
+
+    async def get_project_facts(
+        self, project_id: int
+    ) -> list[models.ImbiProjectFact]:
+        """Get all facts for a project.
+
+        Args:
+            project_id: Imbi project ID
+
+        Returns:
+            List of project facts
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        response = await self.get(f'/projects/{project_id}/facts')
+        response.raise_for_status()
+        return [
+            models.ImbiProjectFact.model_validate(fact)
+            for fact in response.json()
+        ]
+
+    async def get_project_types(self) -> list[models.ImbiProjectType]:
+        """Get all project types.
+
+        Returns:
+            List of all project types
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        response = await self.get('/project-types')
+        response.raise_for_status()
+        return [
+            models.ImbiProjectType.model_validate(project_type)
+            for project_type in response.json()
+        ]
+
+    async def get_projects(self) -> list[models.ImbiProject]:
+        """Get all active Imbi projects.
+
+        Returns:
+            List of all active Imbi projects
+
+        """
+        all_projects = []
+        page_size = 100
+        start_from = 0
+
+        while True:
+            query = self._opensearch_payload()
+            query['query'] = {'match': {'archived': False}}
+            query['from'] = start_from
+            query['size'] = page_size
+
+            page_projects = await self._opensearch_projects(query)
+            if not page_projects:
+                break
+
+            all_projects.extend(page_projects)
+            start_from += page_size
+
+            # Break if we got fewer results than page_size (last page)
+            if len(page_projects) < page_size:
+                break
+
+        LOGGER.debug('Found %d total active projects', len(all_projects))
+
+        # Sort by project slug for deterministic results
+        all_projects.sort(key=lambda project: project.slug)
+
+        return all_projects
 
     async def get_projects_by_type(
         self, project_type_slug: str
@@ -88,93 +273,6 @@ class Imbi(http.BaseURLHTTPClient):
 
         return all_projects
 
-    def _add_imbi_url(
-        self, project: dict[str, typing.Any]
-    ) -> models.ImbiProject:
-        value = project['_source'].copy()
-        value['imbi_url'] = f'{self.base_url}/ui/projects/{value["id"]}'
-
-        # Convert environment names to ImbiEnvironment objects
-        if value.get('environments'):
-            value['environments'] = [
-                models.ImbiEnvironment(
-                    name=env,
-                    icon_class='',
-                    # slug will auto-generate from name via validator
-                )
-                for env in value['environments']
-            ]
-
-        return models.ImbiProject.model_validate(value)
-
-    async def _opensearch_projects(
-        self, query: dict[str, typing.Any]
-    ) -> list[models.ImbiProject]:
-        try:
-            data = await self._opensearch_request(
-                '/opensearch/projects', query
-            )
-        except (httpx.RequestError, httpx.HTTPStatusError) as err:
-            LOGGER.error(
-                'Error searching Imbi projects: Request error %s', err
-            )
-            return []
-        if not data or 'hits' not in data or 'hits' not in data['hits']:
-            return []
-        projects = []
-        for project in data['hits']['hits']:
-            projects.append(self._add_imbi_url(project))
-        return projects
-
-    def _search_project_id(self, value: int) -> dict[str, typing.Any]:
-        """Return a query payload for searching by project ID."""
-        payload = self._opensearch_payload()
-        payload['query'] = {
-            'bool': {'filter': [{'term': {'_id': f'{value}'}}]}
-        }
-        return payload
-
-    def _search_project_type_slug(self, value: str) -> dict[str, typing.Any]:
-        """Return a query payload for searching by project_type_slug."""
-        payload = self._opensearch_payload()
-        payload['query'] = {
-            'bool': {
-                'must': [
-                    {'match': {'archived': False}},
-                    {'term': {'project_type_slug.keyword': value}},
-                ]
-            }
-        }
-        return payload
-
-    def _search_projects(self, value: str) -> dict[str, typing.Any]:
-        payload = self._opensearch_payload()
-        slug_value = value.lower().replace(' ', '-')
-        payload['query'] = {
-            'bool': {
-                'must': [{'match': {'archived': False}}],
-                'should': [
-                    {
-                        'term': {
-                            'name': {'value': value, 'case_insensitive': True}
-                        }
-                    },
-                    {'fuzzy': {'name': {'value': value}}},
-                    {'match_phrase': {'name': {'query': value}}},
-                    {
-                        'term': {
-                            'slug': {
-                                'value': slug_value,
-                                'case_insensitive': True,
-                            }
-                        }
-                    },
-                ],
-                'minimum_should_match': 1,
-            }
-        }
-        return payload
-
     async def search_projects_by_github_url(
         self, github_url: str
     ) -> list[models.ImbiProject]:
@@ -209,251 +307,6 @@ class Imbi(http.BaseURLHTTPClient):
         }
         return await self._opensearch_projects(query)
 
-    async def get_all_projects(self) -> list[models.ImbiProject]:
-        """Get all active Imbi projects.
-
-        Returns:
-            List of all active Imbi projects
-
-        """
-        all_projects = []
-        page_size = 100
-        start_from = 0
-
-        while True:
-            query = self._opensearch_payload()
-            query['query'] = {'match': {'archived': False}}
-            query['from'] = start_from
-            query['size'] = page_size
-
-            page_projects = await self._opensearch_projects(query)
-            if not page_projects:
-                break
-
-            all_projects.extend(page_projects)
-            start_from += page_size
-
-            # Break if we got fewer results than page_size (last page)
-            if len(page_projects) < page_size:
-                break
-
-        LOGGER.debug('Found %d total active projects', len(all_projects))
-
-        # Sort by project slug for deterministic results
-        all_projects.sort(key=lambda project: project.slug)
-
-        return all_projects
-
-    @staticmethod
-    def _opensearch_payload() -> dict[str, typing.Any]:
-        return copy.deepcopy(
-            {
-                '_source': {
-                    'exclude': ['archived', 'component_versions', 'components']
-                },
-                'query': {'bool': {'must': {'term': {'archived': False}}}},
-            }
-        )
-
-    async def _opensearch_request(
-        self, url: str, query: dict[str, typing.Any]
-    ) -> dict[str, typing.Any]:
-        LOGGER.debug('Query: %r', query)
-        response = await self.post(url, json=query)
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as err:
-            LOGGER.error('Error searching Imbi projects: %s', err)
-            LOGGER.debug('Response: %r', response.content)
-            raise err
-        try:
-            return response.json() if response.content else {}
-        except ValueError as err:
-            LOGGER.error('Error deserializing the response: %s', err)
-            raise err
-
-    async def get_environments(self) -> list[models.ImbiEnvironment]:
-        """Get all project fact types.
-
-        Returns:
-            List of all project fact types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/environments')
-        response.raise_for_status()
-        return [
-            models.ImbiEnvironment.model_validate(datum)
-            for datum in response.json()
-        ]
-
-    async def get_fact_types(self) -> list[models.ImbiProjectFactType]:
-        """Get all project fact types.
-
-        Returns:
-            List of all project fact types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-types')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactType.model_validate(fact_type)
-            for fact_type in response.json()
-        ]
-
-    async def get_project_types(self) -> list[models.ImbiProjectType]:
-        """Get all project types.
-
-        Returns:
-            List of all project types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-types')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectType.model_validate(project_type)
-            for project_type in response.json()
-        ]
-
-    async def get_fact_type_id_by_name(self, fact_name: str) -> int | None:
-        """Get fact type ID by name.
-
-        Args:
-            fact_name: Name of the fact type
-
-        Returns:
-            Fact type ID or None if not found
-
-        """
-        fact_types = await self.get_fact_types()
-        for fact_type in fact_types:
-            if fact_type.name == fact_name:
-                return fact_type.id
-        return None
-
-    async def get_fact_type_enums(
-        self,
-    ) -> list[models.ImbiProjectFactTypeEnum]:
-        """Get all project fact type enum values.
-
-        Returns:
-            List of all enum values for all fact types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-type-enums')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactTypeEnum.model_validate(enum)
-            for enum in response.json()
-        ]
-
-    async def get_project_fact_types(self) -> list[models.ImbiProjectFactType]:
-        """Get all of the project fact types.
-
-        Returns:
-            List of project fact types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-types')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactType.model_validate(fact)
-            for fact in response.json()
-        ]
-
-    async def get_project_fact_type_enums(
-        self,
-    ) -> list[models.ImbiProjectFactTypeEnum]:
-        """Get all of the project fact types.
-
-        Returns:
-            List of project fact type enums
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-type-enums')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactTypeEnum.model_validate(fact)
-            for fact in response.json()
-        ]
-
-    async def get_project_fact_type_ranges(
-        self,
-    ) -> list[models.ImbiProjectFactTypeRange]:
-        """Get all of the project fact types.
-
-        Returns:
-            List of project fact type ranges
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-type-ranges')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactTypeRange.model_validate(fact)
-            for fact in response.json()
-        ]
-
-    async def get_project_facts(
-        self, project_id: int
-    ) -> list[models.ImbiProjectFact]:
-        """Get all facts for a project.
-
-        Args:
-            project_id: Imbi project ID
-
-        Returns:
-            List of project facts
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get(f'/projects/{project_id}/facts')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFact.model_validate(fact)
-            for fact in response.json()
-        ]
-
-    async def get_project_fact_value(
-        self, project_id: int, fact_name: str
-    ) -> str | None:
-        """Get current value of a specific project fact.
-
-        Args:
-            project_id: Imbi project ID
-            fact_name: Name of the fact to retrieve
-
-        Returns:
-            Current fact value or None if not set
-
-        """
-        facts = await self.get_project_facts(project_id)
-        for fact in facts:
-            if fact.fact_name == fact_name:
-                return str(fact.value) if fact.value is not None else None
-        return None
-
     async def update_project_fact(
         self,
         project_id: int,
@@ -483,7 +336,9 @@ class Imbi(http.BaseURLHTTPClient):
 
         # If fact_name is provided, look up the fact_type_id
         if fact_name and not fact_type_id:
-            fact_type_id = await self.get_fact_type_id_by_name(fact_name)
+            fact_type_id = await self.get_project_fact_type_id_by_name(
+                fact_name
+            )
             if not fact_type_id:
                 raise ValueError(f'Fact type not found: {fact_name}')
 
@@ -495,7 +350,7 @@ class Imbi(http.BaseURLHTTPClient):
                 raise ValueError(f'Project not found: {project_id}')
 
             # Validate that the fact type supports this project's type
-            fact_types = await self.get_fact_types()
+            fact_types = await self.get_project_fact_types()
             fact_type = next(
                 (ft for ft in fact_types if ft.id == fact_type_id), None
             )
@@ -629,7 +484,7 @@ class Imbi(http.BaseURLHTTPClient):
             )
             raise
 
-    async def update_github_identifier(
+    async def update_project_github_identifier(
         self, project_id: int, identifier_name: str, value: int | str | None
     ) -> None:
         """Update GitHub identifier for a project only if different.
@@ -716,3 +571,117 @@ class Imbi(http.BaseURLHTTPClient):
             )
 
         response.raise_for_status()
+
+    async def _add_imbi_url(
+        self, project: dict[str, typing.Any]
+    ) -> models.ImbiProject:
+        value = project['_source'].copy()
+        value['imbi_url'] = f'{self.base_url}/ui/projects/{value["id"]}'
+        environments = set({})
+        imbi_environments = await self.get_environments()
+        for environment in value.get('environments') or []:
+            for imbi_environment in imbi_environments:
+                if (
+                    environment == imbi_environment.name
+                    or environment == imbi_environment.slug
+                ):
+                    environments.add(imbi_environment)
+        if environments:
+            value['environments'] = environments
+        return models.ImbiProject.model_validate(value)
+
+    async def _opensearch_projects(
+        self, query: dict[str, typing.Any]
+    ) -> list[models.ImbiProject]:
+        try:
+            data = await self._opensearch_request(
+                '/opensearch/projects', query
+            )
+        except (httpx.RequestError, httpx.HTTPStatusError) as err:
+            LOGGER.error(
+                'Error searching Imbi projects: Request error %s', err
+            )
+            return []
+        if not data or 'hits' not in data or 'hits' not in data['hits']:
+            return []
+        projects = []
+        for project in data['hits']['hits']:
+            projects.append(await self._add_imbi_url(project))
+        return projects
+
+    def _search_project_id(self, value: int) -> dict[str, typing.Any]:
+        """Return a query payload for searching by project ID."""
+        payload = self._opensearch_payload()
+        payload['query'] = {
+            'bool': {'filter': [{'term': {'_id': f'{value}'}}]}
+        }
+        return payload
+
+    def _search_project_type_slug(self, value: str) -> dict[str, typing.Any]:
+        """Return a query payload for searching by project_type_slug."""
+        payload = self._opensearch_payload()
+        payload['query'] = {
+            'bool': {
+                'must': [
+                    {'match': {'archived': False}},
+                    {'term': {'project_type_slug.keyword': value}},
+                ]
+            }
+        }
+        return payload
+
+    def _search_projects(self, value: str) -> dict[str, typing.Any]:
+        payload = self._opensearch_payload()
+        slug_value = value.lower().replace(' ', '-')
+        payload['query'] = {
+            'bool': {
+                'must': [{'match': {'archived': False}}],
+                'should': [
+                    {
+                        'term': {
+                            'name': {'value': value, 'case_insensitive': True}
+                        }
+                    },
+                    {'fuzzy': {'name': {'value': value}}},
+                    {'match_phrase': {'name': {'query': value}}},
+                    {
+                        'term': {
+                            'slug': {
+                                'value': slug_value,
+                                'case_insensitive': True,
+                            }
+                        }
+                    },
+                ],
+                'minimum_should_match': 1,
+            }
+        }
+        return payload
+
+    @staticmethod
+    def _opensearch_payload() -> dict[str, typing.Any]:
+        return copy.deepcopy(
+            {
+                '_source': {
+                    'exclude': ['archived', 'component_versions', 'components']
+                },
+                'query': {'bool': {'must': {'term': {'archived': False}}}},
+            }
+        )
+
+    async def _opensearch_request(
+        self, url: str, query: dict[str, typing.Any]
+    ) -> dict[str, typing.Any]:
+        LOGGER.debug('Query: %r', query)
+        response = await self.post(url, json=query)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as err:
+            LOGGER.error('Error searching Imbi projects: %s', err)
+            LOGGER.debug('Response: %r', response.content)
+            raise err
+        try:
+            return response.json() if response.content else {}
+        except ValueError as err:
+            LOGGER.error('Error deserializing the response: %s', err)
+            raise err

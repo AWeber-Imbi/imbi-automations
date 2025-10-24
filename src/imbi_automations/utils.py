@@ -5,6 +5,7 @@ directories, masking passwords in URLs, and other common utilities used
 throughout the codebase.
 """
 
+import hashlib
 import json
 import logging
 import pathlib
@@ -396,3 +397,21 @@ def sanitize(url: str | pydantic.AnyUrl) -> str:
     """
     pattern = re.compile(r'(\w+?://[^:@]+:)([^@]+)(@)')
     return pattern.sub(r'\1******\3', str(url))
+
+
+def hash_configuration(config: models.Configuration) -> str:
+    """Generate hash of configuration for change detection.
+
+    Used to detect configuration changes between workflow execution and
+    resume attempts. Excludes cache_dir as it doesn't affect execution.
+
+    Args:
+        config: Configuration instance to hash
+
+    Returns:
+        First 16 characters of SHA256 hash of configuration JSON
+
+    """
+    config_dict = config.model_dump(mode='json', exclude={'cache_dir'})
+    config_json = json.dumps(config_dict, sort_keys=True)
+    return hashlib.sha256(config_json.encode()).hexdigest()[:16]
