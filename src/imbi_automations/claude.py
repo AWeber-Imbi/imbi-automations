@@ -169,8 +169,13 @@ class Claude(mixins.WorkflowLoggerMixin):
         output_styles_dir = claude_dir / 'output-style'
         output_styles_dir.mkdir(parents=True, exist_ok=True)
 
-        for agent in ['planning', 'task', 'validator']:
-            self.agents[agent] = self._parse_agent_file(agent)
+        # Import AgentType from actions.claude to iterate agent types
+        from imbi_automations.actions import claude as claude_actions
+
+        for agent_type in claude_actions.AgentType:
+            self.agents[agent_type.value] = self._parse_agent_file(
+                agent_type.value
+            )
 
         # Create custom settings.json - disable all global settings
         settings = claude_dir / 'settings.json'

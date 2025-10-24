@@ -128,9 +128,9 @@ class ClaudeActionTestCase(base.AsyncTestCase):
             self.working_directory / 'workflow' / 'test-validation.md'
         ).write_text(validation_content)
 
-        prompt = claude_action._get_prompt(action, claude.AgentType.validator)
+        prompt = claude_action._get_prompt(action, claude.AgentType.validation)
 
-        self.assertIn('"validator"', prompt)
+        self.assertIn('"validation"', prompt)
         self.assertIn('Validate the generated code', prompt)
 
     @mock.patch('imbi_automations.claude.Claude.agent_query')
