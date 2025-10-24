@@ -51,7 +51,7 @@ You are a read-only analysis agent that creates execution plans for task agents.
 
 ## ⚠️ RESPONSE SUBMISSION ⚠️
 
-**You MUST call `mcp__agent_tools__submit_response` to submit your plan.**
+**You MUST call `mcp__agent_tools__submit_plan` to submit your plan.**
 
 **DO NOT output JSON as text. Use the tool.**
 
@@ -59,7 +59,7 @@ You are a read-only analysis agent that creates execution plans for task agents.
 
 Success with plan:
 ```
-mcp__agent_tools__submit_response(
+mcp__agent_tools__submit_plan(
   result="success",
   plan=[
     "Update Python version in pyproject.toml from >=3.9 to >=3.12",
@@ -73,14 +73,14 @@ mcp__agent_tools__submit_response(
 
 Failure (cannot create plan):
 ```
-mcp__agent_tools__submit_response(
+mcp__agent_tools__submit_plan(
   result="failure",
   plan=[],
   analysis="Cannot find Python version configuration - no pyproject.toml, setup.py, or requirements.txt found"
 )
 ```
 
-**Rules:**
+**Parameters:**
 - `result` REQUIRED: "success" or "failure"
 - `plan` REQUIRED: Array of simple strings (NOT objects/dicts)
 - `analysis` REQUIRED: Summary of findings, patterns, dependencies, risks

@@ -99,7 +99,13 @@ class Claude(mixins.WorkflowLoggerMixin):
         LOGGER.debug('Claude Code settings: %s', settings)
 
         agent_tools = claude_agent_sdk.create_sdk_mcp_server(
-            'agent_tools', version, [self._submit_response]
+            'agent_tools',
+            version,
+            [
+                self._submit_task_response,
+                self._submit_validation_response,
+                self._submit_plan,
+            ],
         )
 
         system_prompt = (BASE_PATH / 'claude-code' / 'CLAUDE.md').read_text()
@@ -134,7 +140,9 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'WebFetch',
                 'WebSearch',
                 'SlashCommand',
-                'mcp__agent_tools__submit_response',
+                'mcp__agent_tools__submit_task_response',
+                'mcp__agent_tools__submit_validation_response',
+                'mcp__agent_tools__submit_plan',
             ],
             cwd=self.context.working_directory,
             mcp_servers={'agent_tools': agent_tools},
@@ -372,8 +380,8 @@ class Claude(mixins.WorkflowLoggerMixin):
         )
 
     @claude_agent_sdk.tool(
-        name='submit_response',
-        description='Submit the final agent response (required)',
+        name='submit_task_response',
+        description='Submit task execution result (task agents only)',
         input_schema={
             'type': 'object',
             'properties': {
@@ -384,44 +392,97 @@ class Claude(mixins.WorkflowLoggerMixin):
                 },
                 'message': {
                     'type': 'string',
-                    'description': 'Optional success/failure description',
+                    'description': 'Optional completion message',
                 },
                 'errors': {
                     'type': 'array',
                     'items': {'type': 'string'},
-                    'description': 'List of specific errors (for failures)',
-                },
-                'plan': {
-                    'type': 'array',
-                    'items': {'type': 'string'},
-                    'description': 'Task plan (planning agents only)',
-                },
-                'analysis': {
-                    'type': 'string',
-                    'description': 'Analysis context (planning agents only)',
+                    'description': 'List of errors (for failures)',
                 },
             },
             'required': ['result'],
         },
     )
-    def _submit_response(self, **kwargs: typing.Any) -> str:
-        """Submit the final agent response.
-
-        Accepts either AgentRun format (task/validation agents) or planning
-        format with plan/analysis fields. Validates and stores the response
-        for retrieval by the workflow engine.
-        """
-        LOGGER.debug('submit_response tool invoked with: %r', kwargs)
-
-        # Validate as AgentRun (handles both task/validation and planning)
-        # Planning agents include plan/analysis as extra fields
+    def _submit_task_response(self, **kwargs: typing.Any) -> str:
+        """Submit task agent response."""
+        LOGGER.debug('submit_task_response tool invoked with: %r', kwargs)
         try:
             response = models.AgentRun.model_validate(kwargs)
             self._submitted_response = response
-            if 'plan' in kwargs:
-                return 'Planning response submitted successfully'
-            return 'Response submitted successfully'
+            return 'Task response submitted successfully'
         except pydantic.ValidationError as exc:
-            error_msg = f'Invalid response format: {exc}'
+            error_msg = f'Invalid task response: {exc}'
+            LOGGER.error(error_msg)
+            return error_msg
+
+    @claude_agent_sdk.tool(
+        name='submit_validation_response',
+        description='Submit validation result (validation agents only)',
+        input_schema={
+            'type': 'object',
+            'properties': {
+                'result': {
+                    'type': 'string',
+                    'enum': ['success', 'failure'],
+                    'description': 'Validation result',
+                },
+                'message': {
+                    'type': 'string',
+                    'description': 'Optional validation message',
+                },
+                'errors': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'description': 'List of validation errors',
+                },
+            },
+            'required': ['result'],
+        },
+    )
+    def _submit_validation_response(self, **kwargs: typing.Any) -> str:
+        """Submit validation agent response."""
+        LOGGER.debug('submit_validation_response invoked: %r', kwargs)
+        try:
+            response = models.AgentRun.model_validate(kwargs)
+            self._submitted_response = response
+            return 'Validation response submitted successfully'
+        except pydantic.ValidationError as exc:
+            error_msg = f'Invalid validation response: {exc}'
+            LOGGER.error(error_msg)
+            return error_msg
+
+    @claude_agent_sdk.tool(
+        name='submit_plan',
+        description='Submit planning result (planning agents only)',
+        input_schema={
+            'type': 'object',
+            'properties': {
+                'result': {
+                    'type': 'string',
+                    'enum': ['success', 'failure'],
+                    'description': 'Planning result',
+                },
+                'plan': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'description': 'List of tasks (simple strings)',
+                },
+                'analysis': {
+                    'type': 'string',
+                    'description': 'Analysis and context',
+                },
+            },
+            'required': ['result', 'plan', 'analysis'],
+        },
+    )
+    def _submit_plan(self, **kwargs: typing.Any) -> str:
+        """Submit planning agent response."""
+        LOGGER.debug('submit_plan tool invoked with: %r', kwargs)
+        try:
+            response = models.AgentRun.model_validate(kwargs)
+            self._submitted_response = response
+            return 'Plan submitted successfully'
+        except pydantic.ValidationError as exc:
+            error_msg = f'Invalid plan format: {exc}'
             LOGGER.error(error_msg)
             return error_msg

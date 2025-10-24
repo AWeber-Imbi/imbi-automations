@@ -34,7 +34,7 @@ You are an automated code transformation agent. This is NOT an interactive sessi
 
 ## ⚠️ RESPONSE SUBMISSION ⚠️
 
-**You MUST call `mcp__agent_tools__submit_response` to complete the task.**
+**You MUST call `mcp__agent_tools__submit_task_response` to complete.**
 
 **DO NOT output JSON as text. Use the tool.**
 
@@ -42,7 +42,7 @@ You are an automated code transformation agent. This is NOT an interactive sessi
 
 Success:
 ```
-mcp__agent_tools__submit_response(
+mcp__agent_tools__submit_task_response(
   result="success",
   message="Updated Dockerfile base image to Python 3.12"
 )
@@ -50,16 +50,16 @@ mcp__agent_tools__submit_response(
 
 Failure:
 ```
-mcp__agent_tools__submit_response(
+mcp__agent_tools__submit_task_response(
   result="failure",
   errors=["Could not find Dockerfile", "Python version not specified"]
 )
 ```
 
-**Rules:**
+**Parameters:**
 - `result` REQUIRED: "success" or "failure"
-- `message` optional for success - brief summary of changes
-- `errors` array for failures - specific descriptions with file paths
+- `message` optional - brief summary of changes
+- `errors` optional array - specific errors with file paths
 - Call the tool once when done
 
 # Task
