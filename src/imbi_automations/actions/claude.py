@@ -39,6 +39,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self.claude = claude.Claude(configuration, context, verbose)
         self.configuration = configuration
         self.context = context
+        self.has_planning_prompt: bool = False
         self.last_error: models.AgentRun | None = None
         self.task_plan: models.AgentPlan | None = None
         commit_author = email_utils.parseaddr(self.configuration.commit_author)
@@ -110,12 +111,14 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self, action: models.WorkflowClaudeAction, cycle: int
     ) -> bool:
         # Reset task_plan at the start of each cycle
+        self.has_planning_prompt = False
         self.task_plan = None
 
         # Build agent execution sequence
         agents = []
         if action.planning_prompt:
             agents.append(AgentType.planning)
+            self.has_planning_prompt = True
         agents.append(AgentType.task)
         if action.validation_prompt:
             agents.append(AgentType.validation)
@@ -241,20 +244,11 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         else:
             prompt += prompt_file.read_text(encoding='utf-8')
 
-        # Inject plan if available (for task agent only)
-        if agent == AgentType.task and self.task_plan:
-            prompt_file = (
-                pathlib.Path(__file__).parent / 'prompts' / 'with-plan.md.j2'
-            )
-            return prompts.render(
-                self.context,
-                prompt_file,
-                plan=self.task_plan.model_dump(),
-                original_prompt=prompt,
-            )
-
-        # Inject validation errors if available (for task agent only)
-        if agent == AgentType.task and self.last_error:
+        if (agent == AgentType.planning and self.last_error) or (
+            agent == AgentType.task
+            and not self.has_planning_prompt
+            and self.last_error
+        ):
             prompt_file = (
                 pathlib.Path(__file__).parent / 'prompts' / 'last-error.md.j2'
             )
@@ -262,6 +256,16 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 self.context,
                 prompt_file,
                 last_error=self.last_error.model_dump_json(indent=2),
+                original_prompt=prompt,
+            )
+        elif agent == AgentType.task and self.task_plan:
+            prompt_file = (
+                pathlib.Path(__file__).parent / 'prompts' / 'with-plan.md.j2'
+            )
+            return prompts.render(
+                self.context,
+                prompt_file,
+                plan=self.task_plan.model_dump(),
                 original_prompt=prompt,
             )
 
