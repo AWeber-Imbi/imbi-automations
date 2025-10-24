@@ -48,11 +48,73 @@ class AgentPlan(pydantic.BaseModel):
     The analysis field accepts either a string or any JSON-serializable object,
     automatically converting non-string values to JSON strings for consistent
     handling.
+
+    The plan field accepts structured objects (dicts with task/description/
+    details fields) and flattens them to simple strings for compatibility.
     """
 
     result: AgentRunResult
     plan: list[str] = []
     analysis: str | None = None
+
+    @pydantic.field_validator('plan', mode='before')
+    @classmethod
+    def _flatten_plan_items(cls, value: typing.Any) -> list[str]:
+        """Flatten structured plan items to simple strings.
+
+        Accepts:
+        - list[str]: Pass through unchanged
+        - list[dict]: Flatten each dict to a string by combining fields
+        - Empty list: Pass through
+
+        Common structured formats:
+        - {"step": N, "task": "...", "details": "..."}
+        - {"task_id": N, "description": "...", "details": "..."}
+        - {"task": "...", "description": "..."}
+
+        This allows planning agents to return structured plan items which
+        will be automatically flattened to simple task strings.
+        """
+        if not value:
+            return []
+
+        if not isinstance(value, list):
+            return []
+
+        flattened = []
+        for item in value:
+            if isinstance(item, str):
+                # Already a string, keep as-is
+                flattened.append(item)
+            elif isinstance(item, dict):
+                # Flatten dict to string
+                parts = []
+
+                # Try common field names in order of preference
+                task_field = (
+                    item.get('task')
+                    or item.get('description')
+                    or item.get('name')
+                )
+                details_field = item.get('details') or item.get('notes')
+
+                if task_field:
+                    parts.append(str(task_field))
+                if details_field:
+                    parts.append(str(details_field))
+
+                # If we didn't find common fields, use all values
+                if not parts:
+                    parts = [str(v) for v in item.values() if v]
+
+                # Combine parts with separator
+                if parts:
+                    flattened.append(' - '.join(parts))
+            else:
+                # Other types: convert to string
+                flattened.append(str(item))
+
+        return flattened
 
     @pydantic.field_validator('analysis', mode='before')
     @classmethod

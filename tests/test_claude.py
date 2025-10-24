@@ -158,6 +158,81 @@ class AgentPlanTestCase(unittest.TestCase):
         )
         self.assertIsNone(plan.analysis)
 
+    def test_agent_plan_structured_items_with_step_task_details(self) -> None:
+        """Test AgentPlan with structured plan items (step/task/details)."""
+        structured_plan = [
+            {'step': 1, 'task': 'Do first thing', 'details': 'Extra info'},
+            {'step': 2, 'task': 'Do second thing', 'details': 'More details'},
+        ]
+        plan = models.AgentPlan(
+            result=models.AgentRunResult.success,
+            plan=structured_plan,
+            analysis='Test analysis',
+        )
+        # Should flatten to strings
+        self.assertEqual(len(plan.plan), 2)
+        self.assertEqual(plan.plan[0], 'Do first thing - Extra info')
+        self.assertEqual(plan.plan[1], 'Do second thing - More details')
+
+    def test_agent_plan_structured_items_with_task_id_description(
+        self,
+    ) -> None:
+        """Test AgentPlan with structured items (task_id/description)."""
+        structured_plan = [
+            {
+                'task_id': 1,
+                'description': 'Read file',
+                'details': 'From source',
+            },
+            {
+                'task_id': 2,
+                'description': 'Write file',
+                'details': 'To destination',
+            },
+        ]
+        plan = models.AgentPlan(
+            result=models.AgentRunResult.success, plan=structured_plan
+        )
+        # Should flatten using description and details fields
+        self.assertEqual(len(plan.plan), 2)
+        self.assertEqual(plan.plan[0], 'Read file - From source')
+        self.assertEqual(plan.plan[1], 'Write file - To destination')
+
+    def test_agent_plan_mixed_string_and_structured(self) -> None:
+        """Test AgentPlan with mix of strings and structured items."""
+        mixed_plan = [
+            'Simple string task',
+            {'task': 'Structured task', 'details': 'With details'},
+            'Another string task',
+        ]
+        plan = models.AgentPlan(
+            result=models.AgentRunResult.success, plan=mixed_plan
+        )
+        # Should handle both formats
+        self.assertEqual(len(plan.plan), 3)
+        self.assertEqual(plan.plan[0], 'Simple string task')
+        self.assertEqual(plan.plan[1], 'Structured task - With details')
+        self.assertEqual(plan.plan[2], 'Another string task')
+
+    def test_agent_plan_structured_item_without_details(self) -> None:
+        """Test AgentPlan with structured item lacking details field."""
+        structured_plan = [
+            {'task': 'Task without details'},
+            {'description': 'Description only'},
+        ]
+        plan = models.AgentPlan(
+            result=models.AgentRunResult.success, plan=structured_plan
+        )
+        # Should use available fields
+        self.assertEqual(len(plan.plan), 2)
+        self.assertEqual(plan.plan[0], 'Task without details')
+        self.assertEqual(plan.plan[1], 'Description only')
+
+    def test_agent_plan_empty_list(self) -> None:
+        """Test AgentPlan with empty plan list."""
+        plan = models.AgentPlan(result=models.AgentRunResult.success, plan=[])
+        self.assertEqual(plan.plan, [])
+
 
 class ClaudeTestCase(base.AsyncTestCase):
     """Test cases for the Claude class."""
