@@ -187,7 +187,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                         error_message=str(exc),
                     )
                 working_directory.cleanup()
-                return False
+                raise exc
 
         # Handle dry-run mode: preserve working directory and skip push/PR
         if self.configuration.dry_run:

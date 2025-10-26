@@ -1,21 +1,13 @@
-A planning agent has analyzed the codebase and created the following plan for you to execute.
+{{ original_prompt }}
 
-## Plan
+# Plan
+The planning agent created the following plan for you to follow in order:
 
-Follow these tasks in order:
-
-{% for task in plan.plan %}
-{{ loop.index }}. {{ task }}
+{% for task in plan.plan %}{{ loop.index }}. {{ task }}
 {% endfor %}
-
 {% if plan.analysis %}
-## Analysis
-
+# Analysis
 The planning agent provided the following context:
 
 {{ plan.analysis }}
 {% endif %}
-
----
-
-{{ original_prompt }}

@@ -1,11 +1,10 @@
 """Claude Code action implementation for AI-powered transformations.
 
-Executes Claude Code actions using agent-based workflows (task/validator) with
+Executes Claude Code actions using agent-based workflows (task/validation) with
 prompt templating, failure detection, and restart capabilities for reliable
 AI-powered code transformations.
 """
 
-import enum
 import pathlib
 import typing
 from email import utils as email_utils
@@ -13,18 +12,10 @@ from email import utils as email_utils
 from imbi_automations import claude, mixins, models, prompts
 
 
-class AgentType(enum.StrEnum):
-    """Claude Code agent types for task execution and validation workflows."""
-
-    planning = 'planning'
-    task = 'task'
-    validator = 'validator'
-
-
 class ClaudeAction(mixins.WorkflowLoggerMixin):
     """Executes AI-powered code transformations using Claude Code SDK.
 
-    Manages agent-based workflows with task/validator cycles, prompt
+    Manages agent-based workflows with task/validation cycles, prompt
     templating, and automatic restart on failure detection.
     """
 
@@ -39,8 +30,9 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self.claude = claude.Claude(configuration, context, verbose)
         self.configuration = configuration
         self.context = context
-        self.last_error: models.AgentRun | None = None
-        self.task_plan: models.AgentPlan | None = None
+        self.has_planning_prompt: bool = False
+        self.last_error: models.ClaudeAgentValidationResult | None = None
+        self.task_plan: models.ClaudeAgentPlanningResult | None = None
         commit_author = email_utils.parseaddr(self.configuration.commit_author)
         self.prompt_kwargs = {
             'commit_author': self.configuration.commit_author,
@@ -88,8 +80,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 success = True
                 break
 
-        if not success:
-            # Categorize failure for better diagnostics
+        if not success:  # Categorize failure for better diagnostics
             failure_category = self._categorize_failure()
             error_msg = (
                 f'Claude Code action {action.name} failed after '
@@ -110,15 +101,17 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self, action: models.WorkflowClaudeAction, cycle: int
     ) -> bool:
         # Reset task_plan at the start of each cycle
+        self.has_planning_prompt = False
         self.task_plan = None
 
         # Build agent execution sequence
         agents = []
         if action.planning_prompt:
-            agents.append(AgentType.planning)
-        agents.append(AgentType.task)
+            agents.append(models.ClaudeAgentType.planning)
+            self.has_planning_prompt = True
+        agents.append(models.ClaudeAgentType.task)
         if action.validation_prompt:
-            agents.append(AgentType.validator)
+            agents.append(models.ClaudeAgentType.validation)
 
         for agent in agents:
             self._log_verbose_info(
@@ -135,95 +128,66 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 action.name,
                 prompt,
             )
+
             run = await self.claude.agent_query(prompt)
             self.logger.debug(
-                '%s %s execute agent result: %r',
+                '%s %s %s agent result: %r',
                 self.context.imbi_project.slug,
                 action.name,
+                agent.name,
                 run,
             )
 
-            if run.result == models.AgentRunResult.failure:
-                # Store different types of failures
-                if agent == AgentType.planning:
-                    self.logger.error(
-                        '%s %s Claude Code planning agent failed in cycle %d',
-                        self.context.imbi_project.slug,
-                        action.name,
-                        cycle,
-                    )
-                    self.task_plan = None
-                    return False
-                elif agent == AgentType.validator:
-                    self.last_error = run
-                    self.logger.error(
-                        '%s %s Claude Code validator agent failed in cycle %d',
-                        self.context.imbi_project.slug,
-                        action.name,
-                        cycle,
-                    )
-                    # Clear task_plan for next cycle since validation failed
-                    self.task_plan = None
-                    return False
-                else:  # task agent
-                    self.last_error = run
-                    self.logger.error(
-                        '%s %s Claude Code task agent failed in cycle %d',
-                        self.context.imbi_project.slug,
-                        action.name,
-                        cycle,
-                    )
-                    self.task_plan = None
-                    return False
-
-            # Store planning result for task agent
-            if agent == AgentType.planning:
-                # Parse the planning result into AgentPlan model
-                try:
-                    self.task_plan = models.AgentPlan.model_validate(
-                        run.model_dump()
-                    )
-                    self.logger.debug(
-                        '%s %s planning agent created plan with %d tasks',
-                        self.context.imbi_project.slug,
-                        action.name,
-                        len(self.task_plan.plan),
-                    )
-                except (ValueError, KeyError, TypeError) as exc:
-                    self.logger.error(
-                        '%s %s failed to parse planning result: %s',
-                        self.context.imbi_project.slug,
-                        action.name,
-                        exc,
-                    )
-                    self.task_plan = None
-                    return False
-
-            # Clear last_error on successful task/validator run
-            if agent in (AgentType.task, AgentType.validator):
-                self.last_error = None
+            if isinstance(run, models.ClaudeAgentPlanningResult):
+                self.task_plan = run
+                self.logger.debug(
+                    '%s %s planning agent created plan with %d tasks',
+                    self.context.imbi_project.slug,
+                    action.name,
+                    len(self.task_plan.plan),
+                )
+                # Continue to task agent - don't return yet
+            elif isinstance(run, models.ClaudeAgentTaskResult):
+                self.logger.debug(
+                    '%s %s task result: %s',
+                    self.context.imbi_project.slug,
+                    action.name,
+                    run.message,
+                )
+            elif isinstance(run, models.ClaudeAgentValidationResult):
+                self.logger.debug(
+                    '%s %s validation result: %r',
+                    self.context.imbi_project.slug,
+                    action.name,
+                    run,
+                )
+                self.task_plan = None
+                self.last_error = run if not run.validated else None
+                return run.validated
 
         return True
 
     def _get_prompt(
-        self, action: models.WorkflowClaudeAction, agent: AgentType
+        self,
+        action: models.WorkflowClaudeAction,
+        agent: models.ClaudeAgentType,
     ) -> str:
         """Return the rendered prompt for the given agent."""
         prompt = f'Use the "{agent}" agent to complete the following task:\n\n'
 
-        if agent == AgentType.planning:
+        if agent == models.ClaudeAgentType.planning:
             prompt_file = (
                 self.context.working_directory
                 / 'workflow'
                 / action.planning_prompt
             )
-        elif agent == AgentType.task:
+        elif agent == models.ClaudeAgentType.task:
             prompt_file = (
                 self.context.working_directory
                 / 'workflow'
                 / action.task_prompt
             )
-        elif agent == AgentType.validator:
+        elif agent == models.ClaudeAgentType.validation:
             prompt_file = (
                 self.context.working_directory
                 / 'workflow'
@@ -243,8 +207,35 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         else:
             prompt += prompt_file.read_text(encoding='utf-8')
 
-        # Inject plan if available (for task agent only)
-        if agent == AgentType.task and self.task_plan:
+        if agent == models.ClaudeAgentType.planning and self.last_error:
+            # Planning agent with errors: create a new plan, don't fix directly
+            prompt_file = (
+                pathlib.Path(__file__).parent
+                / 'prompts'
+                / 'planning-with-errors.md.j2'
+            )
+            return prompts.render(
+                self.context,
+                prompt_file,
+                last_error=self.last_error.model_dump_json(indent=2),
+                original_prompt=prompt,
+            )
+        elif (
+            agent == models.ClaudeAgentType.task
+            and not self.has_planning_prompt
+            and self.last_error
+        ):
+            # Task agent with errors (no planning): fix directly
+            prompt_file = (
+                pathlib.Path(__file__).parent / 'prompts' / 'last-error.md.j2'
+            )
+            return prompts.render(
+                self.context,
+                prompt_file,
+                last_error=self.last_error.model_dump_json(indent=2),
+                original_prompt=prompt,
+            )
+        elif agent == models.ClaudeAgentType.task and self.task_plan:
             prompt_file = (
                 pathlib.Path(__file__).parent / 'prompts' / 'with-plan.md.j2'
             )
@@ -255,31 +246,20 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 original_prompt=prompt,
             )
 
-        # Inject validation errors if available (for task agent only)
-        if agent == AgentType.task and self.last_error:
-            prompt_file = (
-                pathlib.Path(__file__).parent / 'prompts' / 'last-error.md.j2'
-            )
-            return prompts.render(
-                self.context,
-                prompt_file,
-                last_error=self.last_error.model_dump_json(indent=2),
-                original_prompt=prompt,
-            )
-
         return prompt
 
     def _categorize_failure(self) -> str | None:
-        """Categorize the failure type based on last error message.
+        """Categorize the failure type based on last error messages.
 
         Returns:
             Failure category string or None if no clear category
 
         """
-        if not self.last_error or not self.last_error.message:
+        if not self.last_error or not self.last_error.errors:
             return None
 
-        error_msg = self.last_error.message.lower()
+        # Combine all error messages for pattern matching
+        error_msg = ' '.join(self.last_error.errors).lower()
 
         # Define failure patterns and categories
         failure_patterns = {

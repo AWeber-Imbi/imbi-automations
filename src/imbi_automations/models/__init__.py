@@ -5,7 +5,12 @@ workflow definitions, git operations, and Claude Code integration models.
 """
 
 from . import configuration, imbi
-from .claude import AgentPlan, AgentRun, AgentRunResult
+from .claude import (
+    ClaudeAgentPlanningResult,
+    ClaudeAgentTaskResult,
+    ClaudeAgentType,
+    ClaudeAgentValidationResult,
+)
 from .configuration import (
     AnthropicConfiguration,
     ClaudeCodeConfiguration,
@@ -75,10 +80,11 @@ from .workflow import (
 __all__ = [
     'configuration',
     'imbi',
-    'AgentPlan',
-    'AgentRun',
-    'AgentRunResult',
     'AnthropicConfiguration',
+    'ClaudeAgentPlanningResult',
+    'ClaudeAgentTaskResult',
+    'ClaudeAgentType',
+    'ClaudeAgentValidationResult',
     'ClaudeCodeConfiguration',
     'Configuration',
     'GitCommit',
