@@ -162,7 +162,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     run,
                 )
                 self.task_plan = None
-                self.last_error = run.errors or None
+                self.last_error = run if not run.validated else None
                 return run.validated
 
         return True
@@ -235,16 +235,17 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         return prompt
 
     def _categorize_failure(self) -> str | None:
-        """Categorize the failure type based on last error message.
+        """Categorize the failure type based on last error messages.
 
         Returns:
             Failure category string or None if no clear category
 
         """
-        if not self.last_error or not self.last_error.message:
+        if not self.last_error or not self.last_error.errors:
             return None
 
-        error_msg = self.last_error.message.lower()
+        # Combine all error messages for pattern matching
+        error_msg = ' '.join(self.last_error.errors).lower()
 
         # Define failure patterns and categories
         failure_patterns = {
