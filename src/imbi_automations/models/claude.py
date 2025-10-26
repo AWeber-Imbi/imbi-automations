@@ -6,40 +6,19 @@ workflows.
 """
 
 import enum
-import json
-import typing
 
 import pydantic
 
 
-class AgentRunResult(enum.Enum):
-    """Claude agent execution result status.
+class ClaudeAgentType(enum.StrEnum):
+    """Claude Code agent types for task execution and validation workflows."""
 
-    Indicates whether an agent run completed successfully or failed.
-    """
-
-    success = 'success'
-    failure = 'failure'
+    planning = 'planning'
+    task = 'task'
+    validation = 'validation'
 
 
-class AgentRun(pydantic.BaseModel):
-    """Claude agent execution result with status and error details.
-
-    Contains the execution result, optional message, and list of errors
-    encountered during the agent run.
-
-    Extra fields (like 'plan', 'analysis' from planning agents) are preserved
-    and accessible via model_extra.
-    """
-
-    model_config = pydantic.ConfigDict(extra='allow')
-
-    result: AgentRunResult
-    message: str | None = None
-    errors: list[str] = []
-
-
-class AgentPlan(pydantic.BaseModel):
+class ClaudeAgentPlanningResult(pydantic.BaseModel):
     """Claude planning agent result with structured plan and analysis.
 
     Contains the execution result, a list of planned tasks for the task agent
@@ -53,86 +32,39 @@ class AgentPlan(pydantic.BaseModel):
     details fields) and flattens them to simple strings for compatibility.
     """
 
-    result: AgentRunResult
-    plan: list[str] = []
-    analysis: str | None = None
+    plan: list[str]
+    analysis: str
 
-    @pydantic.field_validator('plan', mode='before')
-    @classmethod
-    def _flatten_plan_items(cls, value: typing.Any) -> list[str]:
-        """Flatten structured plan items to simple strings.
 
-        Accepts:
-        - list[str]: Pass through unchanged
-        - list[dict]: Flatten each dict to a string by combining fields
-        - Empty list: Pass through
+class ClaudeAgentTaskResult(pydantic.BaseModel):
+    """
+    Represents the result of an agent task.
 
-        Common structured formats:
-        - {"step": N, "task": "...", "details": "..."}
-        - {"task_id": N, "description": "...", "details": "..."}
-        - {"task": "...", "description": "..."}
+    This class is a Pydantic model used for managing and validating data
+    related to the outcome of an agent task. It encapsulates the details and
+    message representing the outcome of a specific task processed by an agent.
 
-        This allows planning agents to return structured plan items which
-        will be automatically flattened to simple task strings.
-        """
-        if not value:
-            return []
+    :ivar message: The descriptive message about the result of the agent task.
+    :type message: str
+    """
 
-        if not isinstance(value, list):
-            return []
+    message: str
 
-        flattened = []
-        for item in value:
-            if isinstance(item, str):
-                # Already a string, keep as-is
-                flattened.append(item)
-            elif isinstance(item, dict):
-                # Flatten dict to string
-                parts = []
 
-                # Try common field names in order of preference
-                task_field = (
-                    item.get('task')
-                    or item.get('description')
-                    or item.get('name')
-                )
-                details_field = item.get('details') or item.get('notes')
+class ClaudeAgentValidationResult(pydantic.BaseModel):
+    """
+    Represents the validation response for an agent.
 
-                if task_field:
-                    parts.append(str(task_field))
-                if details_field:
-                    parts.append(str(details_field))
+    This model is used to encapsulate the results of validating an agent,
+    including whether the validation was successful and any associated
+    errors if the validation failed.
 
-                # If we didn't find common fields, use all values
-                if not parts:
-                    parts = [str(v) for v in item.values() if v]
+    :ivar validated: Indicates if the agent passed validation.
+    :type validated: bool
+    :ivar errors: A list of error messages generated during the validation
+        process. Defaults to an empty list if there are no errors.
+    :type errors: list[str]
+    """
 
-                # Combine parts with separator
-                if parts:
-                    flattened.append(' - '.join(parts))
-            else:
-                # Other types: convert to string
-                flattened.append(str(item))
-
-        return flattened
-
-    @pydantic.field_validator('analysis', mode='before')
-    @classmethod
-    def _serialize_analysis(cls, value: typing.Any) -> str | None:
-        """Convert analysis to string if it's a dict or other structure.
-
-        Accepts:
-        - None: Pass through
-        - str: Pass through
-        - dict/list/other: Convert to JSON string
-
-        This allows planning agents to return structured analysis that will
-        be automatically serialized for consistent string handling.
-        """
-        if value is None or isinstance(value, str):
-            return value
-        try:
-            return json.dumps(value, indent=2)
-        except (TypeError, ValueError):
-            # If serialization fails, convert to string
-            return str(value)
+    validated: bool
+    errors: list[str] = []

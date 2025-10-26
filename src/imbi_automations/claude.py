@@ -17,12 +17,29 @@ import pydantic
 from anthropic import types as anthropic_types
 from claude_agent_sdk import types
 
-from imbi_automations import mixins, models, prompts, tracker, utils, version
+from imbi_automations import mixins, models, prompts, tracker, version
 
 LOGGER = logging.getLogger(__name__)
 BASE_PATH = pathlib.Path(__file__).parent
-
 COMMIT = 'commit'
+SUBMIT_PLANNING_RESPONSE = 'submit_planning_response'
+SUBMIT_TASK_RESPONSE = 'submit_task_response'
+SUBMIT_VALIDATION_RESPONSE = 'submit_validation_response'
+
+
+class Agents(typing.TypedDict):
+    """TypedDict for agent configuration."""
+
+    planning: types.AgentDefinition | None
+    task: types.AgentDefinition | None
+    validation: types.AgentDefinition | None
+
+
+AgentResult = (
+    models.ClaudeAgentPlanningResult
+    | models.ClaudeAgentTaskResult
+    | models.ClaudeAgentValidationResult
+)
 
 
 class Claude(mixins.WorkflowLoggerMixin):
@@ -45,7 +62,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             else:
                 api_key = None
             self.anthropic = anthropic.AsyncAnthropic(api_key=api_key)
-        self.agents: dict[str, types.AgentDefinition] = {}
+        self.agents: Agents = Agents(planning=None, task=None, validation=None)
         self.configuration = config
         self.context = context
         self.logger: logging.Logger = LOGGER
@@ -61,18 +78,19 @@ class Claude(mixins.WorkflowLoggerMixin):
         }
         self.tracker = tracker.Tracker.get_instance()
         self._set_workflow_logger(self.context.workflow)
-        self._submitted_response: models.AgentRun | models.AgentPlan | None = (
-            None
-        )
+        self._submitted_response: AgentResult | None = None
         self.client = self._create_client()
 
-    async def agent_query(self, prompt: str) -> models.AgentRun:
-        self._submitted_response = None  # Reset for each query
+    async def agent_query(self, prompt: str) -> AgentResult | None:
+        self._submitted_response = None
         await self.client.connect()
         await self.client.query(prompt)
-        response = await self._response()
+        async for message in self.client.receive_response():
+            self._parse_message(message)
         await self.client.disconnect()
-        return response
+        if self._submitted_response is None:
+            raise RuntimeError('No response received from Claude Code')
+        return self._submitted_response
 
     async def anthropic_query(
         self, prompt: str, model: str | None = None
@@ -98,13 +116,117 @@ class Claude(mixins.WorkflowLoggerMixin):
         settings = self._initialize_working_directory()
         LOGGER.debug('Claude Code settings: %s', settings)
 
+        # Create tool functions that capture self context
+        @claude_agent_sdk.tool(
+            SUBMIT_PLANNING_RESPONSE,
+            'Submit planning result',
+            models.ClaudeAgentPlanningResult.model_json_schema(),
+        )
+        async def submit_planning_response(
+            args: dict[str, typing.Any],
+        ) -> dict[str, typing.Any]:
+            """Submit planning agent response."""
+            LOGGER.debug(
+                'submit_planning_response tool invoked with: %r', args
+            )
+            try:
+                self._submitted_response = (
+                    models.ClaudeAgentPlanningResult.model_validate(args)
+                )
+            except pydantic.ValidationError as err:
+                return {
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': f'Error: invalid response {err}',
+                        }
+                    ],
+                    'is_error': True,
+                }
+            return {
+                'content': [
+                    {
+                        'type': 'text',
+                        'text': 'Planning response submitted successfully',
+                    }
+                ]
+            }
+
+        @claude_agent_sdk.tool(
+            SUBMIT_TASK_RESPONSE,
+            'The task agent MUST use this tool to submit the task result',
+            models.ClaudeAgentTaskResult.model_json_schema(),
+        )
+        async def submit_task_response(
+            args: dict[str, typing.Any],
+        ) -> dict[str, typing.Any]:
+            """Submit task agent response."""
+            LOGGER.debug('submit_task_response tool invoked with: %r', args)
+            try:
+                self._submitted_response = (
+                    models.ClaudeAgentTaskResult.model_validate(args)
+                )
+            except pydantic.ValidationError as err:
+                return {
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': f'Error: invalid response {err}',
+                        }
+                    ],
+                    'is_error': True,
+                }
+            return {
+                'content': [
+                    {
+                        'type': 'text',
+                        'text': 'Task response submitted successfully',
+                    }
+                ]
+            }
+
+        @claude_agent_sdk.tool(
+            SUBMIT_VALIDATION_RESPONSE,
+            'The validation agent MUST use this tool to submit its result',
+            models.ClaudeAgentValidationResult.model_json_schema(),
+        )
+        async def submit_validation_response(
+            args: dict[str, typing.Any],
+        ) -> dict[str, typing.Any]:
+            """Submit validation agent response."""
+            LOGGER.debug(
+                'submit_validation_response tool invoked with: %r', args
+            )
+            try:
+                self._submitted_response = (
+                    models.ClaudeAgentValidationResult.model_validate(args)
+                )
+            except pydantic.ValidationError as err:
+                return {
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': f'Error: invalid response {err}',
+                        }
+                    ],
+                    'is_error': True,
+                }
+            return {
+                'content': [
+                    {
+                        'type': 'text',
+                        'text': 'Validation response submitted successfully',
+                    }
+                ]
+            }
+
         agent_tools = claude_agent_sdk.create_sdk_mcp_server(
-            'agent_tools',
+            'agent-tools',
             version,
             [
-                self._submit_task_response,
-                self._submit_validation_response,
-                self._submit_plan,
+                submit_planning_response,
+                submit_task_response,
+                submit_validation_response,
             ],
         )
 
@@ -123,7 +245,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 raise RuntimeError
 
         options = claude_agent_sdk.ClaudeAgentOptions(
-            agents=self.agents,
+            agents=dict(self.agents),
             allowed_tools=[
                 'Bash',
                 'Bash(git:*)',
@@ -140,9 +262,9 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'WebFetch',
                 'WebSearch',
                 'SlashCommand',
-                'mcp__agent_tools__submit_task_response',
-                'mcp__agent_tools__submit_validation_response',
-                'mcp__agent_tools__submit_plan',
+                f'mcp__agent_tools__{SUBMIT_PLANNING_RESPONSE}',
+                f'mcp__agent_tools__{SUBMIT_TASK_RESPONSE}',
+                f'mcp__agent_tools__{SUBMIT_VALIDATION_RESPONSE}',
             ],
             cwd=self.context.working_directory,
             mcp_servers={'agent_tools': agent_tools},
@@ -154,6 +276,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             ),
             permission_mode='bypassPermissions',
         )
+
         return claude_agent_sdk.ClaudeSDKClient(options)
 
     def _initialize_working_directory(self) -> pathlib.Path:
@@ -181,13 +304,8 @@ class Claude(mixins.WorkflowLoggerMixin):
         output_styles_dir = claude_dir / 'output-style'
         output_styles_dir.mkdir(parents=True, exist_ok=True)
 
-        # Import AgentType from actions.claude to iterate agent types
-        from imbi_automations.actions import claude as claude_actions
-
-        for agent_type in claude_actions.AgentType:
-            self.agents[agent_type.value] = self._parse_agent_file(
-                agent_type.value
-            )
+        for agent_type in models.ClaudeAgentType:
+            self.agents[agent_type.value] = self._parse_agent_file(agent_type)
 
         # Create custom settings.json - disable all global settings
         settings = claude_dir / 'settings.json'
@@ -262,22 +380,35 @@ class Claude(mixins.WorkflowLoggerMixin):
                     continue
                 elif isinstance(entry, claude_agent_sdk.TextBlock):
                     self.logger.debug(
-                        '%s %s: %s',
+                        '[%s] %s: %s',
                         self.context.imbi_project.slug,
                         message_type,
-                        entry.text,
+                        entry.text.rstrip(':'),
+                    )
+                elif isinstance(
+                    entry,
+                    claude_agent_sdk.ToolUseBlock
+                    | claude_agent_sdk.ToolResultBlock,
+                ):
+                    self.logger.debug(
+                        '[%s] %s: %r',
+                        self.context.imbi_project.slug,
+                        message_type,
+                        entry,
                     )
                 else:
                     raise RuntimeError(f'Unknown message type: {type(entry)}')
         else:
             self.logger.debug(
-                '%s %s: %s',
+                '[%s] %s: %s',
                 self.context.imbi_project.slug,
                 message_type,
                 content,
             )
 
-    def _parse_agent_file(self, name: str) -> types.AgentDefinition:
+    def _parse_agent_file(
+        self, agent_type: models.ClaudeAgentType
+    ) -> types.AgentDefinition:
         """Parse the agent file and return the agent.
 
         Expects format:
@@ -289,13 +420,17 @@ class Claude(mixins.WorkflowLoggerMixin):
         ---
         Prompt content here...
         """
-        agent_file = BASE_PATH / 'claude-code' / 'agents' / f'{name}.md.j2'
+        agent_file = (
+            BASE_PATH / 'claude-code' / 'agents' / f'{agent_type.value}.md.j2'
+        )
         content = agent_file.read_text(encoding='utf-8')
 
         # Split frontmatter and prompt content
         parts = content.split('---', 2)
         if len(parts) < 3:
-            raise ValueError(f'Invalid agent file format for {name}')
+            raise ValueError(
+                f'Invalid agent file format for {agent_type.value}'
+            )
 
         # Parse frontmatter manually (simple YAML-like format)
         frontmatter = {}
@@ -317,15 +452,21 @@ class Claude(mixins.WorkflowLoggerMixin):
                 self.context, template=prompt, **self.prompt_kwargs
             ),
             tools=tools,
-            model=frontmatter.get('model', 'inherit'),
+            model=frontmatter.get('model', 'inherit'),  # type: ignore
         )
 
-    def _parse_message(
-        self, message: claude_agent_sdk.Message
-    ) -> models.AgentRun | None:
+    def _parse_message(self, message: claude_agent_sdk.Message) -> None:
         """Parse the response from Claude Code."""
         if isinstance(message, claude_agent_sdk.AssistantMessage):
             self._log_message('Claude Assistant', message.content)
+            # Check for tool use blocks
+            for content in message.content:
+                if isinstance(content, claude_agent_sdk.ToolUseBlock):
+                    LOGGER.debug(
+                        'Tool use detected: %s with input: %r',
+                        content.name,
+                        content.input,
+                    )
         elif isinstance(message, claude_agent_sdk.SystemMessage):
             self.logger.debug(
                 '%s Claude System: %s',
@@ -339,108 +480,8 @@ class Claude(mixins.WorkflowLoggerMixin):
                 self.session_id = message.session_id
             self.tracker.add_claude_run(message)
             if message.is_error:
-                return models.AgentRun(
-                    result=models.AgentRunResult.failure,
-                    message='Claude Error',
-                    errors=[message.result],
+                LOGGER.error('Claude Error: %s', message.result)
+            else:
+                LOGGER.debug(
+                    'Result (%s): %r', message.session_id, message.result
                 )
-            # Don't pre-strip code fences - let extract_json handle it
-            LOGGER.debug('Result (%s): %r', message.session_id, message.result)
-
-            try:
-                payload = utils.extract_json(message.result)
-            except ValueError as err:
-                self.logger.error(
-                    '%s failed to parse JSON result: %s',
-                    self.context.imbi_project.slug,
-                    err,
-                )
-                return models.AgentRun(
-                    result=models.AgentRunResult.failure,
-                    errors=[f'Failed to parse JSON result: {err}'],
-                    message='Agent Contract Failure',
-                )
-            return models.AgentRun.model_validate(payload)
-        return None
-
-    async def _response(self) -> models.AgentRun:
-        async for message in self.client.receive_response():
-            response = self._parse_message(message)
-            if response and isinstance(response, models.AgentRun):
-                return response
-
-        # Check if agent submitted response via tool (preferred method)
-        if self._submitted_response:
-            return self._submitted_response
-
-        return models.AgentRun(
-            result=models.AgentRunResult.failure,
-            message='Unspecified failure',
-            errors=[],
-        )
-
-    @claude_agent_sdk.tool(
-        name='submit_task_response',
-        description='Submit task execution result (task agents only)',
-        input_schema=str,
-    )
-    def _submit_task_response(self, response_json: str) -> str:
-        """Submit task agent response.
-
-        Args:
-            response_json: JSON string with result, message, errors fields
-        """
-        LOGGER.debug('submit_task_response invoked: %r', response_json)
-        try:
-            data = json.loads(response_json)
-            response = models.AgentRun.model_validate(data)
-            self._submitted_response = response
-            return 'Task response submitted successfully'
-        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
-            error_msg = f'Invalid task response: {exc}'
-            LOGGER.error(error_msg)
-            return error_msg
-
-    @claude_agent_sdk.tool(
-        name='submit_validation_response',
-        description='Submit validation result (validation agents only)',
-        input_schema=str,
-    )
-    def _submit_validation_response(self, response_json: str) -> str:
-        """Submit validation agent response.
-
-        Args:
-            response_json: JSON string with result, message, errors fields
-        """
-        LOGGER.debug('submit_validation_response invoked: %r', response_json)
-        try:
-            data = json.loads(response_json)
-            response = models.AgentRun.model_validate(data)
-            self._submitted_response = response
-            return 'Validation response submitted successfully'
-        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
-            error_msg = f'Invalid validation response: {exc}'
-            LOGGER.error(error_msg)
-            return error_msg
-
-    @claude_agent_sdk.tool(
-        name='submit_plan',
-        description='Submit planning result (planning agents only)',
-        input_schema=str,
-    )
-    def _submit_plan(self, plan_json: str) -> str:
-        """Submit planning agent response.
-
-        Args:
-            plan_json: JSON string with result, plan, analysis fields
-        """
-        LOGGER.debug('submit_plan tool invoked with: %r', plan_json)
-        try:
-            data = json.loads(plan_json)
-            response = models.AgentRun.model_validate(data)
-            self._submitted_response = response
-            return 'Plan submitted successfully'
-        except (json.JSONDecodeError, pydantic.ValidationError) as exc:
-            error_msg = f'Invalid plan format: {exc}'
-            LOGGER.error(error_msg)
-            return error_msg

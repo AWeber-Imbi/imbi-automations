@@ -166,6 +166,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     action.name,
                     exc,
                 )
+                raise exc
                 if self.configuration.preserve_on_error:
                     # Calculate completed indices for this execution
                     if not self.resume_state:

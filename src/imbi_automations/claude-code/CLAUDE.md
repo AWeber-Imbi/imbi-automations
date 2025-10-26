@@ -18,58 +18,59 @@ Do NOT output JSON as text. Use the appropriate tool for your agent type.
 
 ### Task Agents: `mcp__agent_tools__submit_task_response`
 
-Use this tool to submit task execution results. Pass a JSON string.
+Use this tool to submit task execution results with structured arguments.
 
 Success:
 ```
-mcp__agent_tools__submit_task_response('{"result": "success", "message": "Created requested program"}')
+mcp__agent_tools__submit_task_response(
+    message="Created requested program and updated dependencies"
+)
 ```
 
-Failure:
-```
-mcp__agent_tools__submit_task_response('{"result": "failure", "errors": ["Missing requests in dependencies", "Invalid version"]}')
-```
-
-**JSON Format:**
-- `result` (required): "success" or "failure"
-- `message` (optional): Brief description of changes
-- `errors` (optional): Array of error strings
+**Parameters:**
+- `message` (required): Brief description of changes made
 
 ### Validation Agents: `mcp__agent_tools__submit_validation_response`
 
-Use this tool to submit validation results. Pass a JSON string.
+Use this tool to submit validation results with structured arguments.
 
 Success:
 ```
-mcp__agent_tools__submit_validation_response('{"result": "success", "message": "All validation checks passed"}')
+mcp__agent_tools__submit_validation_response(
+    validated=true,
+    errors=[]
+)
 ```
 
 Failure:
 ```
-mcp__agent_tools__submit_validation_response('{"result": "failure", "errors": ["Dockerfile:1 - Expected Python 3.12, found 3.9"]}')
+mcp__agent_tools__submit_validation_response(
+    validated=false,
+    errors=["Dockerfile:1 - Expected Python 3.12, found 3.9", "Missing required dependency"]
+)
 ```
 
-**JSON Format:**
-- `result` (required): "success" or "failure"
-- `message` (optional): Validation summary
+**Parameters:**
+- `validated` (required): Boolean indicating validation success
 - `errors` (optional): Array of specific validation errors with locations
 
-### Planning Agents: `mcp__agent_tools__submit_plan`
+### Planning Agents: `mcp__agent_tools__submit_planning_response`
 
-Use this tool to submit planning results. Pass a JSON string.
+Use this tool to submit planning results with structured arguments.
 
-Success:
+Example:
 ```
-mcp__agent_tools__submit_plan('{"result": "success", "plan": ["Update Python version in pyproject.toml from >=3.9 to >=3.12", "Update base image in Dockerfile"], "analysis": "Repository uses Python 3.9 in multiple locations"}')
+mcp__agent_tools__submit_planning_response(
+    plan=[
+        "Update Python version in pyproject.toml from >=3.9 to >=3.12",
+        "Update base image in Dockerfile to python:3.12",
+        "Modify dependency constraints for Python 3.12 compatibility"
+    ],
+    analysis="Repository uses Python 3.9 in multiple locations. Found dependencies that need updating for 3.12 compatibility."
+)
 ```
 
-Failure:
-```
-mcp__agent_tools__submit_plan('{"result": "failure", "plan": [], "analysis": "Cannot find Python configuration files"}')
-```
-
-**JSON Format:**
-- `result` (required): "success" or "failure"
+**Parameters:**
 - `plan` (required): Array of task strings (simple strings, not objects)
 - `analysis` (required): Summary of findings and context
 
@@ -77,5 +78,6 @@ mcp__agent_tools__submit_plan('{"result": "failure", "plan": [], "analysis": "Ca
 
 - **Use the correct tool** - Each agent type has its own submission tool
 - **One submission only** - Call the tool once when you're done
+- **Use structured arguments** - Pass arguments as named parameters, not JSON strings
 - **Tool validates automatically** - The tool validates your response format
-- **Never output JSON as text** - Always use the tool
+- **Never output text instead of calling the tool** - Always use the tool to submit your response

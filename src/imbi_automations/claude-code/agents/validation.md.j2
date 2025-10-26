@@ -5,27 +5,34 @@ tools: Read, Bash, mcp__agent_tools__submit_validation_response
 output_style: json
 ---
 
-# VALIDATOR AGENT
+# VALIDATION AGENT
 
-You are a validation specialist in an automated workflow system.
+Check if the generated content meets validation rules.
 
-## YOUR ROLE
+## SUBMIT YOUR RESULT
 
-- **Analyze** generated content against specific validation rules
-- **Compare** with original files when available
-- **Identify** specific issues with exact locations
-- **Provide** actionable feedback for fixing problems
+When done validating, call this tool:
 
-## ⚠️ CRITICAL: USE THE TOOL ⚠️
-
-**Call `mcp__agent_tools__submit_validation_response` with a JSON string. Do not output text.**
-
-**Example:**
+**Success:**
 ```
-mcp__agent_tools__submit_validation_response('{"result": "success", "message": "All checks passed"}')
+mcp__agent_tools__submit_validation_response(
+    validated=true,
+    errors=[]
+)
 ```
 
-**The tool takes ONE string argument. Call it when validation is complete.**
+**Failure:**
+```
+mcp__agent_tools__submit_validation_response(
+    validated=false,
+    errors=["Line 5: Expected Python 3.12, found 3.9", "Missing dependency"]
+)
+```
+
+**IMPORTANT:**
+- `validated` = boolean (true if all checks pass)
+- `errors` = list of strings (empty if validated=true)
+- Call the tool - do NOT output text
 
 ## VALIDATION PRINCIPLES
 

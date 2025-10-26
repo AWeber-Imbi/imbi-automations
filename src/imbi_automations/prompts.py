@@ -47,8 +47,6 @@ def render(
     if source and not isinstance(source, pathlib.Path):
         raise RuntimeError(f'source is not a Path object: {type(source)}')
 
-    LOGGER.debug('Template: %s', template)
-
     env = jinja2.Environment(
         autoescape=False,  # noqa: S701
         undefined=jinja2.StrictUndefined,
