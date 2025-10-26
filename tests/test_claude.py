@@ -14,26 +14,33 @@ from tests import base
 
 
 def _test_response_validator(message: str) -> str:
-    """Test helper function that replicates response_validator logic.
+    """Test helper function that validates agent responses.
 
-    Validates against both AgentRun (task/validator agents) and AgentPlan
-    (planning agents) schemas.
+    Validates against ClaudeAgentPlanningResult, ClaudeAgentTaskResult,
+    or ClaudeAgentValidationResult schemas.
     """
     try:
         payload = json.loads(message)
     except json.JSONDecodeError:
         return 'Payload not validate as JSON'
 
-    # Try AgentPlan first (planning agents)
+    # Try ClaudeAgentPlanningResult first (planning agents)
     try:
-        models.AgentPlan.model_validate(payload)
+        models.ClaudeAgentPlanningResult.model_validate(payload)
         return 'Response is valid'
     except pydantic.ValidationError:
-        pass  # Try AgentRun next
+        pass
 
-    # Try AgentRun (task/validator agents)
+    # Try ClaudeAgentTaskResult (task agents)
     try:
-        models.AgentRun.model_validate(payload)
+        models.ClaudeAgentTaskResult.model_validate(payload)
+        return 'Response is valid'
+    except pydantic.ValidationError:
+        pass
+
+    # Try ClaudeAgentValidationResult (validation agents)
+    try:
+        models.ClaudeAgentValidationResult.model_validate(payload)
         return 'Response is valid'
     except pydantic.ValidationError as exc:
         return str(exc)
@@ -57,13 +64,18 @@ def _create_mock_result_message_usage() -> dict:
 class ResponseValidatorTestCase(unittest.TestCase):
     """Test cases for the response_validator function logic."""
 
-    def test_response_validator_valid_json(self) -> None:
-        """Test response_validator with valid JSON."""
-        valid_payload = {
-            'result': 'success',
-            'message': 'Test successful',
-            'errors': [],
-        }
+    def test_response_validator_valid_json_task_result(self) -> None:
+        """Test response_validator with valid TaskResult JSON."""
+        valid_payload = {'message': 'Test successful'}
+        json_message = json.dumps(valid_payload)
+
+        result = _test_response_validator(json_message)
+
+        self.assertEqual(result, 'Response is valid')
+
+    def test_response_validator_valid_json_validation_result(self) -> None:
+        """Test response_validator with valid ValidationResult JSON."""
+        valid_payload = {'validated': True, 'errors': []}
         json_message = json.dumps(valid_payload)
 
         result = _test_response_validator(json_message)
@@ -90,7 +102,6 @@ class ResponseValidatorTestCase(unittest.TestCase):
     def test_response_validator_planning_agent_response(self) -> None:
         """Test response_validator accepts planning agent responses."""
         planning_payload = {
-            'result': 'success',
             'plan': ['Task 1', 'Task 2', 'Task 3'],
             'analysis': 'Detailed analysis',
         }
@@ -105,13 +116,14 @@ class ResponseValidatorTestCase(unittest.TestCase):
     ) -> None:
         """Test response_validator with structured analysis."""
         planning_payload = {
-            'result': 'success',
             'plan': ['Task 1', 'Task 2'],
-            'analysis': {
-                'original_base_image': 'python:3.9-slim',
-                'target_base_image': 'python:3.12-slim',
-                'apk_packages': ['musl-dev', 'gcc'],
-            },
+            'analysis': json.dumps(
+                {
+                    'original_base_image': 'python:3.9-slim',
+                    'target_base_image': 'python:3.12-slim',
+                    'apk_packages': ['musl-dev', 'gcc'],
+                }
+            ),
         }
         json_message = json.dumps(planning_payload)
 
@@ -121,116 +133,50 @@ class ResponseValidatorTestCase(unittest.TestCase):
 
 
 class AgentPlanTestCase(unittest.TestCase):
-    """Test cases for AgentPlan model."""
+    """Test cases for ClaudeAgentPlanningResult model."""
 
     def test_agent_plan_string_analysis(self) -> None:
-        """Test AgentPlan with string analysis."""
-        plan = models.AgentPlan(
-            result=models.AgentRunResult.success,
-            plan=['Task 1', 'Task 2'],
-            analysis='Simple string analysis',
+        """Test ClaudeAgentPlanningResult with string analysis."""
+        plan = models.ClaudeAgentPlanningResult(
+            plan=['Task 1', 'Task 2'], analysis='Simple string analysis'
         )
         self.assertEqual(plan.analysis, 'Simple string analysis')
 
     def test_agent_plan_dict_analysis(self) -> None:
-        """Test AgentPlan with dict analysis (auto-serialized)."""
+        """Test ClaudeAgentPlanningResult with dict analysis as JSON."""
         analysis_dict = {
             'base_image': 'python:3.9',
             'packages': ['gcc', 'musl-dev'],
         }
-        plan = models.AgentPlan(
-            result=models.AgentRunResult.success,
+        plan = models.ClaudeAgentPlanningResult(
             plan=['Task 1'],
-            analysis=analysis_dict,
+            analysis=json.dumps(analysis_dict),  # Must be JSON string
         )
-        # Should be serialized to JSON string
+        # Should be a string
         self.assertIsInstance(plan.analysis, str)
         # Should be valid JSON
         parsed = json.loads(plan.analysis)
         self.assertEqual(parsed['base_image'], 'python:3.9')
 
-    def test_agent_plan_none_analysis(self) -> None:
-        """Test AgentPlan with None analysis."""
-        plan = models.AgentPlan(
-            result=models.AgentRunResult.success,
-            plan=['Task 1'],
-            analysis=None,
-        )
-        self.assertIsNone(plan.analysis)
+    def test_agent_plan_empty_analysis(self) -> None:
+        """Test ClaudeAgentPlanningResult with empty string analysis."""
+        plan = models.ClaudeAgentPlanningResult(plan=['Task 1'], analysis='')
+        self.assertEqual(plan.analysis, '')
 
-    def test_agent_plan_structured_items_with_step_task_details(self) -> None:
-        """Test AgentPlan with structured plan items (step/task/details)."""
-        structured_plan = [
-            {'step': 1, 'task': 'Do first thing', 'details': 'Extra info'},
-            {'step': 2, 'task': 'Do second thing', 'details': 'More details'},
-        ]
-        plan = models.AgentPlan(
-            result=models.AgentRunResult.success,
-            plan=structured_plan,
+    def test_agent_plan_multiple_tasks(self) -> None:
+        """Test ClaudeAgentPlanningResult with multiple tasks."""
+        plan = models.ClaudeAgentPlanningResult(
+            plan=['Do first thing', 'Do second thing', 'Do third thing'],
             analysis='Test analysis',
         )
-        # Should flatten to strings
-        self.assertEqual(len(plan.plan), 2)
-        self.assertEqual(plan.plan[0], 'Do first thing - Extra info')
-        self.assertEqual(plan.plan[1], 'Do second thing - More details')
-
-    def test_agent_plan_structured_items_with_task_id_description(
-        self,
-    ) -> None:
-        """Test AgentPlan with structured items (task_id/description)."""
-        structured_plan = [
-            {
-                'task_id': 1,
-                'description': 'Read file',
-                'details': 'From source',
-            },
-            {
-                'task_id': 2,
-                'description': 'Write file',
-                'details': 'To destination',
-            },
-        ]
-        plan = models.AgentPlan(
-            result=models.AgentRunResult.success, plan=structured_plan
-        )
-        # Should flatten using description and details fields
-        self.assertEqual(len(plan.plan), 2)
-        self.assertEqual(plan.plan[0], 'Read file - From source')
-        self.assertEqual(plan.plan[1], 'Write file - To destination')
-
-    def test_agent_plan_mixed_string_and_structured(self) -> None:
-        """Test AgentPlan with mix of strings and structured items."""
-        mixed_plan = [
-            'Simple string task',
-            {'task': 'Structured task', 'details': 'With details'},
-            'Another string task',
-        ]
-        plan = models.AgentPlan(
-            result=models.AgentRunResult.success, plan=mixed_plan
-        )
-        # Should handle both formats
         self.assertEqual(len(plan.plan), 3)
-        self.assertEqual(plan.plan[0], 'Simple string task')
-        self.assertEqual(plan.plan[1], 'Structured task - With details')
-        self.assertEqual(plan.plan[2], 'Another string task')
-
-    def test_agent_plan_structured_item_without_details(self) -> None:
-        """Test AgentPlan with structured item lacking details field."""
-        structured_plan = [
-            {'task': 'Task without details'},
-            {'description': 'Description only'},
-        ]
-        plan = models.AgentPlan(
-            result=models.AgentRunResult.success, plan=structured_plan
-        )
-        # Should use available fields
-        self.assertEqual(len(plan.plan), 2)
-        self.assertEqual(plan.plan[0], 'Task without details')
-        self.assertEqual(plan.plan[1], 'Description only')
+        self.assertEqual(plan.plan[0], 'Do first thing')
+        self.assertEqual(plan.plan[1], 'Do second thing')
+        self.assertEqual(plan.plan[2], 'Do third thing')
 
     def test_agent_plan_empty_list(self) -> None:
-        """Test AgentPlan with empty plan list."""
-        plan = models.AgentPlan(result=models.AgentRunResult.success, plan=[])
+        """Test ClaudeAgentPlanningResult with empty plan list."""
+        plan = models.ClaudeAgentPlanningResult(plan=[], analysis='No tasks')
         self.assertEqual(plan.plan, [])
 
 
@@ -324,206 +270,9 @@ class ClaudeTestCase(base.AsyncTestCase):
         mock_client_class.assert_called_once()
         mock_create_server.assert_called_once()
 
-    def test_parse_message_result_message_success(self) -> None:
-        """Test _parse_message with successful ResultMessage."""
-        with (
-            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
-            mock.patch(
-                'builtins.open',
-                new_callable=mock.mock_open,
-                read_data='Mock system prompt',
-            ),
-        ):
-            claude_instance = claude.Claude(
-                config=self.config, context=self.context
-            )
-
-        # Test with plain JSON
-        valid_result = {'result': 'success', 'message': 'Operation completed'}
-
-        # Create mock ResultMessage
-        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
-        message.session_id = 'test-session'
-        message.result = json.dumps(valid_result)
-        message.is_error = False
-        message.duration_ms = 1000
-        message.duration_api_ms = 800
-        message.num_turns = 1
-        message.total_cost_usd = 0.01
-        message.usage = _create_mock_result_message_usage()
-
-        result = claude_instance._parse_message(message)
-
-        self.assertIsInstance(result, models.AgentRun)
-        self.assertEqual(result.result, models.AgentRunResult.success)
-        self.assertEqual(result.message, 'Operation completed')
-        self.assertEqual(claude_instance.session_id, 'test-session')
-
-    def test_parse_message_result_message_with_json_code_blocks(self) -> None:
-        """Test _parse_message with JSON code blocks."""
-        with (
-            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
-            mock.patch(
-                'builtins.open',
-                new_callable=mock.mock_open,
-                read_data='Mock system prompt',
-            ),
-        ):
-            claude_instance = claude.Claude(
-                config=self.config, context=self.context
-            )
-
-        valid_result = {'result': 'success', 'message': 'Operation completed'}
-
-        # Test with ```json wrapper
-        json_with_wrapper = f'```json\n{json.dumps(valid_result)}\n```'
-
-        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
-        message.session_id = 'test-session'
-        message.result = json_with_wrapper
-        message.is_error = False
-        message.duration_ms = 1000
-        message.duration_api_ms = 800
-        message.num_turns = 1
-        message.total_cost_usd = 0.01
-        message.usage = _create_mock_result_message_usage()
-
-        result = claude_instance._parse_message(message)
-
-        self.assertIsInstance(result, models.AgentRun)
-        self.assertEqual(result.result, models.AgentRunResult.success)
-        self.assertEqual(result.message, 'Operation completed')
-
-    def test_parse_message_planning_agent_with_extra_fields(self) -> None:
-        """Test _parse_message preserves planning agent extra fields."""
-        with (
-            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
-            mock.patch(
-                'builtins.open',
-                new_callable=mock.mock_open,
-                read_data='Mock system prompt',
-            ),
-        ):
-            claude_instance = claude.Claude(
-                config=self.config, context=self.context
-            )
-
-        # Planning agent response with plan and analysis fields
-        planning_result = {
-            'result': 'success',
-            'plan': ['Task 1', 'Task 2', 'Task 3'],
-            'analysis': 'Detailed analysis of the codebase',
-        }
-
-        json_response = f'```json\n{json.dumps(planning_result)}\n```'
-
-        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
-        message.session_id = 'test-session'
-        message.result = json_response
-        message.is_error = False
-        message.duration_ms = 1000
-        message.duration_api_ms = 800
-        message.num_turns = 1
-        message.total_cost_usd = 0.01
-        message.usage = _create_mock_result_message_usage()
-
-        result = claude_instance._parse_message(message)
-
-        # Verify AgentRun received the data
-        self.assertIsInstance(result, models.AgentRun)
-        self.assertEqual(result.result, models.AgentRunResult.success)
-
-        # Verify extra fields are preserved
-        self.assertIsNotNone(result.model_extra)
-        self.assertIn('plan', result.model_extra)
-        self.assertIn('analysis', result.model_extra)
-        self.assertEqual(
-            result.model_extra['plan'], ['Task 1', 'Task 2', 'Task 3']
-        )
-        self.assertEqual(
-            result.model_extra['analysis'], 'Detailed analysis of the codebase'
-        )
-
-        # Verify conversion to AgentPlan works
-        plan_data = {**result.model_dump(), **(result.model_extra or {})}
-        agent_plan = models.AgentPlan.model_validate(plan_data)
-        self.assertEqual(len(agent_plan.plan), 3)
-        self.assertEqual(
-            agent_plan.analysis, 'Detailed analysis of the codebase'
-        )
-
-    def test_parse_message_result_message_error(self) -> None:
-        """Test _parse_message with error ResultMessage."""
-        with (
-            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
-            mock.patch(
-                'builtins.open',
-                new_callable=mock.mock_open,
-                read_data='Mock system prompt',
-            ),
-        ):
-            claude_instance = claude.Claude(
-                config=self.config, context=self.context
-            )
-
-        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
-        message.subtype = 'error'
-        message.session_id = 'test-session'
-        message.result = 'Error occurred'
-        message.is_error = True
-        message.duration_ms = 1000
-        message.duration_api_ms = 800
-        message.num_turns = 1
-        message.total_cost_usd = 0.01
-        message.usage = _create_mock_result_message_usage()
-
-        result = claude_instance._parse_message(message)
-
-        self.assertIsInstance(result, models.AgentRun)
-        self.assertEqual(result.result, models.AgentRunResult.failure)
-        self.assertEqual(result.message, 'Claude Error')
-        self.assertEqual(result.errors, ['Error occurred'])
-
-    def test_parse_message_result_message_invalid_json(self) -> None:
-        """Test _parse_message with ResultMessage containing invalid JSON."""
-        with (
-            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
-            mock.patch(
-                'builtins.open',
-                new_callable=mock.mock_open,
-                read_data='Mock system prompt',
-            ),
-        ):
-            claude_instance = claude.Claude(
-                config=self.config, context=self.context
-            )
-
-        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
-        message.session_id = 'test-session'
-        message.result = '{"invalid": json syntax'
-        message.is_error = False
-        message.duration_ms = 1000
-        message.duration_api_ms = 800
-        message.num_turns = 1
-        message.total_cost_usd = 0.01
-        message.usage = _create_mock_result_message_usage()
-
-        result = claude_instance._parse_message(message)
-
-        self.assertIsInstance(result, models.AgentRun)
-        self.assertEqual(result.result, models.AgentRunResult.failure)
-        self.assertEqual(result.message, 'Agent Contract Failure')
-        self.assertTrue(
-            any(
-                'Failed to parse JSON result' in error
-                for error in result.errors
-            )
-        )
+    # Note: Removed obsolete _parse_message tests that tested return values.
+    # The _parse_message method was refactored to return None and work via
+    # side effects.
 
     def test_parse_message_assistant_message(self) -> None:
         """Test _parse_message with AssistantMessage."""
@@ -626,10 +375,13 @@ class ClaudeTestCase(base.AsyncTestCase):
         mock_debug.assert_has_calls(
             [
                 mock.call(
-                    '%s %s: %s', 'test-project', 'Test Type', 'First message'
+                    '[%s] %s: %s', 'test-project', 'Test Type', 'First message'
                 ),
                 mock.call(
-                    '%s %s: %s', 'test-project', 'Test Type', 'Second message'
+                    '[%s] %s: %s',
+                    'test-project',
+                    'Test Type',
+                    'Second message',
                 ),
             ]
         )
@@ -653,7 +405,7 @@ class ClaudeTestCase(base.AsyncTestCase):
             claude_instance._log_message('Test Type', 'Simple string message')
 
         mock_debug.assert_called_once_with(
-            '%s %s: %s', 'test-project', 'Test Type', 'Simple string message'
+            '[%s] %s: %s', 'test-project', 'Test Type', 'Simple string message'
         )
 
     def test_log_message_with_unknown_block_type(self) -> None:
@@ -682,77 +434,8 @@ class ClaudeTestCase(base.AsyncTestCase):
         self.assertIn('Unknown message type', str(exc_context.exception))
 
     # Note: execute-related tests moved to tests/actions/test_claude.py
-
-    def test_parse_message_with_session_id_update(self) -> None:
-        """Test _parse_message updates session_id when different."""
-        with (
-            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
-            mock.patch(
-                'builtins.open',
-                new_callable=mock.mock_open,
-                read_data='Mock system prompt',
-            ),
-        ):
-            claude_instance = claude.Claude(
-                config=self.config, context=self.context
-            )
-
-        # Set initial session_id
-        claude_instance.session_id = 'old-session'
-
-        valid_result = {'result': 'success', 'message': 'Session updated'}
-
-        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
-        message.session_id = 'new-session'
-        message.result = json.dumps(valid_result)
-        message.is_error = False
-        message.duration_ms = 1000
-        message.duration_api_ms = 800
-        message.num_turns = 1
-        message.total_cost_usd = 0.01
-        message.usage = _create_mock_result_message_usage()
-
-        result = claude_instance._parse_message(message)
-
-        self.assertIsInstance(result, models.AgentRun)
-        self.assertEqual(claude_instance.session_id, 'new-session')
-
-    def test_parse_message_with_same_session_id(self) -> None:
-        """Test _parse_message doesn't update session_id when same."""
-        with (
-            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
-            mock.patch(
-                'builtins.open',
-                new_callable=mock.mock_open,
-                read_data='Mock system prompt',
-            ),
-        ):
-            claude_instance = claude.Claude(
-                config=self.config, context=self.context
-            )
-
-        # Set initial session_id
-        claude_instance.session_id = 'same-session'
-
-        valid_result = {'result': 'success', 'message': 'Same session'}
-
-        message = mock.MagicMock(spec=claude_agent_sdk.ResultMessage)
-        message.session_id = 'same-session'
-        message.result = json.dumps(valid_result)
-        message.is_error = False
-        message.duration_ms = 1000
-        message.duration_api_ms = 800
-        message.num_turns = 1
-        message.total_cost_usd = 0.01
-        message.usage = _create_mock_result_message_usage()
-
-        result = claude_instance._parse_message(message)
-
-        self.assertIsInstance(result, models.AgentRun)
-        # Session ID should remain unchanged since it's the same
-        self.assertEqual(claude_instance.session_id, 'same-session')
+    # Note: Removed obsolete session_id update tests - _parse_message now
+    # returns None
 
 
 if __name__ == '__main__':

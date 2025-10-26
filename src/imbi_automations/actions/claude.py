@@ -207,11 +207,25 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         else:
             prompt += prompt_file.read_text(encoding='utf-8')
 
-        if (agent == models.ClaudeAgentType.planning and self.last_error) or (
+        if agent == models.ClaudeAgentType.planning and self.last_error:
+            # Planning agent with errors: create a new plan, don't fix directly
+            prompt_file = (
+                pathlib.Path(__file__).parent
+                / 'prompts'
+                / 'planning-with-errors.md.j2'
+            )
+            return prompts.render(
+                self.context,
+                prompt_file,
+                last_error=self.last_error.model_dump_json(indent=2),
+                original_prompt=prompt,
+            )
+        elif (
             agent == models.ClaudeAgentType.task
             and not self.has_planning_prompt
             and self.last_error
         ):
+            # Task agent with errors (no planning): fix directly
             prompt_file = (
                 pathlib.Path(__file__).parent / 'prompts' / 'last-error.md.j2'
             )

@@ -266,7 +266,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 f'mcp__agent_tools__{SUBMIT_TASK_RESPONSE}',
                 f'mcp__agent_tools__{SUBMIT_VALIDATION_RESPONSE}',
             ],
-            cwd=self.context.working_directory,
+            cwd=self.context.working_directory / 'repository',
             mcp_servers={'agent_tools': agent_tools},
             model=self.configuration.claude_code.model,
             settings=str(settings),
