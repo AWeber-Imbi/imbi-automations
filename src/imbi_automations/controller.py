@@ -82,6 +82,7 @@ class Automation(mixins.WorkflowLoggerMixin):
                 config=self.configuration,
                 workflow=self.workflow,
                 verbose=self.args.verbose,
+                registry=self.registry,
             )
         return self._workflow_engine
 
@@ -212,6 +213,7 @@ class Automation(mixins.WorkflowLoggerMixin):
             workflow=self.workflow,
             verbose=self.args.verbose,
             resume_state=state,
+            registry=self.registry,
         )
 
         # Execute with resume

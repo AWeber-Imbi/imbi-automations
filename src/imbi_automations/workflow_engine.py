@@ -10,6 +10,7 @@ import logging
 import pathlib
 import shutil
 import tempfile
+import typing
 
 from imbi_automations import (
     actions,
@@ -38,6 +39,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         workflow: models.Workflow,
         verbose: bool = False,
         resume_state: models.ResumeState | None = None,
+        registry: typing.Any = None,
     ) -> None:
         super().__init__(verbose)
         self.actions = actions.Actions(config, verbose)
@@ -48,6 +50,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         self.configuration = config
         self.github = clients.GitHub.get_instance(config=config.github)
         self.last_error_path: pathlib.Path | None = None
+        self.registry = registry
         self.resume_state = resume_state
         self.tracker = tracker.Tracker.get_instance()
         self.workflow = workflow
@@ -516,6 +519,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             imbi_project=project,
             starting_commit=None,
             working_directory=working_directory,
+            registry=self.registry,
         )
 
     def _restore_workflow_context(
@@ -567,6 +571,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             starting_commit=self.resume_state.starting_commit,
             working_directory=working_directory_path,
             has_repository_changes=self.resume_state.has_repository_changes,
+            registry=self.registry,
         )
 
     def _cleanup_resume_state(self, state: models.ResumeState) -> None:

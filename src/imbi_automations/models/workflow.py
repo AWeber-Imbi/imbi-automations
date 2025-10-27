@@ -351,12 +351,13 @@ class WorkflowGitHubAction(WorkflowAction):
     committable: bool = False
 
 
-class WorkflowImbiCommands(enum.StrEnum):
+class WorkflowImbiActionCommand(enum.StrEnum):
     """Imbi project management system operation commands.
 
     Defines available Imbi operations including project fact management.
     """
 
+    set_environments = 'set_environments'
     set_project_fact = 'set_project_fact'
 
 
@@ -368,26 +369,28 @@ class WorkflowImbiAction(WorkflowAction):
     """
 
     type: typing.Literal['imbi'] = 'imbi'
-    command: WorkflowImbiCommands
+    command: WorkflowImbiActionCommand
 
     # Fields for set_project_fact command
     fact_name: str | None = None
     value: bool | int | float | str | None = None
     skip_validations: bool = False
 
-    @pydantic.model_validator(mode='after')
-    def validate_set_project_fact_fields(self) -> 'WorkflowImbiAction':
-        """Validate required fields for set_project_fact command."""
-        if self.command == WorkflowImbiCommands.set_project_fact:
-            if not self.fact_name:
-                raise ValueError(
-                    'fact_name is required for set_project_fact command'
-                )
-            if self.value is None:
-                raise ValueError(
-                    'value is required for set_project_fact command'
-                )
-        return self
+    # Attributes for set_environments command
+    values: list[str] = []
+
+    required_fields: typing.ClassVar[dict[object, set[str]]] = {
+        WorkflowImbiActionCommand.set_environments: {'values'},
+        WorkflowImbiActionCommand.set_project_fact: {'fact_name', 'value'},
+    }
+    allowed_fields: typing.ClassVar[dict[object, set[str]]] = {
+        WorkflowImbiActionCommand.set_environments: {'values'},
+        WorkflowImbiActionCommand.set_project_fact: {
+            'fact_name',
+            'value',
+            'skip_validations',
+        },
+    }
 
 
 class WorkflowShellAction(WorkflowAction):
@@ -624,9 +627,12 @@ class Workflow(pydantic.BaseModel):
 class WorkflowContext(pydantic.BaseModel):
     """Template context for workflow execution with type safety."""
 
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+
     workflow: Workflow
     github_repository: github.GitHubRepository | None = None
     imbi_project: imbi.ImbiProject
     working_directory: pathlib.Path
     starting_commit: str | None = None
     has_repository_changes: bool = False
+    registry: typing.Any = None  # ImbiMetadataCache (avoid circular import)

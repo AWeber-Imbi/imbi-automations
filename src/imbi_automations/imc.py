@@ -101,6 +101,39 @@ class ImbiMetadataCache:
             project_type.slug for project_type in self.cache_data.project_types
         }
 
+    def translate_environments(self, values: list[str]) -> list[str]:
+        """Translate environment names or slugs to environment names.
+
+        Accepts a list of environment identifiers (names or slugs, mixed
+        allowed) and returns the corresponding environment names required
+        by the Imbi API.
+
+        Args:
+            values: List of environment names or slugs
+
+        Returns:
+            List of environment names for Imbi API
+
+        Raises:
+            ValueError: If any environment not found in cache
+
+        """
+        result = []
+        for value in values:
+            # Try to find environment by slug or name
+            env = next(
+                (
+                    e
+                    for e in self.cache_data.environments
+                    if e.slug == value or e.name == value
+                ),
+                None,
+            )
+            if not env:
+                raise ValueError(f'Environment not found in cache: {value}')
+            result.append(env.name)
+        return result
+
     async def refresh_from_cache(
         self, cache_file: pathlib.Path, config: configuration.ImbiConfiguration
     ) -> None:

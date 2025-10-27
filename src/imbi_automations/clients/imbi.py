@@ -484,6 +484,44 @@ class Imbi(http.BaseURLHTTPClient):
             )
             raise
 
+    async def update_project_environments(
+        self, project_id: int, environments: list[str]
+    ) -> None:
+        """Update environments for a project using JSON Patch.
+
+        Args:
+            project_id: Imbi project ID
+            environments: List of environment names (e.g., ["Testing"])
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        LOGGER.debug(
+            'Updating environments for project %d to %s',
+            project_id,
+            environments,
+        )
+
+        payload = [
+            {'op': 'replace', 'path': '/environments', 'value': environments}
+        ]
+        response = await self.patch(f'/projects/{project_id}', json=payload)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            try:
+                error_body = response.text
+            except (AttributeError, UnicodeDecodeError):
+                error_body = '<unable to read response body>'
+            LOGGER.error(
+                'Failed to update environments for project %d: HTTP %d - %s',
+                project_id,
+                response.status_code,
+                error_body,
+            )
+            raise
+
     async def update_project_github_identifier(
         self, project_id: int, identifier_name: str, value: int | str | None
     ) -> None:

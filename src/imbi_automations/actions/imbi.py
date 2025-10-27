@@ -34,10 +34,80 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
 
         """
         match action.command:
-            case models.WorkflowImbiCommands.set_project_fact:
+            case models.WorkflowImbiActionCommand.set_project_fact:
                 await self._set_project_fact(action)
+            case models.WorkflowImbiActionCommand.set_environments:
+                await self._set_environments(action)
             case _:
                 raise RuntimeError(f'Unsupported command: {action.command}')
+
+    async def _set_environments(
+        self, action: models.WorkflowImbiAction
+    ) -> None:
+        """Set environments via Imbi API.
+
+        Args:
+            action: Action with values list of environment slugs or names
+
+        Raises:
+            ValueError: If values is missing or registry is not available
+            httpx.HTTPError: If API request fails
+
+        """
+        if not action.values:
+            raise ValueError('values is required for set_environments')
+
+        if not self.context.registry:
+            raise ValueError(
+                'ImbiMetadataCache registry not available in context'
+            )
+
+        # Translate environment slugs/names to names
+        try:
+            environment_names = self.context.registry.translate_environments(
+                action.values
+            )
+        except ValueError as exc:
+            self.logger.error(
+                '%s %s failed to translate environments: %s',
+                self.context.imbi_project.slug,
+                action.name,
+                exc,
+            )
+            raise
+
+        client = clients.Imbi.get_instance(config=self.configuration.imbi)
+
+        self.logger.info(
+            '%s %s setting environments to %s for project %d (%s)',
+            self.context.imbi_project.slug,
+            action.name,
+            environment_names,
+            self.context.imbi_project.id,
+            self.context.imbi_project.name,
+        )
+
+        try:
+            await client.update_project_environments(
+                project_id=self.context.imbi_project.id,
+                environments=environment_names,
+            )
+        except httpx.HTTPError as exc:
+            self.logger.error(
+                '%s %s failed to set environments for project %d: %s',
+                self.context.imbi_project.slug,
+                action.name,
+                self.context.imbi_project.id,
+                exc,
+            )
+            raise
+        else:
+            self.logger.debug(
+                '%s %s successfully updated environments for project %d',
+                self.context.imbi_project.slug,
+                action.name,
+                self.context.imbi_project.id,
+            )
 
     async def _set_project_fact(
         self, action: models.WorkflowImbiAction
@@ -57,8 +127,7 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 'fact_name and value are required for set_project_fact'
             )
 
-        imbi_client = clients.Imbi.get_instance(config=self.configuration.imbi)
-        project_id = self.context.imbi_project.id
+        client = clients.Imbi.get_instance(config=self.configuration.imbi)
 
         self.logger.info(
             '%s %s setting fact "%s" to "%s" for project %d (%s)',
@@ -66,23 +135,16 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             action.name,
             action.fact_name,
             action.value,
-            project_id,
+            self.context.imbi_project.id,
             self.context.imbi_project.name,
         )
 
         try:
-            await imbi_client.update_project_fact(
-                project_id=project_id,
+            await client.update_project_fact(
+                project_id=self.context.imbi_project.id,
                 fact_name=action.fact_name,
                 value=action.value,
                 skip_validations=action.skip_validations,
-            )
-            self.logger.debug(
-                '%s %s successfully updated fact "%s" for project %d',
-                self.context.imbi_project.slug,
-                action.name,
-                action.fact_name,
-                project_id,
             )
         except (httpx.HTTPError, ValueError, RuntimeError) as exc:
             self.logger.error(
@@ -90,7 +152,15 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 self.context.imbi_project.slug,
                 action.name,
                 action.fact_name,
-                project_id,
+                self.context.imbi_project.id,
                 exc,
             )
             raise
+        else:
+            self.logger.debug(
+                '%s %s successfully updated fact "%s" for project %d',
+                self.context.imbi_project.slug,
+                action.name,
+                action.fact_name,
+                self.context.imbi_project.id,
+            )
