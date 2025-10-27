@@ -484,6 +484,75 @@ class Imbi(http.BaseURLHTTPClient):
             )
             raise
 
+    async def update_project_environments(
+        self, project_id: int, environments: list[str]
+    ) -> None:
+        """Update environments for a project using JSON Patch.
+
+        Args:
+            project_id: Imbi project ID
+            environments: List of environment names (e.g., ["Testing"])
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        # Get current project data to check existing environments
+        project = await self.get_project(project_id)
+        if not project:
+            raise ValueError(f'Project not found: {project_id}')
+
+        # Extract current environment names
+        current_env_names = (
+            sorted([env.name for env in project.environments])
+            if project.environments
+            else []
+        )
+        new_env_names = sorted(environments)
+
+        # Skip update if environments are unchanged
+        if current_env_names == new_env_names:
+            LOGGER.debug(
+                'Environments unchanged for project %d, skipping update',
+                project_id,
+            )
+            return
+
+        LOGGER.debug(
+            'Updating environments for project %d from %s to %s',
+            project_id,
+            current_env_names,
+            new_env_names,
+        )
+
+        payload = [
+            {'op': 'replace', 'path': '/environments', 'value': environments}
+        ]
+        response = await self.patch(f'/projects/{project_id}', json=payload)
+
+        # HTTP 304 Not Modified is success (no changes needed)
+        if response.status_code == 304:
+            LOGGER.debug(
+                'Environments already set for project %d (HTTP 304)',
+                project_id,
+            )
+            return
+
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            try:
+                error_body = response.text
+            except (AttributeError, UnicodeDecodeError):
+                error_body = '<unable to read response body>'
+            LOGGER.error(
+                'Failed to update environments for project %d: HTTP %d - %s',
+                project_id,
+                response.status_code,
+                error_body,
+            )
+            raise
+
     async def update_project_github_identifier(
         self, project_id: int, identifier_name: str, value: int | str | None
     ) -> None:
