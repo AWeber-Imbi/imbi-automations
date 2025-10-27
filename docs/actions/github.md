@@ -29,23 +29,18 @@ command = "sync_environments"
 **Behavior:**
 
 - Reads environment data from Imbi project (`imbi_project.environments: list[ImbiEnvironment]`)
-- Extracts slugs from `ImbiEnvironment` objects (auto-generated from names)
+- Extracts slugs directly from `ImbiEnvironment` objects (provided by Imbi API)
 - Compares with existing GitHub repository environments
 - Creates missing environments in GitHub
 - Deletes extra environments from GitHub (not in Imbi)
-- Uses slugified names (lowercase, special chars sanitized, normalized hyphens)
 - Operations sorted alphabetically for deterministic behavior
 - Logs all operations (created, deleted, errors)
 - Raises error if sync fails
 
-**Slug Generation:**
-- Environment names are automatically converted to URL-safe slugs
-- Special characters (parentheses, slashes, etc.) are replaced with hyphens
-- Multiple consecutive spaces/hyphens normalized to single hyphens
-- Examples:
-  - "Production" → "production"
-  - "Test  Multiple   Spaces" → "test-multiple-spaces"
-  - "Prod (US/East)" → "prod-us-east"
+**Environment Slugs:**
+- Slugs are provided by the Imbi API (no local transformation)
+- The `ImbiEnvironment` model contains both `name` and `slug` fields
+- Slug format is controlled by Imbi (typically lowercase with hyphens)
 
 ## Common Use Cases
 
@@ -90,8 +85,8 @@ The GitHub action implementation:
 **Type Safety:**
 - Uses `ImbiEnvironment` model objects (not plain strings) for type-safe environment handling
 - Each environment has `name`, `slug`, `icon_class`, and optional `description` fields
-- Slug auto-generation handled by Pydantic validator in the model
-- Imbi client creates `ImbiEnvironment` objects from API environment name strings
+- Slugs provided directly by Imbi API (no local transformation)
+- Imbi client creates `ImbiEnvironment` objects from API response data
 
 **Filter Support:**
 - Workflow filters can target specific environments using `project_environments` field
