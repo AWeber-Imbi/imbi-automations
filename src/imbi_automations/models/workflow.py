@@ -361,7 +361,7 @@ class WorkflowImbiActionCommand(enum.StrEnum):
     set_project_fact = 'set_project_fact'
 
 
-class WorkflowImbiAction(WorkflowAction):
+class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     """Action for Imbi project management system operations.
 
     Executes Imbi API operations including setting project facts and managing
@@ -381,6 +381,8 @@ class WorkflowImbiAction(WorkflowAction):
     # Attributes for set_environments command
     values: list[str] = []
 
+    # CommandRulesMixin configuration
+    command_field: typing.ClassVar[str] = 'command'
     required_fields: typing.ClassVar[dict[object, set[str]]] = {
         WorkflowImbiActionCommand.set_environments: {'values'},
         WorkflowImbiActionCommand.set_project_fact: {'fact_name', 'value'},
