@@ -125,7 +125,7 @@ String arguments support Jinja2 templating with full workflow context:
 
 ## Async/Sync Detection
 
-The action automatically detects whether the callable is synchronous or asynchronous:
+The action automatically detects whether the callable is synchronous or asynchronous using `asyncio.iscoroutinefunction()` and executes accordingly to maintain async safety.
 
 **Async callables:**
 ```python
@@ -140,14 +140,14 @@ name = "call-async"
 type = "callable"
 callable = "my_module:my_async_function"
 args = [42, "hello"]
-# Automatically awaited
+# Automatically awaited with: await action.callable(*args, **kwargs)
 ```
 
 **Sync callables:**
 ```python
 def my_sync_function(arg1: int, arg2: str) -> None:
-    # ... sync work
-    pass
+    # ... sync work (may be blocking)
+    time.sleep(1)
 ```
 
 ```toml
@@ -156,10 +156,19 @@ name = "call-sync"
 type = "callable"
 callable = "my_module:my_sync_function"
 args = [42, "hello"]
-# Executed directly (not awaited)
+# Executed in thread pool: await asyncio.to_thread(callable, *args, **kwargs)
 ```
 
-**Detection method:** Uses `asyncio.iscoroutinefunction()` to detect async callables.
+**Detection and Execution:**
+- **Detection Method:** Uses `asyncio.iscoroutinefunction()` to detect async callables
+- **Async Execution:** Coroutines are directly awaited: `await callable(*args, **kwargs)`
+- **Sync Execution:** Regular functions run in thread pool via `asyncio.to_thread()` to prevent blocking the event loop
+- **Thread Pool Benefit:** Sync callables can perform blocking I/O without freezing async workflows
+
+**Recent Fix (commit dc48d25):**
+- Sync callables now properly use `asyncio.to_thread()` instead of direct execution
+- Prevents blocking the event loop when sync callables perform blocking operations
+- Maintains async safety across all callable types
 
 ## Examples
 
@@ -440,10 +449,12 @@ destination = "repository:///config/generated.yaml"
 
 ## Performance Considerations
 
-- **Import Time**: First call imports the module (cached thereafter)
+- **Import Time**: First call imports the module (cached by Python thereafter)
 - **Execution Time**: Depends on callable implementation
-- **Async Overhead**: Minimal for properly async callables
-- **Template Rendering**: Only performed for string arguments with template syntax
+- **Async Overhead**: Minimal for properly async callables (directly awaited)
+- **Sync Thread Pool Overhead**: Minor context switch cost for sync callables via `asyncio.to_thread()`
+- **Template Rendering**: Only performed for string arguments with template syntax (detected via regex)
+- **ResourceUrl Resolution**: Path resolution performed for each ResourceUrl argument (cached by `pathlib.Path`)
 
 ## Security Considerations
 
@@ -472,13 +483,16 @@ destination = "repository:///config/generated.yaml"
 
 ## Implementation Details
 
-- **Module:** `src/imbi_automations/actions/callablea.py`
-- **Model:** `src/imbi_automations/models/workflow.py:132-143`
-- **Tests:** `tests/actions/test_callable.py` (23 tests, full coverage)
-- **Import Format:** Uses Pydantic's `ImportString` validator
-- **Async Detection:** Uses `asyncio.iscoroutinefunction()`
-- **Template Rendering:** Uses `prompts.render()` with Jinja2
-- **Error Wrapping:** All exceptions wrapped in `RuntimeError` with original as `__cause__`
+- **Module:** `src/imbi_automations/actions/callablea.py` (656 lines of implementation + tests)
+- **Model:** `src/imbi_automations/models/workflow.py:WorkflowCallableAction`
+- **Tests:** `tests/actions/test_callable.py` (30 comprehensive test cases, full coverage)
+- **Import Format:** Uses Pydantic's `ImportString` validator for safe dynamic imports
+- **Async Detection:** Uses `asyncio.iscoroutinefunction()` to detect coroutines
+- **Sync Execution:** Uses `asyncio.to_thread(callable, *args, **kwargs)` for thread pool execution
+- **Template Rendering:** Uses `prompts.render()` with Jinja2, only for strings with `{{`, `{%`, or `{#`
+- **Template Detection:** Uses `prompts.has_template_syntax()` regex check
+- **ResourceUrl Resolution:** Uses `utils.resolve_path()` for path scheme handling
+- **Error Wrapping:** All exceptions wrapped in `RuntimeError` with original as `__cause__` for exception chaining
 
 ## Migration from Shell Actions
 

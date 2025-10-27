@@ -87,8 +87,8 @@ pre-commit run --all-files
 - **Validators** (`models/validators.py`): Pydantic field validators
 
 #### Actions Layer (under `actions/`)
-- **Callable Actions** (`actions/callablea.py`): Direct Python function/method invocation with async support, template rendering, and dynamic args/kwargs
-- **Claude Actions** (`actions/claude.py`): AI-powered transformations using Claude Code SDK
+- **Callable Actions** (`actions/callablea.py`): Direct Python function/method invocation with intelligent async/sync detection, Jinja2 template rendering, ResourceUrl path resolution, and dynamic args/kwargs (uses `asyncio.to_thread()` for sync callables to prevent event loop blocking)
+- **Claude Actions** (`actions/claude.py`): AI-powered transformations using Claude Code SDK with optional planning phase, multi-cycle validation, and intelligent error recovery
 - **Docker Actions** (`actions/docker.py`): Docker container operations and file extractions
 - **File Actions** (`actions/filea.py`): File manipulation (copy with glob support, move, delete, regex replacement)
 - **Git Actions** (`actions/git.py`): Git operations (revert, extract, branch management)
@@ -152,7 +152,7 @@ The `cache_dir` setting can also be overridden via the `--cache-dir` CLI option.
 
 The system supports multiple transformation types through the workflow action system:
 
-1. **Callable Actions** (`actions/callablea.py`): Direct Python function/method invocation with async support, template rendering, and dynamic args/kwargs
+1. **Callable Actions** (`actions/callablea.py`): Direct Python function/method invocation with intelligent async/sync detection (`asyncio.iscoroutinefunction()`), Jinja2 template rendering for string arguments, ResourceUrl path resolution, and flexible args/kwargs handling (sync callables executed via `asyncio.to_thread()` for async safety)
 2. **Claude Actions** (`actions/claude.py`): Complex multi-file analysis and transformation using Claude Code SDK
 3. **Docker Actions** (`actions/docker.py`): Container-based file extraction and manipulation
 4. **File Actions** (`actions/filea.py`): Direct file manipulation (copy with glob patterns, move, delete, regex replacement)
@@ -390,9 +390,10 @@ exclude_github_workflow_status = ["success"]
 When workflows fail with `--preserve-on-error` enabled, the system creates a `.state` file in the error directory containing all context needed to resume execution from the point of failure.
 
 **State File Format:**
-- **Format**: MessagePack binary serialization (`.state` file)
-- **Purpose**: Discourage manual editing while remaining debuggable with tools
+- **Format**: MessagePack binary serialization (`.state` file) using `msgpack.packb(use_bin_type=True)`
+- **Purpose**: Discourage manual editing while remaining debuggable with tools like `msgpack-tools`
 - **Location**: `<error-dir>/<workflow>/<project>-<timestamp>/.state`
+- **Model**: `ResumeState` Pydantic model serialized to JSON-compatible dict then packed to binary
 
 **Resume Usage:**
 ```bash
@@ -403,32 +404,51 @@ imbi-automations config.toml workflows/my-workflow --project-id 123 --preserve-o
 imbi-automations config.toml workflows/my-workflow --resume ./errors/my-workflow/test-project-20251023-150000
 ```
 
-**Resume State Contents:**
+**Resume State Contents** (`models/resume_state.py`):
 - Workflow identification (slug, path)
 - Project information (ID, slug)
-- Execution state (failed action index, completed action indices)
+- Execution state (failed action index, failed action name, completed action indices list)
 - WorkflowContext restoration data (starting commit, repository changes flag, GitHub repository model)
 - Error details (message, timestamp)
-- Configuration hash (to detect config changes between runs)
+- Preserved directory path (absolute path to working directory copy)
+- Configuration hash (SHA256 first 16 chars to detect config changes between runs)
 
 **Resume Behavior:**
-- **Reuses preserved directory**: Maintains exact state including temporary files/artifacts
-- **Retries failed action**: Starts from the action that failed, not the next one
+- **Reuses preserved directory**: Exact copy of working directory with `shutil.copytree()` including symlinks
+- **Retries failed action**: Starts from the action that failed (`failed_action_index`), not the next one
 - **Skips condition checks**: Remote and local conditions already validated in original run
-- **Skips git clone**: Repository already cloned in preserved state
-- **Configuration change detection**: Warns if configuration hash differs from original run
-- **Automatic cleanup**: Successfully resumed states are cleaned up after completion
+- **Skips git clone**: Repository already cloned in preserved state (only skips if resuming)
+- **Configuration change detection**: Compares configuration hash, warns if differs (doesn't fail - allows recovery attempts)
+- **Automatic cleanup**: Successfully resumed states cleaned up via `shutil.rmtree()` after completion
+- **Action index tracking**: Completed indices tracked **per execution attempt** to avoid accumulation across retries
+
+**Recent Critical Fixes (October 2025):**
+1. **Git Commit Failure Handling** (commit 802fab7):
+   - Moved git commit operation inside exception handler
+   - Now preserves state when pre-commit hooks fail (e.g., ruff-format errors)
+   - Previously only caught action execution failures, not subsequent commit failures
+
+2. **Action Index Accumulation Bug** (commit 9bbf6a7):
+   - Fixed `completed_action_indices` to track only actions from current execution
+   - Previously accumulated indices from all previous resume attempts
+   - Now correctly calculates: `range(resume_state.failed_action_index, current_idx)` for resumed runs
+
+3. **State Preservation Order**:
+   - Proper exception handling order: log error → preserve state → cleanup → raise
+   - Ensures state always saved before cleanup/exit
 
 **Benefits:**
 - **Debug failed workflows**: Preserved state includes full working directory for investigation
 - **Retry after external fixes**: Address network issues, API limits, or dependencies and retry
 - **No re-execution of successful actions**: Only retries from point of failure
 - **Per-project debug logs**: When using `--preserve-on-error`, debug logs written to `debug.log` in error directory
+- **Multi-retry support**: Can resume multiple times until workflow succeeds or issue resolved
 
 **Limitations:**
 - Resume must be from same machine (absolute paths in preserved state)
 - Resume is single-project only (no `--all-projects` with `--resume`)
-- Configuration changes between runs may cause unexpected behavior (warning issued)
+- Configuration changes between runs may cause unexpected behavior (warning issued but execution continues)
+- Working directory symlinks preserved via `symlinks=True` parameter (workflow directory reference)
 
 ## Code Style and Standards
 
@@ -507,7 +527,7 @@ Claude actions support an optional planning phase using a dedicated planning age
 name = "update-python-version"
 type = "claude"
 planning_prompt = "prompts/planning.md.j2"  # Optional - enables planning phase
-task_prompt = "prompts/task.md.j2"          # Required - task instructions
+task_prompt = "prompts/task.md.j2"          # Required - task instructions (renamed from 'prompt')
 validation_prompt = "prompts/validate.md.j2"  # Optional - validation instructions
 max_cycles = 3
 ```
@@ -515,29 +535,34 @@ max_cycles = 3
 **Execution Flow (per cycle):**
 1. **Planning Phase** (if `planning_prompt` is set):
    - Planning agent analyzes codebase using Read, Glob, Grep, Bash tools (read-only)
-   - Creates structured todo list with specific, actionable tasks
+   - Creates structured todo list with specific, actionable task strings (not objects)
    - Provides analysis/observations about codebase structure and dependencies
-   - Returns JSON with `result`, `plan` (array of tasks), and `analysis` (context)
+   - Returns via `mcp__agent_tools__submit_planning_response(plan=[...], analysis="...")`
+   - Returns `ClaudeAgentPlanningResult` with `plan: list[str]` and `analysis: str`
 
 2. **Task Phase**:
-   - Task agent receives the plan injected into the task prompt
-   - Executes changes following the structured plan
+   - Task agent receives plan injected into task prompt via `with-plan.md.j2` template
+   - Executes changes following the structured, numbered plan
    - Has full context from planning agent's analysis
+   - Claude SDK runs in `working_directory/repository/` (can access `../workflow/` and `../extracted/`)
+   - Returns via `mcp__agent_tools__submit_task_response(message="...")`
 
 3. **Validation Phase** (if `validation_prompt` is set):
-   - Validator agent checks the task agent's work
-   - Returns success/failure with error details
+   - Validator agent checks the task agent's work (read-only)
+   - Returns via `mcp__agent_tools__submit_validation_response(validated=bool, errors=list)`
+   - Returns `ClaudeAgentValidationResult` with `validated: bool` and `errors: list[str]`
 
 **Key Behaviors:**
-- **Plan Reset**: Task plan is cleared and regenerated at the start of each cycle
-- **Fresh Planning**: Each cycle gets a new plan based on current repository state
-- **Failure Handling**: Planning failures abort the cycle immediately
-- **Plan Injection**: Plan is injected into task prompt similar to validation error injection
+- **Plan Reset**: Task plan cleared (`self.task_plan = None`) and regenerated at the start of each cycle
+- **Fresh Planning**: Each cycle gets a new plan based on current repository state (adapts to changes)
+- **Failure Handling**: Planning failures abort the cycle immediately (no task execution)
+- **Plan Injection**: Plan injected into task prompt via `with-plan.md.j2` template (similar to error injection)
+- **Error Recovery**: Planning agent gets `planning-with-errors.md.j2` template instructing it to create NEW PLAN (not fix errors directly)
+- **Cycle Warning**: Logs warning at 60% of max cycles (e.g., cycle 3 of 5) to indicate approaching limit
 
 **Planning Agent Response Schema:**
 ```json
 {
-  "result": "success",
   "plan": [
     "First specific task to complete",
     "Second specific task to complete"
@@ -546,11 +571,43 @@ max_cycles = 3
 }
 ```
 
+**Recent Critical Fixes (October 2025):**
+1. **Planning Agent Error Handling** (commit 561909f - CRITICAL):
+   - Created `planning-with-errors.md.j2` template that explicitly instructs: "Create a NEW PLAN, do NOT fix errors yourself"
+   - Planning agent was previously trying to fix errors directly instead of re-planning
+   - Now properly re-analyzes and creates new task list each cycle when validation fails
+
+2. **Claude SDK Working Directory** (commit 561909f - CRITICAL):
+   - Changed SDK CWD from `working_directory` to `working_directory/repository`
+   - Claude Code now operates directly in repository where modifications occur
+   - Workflow and extracted directories accessible via `../workflow/` and `../extracted/`
+
+3. **preserve_on_error Bug Fix** (commit 561909f):
+   - Fixed unreachable code where `raise exc` was before preservation logic
+   - Proper order now: log error → preserve if enabled → cleanup → raise
+   - Error states now properly preserved for debugging
+
+**Error Categorization:**
+The `_categorize_failure()` method provides diagnostics when all cycles fail:
+- `dependency_unavailable`: Package/dependency not found errors
+- `constraint_conflict`: Version conflicts, incompatible requirements
+- `prohibited_action`: Workflow constraints preventing action
+- `test_failure`: Test failures, assertion errors
+- `unknown`: No keywords matched
+
 **Benefits:**
 - **Better Context**: Planning agent explores codebase before task agent makes changes
-- **Structured Execution**: Task agent follows clear, ordered steps
+- **Structured Execution**: Task agent follows clear, ordered steps from numbered plan
 - **Adaptability**: New plan created each cycle adapts to repository changes
-- **Separation of Concerns**: Read-only analysis separate from write operations
+- **Separation of Concerns**: Read-only analysis (planning) separate from write operations (task)
+- **Error Recovery**: Planning agent creates new strategies when validation fails
+- **Intelligent Retries**: Each cycle benefits from previous cycle's learnings via error injection
+
+**Agent Locations:**
+- Planning: `claude-code/agents/planning.md.j2`
+- Task: `claude-code/agents/task.md.j2`
+- Validation: `claude-code/agents/validation.md.j2`
+- Prompt templates: `actions/prompts/{with-plan,planning-with-errors,last-error}.md.j2`
 
 ## Available Workflows
 

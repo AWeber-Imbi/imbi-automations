@@ -31,6 +31,7 @@ Preserves the complete working directory when a workflow fails, including:
 - Workflow resource files
 - Extracted Docker files
 - All intermediate files
+- `.state` file (MessagePack format) for resuming execution
 
 **Usage:**
 ```bash
@@ -47,6 +48,7 @@ imbi-automations config.toml workflows/my-workflow \
 - Examining repository state at time of failure
 - Debugging file operations
 - Analyzing Claude action failures
+- Need to resume workflow from failure point (see `--resume` below)
 
 ### --error-dir
 
@@ -71,6 +73,7 @@ errors/
         ├── workflow/            # Workflow resources
         ├── extracted/           # Docker extracted files (if any)
         ├── debug.log            # Complete DEBUG level logs
+        ├── .state               # Resume state file (MessagePack binary)
         └── other temporary files
 ```
 
@@ -166,6 +169,50 @@ imbi-automations config.toml workflows/my-workflow \
 - CI/CD environments
 - When failures are critical
 - Debugging specific project issues
+
+### --resume
+
+Resume workflow execution from a previously preserved error state.
+
+**Usage:**
+```bash
+# First run that fails with --preserve-on-error
+imbi-automations config.toml workflows/my-workflow \
+  --project-id 123 \
+  --preserve-on-error
+
+# Resume from the preserved error directory
+imbi-automations config.toml workflows/my-workflow \
+  --resume ./errors/my-workflow/project-slug-20251026-150000
+```
+
+**Default:** Not set (normal execution)
+
+**Requirements:**
+- Error directory must contain `.state` file
+- Original workflow must have used `--preserve-on-error`
+- Must run from same machine (absolute paths in state)
+
+**Behavior:**
+- Reuses exact preserved working directory (repository, workflow, extracted files)
+- Retries from the **failed action** (not the next action)
+- Skips remote/local conditions (already validated)
+- Skips git clone (repository already present)
+- Warns if configuration changed since original run
+- Cleans up preserved state after successful completion
+
+**When to Use:**
+- Workflow failed due to transient issues (network, API limits)
+- Need to investigate failure before retrying
+- Manual fixes required before retry (e.g., fix pre-commit hooks)
+- Multi-retry debugging of same failure
+
+**Limitations:**
+- Single-project only (no `--all-projects` with `--resume`)
+- Requires same machine (absolute paths)
+- Configuration changes between runs may cause issues (warning shown)
+
+**See Also:** [Workflow Resumability](../AGENTS.md#workflow-resumability) in AGENTS.md for implementation details
 
 ## debug.log File
 
@@ -264,6 +311,23 @@ Files extracted from Docker containers by docker actions:
 ### debug.log
 
 Complete DEBUG level logs (see above section).
+
+### .state (if present)
+
+MessagePack binary file containing resume state:
+- Workflow and project identification
+- Failed action index and name
+- Completed action indices
+- WorkflowContext restoration data
+- Configuration hash for compatibility checking
+- Error details (message, timestamp)
+
+**Use Cases:**
+- Resume workflow from failure point using `--resume`
+- Inspect state with msgpack-tools: `msgpack-python -d < .state`
+- Verify configuration compatibility before retry
+
+**Note:** `.state` file only created when using `--preserve-on-error`
 
 ### Other Files
 
@@ -462,6 +526,61 @@ Any temporary files created during workflow execution:
    ```bash
    ls -ltr errors/my-workflow/
    ```
+
+### Resuming Failed Workflows
+
+**Scenario:** Workflow failed and you want to retry from the point of failure without re-running successful actions.
+
+**Steps:**
+1. Run workflow with error preservation:
+   ```bash
+   imbi-automations config.toml workflows/my-workflow \
+     --project-id 123 \
+     --preserve-on-error \
+     --debug
+   ```
+
+2. Workflow fails and creates preserved state:
+   ```
+   errors/my-workflow/project-slug-20251026-150000/
+   ├── repository/
+   ├── workflow/
+   ├── .state
+   └── debug.log
+   ```
+
+3. Examine the failure:
+   ```bash
+   cd errors/my-workflow/project-slug-20251026-150000
+   cat debug.log | grep ERROR
+   cd repository && git status
+   ```
+
+4. Fix any external issues (if needed):
+   - Network problems resolved
+   - API rate limits lifted
+   - Pre-commit hooks fixed
+   - Manual file edits if necessary
+
+5. Resume from the preserved state:
+   ```bash
+   imbi-automations config.toml workflows/my-workflow \
+     --resume ./errors/my-workflow/project-slug-20251026-150000
+   ```
+
+6. On success, preserved directory automatically cleaned up
+
+**Benefits:**
+- Skips successful actions (no re-execution)
+- Reuses exact repository state at failure
+- No need to re-clone or re-run conditions
+- Can retry multiple times from same state
+
+**Common Resume Scenarios:**
+- **Transient Network Failure:** API call failed, network restored, retry
+- **Pre-commit Hook Failure:** Fixed ruff/linting issues, retry commit
+- **API Rate Limit:** Waited for rate limit reset, retry
+- **Manual Investigation:** Made manual fixes to repository, retry workflow
 
 ## Configuration File Debugging
 
