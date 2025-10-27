@@ -129,24 +129,17 @@ hostname = "imbi.example.com"
 executable = "claude"  # Optional, defaults to 'claude'
 
 [git]
-# Optional: Configure commit signing for Claude Code actions
-# When enabled, git commits made by Claude Code will be signed
-gpg_sign = true                    # Enable commit signing (default: false)
-gpg_format = "ssh"                 # Format: 'gpg', 'ssh', 'x509', 'openpgp' (required for SSH signing)
-signing_key = "ssh-ed25519 AAAA..."  # Your SSH public key or GPG key ID
-ssh_program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"  # SSH signing program (for SSH format)
-# gpg_program = "gpg"              # GPG program path (for GPG format)
+# Optional: Git commit signing (SSH or GPG formats supported)
+gpg_sign = true
+gpg_format = "ssh"  # or "gpg"
+signing_key = "ssh-ed25519 AAAA..."
+ssh_program = "/path/to/op-ssh-sign"  # Optional for SSH signing
 
-# Optional: Override cache directory (default: ~/.cache/imbi-automations)
+# Optional: Cache directory (default: ~/.cache/imbi-automations)
 cache_dir = "/custom/path/to/cache"
 ```
 
-The `cache_dir` setting can also be overridden via the `--cache-dir` CLI option.
-
-**Git Signing Configuration:**
-- **SSH Signing** (1Password, ssh-agent): Set `gpg_sign=true`, `gpg_format="ssh"`, provide your SSH public key in `signing_key`, and optionally specify `ssh_program` for custom signing programs like 1Password's op-ssh-sign.
-- **GPG Signing**: Set `gpg_sign=true`, `gpg_format="gpg"` (or omit, as GPG is the default), provide your GPG key ID in `signing_key`, and optionally specify `gpg_program` path.
-- **Note**: Git signing configuration only applies to commits made by Claude Code actions. Manual git operations and commits made through other actions use the standard git configuration.
+**Note**: Git signing only applies to Claude Code actions. Override cache via `--cache-dir` CLI option.
 
 ### Transformation Architecture
 
@@ -257,86 +250,19 @@ Evaluated before cloning using GitHub API, providing performance benefits:
 - **`remote_file_not_exists`**: Check if a file does not exist (supports exact paths or glob patterns)
 - **`remote_file_contains`**: Check if a remote file contains specified text or regex pattern
 
-#### File Contains Conditions (Local and Remote)
-
-Both `file_contains` and `remote_file_contains` support string literals and regular expressions:
-
+**Example:**
 ```toml
-# Local conditions (require git clone)
 [[conditions]]
-file_exists = "package.json"
-
-[[conditions]]
-file_exists = "**/*.tf"  # Glob pattern - any .tf file recursively
-
-[[conditions]]
-file_not_exists = "*.pyc"  # Glob pattern - no .pyc files
-
-[[conditions]]
-file_contains = "compose.yml"
-file = "bootstrap"
-
-# Remote conditions (checked before cloning - more efficient)
-[[conditions]]
-remote_file_exists = "README.md"
-
-[[conditions]]
-remote_file_exists = "**/*.tf"  # Glob pattern - any .tf file recursively
-
-[[conditions]]
-remote_file_not_exists = "legacy-config.json"
-
-[[conditions]]
-remote_file_contains = "node.*18"
-remote_file = ".nvmrc"
-
-# Mixed local and remote conditions
-[[conditions]]
-remote_file_exists = "package.json"  # Check remotely first
-
-[[conditions]]
-file_contains = "test.*script"       # Then check locally after clone
-file = "package.json"
-```
-
-#### Advanced Pattern Examples
-
-```toml
-# Version checking with regex
-[[conditions]]
-remote_file_contains = "\"version\":\\s*\"\\d+\\.\\d+\\.\\d+\""
-remote_file = "package.json"
-
-# Docker base image checking
-[[conditions]]
-remote_file_contains = "FROM python:[3-4]\\.[0-9]+"
+remote_file_exists = "**/*.tf"           # Glob: any .tf file
+remote_file_contains = "python:[3-4]"    # Regex supported
 remote_file = "Dockerfile"
 
-# GitHub Actions workflow detection
 [[conditions]]
-remote_file_exists = ".github/workflows/ci.yml"
-
-# Legacy file cleanup detection
-[[conditions]]
-remote_file_not_exists = ".travis.yml"  # No Travis CI
-[[conditions]]
-remote_file_exists = ".github/workflows"  # Has GitHub Actions
+file_contains = "compose.yml"            # Local check after clone
+file = "bootstrap"
 ```
 
-#### Performance Benefits
-
-**Remote Conditions:**
-- ⚡ **Faster**: GitHub API calls are faster than git clone
-- 💾 **Bandwidth efficient**: Skip clone entirely for non-matching repos
-- 🔄 **Early filtering**: Fail fast before expensive operations
-- 🌐 **Glob support**: `remote_file_exists` and `remote_file_not_exists` support glob patterns via Git Trees API
-
-**Best Practices:**
-- Use remote conditions for initial filtering (file existence, basic content checks)
-- Use local conditions for complex file analysis requiring full repository access
-- Remote glob patterns (`**/*.tf`) use Git Trees API (100k file limit)
-- String search is performed first (fast), with regex fallback only when string search fails
-- Invalid regex patterns gracefully fall back to string search behavior
+**Performance:** Remote conditions use GitHub API (faster than clone). Use remote for filtering, local for complex analysis. Glob patterns supported via Git Trees API (100k file limit).
 
 ### Workflow Filtering
 
@@ -363,27 +289,7 @@ requires_github_identifier = true
 exclude_github_workflow_status = ["success"]
 ```
 
-**Performance Benefits:**
-- **Pre-filtering**: Projects are filtered before processing, not during each iteration
-- **Batch efficiency**: "Found 664 total projects" → "Processing 50 filtered projects"
-- **Multiple criteria**: All filter criteria must match (AND logic)
-- **Early Validation**: Filter fields validated at parse time using Registry cache (catches typos before processing)
-
-**Common Use Cases:**
-```toml
-# Target only Python 3.12 projects
-[filter]
-project_facts = {"Programming Language" = "Python 3.12"}
-
-# Target APIs and consumers with GitHub repos
-[filter]
-project_types = ["apis", "consumers"]
-requires_github_identifier = true
-
-# Only process projects with failing builds (exclude working ones)
-[filter]
-exclude_github_workflow_status = ["success"]
-```
+**Performance:** Pre-filtering before execution. All criteria use AND logic. Fields validated at parse time using Registry cache.
 
 ### Workflow Resumability
 
@@ -437,18 +343,9 @@ imbi-automations config.toml workflows/my-workflow --resume ./errors/my-workflow
    - Proper exception handling order: log error → preserve state → cleanup → raise
    - Ensures state always saved before cleanup/exit
 
-**Benefits:**
-- **Debug failed workflows**: Preserved state includes full working directory for investigation
-- **Retry after external fixes**: Address network issues, API limits, or dependencies and retry
-- **No re-execution of successful actions**: Only retries from point of failure
-- **Per-project debug logs**: When using `--preserve-on-error`, debug logs written to `debug.log` in error directory
-- **Multi-retry support**: Can resume multiple times until workflow succeeds or issue resolved
+**Benefits:** Debug failed workflows, retry after external fixes, no re-execution of successful actions, per-project debug logs in error directory.
 
-**Limitations:**
-- Resume must be from same machine (absolute paths in preserved state)
-- Resume is single-project only (no `--all-projects` with `--resume`)
-- Configuration changes between runs may cause unexpected behavior (warning issued but execution continues)
-- Working directory symlinks preserved via `symlinks=True` parameter (workflow directory reference)
+**Limitations:** Same machine only (absolute paths), single-project only, config changes cause warnings.
 
 ## Code Style and Standards
 
@@ -595,49 +492,7 @@ The `_categorize_failure()` method provides diagnostics when all cycles fail:
 - `test_failure`: Test failures, assertion errors
 - `unknown`: No keywords matched
 
-**Benefits:**
-- **Better Context**: Planning agent explores codebase before task agent makes changes
-- **Structured Execution**: Task agent follows clear, ordered steps from numbered plan
-- **Adaptability**: New plan created each cycle adapts to repository changes
-- **Separation of Concerns**: Read-only analysis (planning) separate from write operations (task)
-- **Error Recovery**: Planning agent creates new strategies when validation fails
-- **Intelligent Retries**: Each cycle benefits from previous cycle's learnings via error injection
-
-**Agent Locations:**
-- Planning: `claude-code/agents/planning.md.j2`
-- Task: `claude-code/agents/task.md.j2`
-- Validation: `claude-code/agents/validation.md.j2`
-- Prompt templates: `actions/prompts/{with-plan,planning-with-errors,last-error}.md.j2`
-
-## Available Workflows
-
-The system includes 20 pre-built workflows organized by category:
-
-### Infrastructure and Tooling (9 workflows)
-- **docker-image-update**: Update base images and container configurations
-- **docker-healthchecker**: Add health check configurations to Docker containers
-- **dockerfile-wheel-fix**: Fix wheel installation patterns in Dockerfiles
-- **python39-project-fix**: Update Python 3.9 specific configurations
-- **compose-fix**: Fix Docker Compose configuration issues
-- **compose-volume-fix**: Fix Docker Compose volume mount issues
-- **infrastructure-services**: Infrastructure service configuration updates
-- **frontend-actions**: Frontend build and deployment action updates
-- **terraform-ci**: Terraform CI/CD pipeline configurations
-
-### Code Quality and Standards (4 workflows)
-- **enforce-ci-pipelines**: Ensure CI pipeline configurations are present
-- **fix-workflow**: Fix broken GitHub Actions workflows
-- **failing-sonarqube**: Fix failing SonarQube quality gates
-- **remove-extra-ci-files**: Clean up redundant CI configuration files
-
-### Project Maintenance (7 workflows)
-- **backend-gitignore**: Apply standard backend .gitignore templates
-- **frontend-gitignore**: Apply standard frontend .gitignore templates
-- **restore-gitignore**: Restore .gitignore files from templates
-- **ensure-github-teams**: Synchronize GitHub team access with Imbi
-- **sync-project-environments**: Synchronize GitHub environments with Imbi
-- **validate-github-identifier**: Validate GitHub identifier consistency
-- **github-actions-status**: Check and report GitHub Actions workflow status
+**Agent Files:** `claude-code/agents/{planning,task,validation}.md.j2`, `actions/prompts/{with-plan,planning-with-errors,last-error}.md.j2`
 
 ## Current Implementation Status
 
@@ -654,26 +509,8 @@ The system includes 20 pre-built workflows organized by category:
 - **Error Handling**: Robust error recovery with action restart capabilities and per-project logging
 - **Testing Infrastructure**: Comprehensive test suite (255 tests) with async support and HTTP mocking
 
-### Recent Architecture Improvements (2025)
-- **GitLab Removal**: Removed GitLab client, models, and CLI arguments (GitHub-only integration)
-- **Registry System**: New singleton `Registry` class for Imbi metadata caching with 15-minute TTL
-- **Filter Validation**: Parse-time validation of project_types and project_facts against Registry
-- **Imbi Actions**: Implemented set_project_fact command with enum/range/free-form validation
-- **Shell Action Fix**: Changed to subprocess_shell for proper glob pattern expansion
-- **Controller Refactoring**: Replaced `AutomationEngine` with modern `Automation` controller
-- **Modular Structure**: Organized codebase into logical modules (`clients/`, `models/`, `actions/`)
-- **Async Optimization**: Full async/await implementation with concurrency controls
-- **Memory Optimization**: LRU caching for expensive operations
-- **Type Safety**: Comprehensive type hints and Pydantic models throughout
-- **External Scheme**: Added `external:///` ResourceUrl scheme for writing files outside working directory
-- **Repository Change Tracking**: Workflow engine tracks repository changes, skips push/PR when no changes made
-
 ### Future Enhancement Areas
-- **Transaction Rollback**: Atomic workflow operations with rollback capabilities
-- **Workflow Templates**: Reusable workflow components and templates
-- **Advanced Filtering**: More sophisticated project filtering and targeting
-- **Monitoring Integration**: Enhanced logging and metrics collection
-- **Plugin System**: Extensible action types and client providers
+- Transaction rollback, workflow templates, advanced filtering, monitoring integration, plugin system
 
 ## Key Implementation Details
 
@@ -731,58 +568,17 @@ The GitHub Actions module syncs repository environments with Imbi project defini
 - Uses slugified names for consistent matching (lowercase, hyphenated)
 
 **Environment Slug Generation** (`models/imbi.py:ImbiEnvironment._set_slug`):
-- Auto-generates slug from name if not provided by API
-- Converts to lowercase and sanitizes special characters
-- Normalizes consecutive spaces/hyphens to single hyphens
-- Strips leading/trailing hyphens
-- Examples:
-  - "Production" → "production"
-  - "Test  Multiple   Spaces" → "test-multiple-spaces"
-  - "Prod (US/East)" → "prod-us-east"
+- Auto-generates slug from name: lowercase, sanitize special chars, normalize spaces/hyphens
+- Example: "Prod (US/East)" → "prod-us-east"
 
 **Filter Support** (`workflow_filter.py:_filter_environments`):
-- Filters projects by environment using both name and slug matching
-- Supports configuration with either "Production" or "production"
-- Checks if filter value matches any environment's name OR slug
-- All filter environments must be present in project (AND logic)
+- Filters by environment using name OR slug matching (AND logic for multiple filters)
 
-### Shell Actions
-Shell actions use `subprocess_shell` instead of `subprocess_exec` to enable:
-- **Glob pattern expansion**: `.github/workflows/*.yml` expands to actual files
-- **Environment variable expansion**: `$HOME`, `$PATH`, etc.
-- **Command chaining**: Pipes, redirects, and shell operators
-- **Template support**: Jinja2 templating with workflow context
+### Shell Actions and Git Operations
+- **Shell Actions**: Use `subprocess_shell` for glob expansion, env vars, pipes, Jinja2 templates
+- **Git Operations**: `git add --all`, depth/branch cloning (SSH/HTTPS), AI-powered/manual commits via Committer
 
-### Git Operations
-- **add_files()**: Uses `git add --all` (no file list parameter)
-- **Cloning**: Supports depth, branch, and SSH/HTTPS clone types
-- **Commits**: Handled by Committer class (AI-powered or manual)
-- **Branch Management**: Create, checkout, delete remote branches
-
-## Recent Refactoring Summary (October 2025)
-
-**Major Changes**:
-- **GitLab Removal**: Removed all GitLab support (client, models, CLI args) - GitHub-only
-- **IMC Pattern**: Introduced ImbiMetadataCache class with explicit async initialization for metadata caching
-- **Cache Initialization Fix**: Removed singleton pattern, added explicit `refresh_from_cache()` method called in `Automation.run()`
-- **Configurable Cache Directory**: Added `cache_dir` to Configuration model and `--cache-dir` CLI option
-- **Filter Validation**: Added parse-time validation for project_types, project_facts, and environments
-- **Imbi Actions**: Implemented set_project_fact with full enum/range/free-form support
-- **Shell Execution Fix**: Changed from subprocess_exec to subprocess_shell for glob support
-- **Controller Simplification**: Removed GitLab iterator types, streamlined validation
-- **Imbi Client Updates**: Removed internal caching, simplified to use ImbiMetadataCache
-- **Workflow Filter Refactor**: Split filter logic into helper methods for clarity
-
-**Architecture Benefits**:
-- **Simpler Codebase**: Removed ~2000 lines of unused GitLab code
-- **Faster Validation**: ImbiMetadataCache enables instant filter validation
-- **Better UX**: Helpful error messages with fuzzy-matched suggestions
-- **Maintainability**: Cleaner separation with IMC handling all Imbi metadata, no singleton complexity
-- **Type Safety**: Comprehensive validation at parse time prevents runtime errors
-- **Performance**: 15-minute cache reduces API calls, subprocess_shell enables shell features
-- **Explicit Initialization**: Clear async initialization point eliminates awkward lazy loading
-
-### External Scheme and Repository Change Tracking (October 2025)
+### External Scheme and Repository Change Tracking
 
 **External Scheme** (`external:///`):
 - Allows writing files to absolute paths outside the temporary working directory
