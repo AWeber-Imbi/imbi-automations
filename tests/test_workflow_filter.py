@@ -275,3 +275,116 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
         result = self.filter._filter_environments(project, wf_filter)
         self.assertIsNotNone(result)
         self.assertEqual(result.id, 123)
+
+    async def test_github_identifier_required_no_identifiers(self) -> None:
+        """Test filtering projects with no identifiers."""
+        # Create project without any identifiers
+        project = models.ImbiProject(
+            id=123,
+            dependencies=None,
+            description='Test project',
+            environments=None,
+            facts=None,
+            identifiers=None,
+            links=None,
+            name='test-project',
+            namespace='test-namespace',
+            namespace_slug='test-namespace',
+            project_score=None,
+            project_type='API',
+            project_type_slug='api',
+            slug='test-project',
+            urls=None,
+            imbi_url='https://imbi.example.com/projects/123',
+        )
+
+        # Create filter requiring GitHub identifier
+        wf_filter = models.WorkflowFilter(github_identifier_required=True)
+
+        result = await self.filter.filter_project(project, wf_filter)
+        self.assertIsNone(result)
+
+    async def test_github_identifier_required_empty_identifiers(self) -> None:
+        """Test filtering projects with empty identifiers dict."""
+        # Create project with empty identifiers dict
+        project = models.ImbiProject(
+            id=123,
+            dependencies=None,
+            description='Test project',
+            environments=None,
+            facts=None,
+            identifiers={},
+            links=None,
+            name='test-project',
+            namespace='test-namespace',
+            namespace_slug='test-namespace',
+            project_score=None,
+            project_type='API',
+            project_type_slug='api',
+            slug='test-project',
+            urls=None,
+            imbi_url='https://imbi.example.com/projects/123',
+        )
+
+        # Create filter requiring GitHub identifier
+        wf_filter = models.WorkflowFilter(github_identifier_required=True)
+
+        result = await self.filter.filter_project(project, wf_filter)
+        self.assertIsNone(result)
+
+    async def test_github_identifier_required_missing_github(self) -> None:
+        """Test filtering projects missing GitHub identifier."""
+        # Create project with identifiers but missing GitHub
+        project = models.ImbiProject(
+            id=123,
+            dependencies=None,
+            description='Test project',
+            environments=None,
+            facts=None,
+            identifiers={'gitlab': 'some-org/some-repo'},
+            links=None,
+            name='test-project',
+            namespace='test-namespace',
+            namespace_slug='test-namespace',
+            project_score=None,
+            project_type='API',
+            project_type_slug='api',
+            slug='test-project',
+            urls=None,
+            imbi_url='https://imbi.example.com/projects/123',
+        )
+
+        # Create filter requiring GitHub identifier
+        wf_filter = models.WorkflowFilter(github_identifier_required=True)
+
+        result = await self.filter.filter_project(project, wf_filter)
+        self.assertIsNone(result)
+
+    async def test_github_identifier_required_has_github(self) -> None:
+        """Test allowing projects with GitHub identifier."""
+        # Create project with GitHub identifier
+        project = models.ImbiProject(
+            id=123,
+            dependencies=None,
+            description='Test project',
+            environments=None,
+            facts=None,
+            identifiers={'github': 'some-org/some-repo'},
+            links=None,
+            name='test-project',
+            namespace='test-namespace',
+            namespace_slug='test-namespace',
+            project_score=None,
+            project_type='API',
+            project_type_slug='api',
+            slug='test-project',
+            urls=None,
+            imbi_url='https://imbi.example.com/projects/123',
+        )
+
+        # Create filter requiring GitHub identifier
+        wf_filter = models.WorkflowFilter(github_identifier_required=True)
+
+        result = await self.filter.filter_project(project, wf_filter)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.id, 123)
