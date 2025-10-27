@@ -497,16 +497,47 @@ class Imbi(http.BaseURLHTTPClient):
             httpx.HTTPError: If API request fails
 
         """
+        # Get current project data to check existing environments
+        project = await self.get_project(project_id)
+        if not project:
+            raise ValueError(f'Project not found: {project_id}')
+
+        # Extract current environment names
+        current_env_names = (
+            sorted([env.name for env in project.environments])
+            if project.environments
+            else []
+        )
+        new_env_names = sorted(environments)
+
+        # Skip update if environments are unchanged
+        if current_env_names == new_env_names:
+            LOGGER.debug(
+                'Environments unchanged for project %d, skipping update',
+                project_id,
+            )
+            return
+
         LOGGER.debug(
-            'Updating environments for project %d to %s',
+            'Updating environments for project %d from %s to %s',
             project_id,
-            environments,
+            current_env_names,
+            new_env_names,
         )
 
         payload = [
             {'op': 'replace', 'path': '/environments', 'value': environments}
         ]
         response = await self.patch(f'/projects/{project_id}', json=payload)
+
+        # HTTP 304 Not Modified is success (no changes needed)
+        if response.status_code == 304:
+            LOGGER.debug(
+                'Environments already set for project %d (HTTP 304)',
+                project_id,
+            )
+            return
+
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError:
