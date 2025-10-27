@@ -510,8 +510,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 f'Unable to create symlink for workflow: {workflow_path}'
             )
 
-        # Ensure the extracted directory exists
+        # Ensure the extracted and repository directories exist
         (working_directory / 'extracted').mkdir(exist_ok=True)
+        (working_directory / 'repository').mkdir(exist_ok=True)
 
         return models.WorkflowContext(
             workflow=self.workflow,
