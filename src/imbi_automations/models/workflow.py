@@ -365,11 +365,13 @@ class WorkflowImbiAction(WorkflowAction):
     """Action for Imbi project management system operations.
 
     Executes Imbi API operations including setting project facts and managing
-    project metadata.
+    project metadata. These actions don't modify repository files, so
+    committable defaults to False.
     """
 
     type: typing.Literal['imbi'] = 'imbi'
     command: WorkflowImbiActionCommand
+    committable: bool = False
 
     # Fields for set_project_fact command
     fact_name: str | None = None
