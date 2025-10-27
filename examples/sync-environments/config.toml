@@ -1,0 +1,14 @@
+name = "Sync GitHub Environments with Imbi"
+description = "Synchronize GitHub repository environments to match Imbi project environment definitions"
+
+[git]
+clone = false
+
+[filter]
+github_identifier_required = true
+
+[[actions]]
+name = "sync-environments"
+type = "github"
+command = "sync_environments"
+committable = false
