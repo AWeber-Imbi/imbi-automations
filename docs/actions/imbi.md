@@ -13,9 +13,53 @@ command = "set_project_fact"  # Required
 
 ## Available Commands
 
-### set_project_fact
+### set_environments
 
-**Status:** Not yet implemented
+Updates the list of environments for the current project in Imbi.
+
+**Configuration:**
+```toml
+[[actions]]
+name = "set-environments"
+type = "imbi"
+command = "set_environments"
+values = ["testing", "staging", "production"]
+```
+
+**Fields:**
+
+- `values` (list of strings, required): List of environment names or slugs to set for the project
+
+**Features:**
+
+- **Flexible Input**: Accepts both environment names (e.g., "Testing") and slugs (e.g., "testing")
+- **Smart Updates**: Only makes API calls when environments actually differ from current state
+- **Automatic Translation**: Converts environment slugs to names using ImbiMetadataCache
+- **Non-Committable**: Does not create git commits (modifies Imbi state only)
+
+**Use Cases:**
+
+- Standardize environments across projects
+- Sync environment configuration after infrastructure changes
+- Set up new projects with standard environment set
+- Update environments as part of deployment pipeline setup
+
+**Example:**
+
+```toml
+[[actions]]
+name = "set-standard-environments"
+type = "imbi"
+command = "set_environments"
+values = ["testing", "staging", "production"]
+
+[[actions]]
+name = "sync-to-github"
+type = "github"
+command = "sync_environments"
+```
+
+### set_project_fact
 
 Updates or creates a fact for the current project in Imbi.
 
@@ -26,13 +70,14 @@ name = "update-python-version"
 type = "imbi"
 command = "set_project_fact"
 fact_name = "Python Version"
-fact_value = "3.12"
+value = "3.12"
 ```
 
 **Fields:**
 
 - `fact_name` (string, required): Name of the fact to set
-- `fact_value` (string, required): Value to assign to the fact
+- `value` (string|number|boolean, required): Value to assign to the fact
+- `skip_validations` (boolean, optional): Skip fact validation (default: false)
 
 **Use Cases:**
 
@@ -54,6 +99,26 @@ context.imbi_project.facts        # Current project facts
 ```
 
 ## Examples
+
+### Set Standard Environments
+
+```toml
+# Standardize environments across all frontend projects
+[filter]
+project_types = ["frontend-applications"]
+github_identifier_required = true
+
+[[actions]]
+name = "set-environments"
+type = "imbi"
+command = "set_environments"
+values = ["testing", "staging", "production"]
+
+[[actions]]
+name = "sync-to-github"
+type = "github"
+command = "sync_environments"
+```
 
 ### Update Python Version Fact
 
@@ -148,17 +213,12 @@ fact_name = "Framework"
 fact_value = "FastAPI"
 ```
 
-## Implementation Status
+## Available Commands Summary
 
-Currently, Imbi actions are defined but not fully implemented. The `set_project_fact` command raises `NotImplementedError`.
-
-**Planned Implementation:**
-
-- Integration with Imbi API for fact updates
-- Support for creating new facts
-- Validation of fact names against Imbi schema
-- Batch fact updates
-- Conditional fact updates
+| Command | Description |
+|---------|-------------|
+| `set_environments` | Update project environments with smart validation |
+| `set_project_fact` | Update or create project facts with validation |
 
 ## Integration with Other Actions
 
