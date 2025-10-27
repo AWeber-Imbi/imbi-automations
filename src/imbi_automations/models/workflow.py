@@ -574,26 +574,6 @@ class WorkflowGitHub(pydantic.BaseModel):
         return self
 
 
-class WorkflowGitLab(pydantic.BaseModel):
-    """GitLab workflow configuration for merge request management.
-
-    Controls merge request creation and branch replacement behavior with
-    validation ensuring consistent configuration.
-    """
-
-    create_merge_request: bool = True
-    replace_branch: bool = False
-
-    @pydantic.model_validator(mode='after')
-    def validate_replace_branch(self) -> 'WorkflowGitLab':
-        if self.replace_branch and not self.create_merge_request:
-            raise ValueError(
-                'replace_branch can only be set when '
-                'create_merge_request is True'
-            )
-        return self
-
-
 class WorkflowConfiguration(pydantic.BaseModel):
     """Complete workflow configuration with actions, conditions, and filters.
 

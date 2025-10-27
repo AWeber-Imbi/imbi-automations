@@ -60,16 +60,6 @@ class GitHubConfiguration(pydantic.BaseModel):
     hostname: str = pydantic.Field(default='github.com')
 
 
-class GitLabConfiguration(pydantic.BaseModel):
-    """GitLab API configuration.
-
-    Supports both GitLab.com and self-hosted instances with private token auth.
-    """
-
-    api_key: pydantic.SecretStr
-    hostname: str = pydantic.Field(default='gitlab.com')
-
-
 class ImbiConfiguration(pydantic.BaseModel):
     """Imbi project management system configuration.
 
@@ -80,12 +70,10 @@ class ImbiConfiguration(pydantic.BaseModel):
     api_key: pydantic.SecretStr
     hostname: str
     github_identifier: str = 'github'
-    gitlab_identifier: str = 'gitlab'
     pagerduty_identifier: str = 'pagerduty'
     sonarqube_identifier: str = 'sonarqube'
     sentry_identifier: str = 'sentry'
     github_link: str = 'GitHub Repository'
-    gitlab_link: str = 'GitLab Project'
     grafana_link: str = 'Grafana Dashboard'
     pagerduty_link: str = 'PagerDuty'
     sentry_link: str = 'Sentry'
@@ -135,6 +123,5 @@ class Configuration(pydantic.BaseModel):
     error_dir: pathlib.Path = pathlib.Path('./errors')
     git: GitConfiguration = pydantic.Field(default_factory=GitConfiguration)
     github: GitHubConfiguration | None = None
-    gitlab: GitLabConfiguration | None = None
     imbi: ImbiConfiguration | None = None
     preserve_on_error: bool = False

@@ -147,4 +147,3 @@ class ImbiProjectType(base.BaseModel):
     slug: str
     icon_class: str
     environment_urls: bool = False
-    gitlab_project_prefix: str | None = None

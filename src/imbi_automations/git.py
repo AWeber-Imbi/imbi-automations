@@ -322,40 +322,6 @@ async def commit_changes(
     return commit_sha
 
 
-async def get_git_status(working_directory: pathlib.Path) -> list[str]:
-    """Get list of modified/untracked files in git repository.
-
-    Args:
-        working_directory: Git repository working directory
-
-    Returns:
-        List of file paths that have changes
-
-    """
-    command = ['git', 'status', '--porcelain']
-
-    returncode, stdout, stderr = await _run_git_command(
-        command, cwd=working_directory, timeout_seconds=30
-    )
-
-    if returncode != 0:
-        raise RuntimeError(
-            f'Git status failed (exit code {returncode}): {stderr or stdout}'
-        )
-
-    # Parse porcelain output to extract file paths
-    changed_files = []
-    for line in stdout.split('\n'):
-        if line.strip() and len(line) >= 3:
-            # Porcelain format: XY filename (where XY are 2-char status codes)
-            file_path = line[3:].strip()
-            if file_path:
-                changed_files.append(file_path)
-
-    LOGGER.debug('Found %d changed files', len(changed_files))
-    return changed_files
-
-
 async def push_changes(
     working_directory: pathlib.Path,
     remote: str = 'origin',
