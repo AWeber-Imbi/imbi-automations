@@ -11,4 +11,3 @@ github_identifier_required = true
 name = "sync-environments"
 type = "github"
 command = "sync_environments"
-committable = false
