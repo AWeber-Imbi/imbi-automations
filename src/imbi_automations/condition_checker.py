@@ -205,7 +205,7 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
     def _check_file_doesnt_contain(
         self, file_path: pathlib.Path, condition: models.WorkflowCondition
     ) -> bool:
-        """Check that a file exists & does not contain string or regex pattern"""
+        """Check file exists & does not contain string or regex pattern"""
         if not file_path.is_file():
             self.logger.debug(
                 'file %s does not exist for negative contains check',
