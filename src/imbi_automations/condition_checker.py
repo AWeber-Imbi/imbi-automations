@@ -123,20 +123,46 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
                 content = await client.get_file_contents(context, file_path)
 
                 if condition.remote_file_contains and condition.remote_file:
-                    results.append(
-                        (content is not None)
-                        and (condition.remote_file_contains in content)
-                    )
+                    if content is None:
+                        results.append(False)
+                    else:
+                        # Try exact string match first (fast)
+                        if condition.remote_file_contains in content:
+                            results.append(True)
+                        else:
+                            # Fall back to regex pattern matching
+                            try:
+                                pattern = re.compile(
+                                    condition.remote_file_contains
+                                )
+                                results.append(
+                                    pattern.search(content) is not None
+                                )
+                            except re.error:
+                                # Invalid regex, treat as failed match
+                                results.append(False)
                 elif (
                     condition.remote_file_doesnt_contain
                     and condition.remote_file
                 ):
-                    results.append(
-                        (content is not None)
-                        and (
-                            condition.remote_file_doesnt_contain not in content
-                        )
-                    )
+                    if content is None:
+                        results.append(False)
+                    else:
+                        # Try exact string match first (fast)
+                        if condition.remote_file_doesnt_contain in content:
+                            results.append(False)
+                        else:
+                            # Fall back to regex pattern matching
+                            try:
+                                pattern = re.compile(
+                                    condition.remote_file_doesnt_contain
+                                )
+                                results.append(
+                                    pattern.search(content) is None
+                                )
+                            except re.error:
+                                # Invalid regex, treat as no match (passes)
+                                results.append(True)
                 elif condition.remote_file_exists:
                     results.append(content is not None)
                 elif condition.remote_file_not_exists:

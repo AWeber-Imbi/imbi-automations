@@ -454,6 +454,96 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
         self.assertFalse(result)
 
     @mock.patch('imbi_automations.clients.GitHub.get_file_contents')
+    async def test_check_remote_file_contains_regex_success(
+        self, mock_get_file: mock.AsyncMock
+    ) -> None:
+        """Test remote_file_contains with regex pattern that matches."""
+        mock_get_file.return_value = 'FROM python:3.9-slim'
+
+        condition = models.WorkflowCondition(
+            remote_file_contains=r'python:[3-4]\.\d+',
+            remote_file=pathlib.Path('Dockerfile'),
+        )
+
+        result = await self.checker.check_remote(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    @mock.patch('imbi_automations.clients.GitHub.get_file_contents')
+    async def test_check_remote_file_contains_regex_failure(
+        self, mock_get_file: mock.AsyncMock
+    ) -> None:
+        """Test remote_file_contains with regex pattern that doesn't match."""
+        mock_get_file.return_value = 'FROM python:2.7-slim'
+
+        condition = models.WorkflowCondition(
+            remote_file_contains=r'python:[3-4]\.\d+',
+            remote_file=pathlib.Path('Dockerfile'),
+        )
+
+        result = await self.checker.check_remote(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    @mock.patch('imbi_automations.clients.GitHub.get_file_contents')
+    async def test_check_remote_file_contains_invalid_regex(
+        self, mock_get_file: mock.AsyncMock
+    ) -> None:
+        """Test remote_file_contains with invalid regex pattern."""
+        mock_get_file.return_value = 'some content'
+
+        condition = models.WorkflowCondition(
+            remote_file_contains=r'[invalid(regex',
+            remote_file=pathlib.Path('test.txt'),
+        )
+
+        result = await self.checker.check_remote(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    @mock.patch('imbi_automations.clients.GitHub.get_file_contents')
+    async def test_check_remote_file_doesnt_contain_regex_success(
+        self, mock_get_file: mock.AsyncMock
+    ) -> None:
+        """Test remote_file_doesnt_contain with regex that doesn't match."""
+        mock_get_file.return_value = 'FROM python:2.7-slim'
+
+        condition = models.WorkflowCondition(
+            remote_file_doesnt_contain=r'python:[3-4]\.\d+',
+            remote_file=pathlib.Path('Dockerfile'),
+        )
+
+        result = await self.checker.check_remote(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    @mock.patch('imbi_automations.clients.GitHub.get_file_contents')
+    async def test_check_remote_file_doesnt_contain_regex_failure(
+        self, mock_get_file: mock.AsyncMock
+    ) -> None:
+        """Test remote_file_doesnt_contain with regex that matches."""
+        mock_get_file.return_value = 'FROM python:3.9-slim'
+
+        condition = models.WorkflowCondition(
+            remote_file_doesnt_contain=r'python:[3-4]\.\d+',
+            remote_file=pathlib.Path('Dockerfile'),
+        )
+
+        result = await self.checker.check_remote(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    @mock.patch('imbi_automations.clients.GitHub.get_file_contents')
     async def test_check_remote_condition_type_any(
         self, mock_get_file: mock.AsyncMock
     ) -> None:
