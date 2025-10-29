@@ -124,17 +124,19 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
 
                 if condition.remote_file_contains and condition.remote_file:
                     results.append(
-                        (content is not None)
-                        and (condition.remote_file_contains in content)
+                        content is not None
+                        and self._match_string_or_regex(
+                            condition.remote_file_contains, content
+                        )
                     )
                 elif (
                     condition.remote_file_doesnt_contain
                     and condition.remote_file
                 ):
                     results.append(
-                        (content is not None)
-                        and (
-                            condition.remote_file_doesnt_contain not in content
+                        content is not None
+                        and not self._match_string_or_regex(
+                            condition.remote_file_doesnt_contain, content
                         )
                     )
                 elif condition.remote_file_exists:
@@ -150,10 +152,37 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
             return any(results)
         return all(results)
 
+    @staticmethod
+    def _match_string_or_regex(pattern: str, content: str) -> bool:
+        """Check if content matches pattern via exact string or regex.
+
+        Tries exact string matching first for performance, then falls back
+        to regex pattern matching if no exact match is found.
+
+        Args:
+            pattern: String to match (literal or regex pattern)
+            content: Content to search within
+
+        Returns:
+            True if exact string match or regex match found, False otherwise
+
+        """
+        # Try exact string match first (fast)
+        if pattern in content:
+            return True
+
+        # Fall back to regex pattern matching
+        try:
+            compiled = re.compile(pattern)
+            return compiled.search(content) is not None
+        except re.error:
+            # Invalid regex, treat as failed match
+            return False
+
     def _check_file_contains(
         self, file_path: pathlib.Path, condition: models.WorkflowCondition
     ) -> bool:
-        """Check if a file contains the specified string"""
+        """Check if a file contains the specified string or regex pattern"""
         if not file_path.is_file():
             self.logger.debug(
                 'file %s does not exist for contains check', condition.file
@@ -168,12 +197,15 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
                 exc,
             )
             return False
-        return condition.file_contains in file_content
+
+        return self._match_string_or_regex(
+            condition.file_contains, file_content
+        )
 
     def _check_file_doesnt_contain(
         self, file_path: pathlib.Path, condition: models.WorkflowCondition
     ) -> bool:
-        """Check that a file exists & does not contain the specified string"""
+        """Check file exists & does not contain string or regex pattern"""
         if not file_path.is_file():
             self.logger.debug(
                 'file %s does not exist for negative contains check',
@@ -189,7 +221,10 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
                 exc,
             )
             return False
-        return condition.file_doesnt_contain not in file_content
+
+        return not self._match_string_or_regex(
+            condition.file_doesnt_contain, file_content
+        )
 
     @staticmethod
     def _check_file_pattern_exists(
