@@ -203,9 +203,7 @@ AI-powered transformations:
 ```toml
 [[actions]]
 type = "claude"
-[actions.value]
-prompt_file = "prompts/update-readme.md"
-context = "project_context"
+task_prompt = "prompts/update-readme.md"
 ```
 
 #### 3. File Operations
@@ -213,11 +211,9 @@ Direct file manipulation:
 ```toml
 [[actions]]
 type = "file"
-[actions.value]
-operation = "regex_replace"
-file = "README.md"
-pattern = "Version: \\d+\\.\\d+\\.\\d+"
-replacement = "Version: {{ new_version }}"
+command = "copy"
+source = "templates/config.yml"
+destination = "repository:///config/production.yml"
 ```
 
 #### 4. Shell Commands
@@ -225,9 +221,8 @@ Arbitrary command execution:
 ```toml
 [[actions]]
 type = "shell"
-[actions.value]
 command = "python -m pytest tests/"
-working_directory = "{{ repository_path }}"
+working_directory = "repository:///"
 ```
 
 ### Condition System
