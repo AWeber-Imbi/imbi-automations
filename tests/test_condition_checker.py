@@ -637,6 +637,71 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
 
         self.assertFalse(result)
 
+    def test_check_file_contains_regex_success(self) -> None:
+        """Test file_contains with regex pattern that matches."""
+        condition = models.WorkflowCondition(
+            file_contains=r'fastapi==0\.\d+\.\d+',
+            file='repository://requirements.txt',
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_check_file_contains_regex_failure(self) -> None:
+        """Test file_contains with regex pattern that doesn't match."""
+        condition = models.WorkflowCondition(
+            file_contains=r'django==\d+\.\d+\.\d+',
+            file='repository://requirements.txt',
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_check_file_contains_invalid_regex(self) -> None:
+        """Test file_contains with invalid regex pattern."""
+        condition = models.WorkflowCondition(
+            file_contains=r'[invalid(regex',
+            file='repository://requirements.txt',
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_check_file_doesnt_contain_regex_success(self) -> None:
+        """Test file_doesnt_contain with regex that doesn't match."""
+        condition = models.WorkflowCondition(
+            file_doesnt_contain=r'django==\d+\.\d+\.\d+',
+            file='repository://requirements.txt',
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_check_file_doesnt_contain_regex_failure(self) -> None:
+        """Test file_doesnt_contain with regex that matches."""
+        condition = models.WorkflowCondition(
+            file_doesnt_contain=r'fastapi==0\.\d+\.\d+',
+            file='repository://requirements.txt',
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
 
 if __name__ == '__main__':
     unittest.main()
