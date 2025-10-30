@@ -28,7 +28,7 @@ class Filter(mixins.WorkflowLoggerMixin):
     async def filter_project(
         self,
         project: models.ImbiProject,
-        workflow_filter: models.WorkflowFilter,
+        workflow_filter: models.WorkflowFilter | None,
     ) -> models.ImbiProject | None:
         """Filter projects based on workflow configuration
 
@@ -42,6 +42,9 @@ class Filter(mixins.WorkflowLoggerMixin):
         )
 
         """
+        if workflow_filter is None:
+            return project
+
         if (
             (
                 workflow_filter.github_identifier_required
