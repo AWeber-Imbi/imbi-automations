@@ -283,7 +283,7 @@ project_facts = {
 }
 
 # Require GitHub identifier to be present
-requires_github_identifier = true
+github_identifier_required = true
 
 # Exclude projects with specific GitHub workflow statuses
 exclude_github_workflow_status = ["success"]
@@ -599,7 +599,7 @@ The GitHub Actions module syncs repository environments with Imbi project defini
 # Extract configuration files for analysis
 [filter]
 project_types = ["apis", "consumers"]
-requires_github_identifier = true
+github_identifier_required = true
 
 [[conditions]]
 remote_file_exists = "config.yaml"
