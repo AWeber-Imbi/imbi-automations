@@ -242,7 +242,7 @@ class Automation(mixins.WorkflowLoggerMixin):
         project_types: set[str] = pydantic.Field(default_factory=set)
         project_facts: dict[str, str] = pydantic.Field(default_factory=dict)
         project_environments: set[str] = pydantic.Field(default_factory=set)
-        requires_github_identifier: bool = False
+        github_identifier_required: bool = False
         exclude_github_workflow_status: set[str] = pydantic.Field(
             default_factory=set
         )

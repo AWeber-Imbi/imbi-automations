@@ -167,7 +167,7 @@ Workflows are defined in TOML configuration files with three main sections:
 [filter]
 project_ids = [123, 456]
 project_types = ["apis", "consumers"]
-requires_github_identifier = true
+github_identifier_required = true
 
 # Execution conditions
 [[conditions]]

@@ -779,7 +779,7 @@ Reduce scope with workflow filters in `config.toml`:
 ```toml
 [filter]
 project_types = ["api", "consumer"]
-requires_github_identifier = true
+github_identifier_required = true
 ```
 
 ### Batch Smartly
