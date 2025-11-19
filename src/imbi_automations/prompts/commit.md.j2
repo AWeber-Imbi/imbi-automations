@@ -83,14 +83,11 @@ rm {{ working_directory }}/do-commit.sh
 
 # RESPONSE FORMAT
 
-You should response with the following if do-commit succeeds:
+After successfully creating commits (or determining there are no changes), you MUST call the `submit_task_response` tool with a message summarizing what was done.
 
-```json
-{"result": "success", "message": "<do-commit.sh response output>"}
-```
+Examples:
+- If commits were created: `submit_task_response(message="Created 2 commits: fix-auth-bug (a1b2c3d) and update-docs (e4f5g6h)")`
+- If no changes: `submit_task_response(message="No changes to commit - working tree is clean")`
+- If commit failed: `submit_task_response(message="Commit failed: <error details>")`
 
-And the following if it fails
-
-```json
-{"result": "failure", "message": "Commit failed", "errors": ["<do-commit.sh response output>"]}
-```
+IMPORTANT: You MUST call submit_task_response - simply outputting JSON is not sufficient.
