@@ -56,8 +56,10 @@ class Committer(mixins.WorkflowLoggerMixin):
             True if a commit was made, False if no changes to commit
         """
         self._log_verbose_info(
-            '%s %s using Claude Code to commit changes',
+            '%s [%s/%s] %s using Claude Code to commit changes',
             context.imbi_project.slug,
+            context.current_action_index,
+            context.total_actions,
             action.name,
         )
         client = claude.Claude(self.configuration, context, self.verbose)
@@ -124,17 +126,21 @@ class Committer(mixins.WorkflowLoggerMixin):
             raise
         else:
             if commit_sha:
-                self.logger.info(
-                    '%s %s committed changes: %s',
+                self._log_verbose_info(
+                    '%s [%s/%s] %s committed changes: %s',
                     context.imbi_project.slug,
+                    context.current_action_index,
+                    context.total_actions,
                     action.name,
                     commit_sha,
                 )
                 return True
             else:
-                self.logger.info(
-                    '%s %s no changes to commit',
+                self._log_verbose_info(
+                    '%s [%s/%s] %s no changes to commit',
                     context.imbi_project.slug,
+                    context.current_action_index,
+                    context.total_actions,
                     action.name,
                 )
                 return False
