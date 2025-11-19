@@ -95,11 +95,15 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 enumerate(self.workflow.configuration.actions)
             )[self.resume_state.failed_action_index :]
 
+            # Set total actions for progress display
+            context.total_actions = len(self.workflow.configuration.actions)
+
             self.logger.info(
-                '%s resuming from action "%s" (index %d)',
+                '%s [%d/%d] resuming from action "%s"',
                 context.imbi_project.slug,
+                self.resume_state.failed_action_index + 1,
+                context.total_actions,
                 self.resume_state.failed_action_name,
-                self.resume_state.failed_action_index,
             )
         else:
             # Normal mode: fresh temporary directory
