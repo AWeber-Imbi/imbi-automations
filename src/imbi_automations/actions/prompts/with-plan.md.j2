@@ -3,7 +3,8 @@
 # Plan
 The planning agent created the following plan for you to follow in order:
 
-{% for task in plan.plan %}{{ loop.index }}. {{ task }}
+{% for task in plan.plan %}
+{{ loop.index }}. {{ task }}
 {% endfor %}
 {% if plan.analysis %}
 # Analysis
