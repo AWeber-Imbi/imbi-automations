@@ -42,7 +42,7 @@ def configure_logging(debug: bool) -> None:
         level=logging.DEBUG if debug else logging.INFO, handlers=[handler]
     )
 
-    for logger_name in ('anthropic', 'httpcore', 'httpx'):
+    for logger_name in ('anthropic', 'claude_agent_sdk', 'httpcore', 'httpx'):
         logging.getLogger(logger_name).setLevel(logging.WARNING)
 
 
