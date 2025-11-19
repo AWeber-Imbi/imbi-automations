@@ -50,8 +50,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
         for cycle in range(1, action.max_cycles + 1):
             self._log_verbose_info(
-                '%s %s Claude Code cycle %d/%d',
+                '%s [%s/%s] %s Claude Code cycle %d/%d',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 cycle,
                 action.max_cycles,
@@ -63,8 +65,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 and action.max_cycles > 5
             ):
                 self.logger.warning(
-                    '%s %s has used %d/%d cycles - approaching limit',
+                    '%s [%s/%s] %s has used %d/%d cycles - approaching limit',
                     self.context.imbi_project.slug,
+                    self.context.current_action_index,
+                    self.context.total_actions,
                     action.name,
                     cycle,
                     action.max_cycles,
@@ -115,8 +119,10 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
         for agent in agents:
             self._log_verbose_info(
-                '%s %s executing Claude Code %s agent in cycle %d',
+                '%s [%s/%s] %s executing Claude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 agent,
                 cycle,

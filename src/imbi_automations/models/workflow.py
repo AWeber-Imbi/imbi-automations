@@ -640,3 +640,5 @@ class WorkflowContext(pydantic.BaseModel):
     starting_commit: str | None = None
     has_repository_changes: bool = False
     registry: typing.Any = None  # ImbiMetadataCache (avoid circular import)
+    current_action_index: int | None = None  # 1-indexed position in workflow
+    total_actions: int | None = None  # Total actions in workflow

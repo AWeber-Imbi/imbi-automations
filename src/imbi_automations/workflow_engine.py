@@ -149,8 +149,14 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             )
             return False
 
+        # Set total actions for progress tracking
+        context.total_actions = len(self.workflow.configuration.actions)
+
         # Execute actions (all actions for normal mode, remaining for resume)
         for idx, action in actions_to_run:
+            # Update current action index for progress tracking
+            context.current_action_index = idx + 1
+
             try:
                 await self._execute_action(context, action)
 
