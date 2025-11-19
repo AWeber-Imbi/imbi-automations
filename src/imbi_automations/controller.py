@@ -353,16 +353,10 @@ class Automation(mixins.WorkflowLoggerMixin):
             log_capture, token = None, None
 
         try:
-            if not await self.workflow_engine.execute(
+            result = await self.workflow_engine.execute(
                 project, github_repository
-            ):
-                if log_capture:  # Write debug logs to error directory
-                    error_path = self.workflow_engine.get_last_error_path()
-                    if error_path:
-                        log_capture.write_to_file(error_path / 'debug.log')
-                        self.logger.info(
-                            'Wrote debug logs to %s', error_path / 'debug.log'
-                        )
+            )
+            if not result:
                 if self.args.exit_on_error:
                     raise RuntimeError(
                         f'Workflow failed for {project.name} ({project.id})'
@@ -373,8 +367,15 @@ class Automation(mixins.WorkflowLoggerMixin):
                 'Completed processing %s (%i)', project.name, project.id
             )
             return True
-        finally:  # Always cleanup log capture to prevent memory leaks
-            if log_capture and token:
+        finally:
+            # Write debug logs if error occurred (error_path set by engine)
+            if log_capture:
+                error_path = self.workflow_engine.get_last_error_path()
+                if error_path:
+                    log_capture.write_to_file(error_path / 'debug.log')
+                    self.logger.info(
+                        'Wrote debug logs to %s', error_path / 'debug.log'
+                    )
                 log_capture.cleanup(token)
 
     def _validate_workflow_filter_environments(self) -> None:
