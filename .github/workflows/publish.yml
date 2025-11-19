@@ -10,7 +10,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/p/pgdumplib
+      url: https://pypi.org/p/imbi-automations
 
     permissions:
       id-token: write
