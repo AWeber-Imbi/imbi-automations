@@ -66,8 +66,10 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         )
 
         self._log_verbose_info(
-            '%s %s syncing environments for %s/%s: %s',
+            '%s [%s/%s] %s syncing environments for %s/%s: %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             org,
             repo,
@@ -88,9 +90,11 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         # Log results
         if result['success']:
             self._log_verbose_info(
-                '%s %s successfully synced environments: '
+                '%s [%s/%s] %s successfully synced environments: '
                 'created %d, deleted %d',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 len(result['created']),
                 len(result['deleted']),

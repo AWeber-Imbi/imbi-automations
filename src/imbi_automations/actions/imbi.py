@@ -78,9 +78,11 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
 
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
 
-        self.logger.info(
-            '%s %s setting environments to %s for project %d (%s)',
+        self._log_verbose_info(
+            '%s [%s/%s] %s setting environments to %s for project %d (%s)',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             environment_names,
             self.context.imbi_project.id,
@@ -94,17 +96,22 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             )
         except httpx.HTTPError as exc:
             self.logger.error(
-                '%s %s failed to set environments for project %d: %s',
+                '%s [%s/%s] %s failed to set environments for project %d: %s',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 self.context.imbi_project.id,
                 exc,
             )
             raise
         else:
-            self.logger.debug(
-                '%s %s successfully updated environments for project %d',
+            self._log_verbose_info(
+                '%s [%s/%s] %s successfully updated environments for '
+                'project %d',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 self.context.imbi_project.id,
             )
@@ -129,9 +136,11 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
 
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
 
-        self.logger.info(
-            '%s %s setting fact "%s" to "%s" for project %d (%s)',
+        self._log_verbose_info(
+            '%s [%s/%s] %s setting fact "%s" to "%s" for project %d (%s)',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             action.fact_name,
             action.value,
@@ -148,8 +157,10 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             )
         except (httpx.HTTPError, ValueError, RuntimeError) as exc:
             self.logger.error(
-                '%s %s failed to set fact "%s" for project %d: %s',
+                '%s [%s/%s] %s failed to set fact "%s" for project %d: %s',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 action.fact_name,
                 self.context.imbi_project.id,
@@ -157,9 +168,11 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             )
             raise
         else:
-            self.logger.debug(
-                '%s %s successfully updated fact "%s" for project %d',
+            self._log_verbose_info(
+                '%s [%s/%s] %s successfully updated fact "%s" for project %d',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 action.fact_name,
                 self.context.imbi_project.id,
