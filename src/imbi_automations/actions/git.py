@@ -32,6 +32,14 @@ class GitActions(mixins.WorkflowLoggerMixin):
                 destination_file = utils.resolve_path(
                     self.context, action.destination
                 )
+                self._log_verbose_info(
+                    '%s [%s/%s] %s extracting %s from git history',
+                    self.context.imbi_project.slug,
+                    self.context.current_action_index,
+                    self.context.total_actions,
+                    action.name,
+                    action.source,
+                )
                 if (
                     not await git.extract_file_from_commit(
                         working_directory=self.context.working_directory
@@ -47,9 +55,27 @@ class GitActions(mixins.WorkflowLoggerMixin):
                     raise RuntimeError(
                         f'Git extraction failed for {action.source}'
                     )
+                self._log_verbose_info(
+                    '%s [%s/%s] %s extracted %s to %s',
+                    self.context.imbi_project.slug,
+                    self.context.current_action_index,
+                    self.context.total_actions,
+                    action.name,
+                    action.source,
+                    destination_file,
+                )
             case models.WorkflowGitActionCommand.clone:
                 destination_path = utils.resolve_path(
                     self.context, action.destination
+                )
+                self._log_verbose_info(
+                    '%s [%s/%s] %s cloning repository from %s to %s',
+                    self.context.imbi_project.slug,
+                    self.context.current_action_index,
+                    self.context.total_actions,
+                    action.name,
+                    action.url,
+                    destination_path,
                 )
                 await git.clone_to_directory(
                     working_directory=self.context.working_directory,
@@ -57,6 +83,14 @@ class GitActions(mixins.WorkflowLoggerMixin):
                     destination=destination_path,
                     branch=action.branch,
                     depth=action.depth,
+                )
+                self._log_verbose_info(
+                    '%s [%s/%s] %s cloned repository to %s',
+                    self.context.imbi_project.slug,
+                    self.context.current_action_index,
+                    self.context.total_actions,
+                    action.name,
+                    destination_path,
                 )
             case _:
                 raise RuntimeError(f'Unsupported command: {action.command}')

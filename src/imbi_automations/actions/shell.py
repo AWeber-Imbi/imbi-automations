@@ -83,9 +83,11 @@ class ShellAction(mixins.WorkflowLoggerMixin):
         # Render command if it contains templating
         command_str = self._render_command(action, self.context)
 
-        self.logger.debug(
-            '%s %s executing shell command: %s',
+        self._log_verbose_info(
+            '%s [%s/%s] %s executing shell command: %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             command_str,
         )
@@ -108,9 +110,11 @@ class ShellAction(mixins.WorkflowLoggerMixin):
             stdout_str = stdout.decode('utf-8') if stdout else ''
             stderr_str = stderr.decode('utf-8') if stderr else ''
 
-            self.logger.debug(
-                '%s %s shell command completed with exit code %d',
+            self._log_verbose_info(
+                '%s [%s/%s] %s shell command completed with exit code %d',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 process.returncode,
             )

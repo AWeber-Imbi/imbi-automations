@@ -59,9 +59,11 @@ class FileActions(mixins.WorkflowLoggerMixin):
         file_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.path)
         )
-        self.logger.debug(
-            '%s %s appending to file: %s',
+        self._log_verbose_info(
+            '%s [%s/%s] %s appending to file: %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             action.path,
         )
@@ -77,26 +79,30 @@ class FileActions(mixins.WorkflowLoggerMixin):
                 f.write(action.content)
 
         self._log_verbose_info(
-            '%s %s appended to %s',
+            '%s [%s/%s] %s appended to %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             action.path,
         )
 
     async def _execute_copy(self, action: models.WorkflowFileAction) -> None:
         """Execute copy file action with glob pattern support."""
-        self.logger.debug(
-            '%s %s copying %s to %s',
-            self.context.imbi_project.slug,
-            action.name,
-            action.source,
-            action.destination,
-        )
         source_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.source)
         )
         dest_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.destination)
+        )
+        self._log_verbose_info(
+            '%s [%s/%s] %s copying %s to %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            action.source,
+            action.destination,
         )
 
         # Check if source contains glob patterns
@@ -105,7 +111,10 @@ class FileActions(mixins.WorkflowLoggerMixin):
         else:
             await self._execute_copy_single(source_path, dest_path)
         self._log_verbose_info(
-            '%s copied from %s to %s',
+            '%s [%s/%s] %s copied from %s to %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             utils.path_to_resource_url(self.context, source_path),
             utils.path_to_resource_url(self.context, dest_path),
@@ -249,18 +258,20 @@ class FileActions(mixins.WorkflowLoggerMixin):
 
     async def _execute_move(self, action: models.WorkflowFileAction) -> None:
         """Execute move file action."""
-        self.logger.debug(
-            '%s %s moving %s to %s',
-            self.context.imbi_project.slug,
-            action.name,
-            action.source,
-            action.destination,
-        )
         source_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.source)
         )
         dest_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.destination)
+        )
+        self._log_verbose_info(
+            '%s [%s/%s] %s moving %s to %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            action.source,
+            action.destination,
         )
 
         if not source_path.exists():
@@ -272,7 +283,10 @@ class FileActions(mixins.WorkflowLoggerMixin):
         shutil.move(str(source_path), str(dest_path))
 
         self._log_verbose_info(
-            '%s moved %s to %s',
+            '%s [%s/%s] %s moved %s to %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             utils.path_to_resource_url(self.context, source_path),
             utils.path_to_resource_url(self.context, dest_path),
@@ -280,18 +294,20 @@ class FileActions(mixins.WorkflowLoggerMixin):
 
     async def _execute_rename(self, action: models.WorkflowFileAction) -> None:
         """Execute rename file action."""
-        self.logger.debug(
-            '%s %s renaming %s to %s',
-            self.context.imbi_project.slug,
-            action.name,
-            action.source,
-            action.destination,
-        )
         source_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.source)
         )
         dest_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.destination)
+        )
+        self._log_verbose_info(
+            '%s [%s/%s] %s renaming %s to %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            action.source,
+            action.destination,
         )
 
         if not source_path.exists():
@@ -303,7 +319,10 @@ class FileActions(mixins.WorkflowLoggerMixin):
         source_path.rename(dest_path)
 
         self._log_verbose_info(
-            '%s renamed %s to %s',
+            '%s [%s/%s] %s renamed %s to %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             utils.path_to_resource_url(self.context, source_path),
             utils.path_to_resource_url(self.context, dest_path),
@@ -314,9 +333,11 @@ class FileActions(mixins.WorkflowLoggerMixin):
         file_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.path)
         )
-        self.logger.debug(
-            '%s %s writing to file: %s',
+        self._log_verbose_info(
+            '%s [%s/%s] %s writing to file: %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             action.path,
         )
@@ -333,8 +354,10 @@ class FileActions(mixins.WorkflowLoggerMixin):
                 f.write(action.content)
 
         self._log_verbose_info(
-            '%s %s wrote to %s',
+            '%s [%s/%s] %s wrote to %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             action.path,
         )

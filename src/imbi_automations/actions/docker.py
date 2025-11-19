@@ -77,8 +77,10 @@ class DockerActions(mixins.WorkflowLoggerMixin):
             self.context, dest_url, default_scheme='extracted'
         )
         self._log_verbose_info(
-            '%s %s extracting %s from container %s to %s',
+            '%s [%s/%s] %s extracting %s from container %s to %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             action.source,
             image,
@@ -103,9 +105,11 @@ class DockerActions(mixins.WorkflowLoggerMixin):
                 ],
                 action=action,
             )
-            self.logger.debug(
-                '%s %s successfully extracted %s to %s',
+            self._log_verbose_info(
+                '%s [%s/%s] %s extracted %s to %s',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 action.source,
                 dest_path,

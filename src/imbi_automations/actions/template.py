@@ -42,9 +42,11 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
                 f'Template source path does not exist: {source_path}'
             )
         if source_path.is_file():  # Single file template
-            self.logger.debug(
-                '%s %s rendering template from %s to %s',
+            self._log_verbose_info(
+                '%s [%s/%s] %s rendering template from %s to %s',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 utils.path_to_resource_url(self.context, source_path),
                 utils.path_to_resource_url(self.context, destination_path),
@@ -52,8 +54,10 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             with destination_path.open('w', encoding='utf-8') as fh:
                 fh.write(prompts.render(self.context, source_path))
             self._log_verbose_info(
-                '%s %s rendered template from %s to %s',
+                '%s [%s/%s] %s rendered template from %s to %s',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
                 utils.path_to_resource_url(self.context, source_path),
                 utils.path_to_resource_url(self.context, destination_path),
@@ -61,9 +65,11 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             return
 
         # Directory of templates - glob everything
-        self.logger.debug(
-            '%s %s rendering all templates from directory %s to %s',
+        self._log_verbose_info(
+            '%s [%s/%s] %s rendering templates from directory %s to %s',
             self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             utils.path_to_resource_url(self.context, source_path),
             utils.path_to_resource_url(self.context, destination_path),
@@ -83,7 +89,10 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
                 file_count += 1
 
         self._log_verbose_info(
-            '%s rendered %d templates from %s to %s',
+            '%s [%s/%s] %s rendered %d templates from %s to %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
             action.name,
             file_count,
             utils.path_to_resource_url(self.context, source_path),

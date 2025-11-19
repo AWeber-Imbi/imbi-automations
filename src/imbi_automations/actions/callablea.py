@@ -31,6 +31,17 @@ class CallableAction(mixins.WorkflowLoggerMixin):
             key: self._process_arg(value)
             for key, value in action.kwargs.items()
         }
+        callable_name = getattr(
+            action.callable, '__name__', repr(action.callable)
+        )
+        self._log_verbose_info(
+            '%s [%s/%s] %s executing callable %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            callable_name,
+        )
         self.logger.debug(
             'Executing %s(%r, %r)', action.callable, args, kwargs
         )
@@ -42,6 +53,14 @@ class CallableAction(mixins.WorkflowLoggerMixin):
         except Exception as exc:
             self.logger.exception('Error invoking callable: %s', exc)
             raise RuntimeError(str(exc)) from exc
+        self._log_verbose_info(
+            '%s [%s/%s] %s completed callable %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            callable_name,
+        )
 
     def _process_arg(self, arg: typing.Any) -> typing.Any:
         """Process an argument for use in a callable.
