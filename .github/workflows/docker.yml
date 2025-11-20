@@ -1,0 +1,97 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  release:
+    types: [created]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOCKERHUB_IMAGE: aweber/imbi-automations
+  GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/imbi-automations
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.DOCKERHUB_IMAGE }}
+            ${{ env.GHCR_IMAGE }}
+          tags: |
+            # Tag with version on release
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            # Tag with 'latest' on main branch push
+            type=raw,value=latest,enable={{is_default_branch}}
+            # Tag with short SHA on main branch
+            type=sha,prefix={{branch}}-,enable={{is_default_branch}}
+            # Tag PR builds with PR number
+            type=ref,event=pr
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Generate artifact attestation for Docker Hub
+        if: github.event_name == 'release'
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.DOCKERHUB_IMAGE }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Generate artifact attestation for GHCR
+        if: github.event_name == 'release'
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true

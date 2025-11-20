@@ -54,6 +54,71 @@ ruff check --fix
 pre-commit run --all-files
 ```
 
+### Docker
+```bash
+# Build Docker image locally
+docker build -t imbi-automations:latest .
+
+# Run with Docker
+docker run --rm \
+  -v $(pwd)/config.toml:/config/config.toml:ro \
+  -v $(pwd)/workflows:/workflows:ro \
+  -v ~/.ssh:/root/.ssh:ro \
+  aweber/imbi-automations:latest /config/config.toml /workflows/my-workflow --all-projects
+
+# Use docker-compose
+docker-compose run --rm aweber/imbi-automations /config/config.toml /workflows/my-workflow --all-projects
+```
+
+## CI/CD and Deployment
+
+### GitHub Actions Workflows
+
+The project uses GitHub Actions for automated testing, building, and deployment:
+
+#### Test Workflow (`.github/workflows/test.yml`)
+- **Trigger**: Push to main, pull requests
+- **Actions**: Runs tests with pytest, linting with ruff, uploads coverage to Codecov
+- **Python Versions**: 3.12
+
+#### Docker Build Workflow (`.github/workflows/docker.yml`)
+- **Trigger**: Push to main, releases, version tags, pull requests, manual dispatch
+- **Actions**: Builds multi-architecture Docker images (amd64, arm64)
+- **Registries**:
+  - Docker Hub (`aweber/imbi-automations`)
+  - GitHub Container Registry (`ghcr.io/aweber-imbi/imbi-automations`)
+- **Tags**:
+  - `latest` - Latest commit on main branch
+  - `1.0.0`, `1.0`, `1` - Semantic version tags from releases
+  - `main-{sha}` - Commit SHA from main branch
+  - `pr-{number}` - Pull request builds (not pushed)
+- **Build Cache**: Uses GitHub Actions cache for faster builds
+- **Attestation**: Generates build provenance for both registries on releases
+
+#### PyPI Publish Workflow (`.github/workflows/publish.yml`)
+- **Trigger**: GitHub releases
+- **Actions**: Builds and publishes Python package to PyPI
+- **Authentication**: Uses trusted publishing (OIDC)
+
+### Required GitHub Secrets
+
+For automated deployments, configure these secrets in the GitHub repository:
+
+- **`DOCKERHUB_USERNAME`** - Docker Hub account username
+- **`DOCKERHUB_TOKEN`** - Docker Hub access token (from Account Settings → Security → Access Tokens)
+
+PyPI publishing uses trusted publishing and does not require secrets.
+
+### Release Process
+
+1. Update version in `pyproject.toml`
+2. Commit changes: `git commit -m "Bump version to X.Y.Z"`
+3. Create and push tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
+4. Create GitHub release with tag `vX.Y.Z`
+5. GitHub Actions automatically:
+   - Publishes Python package to PyPI
+   - Builds and pushes Docker images with version tags to Docker Hub
+
 ## Architecture
 
 ### Core Components

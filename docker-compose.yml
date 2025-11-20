@@ -1,0 +1,55 @@
+services:
+  imbi-automations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aweber/imbi-automations:latest
+
+    # Mount configuration and workflows
+    volumes:
+      # Configuration file
+      - ./config.toml:/config/config.toml:ro
+
+      # Workflows directory
+      - ./workflows:/workflows:ro
+
+      # Cache directory (for Imbi metadata cache)
+      - imbi-cache:/cache
+
+      # Working directory (temporary repo clones)
+      - imbi-workspace:/workspace
+
+      # SSH keys for git operations (uncomment and adjust path)
+      # - ~/.ssh:/root/.ssh:ro
+
+      # Optional: Git signing keys
+      # - ~/.gnupg:/root/.gnupg:ro
+
+    # Environment variables (override as needed)
+    environment:
+      # Git configuration
+      - GIT_AUTHOR_NAME=Imbi Automations
+      - GIT_AUTHOR_EMAIL=imbi-automations@example.com
+      - GIT_COMMITTER_NAME=Imbi Automations
+      - GIT_COMMITTER_EMAIL=imbi-automations@example.com
+
+      # Optional: Override cache directory
+      # - IMBI_AUTOMATIONS_CACHE_DIR=/cache
+
+      # Optional: Anthropic API key (if not in config.toml)
+      # - ANTHROPIC_API_KEY=your-api-key
+
+    # Override command (example: run a specific workflow)
+    # command: ["/config/config.toml", "/workflows/my-workflow", "--all-projects"]
+
+    # For debugging, you can override entrypoint to get a shell
+    # entrypoint: ["/bin/bash"]
+    # stdin_open: true
+    # tty: true
+
+volumes:
+  # Named volumes for persistent data
+  imbi-cache:
+    driver: local
+  imbi-workspace:
+    driver: local
