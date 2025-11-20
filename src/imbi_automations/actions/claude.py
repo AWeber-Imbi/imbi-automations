@@ -146,7 +146,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 agent,
                 cycle,
             )
-            self.logger.debug(
+            self._log_verbose_info(
                 '%s [%s/%s] %s claude response: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
