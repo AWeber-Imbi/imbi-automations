@@ -118,7 +118,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             agents.append(models.ClaudeAgentType.validation)
 
         for agent in agents:
-            self._log_verbose_info(
+            self.logger.debug(
                 '%s [%s/%s] %s executing Claude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
@@ -127,6 +127,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 agent,
                 cycle,
             )
+
             prompt = self._get_prompt(action, agent)
             self.logger.debug(
                 '%s %s execute agent prompt: %s',
@@ -136,11 +137,21 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             )
 
             run = await self.claude.agent_query(prompt)
-            self.logger.debug(
-                '%s %s %s agent result: %r',
+            self._log_verbose_info(
+                '%s [%s/%s] %s executedClaude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
                 action.name,
-                agent.name,
+                agent,
+                cycle,
+            )
+            self.logger.debug(
+                '%s [%s/%s] %s claude response: %s',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
                 run,
             )
 
