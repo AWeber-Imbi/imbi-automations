@@ -20,6 +20,13 @@ class WorkflowLoggerMixin:
         self.verbose = verbose
         super().__init__(*args, **kwargs)
 
+    def _log_verbose_info(
+        self, message: str, *args: typing.Any, **kwargs: typing.Any
+    ) -> None:
+        """Log a verbose message if enabled."""
+        if self.verbose:
+            self.logger.info(message, *args, **kwargs)
+
     def _set_workflow_logger(self, workflow: models.Workflow) -> None:
         """Set logger name to workflow directory name so it's slugified"""
         self.logger = logging.getLogger(workflow.path.name)
