@@ -341,7 +341,7 @@ class Automation(mixins.WorkflowLoggerMixin):
     async def _process_workflow_from_imbi_project(
         self, project: models.ImbiProject
     ) -> bool:
-        self._log_verbose_info(
+        self.logger.info(
             'Processing Project %i - %s', project.id, project.slug
         )
         github_repository = await self._get_github_repository(project)
@@ -363,7 +363,7 @@ class Automation(mixins.WorkflowLoggerMixin):
                     )
                 return False
 
-            self._log_verbose_info(
+            self.logger.info(
                 'Completed processing %s (%i)', project.name, project.id
             )
             return True

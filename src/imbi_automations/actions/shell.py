@@ -110,7 +110,7 @@ class ShellAction(mixins.WorkflowLoggerMixin):
             stdout_str = stdout.decode('utf-8') if stdout else ''
             stderr_str = stderr.decode('utf-8') if stderr else ''
 
-            self._log_verbose_info(
+            self.logger.info(
                 '%s [%s/%s] %s shell command completed with exit code %d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,

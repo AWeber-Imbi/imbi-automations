@@ -55,7 +55,7 @@ class GitActions(mixins.WorkflowLoggerMixin):
                     raise RuntimeError(
                         f'Git extraction failed for {action.source}'
                     )
-                self._log_verbose_info(
+                self.logger.info(
                     '%s [%s/%s] %s extracted %s to %s',
                     self.context.imbi_project.slug,
                     self.context.current_action_index,
@@ -84,7 +84,7 @@ class GitActions(mixins.WorkflowLoggerMixin):
                     branch=action.branch,
                     depth=action.depth,
                 )
-                self._log_verbose_info(
+                self.logger.info(
                     '%s [%s/%s] %s cloned repository to %s',
                     self.context.imbi_project.slug,
                     self.context.current_action_index,
