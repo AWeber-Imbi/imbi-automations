@@ -431,7 +431,7 @@ class CallableActionTestCase(base.AsyncTestCase):
             # Verify debug logging occurred
             mock_logger.debug.assert_called_once()
             call_args = mock_logger.debug.call_args[0]
-            self.assertIn('Executing', call_args[0])
+            self.assertIn('executing callable', call_args[0])
 
     async def test_execute_logs_exception_on_failure(self) -> None:
         """Test that exceptions are logged before re-raising."""
