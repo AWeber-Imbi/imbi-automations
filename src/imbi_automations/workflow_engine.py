@@ -162,16 +162,19 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             context.current_action_index = idx + 1
 
             try:
-                await self._execute_action(context, action)
+                executed = await self._execute_action(context, action)
 
-                self.tracker.incr('actions_executed')
-                self.tracker.incr(f'actions_executed_{action.type}')
+                if executed:
+                    self.tracker.incr('actions_executed')
+                    self.tracker.incr(f'actions_executed_{action.type}')
 
-                if action.committable:
-                    committed = await self.committer.commit(context, action)
-                    if committed:
-                        context.has_repository_changes = True
-                        self.tracker.incr('actions_committed')
+                    if action.committable:
+                        committed = await self.committer.commit(
+                            context, action
+                        )
+                        if committed:
+                            context.has_repository_changes = True
+                            self.tracker.incr('actions_committed')
             except Exception as exc:  # noqa: BLE001 - preserve_on_error must handle all exceptions
                 self.logger.error(
                     '%s error executing action "%s": %s',
@@ -335,8 +338,13 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             | models.WorkflowTemplateAction
             | models.WorkflowUtilityAction
         ),
-    ) -> None:
-        """Execute an action."""
+    ) -> bool:
+        """Execute an action.
+
+        Returns:
+            True if action was executed, False if skipped
+
+        """
         if action.filter and not await self.workflow_filter.filter_project(
             context.imbi_project, action.filter
         ):
@@ -347,7 +355,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             )
             self.tracker.incr('actions_filter_skipped')
             self.tracker.incr(f'actions_filter_skipped_{action.type}')
-            return
+            return False
 
         if not self.condition_checker.check(
             context,
@@ -361,7 +369,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 context.imbi_project.slug,
                 action.name,
             )
-            return
+            return False
         elif not await self.condition_checker.check_remote(
             context,
             self.workflow.configuration.condition_type,
@@ -374,8 +382,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self._log_verbose_info(
                 'Skipping action %s due to failed condition check', action.name
             )
-            return
+            return False
         await self.actions.execute(context, action)
+        return True
 
     def get_last_error_path(self) -> pathlib.Path | None:
         """Return path where error state was last preserved.
