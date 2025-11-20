@@ -157,6 +157,16 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
             if isinstance(run, models.ClaudeAgentPlanningResult):
                 self.task_plan = run
+                if run.skip_task:
+                    self.logger.info(
+                        '%s [%s/%s] %s planning agent determined no work '
+                        'needed - skipping task and validation',
+                        self.context.imbi_project.slug,
+                        self.context.current_action_index,
+                        self.context.total_actions,
+                        action.name,
+                    )
+                    return True  # Success - no work needed
                 self.logger.debug(
                     '%s %s planning agent created plan with %d tasks',
                     self.context.imbi_project.slug,

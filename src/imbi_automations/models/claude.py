@@ -30,10 +30,15 @@ class ClaudeAgentPlanningResult(pydantic.BaseModel):
 
     The plan field accepts structured objects (dicts with task/description/
     details fields) and flattens them to simple strings for compatibility.
+
+    If skip_task is True, the task and validation agents will be skipped
+    entirely, treating the action as successfully completed with no changes
+    needed.
     """
 
     plan: list[str]
     analysis: str
+    skip_task: bool = False
 
 
 class ClaudeAgentTaskResult(pydantic.BaseModel):
