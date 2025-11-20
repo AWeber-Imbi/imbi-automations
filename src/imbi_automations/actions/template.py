@@ -42,7 +42,7 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
                 f'Template source path does not exist: {source_path}'
             )
         if source_path.is_file():  # Single file template
-            self._log_verbose_info(
+            self.logger.debug(
                 '%s [%s/%s] %s rendering template from %s to %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
@@ -65,7 +65,7 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             return
 
         # Directory of templates - glob everything
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s rendering templates from directory %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,

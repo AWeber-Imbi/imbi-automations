@@ -83,7 +83,7 @@ class ShellAction(mixins.WorkflowLoggerMixin):
         # Render command if it contains templating
         command_str = self._render_command(action, self.context)
 
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s executing shell command: %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,

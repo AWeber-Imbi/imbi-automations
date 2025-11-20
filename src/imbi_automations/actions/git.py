@@ -32,7 +32,7 @@ class GitActions(mixins.WorkflowLoggerMixin):
                 destination_file = utils.resolve_path(
                     self.context, action.destination
                 )
-                self._log_verbose_info(
+                self.logger.debug(
                     '%s [%s/%s] %s extracting %s from git history',
                     self.context.imbi_project.slug,
                     self.context.current_action_index,
@@ -68,7 +68,7 @@ class GitActions(mixins.WorkflowLoggerMixin):
                 destination_path = utils.resolve_path(
                     self.context, action.destination
                 )
-                self._log_verbose_info(
+                self.logger.debug(
                     '%s [%s/%s] %s cloning repository from %s to %s',
                     self.context.imbi_project.slug,
                     self.context.current_action_index,

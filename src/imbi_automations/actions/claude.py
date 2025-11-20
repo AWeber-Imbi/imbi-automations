@@ -49,7 +49,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         warning_threshold = int(action.max_cycles * 0.6)
 
         for cycle in range(1, action.max_cycles + 1):
-            self._log_verbose_info(
+            self.logger.debug(
                 '%s [%s/%s] %s Claude Code cycle %d/%d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,

@@ -65,7 +65,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
             ]
         )
 
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s syncing environments for %s/%s: %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,

@@ -59,7 +59,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
         file_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.path)
         )
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s appending to file: %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -95,7 +95,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
         dest_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.destination)
         )
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s copying %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -220,7 +220,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
         """Delete files matching a regex pattern."""
         base_path = self.context.working_directory
 
-        self._log_verbose_info(
+        self.logger.debug(
             '%s %s deleting files matching pattern: %s',
             self.context.imbi_project.slug,
             action.name,
@@ -264,7 +264,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
         dest_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.destination)
         )
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s moving %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -300,7 +300,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
         dest_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.destination)
         )
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s renaming %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -333,7 +333,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
         file_path = utils.resolve_path(
             self.context, prompts.render_path(self.context, action.path)
         )
-        self._log_verbose_info(
+        self.logger.debug(
             '%s [%s/%s] %s writing to file: %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
