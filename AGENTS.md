@@ -434,17 +434,19 @@ max_cycles = 3
    - Planning agent analyzes codebase using Read, Glob, Grep, Bash tools (read-only)
    - Creates structured todo list with specific, actionable task strings (not objects)
    - Provides analysis/observations about codebase structure and dependencies
-   - Returns via `mcp__agent_tools__submit_planning_response(plan=[...], analysis="...")`
-   - Returns `ClaudeAgentPlanningResult` with `plan: list[str]` and `analysis: str`
+   - Can signal "no work needed" by setting `skip_task=True` to skip task and validation entirely
+   - Returns via `mcp__agent_tools__submit_planning_response(plan=[...], analysis="...", skip_task=False)`
+   - Returns `ClaudeAgentPlanningResult` with `plan: list[str]`, `analysis: str`, and `skip_task: bool`
 
-2. **Task Phase**:
+2. **Task Phase** (if `skip_task=False`):
    - Task agent receives plan injected into task prompt via `with-plan.md.j2` template
    - Executes changes following the structured, numbered plan
    - Has full context from planning agent's analysis
    - Claude SDK runs in `working_directory/repository/` (can access `../workflow/` and `../extracted/`)
    - Returns via `mcp__agent_tools__submit_task_response(message="...")`
+   - **Skipped entirely if planning agent sets `skip_task=True`**
 
-3. **Validation Phase** (if `validation_prompt` is set):
+3. **Validation Phase** (if `validation_prompt` is set and `skip_task=False`):
    - Validator agent checks the task agent's work (read-only)
    - Returns via `mcp__agent_tools__submit_validation_response(validated=bool, errors=list)`
    - Returns `ClaudeAgentValidationResult` with `validated: bool` and `errors: list[str]`
@@ -452,6 +454,7 @@ max_cycles = 3
 **Key Behaviors:**
 - **Plan Reset**: Task plan cleared (`self.task_plan = None`) and regenerated at the start of each cycle
 - **Fresh Planning**: Each cycle gets a new plan based on current repository state (adapts to changes)
+- **Skip Task**: Planning agent can set `skip_task=True` to skip task/validation when no work is needed
 - **Failure Handling**: Planning failures abort the cycle immediately (no task execution)
 - **Plan Injection**: Plan injected into task prompt via `with-plan.md.j2` template (similar to error injection)
 - **Error Recovery**: Planning agent gets `planning-with-errors.md.j2` template instructing it to create NEW PLAN (not fix errors directly)
@@ -464,9 +467,17 @@ max_cycles = 3
     "First specific task to complete",
     "Second specific task to complete"
   ],
-  "analysis": "Observations about codebase structure, patterns, dependencies, and potential challenges"
+  "analysis": "Observations about codebase structure, patterns, dependencies, and potential challenges",
+  "skip_task": false
 }
 ```
+
+**When to use skip_task:**
+- Repository already in desired state
+- Required changes already implemented
+- Action not applicable to this project
+- Configuration already correct
+- Prevents unnecessary task execution and commits
 
 **Recent Critical Fixes (October 2025):**
 1. **Planning Agent Error Handling** (commit 561909f - CRITICAL):

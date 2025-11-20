@@ -89,7 +89,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
 
         # Log results
         if result['success']:
-            self._log_verbose_info(
+            self.logger.info(
                 '%s [%s/%s] %s successfully synced environments: '
                 'created %d, deleted %d',
                 self.context.imbi_project.slug,
@@ -223,7 +223,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
                 try:
                     await github_client.delete_environment(org, repo, env_name)
                     result['deleted'].append(env_name)
-                    self._log_verbose_info(
+                    self.logger.info(
                         'Deleted environment "%s" from %s/%s',
                         env_name,
                         org,
@@ -242,7 +242,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
                 try:
                     await github_client.create_environment(org, repo, env_name)
                     result['created'].append(env_name)
-                    self._log_verbose_info(
+                    self.logger.info(
                         'Created environment "%s" in %s/%s',
                         env_name,
                         org,

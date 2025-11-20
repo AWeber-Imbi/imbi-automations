@@ -17,14 +17,39 @@ When done analyzing, call this tool:
 ```
 mcp__agent_tools__submit_planning_response(
     plan=["First task to do", "Second task to do", "Third task to do"],
-    analysis="What you found and observed"
+    analysis="What you found and observed",
+    skip_task=False
 )
 ```
 
 **IMPORTANT:**
 - `plan` = list of strings (tasks for the task agent)
 - `analysis` = string (your findings)
+- `skip_task` = boolean (optional, default False) - set to True if no work is needed
 - Call the tool - do NOT output text
+
+### When to Skip Task Execution
+
+If your analysis determines that **no changes are needed**, set `skip_task=True`:
+
+```
+mcp__agent_tools__submit_planning_response(
+    plan=[],
+    analysis="Analysis complete. The repository already matches requirements - no changes needed.",
+    skip_task=True
+)
+```
+
+**Use skip_task=True when:**
+- Repository already in desired state
+- Required changes already implemented
+- Action not applicable to this project
+- Configuration already correct
+
+**Benefits of skipping:**
+- Saves execution time (no task/validation agents run)
+- Prevents unnecessary commits
+- Clearly documents "no work needed" decision
 
 ## KEY DIRECTIVES
 

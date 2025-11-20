@@ -53,7 +53,7 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
             )
             with destination_path.open('w', encoding='utf-8') as fh:
                 fh.write(prompts.render(self.context, source_path))
-            self._log_verbose_info(
+            self.logger.info(
                 '%s [%s/%s] %s rendered template from %s to %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
@@ -88,7 +88,7 @@ class TemplateAction(mixins.WorkflowLoggerMixin):
                     fh.write(prompts.render(self.context, template_file))
                 file_count += 1
 
-        self._log_verbose_info(
+        self.logger.info(
             '%s [%s/%s] %s rendered %d templates from %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,

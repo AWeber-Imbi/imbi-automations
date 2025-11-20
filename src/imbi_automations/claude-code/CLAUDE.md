@@ -58,7 +58,7 @@ mcp__agent_tools__submit_validation_response(
 
 Use this tool to submit planning results with structured arguments.
 
-Example:
+Example (with work to do):
 ```
 mcp__agent_tools__submit_planning_response(
     plan=[
@@ -66,13 +66,24 @@ mcp__agent_tools__submit_planning_response(
         "Update base image in Dockerfile to python:3.12",
         "Modify dependency constraints for Python 3.12 compatibility"
     ],
-    analysis="Repository uses Python 3.9 in multiple locations. Found dependencies that need updating for 3.12 compatibility."
+    analysis="Repository uses Python 3.9 in multiple locations. Found dependencies that need updating for 3.12 compatibility.",
+    skip_task=False
+)
+```
+
+Example (no work needed):
+```
+mcp__agent_tools__submit_planning_response(
+    plan=[],
+    analysis="Repository already uses Python 3.12 in all locations. No changes needed.",
+    skip_task=True
 )
 ```
 
 **Parameters:**
 - `plan` (required): Array of task strings (simple strings, not objects)
 - `analysis` (required): Summary of findings and context
+- `skip_task` (optional, default False): Set to True if analysis determines no work is needed. Skips task and validation agents entirely.
 
 ## Important Notes
 

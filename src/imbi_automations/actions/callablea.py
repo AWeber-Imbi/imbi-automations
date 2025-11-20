@@ -52,7 +52,7 @@ class CallableAction(mixins.WorkflowLoggerMixin):
         except Exception as exc:
             self.logger.exception('Error invoking callable: %s', exc)
             raise RuntimeError(str(exc)) from exc
-        self._log_verbose_info(
+        self.logger.info(
             '%s [%s/%s] %s completed callable %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,

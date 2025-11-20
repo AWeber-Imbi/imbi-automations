@@ -137,7 +137,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             )
 
             run = await self.claude.agent_query(prompt)
-            self._log_verbose_info(
+            self.logger.info(
                 '%s [%s/%s] %s executedClaude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
@@ -146,7 +146,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 agent,
                 cycle,
             )
-            self.logger.debug(
+            self._log_verbose_info(
                 '%s [%s/%s] %s claude response: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
@@ -157,6 +157,16 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
             if isinstance(run, models.ClaudeAgentPlanningResult):
                 self.task_plan = run
+                if run.skip_task:
+                    self.logger.info(
+                        '%s [%s/%s] %s planning agent determined no work '
+                        'needed - skipping task and validation',
+                        self.context.imbi_project.slug,
+                        self.context.current_action_index,
+                        self.context.total_actions,
+                        action.name,
+                    )
+                    return True  # Success - no work needed
                 self.logger.debug(
                     '%s %s planning agent created plan with %d tasks',
                     self.context.imbi_project.slug,

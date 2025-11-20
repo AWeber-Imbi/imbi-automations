@@ -106,7 +106,7 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             )
             raise
         else:
-            self._log_verbose_info(
+            self.logger.info(
                 '%s [%s/%s] %s successfully updated environments for '
                 'project %d',
                 self.context.imbi_project.slug,
@@ -168,7 +168,7 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             )
             raise
         else:
-            self._log_verbose_info(
+            self.logger.info(
                 '%s [%s/%s] %s successfully updated fact "%s" for project %d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,

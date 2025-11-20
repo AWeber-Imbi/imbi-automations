@@ -78,7 +78,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
             else:
                 f.write(action.content)
 
-        self._log_verbose_info(
+        self.logger.info(
             '%s [%s/%s] %s appended to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -110,7 +110,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
             await self._execute_copy_glob(source_path, dest_path)
         else:
             await self._execute_copy_single(source_path, dest_path)
-        self._log_verbose_info(
+        self.logger.info(
             '%s [%s/%s] %s copied from %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -200,7 +200,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
                 file_path.unlink()
             elif file_path.is_dir():
                 shutil.rmtree(file_path)
-            self._log_verbose_info(
+            self.logger.info(
                 '%s %s deleted %s',
                 self.context.imbi_project.slug,
                 action.name,
@@ -249,7 +249,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
                     file_path.unlink()
                     deleted_count += 1
 
-        self._log_verbose_info(
+        self.logger.info(
             '%s %s deleted %d files matching pattern',
             self.context.imbi_project.slug,
             action.name,
@@ -282,7 +282,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
 
         shutil.move(str(source_path), str(dest_path))
 
-        self._log_verbose_info(
+        self.logger.info(
             '%s [%s/%s] %s moved %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -318,7 +318,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
 
         source_path.rename(dest_path)
 
-        self._log_verbose_info(
+        self.logger.info(
             '%s [%s/%s] %s renamed %s to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
@@ -353,7 +353,7 @@ class FileActions(mixins.WorkflowLoggerMixin):
             with file_path.open('w', encoding=action.encoding) as f:
                 f.write(action.content)
 
-        self._log_verbose_info(
+        self.logger.info(
             '%s [%s/%s] %s wrote to %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,

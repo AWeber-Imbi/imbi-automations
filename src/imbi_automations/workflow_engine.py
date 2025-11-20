@@ -255,7 +255,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
 
         # Delete remote branch if replace_branch is enabled
         if context.workflow.configuration.github.replace_branch:
-            self._log_verbose_info(
+            self.logger.info(
                 'Deleting remote branch %s if exists for %s '
                 '(replace_branch=True)',
                 branch_name,
@@ -265,7 +265,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 working_directory=repository_dir, branch_name=branch_name
             )
 
-        self._log_verbose_info(
+        self.logger.info(
             'Creating pull request branch: %s for %s',
             branch_name,
             context.imbi_project.slug,
@@ -286,7 +286,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             set_upstream=True,
         )
 
-        self._log_verbose_info(
+        self.logger.info(
             'Successfully pushed branch %s for pull request for %s',
             branch_name,
             context.imbi_project.slug,
@@ -318,7 +318,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             body=body,
             head_branch=branch_name,
         )
-        self._log_verbose_info(
+        self.logger.info(
             'Created pull request for %s: %s',
             context.imbi_project.slug,
             pr_url,
@@ -379,7 +379,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.tracker.incr(
                 f'actions_remote_condition_skipped_{action.type}'
             )
-            self._log_verbose_info(
+            self.logger.info(
                 'Skipping action %s due to failed condition check', action.name
             )
             return False
