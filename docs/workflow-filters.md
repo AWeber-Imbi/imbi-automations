@@ -28,10 +28,10 @@ github_identifier_required = true
 github_workflow_status_exclude = ["success"]
 
 # New: Flexible field filtering
-[filter.project_field_filters.description]
+[filter.project.description]
 is_empty = true
 
-[filter.project_field_filters.name]
+[filter.project.name]
 regex = "^api-.*"
 ```
 
@@ -218,7 +218,7 @@ github_identifier_required = true
 
 **Why this filter?** Workflow creates pull requests, so GitHub integration is required.
 
-### project_field_filters
+### project
 
 Filter projects based on arbitrary field conditions with flexible operators.
 
@@ -240,15 +240,15 @@ Filter projects based on arbitrary field conditions with flexible operators.
 
 ```toml
 # Filter projects without descriptions
-[filter.project_field_filters.description]
+[filter.project.description]
 is_empty = true
 
 # Filter projects by name pattern
-[filter.project_field_filters.name]
+[filter.project.name]
 regex = "^api-.*"
 
 # Filter projects with specific archived status
-[filter.project_field_filters.archived]
+[filter.project.archived]
 equals = false
 ```
 
@@ -256,25 +256,25 @@ equals = false
 
 **Find projects missing metadata:**
 ```toml
-[filter.project_field_filters.description]
+[filter.project.description]
 is_empty = true
 ```
 
 **Target projects by name pattern:**
 ```toml
-[filter.project_field_filters.name]
+[filter.project.name]
 regex = "^(api|service)-"
 ```
 
 **Exclude archived projects:**
 ```toml
-[filter.project_field_filters.archived]
+[filter.project.archived]
 equals = false
 ```
 
 **Find projects with specific text:**
 ```toml
-[filter.project_field_filters.description]
+[filter.project.description]
 contains = "legacy"
 ```
 
@@ -295,7 +295,7 @@ contains = "legacy"
 [filter]
 project_facts = {"Programming Language" = "Python 3.12"}
 
-[filter.project_field_filters.description]
+[filter.project.description]
 is_empty = true
 ```
 
