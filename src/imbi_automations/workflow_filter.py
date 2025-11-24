@@ -75,7 +75,7 @@ class Filter(mixins.WorkflowLoggerMixin):
                 not in workflow_filter.project_types
             )
             or (
-                workflow_filter.project_field_filters
+                workflow_filter.project
                 and not self._filter_project_fields(project, workflow_filter)
             )
         ):
@@ -146,10 +146,7 @@ class Filter(mixins.WorkflowLoggerMixin):
         Supports various operators: is_null, is_not_null, equals, not_equals,
         contains, regex, and is_empty.
         """
-        for (
-            field_name,
-            field_filter,
-        ) in workflow_filter.project_field_filters.items():
+        for field_name, field_filter in workflow_filter.project.items():
             # Get the field value from the project
             if not hasattr(project, field_name):
                 LOGGER.warning(

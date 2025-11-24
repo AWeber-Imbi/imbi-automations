@@ -91,7 +91,7 @@ class WorkflowFilter(pydantic.BaseModel):
     project_environments: set[str] = set()
     github_identifier_required: bool = False
     github_workflow_status_exclude: set[str] = set()
-    project_field_filters: dict[str, ProjectFieldFilter] = {}
+    project: dict[str, ProjectFieldFilter] = {}
 
 
 class WorkflowActionTypes(enum.StrEnum):

@@ -138,7 +138,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
             run = await self.claude.agent_query(prompt)
             self.logger.info(
-                '%s [%s/%s] %s executedClaude Code %s agent in cycle %d',
+                '%s [%s/%s] %s executed Claude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
