@@ -83,16 +83,14 @@ The project uses GitHub Actions for automated testing, building, and deployment:
 
 #### Docker Build Workflow (`.github/workflows/docker.yml`)
 - **Trigger**: Push to main, releases, version tags, pull requests, manual dispatch
-- **Actions**: Builds multi-architecture Docker images (amd64, arm64)
-- **Registries**:
+- **Actions**: Builds multi-architecture Docker images (amd64, arm64) on all triggers, but only pushes on releases
+- **Registries** (releases only):
   - Docker Hub (`aweber/imbi-automations`)
   - GitHub Container Registry (`ghcr.io/aweber-imbi/imbi-automations`)
-- **Tags**:
-  - `latest` - Latest commit on main branch
+- **Tags** (releases only):
+  - `latest` - Latest release
   - `1.0.0`, `1.0`, `1` - Semantic version tags from releases
-  - `main-{sha}` - Commit SHA from main branch
-  - `pr-{number}` - Pull request builds (not pushed)
-- **Build Cache**: Uses GitHub Actions cache for faster builds
+- **Build Cache**: Uses GitHub Actions cache for faster builds across all triggers
 - **Attestation**: Generates build provenance for both registries on releases
 
 #### PyPI Publish Workflow (`.github/workflows/publish.yml`)
