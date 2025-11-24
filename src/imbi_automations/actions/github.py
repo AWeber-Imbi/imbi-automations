@@ -37,6 +37,8 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
         match action.command:
             case models.WorkflowGitHubCommand.sync_environments:
                 await self._sync_environments(action)
+            case models.WorkflowGitHubCommand.update_repository:
+                await self._update_repository(action)
             case _:
                 raise RuntimeError(f'Unsupported command: {action.command}')
 
@@ -285,3 +287,121 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
             self.logger.error(error_msg)
             result['errors'].append(error_msg)
             return result
+
+    async def _update_repository(
+        self, action: models.WorkflowGitHubAction
+    ) -> None:
+        """Update GitHub repository attributes.
+
+        Args:
+            action: GitHub action with attributes dict
+
+        Raises:
+            ValueError: If attributes is missing or github_repository not in
+                context
+            RuntimeError: If update fails
+
+        """
+        if not action.attributes:
+            raise ValueError('attributes is required for update_repository')
+
+        if not self.context.github_repository:
+            raise ValueError('No GitHub repository in workflow context')
+
+        org, repo = self.context.github_repository.full_name.split('/', 1)
+
+        # Render Jinja2 templates in attribute values
+        from imbi_automations import prompts
+
+        rendered_attributes = {}
+        for attr_name, attr_value in action.attributes.items():
+            # Only render string values (templates)
+            if isinstance(attr_value, str):
+                rendered_value = prompts.render_template_string(
+                    attr_value,
+                    workflow=self.context.workflow,
+                    github_repository=self.context.github_repository,
+                    imbi_project=self.context.imbi_project,
+                    working_directory=self.context.working_directory,
+                    starting_commit=self.context.starting_commit,
+                )
+                rendered_attributes[attr_name] = rendered_value
+            else:
+                # Pass through non-string values unchanged
+                rendered_attributes[attr_name] = attr_value
+
+        # Log which attributes are being updated
+        attr_summary = ', '.join(
+            f'{k}="{v}"' for k, v in rendered_attributes.items()
+        )
+        self.logger.debug(
+            '%s [%s/%s] %s updating repository %s/%s with: %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            org,
+            repo,
+            attr_summary,
+        )
+
+        # Check if any attributes actually need updating
+        attributes_to_update = {}
+        for attr_name, new_value in rendered_attributes.items():
+            current_value = getattr(
+                self.context.github_repository, attr_name, None
+            )
+            if current_value != new_value:
+                attributes_to_update[attr_name] = new_value
+            else:
+                self.logger.debug(
+                    '%s %s attribute "%s" already matches (value: %s), '
+                    'skipping',
+                    self.context.imbi_project.slug,
+                    action.name,
+                    attr_name,
+                    current_value,
+                )
+
+        # Skip update if no attributes need changing
+        if not attributes_to_update:
+            self.logger.info(
+                '%s [%s/%s] %s no attributes need updating for %s/%s, '
+                'skipping',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
+                org,
+                repo,
+            )
+            return
+
+        # Create GitHub client
+        github_client = clients.GitHub(self.configuration)
+
+        try:
+            await github_client.update_repository(
+                org=org, repo=repo, attributes=attributes_to_update
+            )
+        except httpx.HTTPError as exc:
+            error_msg = f'Failed to update repository {org}/{repo}: {exc}'
+            self.logger.error(
+                '%s [%s/%s] %s %s',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
+                error_msg,
+            )
+            raise RuntimeError(error_msg) from exc
+        else:
+            self.logger.info(
+                '%s [%s/%s] %s successfully updated repository %s/%s',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
+                org,
+                repo,
+            )
