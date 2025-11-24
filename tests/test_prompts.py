@@ -204,7 +204,7 @@ class RenderTestCase(PromptsTestBase):
         repo_dir.mkdir(parents=True, exist_ok=True)
         pyproject_path = repo_dir / 'pyproject.toml'
         pyproject_path.write_text(
-            '[package]\nname = "test-package"\n', encoding='utf-8'
+            '[project]\nname = "test-package"\n', encoding='utf-8'
         )
         self.context.working_directory = self.working_dir
 
@@ -221,7 +221,7 @@ class RenderTestCase(PromptsTestBase):
         custom_path = self.working_dir / 'custom' / 'pyproject.toml'
         custom_path.parent.mkdir(parents=True, exist_ok=True)
         custom_path.write_text(
-            '[package]\nname = "custom-package"\n', encoding='utf-8'
+            '[project]\nname = "custom-package"\n', encoding='utf-8'
         )
         self.context.working_directory = self.working_dir
 

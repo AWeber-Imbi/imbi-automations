@@ -210,7 +210,7 @@ def extract_package_name_from_pyproject(
 ) -> str:
     """Extract the Python package name from a pyproject.toml file."""
     try:
-        return _read_pyproject_toml(context, path)['package']['name']
+        return _read_pyproject_toml(context, path)['project']['name']
     except (FileNotFoundError, KeyError) as err:
         raise RuntimeError(f'Failed to extract package name: {err}') from err
 
