@@ -197,6 +197,42 @@ class RenderTestCase(PromptsTestBase):
             prompts.render(self.context, source='invalid-string')
         self.assertIn('source is not a Path object', str(cm.exception))
 
+    def test_render_with_extract_package_name_no_args(self) -> None:
+        """Test calling extract_package_name_from_pyproject() without args."""
+        # Create a pyproject.toml
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        pyproject_path = repo_dir / 'pyproject.toml'
+        pyproject_path.write_text(
+            '[package]\nname = "test-package"\n', encoding='utf-8'
+        )
+        self.context.working_directory = self.working_dir
+
+        # Should work when called without arguments (using default path)
+        result = prompts.render(
+            self.context,
+            template='{{ extract_package_name_from_pyproject() }}',
+        )
+        self.assertEqual(result, 'test-package')
+
+    def test_render_with_extract_package_name_with_args(self) -> None:
+        """Test calling extract_package_name_from_pyproject() with path arg."""
+        # Create a pyproject.toml at a specific location
+        custom_path = self.working_dir / 'custom' / 'pyproject.toml'
+        custom_path.parent.mkdir(parents=True, exist_ok=True)
+        custom_path.write_text(
+            '[package]\nname = "custom-package"\n', encoding='utf-8'
+        )
+        self.context.working_directory = self.working_dir
+
+        # Should work when called with a path argument
+        template = (
+            '{{ extract_package_name_from_pyproject('
+            '"file:///custom/pyproject.toml") }}'
+        )
+        result = prompts.render(self.context, template=template)
+        self.assertEqual(result, 'custom-package')
+
 
 class RenderFileTestCase(PromptsTestBase):
     """Tests for render_file function."""

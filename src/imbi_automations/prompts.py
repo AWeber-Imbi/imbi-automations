@@ -60,8 +60,10 @@ def render(
                     )
                 ),
                 'extract_package_name_from_pyproject': (
-                    lambda path: utils.extract_package_name_from_pyproject(
-                        context, path
+                    lambda path=None: (
+                        utils.extract_package_name_from_pyproject(
+                            context, path
+                        )
                     )
                 ),
                 'python_init_file_path': (
