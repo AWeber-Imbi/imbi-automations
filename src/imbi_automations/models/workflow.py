@@ -390,12 +390,13 @@ class WorkflowGitHubAction(WorkflowAction):
 class WorkflowImbiActionCommand(enum.StrEnum):
     """Imbi project management system operation commands.
 
-    Defines available Imbi operations including project fact management.
+    Defines available Imbi operations including project fact management
+    and generic project attribute updates.
     """
 
     set_environments = 'set_environments'
     set_project_fact = 'set_project_fact'
-    set_project_description = 'set_project_description'
+    update_project = 'update_project'
 
 
 class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
@@ -415,18 +416,18 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     value: bool | int | float | str | None = None
     skip_validations: bool = False
 
-    # Attributes for set_environments command
+    # Fields for set_environments command
     values: list[str] = []
 
-    # Fields for set_project_description command
-    description: str | None = None
+    # Fields for update_project command
+    attributes: dict[str, typing.Any] = {}
 
     # CommandRulesMixin configuration
     command_field: typing.ClassVar[str] = 'command'
     required_fields: typing.ClassVar[dict[object, set[str]]] = {
         WorkflowImbiActionCommand.set_environments: {'values'},
         WorkflowImbiActionCommand.set_project_fact: {'fact_name', 'value'},
-        WorkflowImbiActionCommand.set_project_description: {'description'},
+        WorkflowImbiActionCommand.update_project: {'attributes'},
     }
     allowed_fields: typing.ClassVar[dict[object, set[str]]] = {
         WorkflowImbiActionCommand.set_environments: {'values'},
@@ -435,7 +436,7 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
             'value',
             'skip_validations',
         },
-        WorkflowImbiActionCommand.set_project_description: {'description'},
+        WorkflowImbiActionCommand.update_project: {'attributes'},
     }
 
 

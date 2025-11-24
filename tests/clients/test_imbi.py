@@ -1216,6 +1216,200 @@ class TestImbiClient(base.AsyncTestCase):
         self.assertEqual(environments[2].name, 'Testing Environment')
         self.assertEqual(environments[2].slug, 'testing-environment')
 
+    async def test_update_project_attributes_success(self) -> None:
+        """Test successful update of project attributes."""
+        # Mock get_project response
+        mock_project = create_mock_project_data(
+            project_id=123,
+            name='Old Name',
+            namespace_slug='testorg',
+            project_type_slug='api',
+            slug='test-project',
+            description='Old description',
+        )
+
+        # Mock responses: opensearch for get_project, then patch
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'hits': {'hits': [mock_project]}},
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={},
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'updated': True},
+                request=httpx.Request(
+                    'PATCH', 'https://imbi.example.com/projects/123'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
+
+        # Should not raise exception
+        await self.instance.update_project_attributes(
+            project_id=123,
+            attributes={'description': 'New description', 'name': 'New Name'},
+        )
+
+    async def test_update_project_attributes_unchanged(self) -> None:
+        """Test update with unchanged attributes skips API call."""
+        # Mock get_project response with current values
+        mock_project = create_mock_project_data(
+            project_id=123,
+            name='Current Name',
+            namespace_slug='testorg',
+            project_type_slug='api',
+            slug='test-project',
+            description='Current description',
+        )
+
+        # Only need opensearch response - no patch should be called
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'hits': {'hits': [mock_project]}},
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
+
+        # Should not make PATCH call since values unchanged
+        await self.instance.update_project_attributes(
+            project_id=123, attributes={'description': 'Current description'}
+        )
+
+        # Verify only 2 calls made (opensearch + environments, no patch)
+        self.assertEqual(call_count, 2)
+
+    async def test_update_project_attributes_empty_dict(self) -> None:
+        """Test update with empty attributes dict raises ValueError."""
+        with self.assertRaises(ValueError) as cm:
+            await self.instance.update_project_attributes(
+                project_id=123, attributes={}
+            )
+        self.assertIn('cannot be empty', str(cm.exception))
+
+    async def test_update_project_attributes_project_not_found(self) -> None:
+        """Test update when project not found raises ValueError."""
+        # Mock empty opensearch response
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'hits': {'hits': []}},
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
+            )
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
+
+        with self.assertRaises(ValueError) as cm:
+            await self.instance.update_project_attributes(
+                project_id=999, attributes={'description': 'New'}
+            )
+        self.assertIn('Project not found', str(cm.exception))
+
+    async def test_update_project_attributes_http_error(self) -> None:
+        """Test update handles HTTP errors properly."""
+        # Mock get_project response
+        mock_project = create_mock_project_data(
+            project_id=123,
+            name='Test',
+            namespace_slug='testorg',
+            project_type_slug='api',
+            slug='test-project',
+            description='Old',
+        )
+
+        # Mock responses: opensearch success, then patch failure
+        responses = [
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json={'hits': {'hits': [mock_project]}},
+                request=httpx.Request(
+                    'POST', 'https://imbi.example.com/opensearch/projects'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.OK,
+                json=[],
+                request=httpx.Request(
+                    'GET', 'https://imbi.example.com/environments'
+                ),
+            ),
+            httpx.Response(
+                http.HTTPStatus.BAD_REQUEST,
+                json={'error': 'Invalid attribute'},
+                request=httpx.Request(
+                    'PATCH', 'https://imbi.example.com/projects/123'
+                ),
+            ),
+        ]
+
+        call_count = 0
+
+        def mock_response(request: httpx.Request) -> httpx.Response:
+            nonlocal call_count
+            response = responses[call_count]
+            call_count += 1
+            return response
+
+        self.http_client_transport = httpx.MockTransport(mock_response)
+        self.instance = imbi.Imbi(self.config, self.http_client_transport)
+
+        with self.assertRaises(httpx.HTTPStatusError):
+            await self.instance.update_project_attributes(
+                project_id=123, attributes={'description': 'New'}
+            )
+
 
 if __name__ == '__main__':
     unittest.main()
