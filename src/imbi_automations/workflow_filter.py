@@ -107,7 +107,7 @@ class Filter(mixins.WorkflowLoggerMixin):
     async def _filter_github_action_status(
         self, project: models.ImbiProject
     ) -> str:
-        client = clients.GitHub.get_instance(config=self.configuration.github)
+        client = clients.GitHub.get_instance(config=self.configuration)
         repository = await client.get_repository(project)
         return await client.get_repository_workflow_status(repository)
 
