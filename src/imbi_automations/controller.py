@@ -334,9 +334,24 @@ class Automation(mixins.WorkflowLoggerMixin):
                 *[
                     asyncio.create_task(limited_process(project))
                     for project in filtered
-                ]
+                ],
+                return_exceptions=True,
             )
-        return all(results)
+
+        # Count successes and failures
+        successes = sum(1 for r in results if r is True)
+        failures = sum(
+            1 for r in results if r is False or isinstance(r, Exception)
+        )
+
+        if failures > 0:
+            self.logger.warning(
+                'Completed batch processing: %d succeeded, %d failed',
+                successes,
+                failures,
+            )
+
+        return all(r is True for r in results)
 
     async def _process_workflow_from_imbi_project(
         self, project: models.ImbiProject

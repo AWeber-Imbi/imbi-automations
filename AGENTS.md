@@ -544,18 +544,25 @@ max_cycles = 3
 - Configuration already correct
 - Prevents unnecessary task execution and commits
 
-**Recent Critical Fixes (October 2025):**
-1. **Planning Agent Error Handling** (commit 561909f - CRITICAL):
+**Recent Critical Fixes:**
+1. **Batch Processing Error Handling** (November 2025 - CRITICAL):
+   - Fixed `asyncio.gather()` to include `return_exceptions=True` for continue-on-error behavior
+   - Previously, batch processing would abort entire run when any single project failed
+   - Now properly continues processing remaining projects when `--exit-on-error` is NOT set
+   - Added warning message showing success/failure counts after batch completion
+   - Location: `controller.py:_process_imbi_projects_common()`
+
+2. **Planning Agent Error Handling** (commit 561909f - CRITICAL):
    - Created `planning-with-errors.md.j2` template that explicitly instructs: "Create a NEW PLAN, do NOT fix errors yourself"
    - Planning agent was previously trying to fix errors directly instead of re-planning
    - Now properly re-analyzes and creates new task list each cycle when validation fails
 
-2. **Claude SDK Working Directory** (commit 561909f - CRITICAL):
+3. **Claude SDK Working Directory** (commit 561909f - CRITICAL):
    - Changed SDK CWD from `working_directory` to `working_directory/repository`
    - Claude Code now operates directly in repository where modifications occur
    - Workflow and extracted directories accessible via `../workflow/` and `../extracted/`
 
-3. **preserve_on_error Bug Fix** (commit 561909f):
+4. **preserve_on_error Bug Fix** (commit 561909f):
    - Fixed unreachable code where `raise exc` was before preservation logic
    - Proper order now: log error → preserve if enabled → cleanup → raise
    - Error states now properly preserved for debugging
