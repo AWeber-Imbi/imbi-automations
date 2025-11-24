@@ -553,6 +553,66 @@ class Imbi(http.BaseURLHTTPClient):
             )
             raise
 
+    async def update_project_description(
+        self, project_id: int, description: str
+    ) -> None:
+        """Update description for a project using JSON Patch.
+
+        Args:
+            project_id: Imbi project ID
+            description: New description text
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        # Get current project data to check existing description
+        project = await self.get_project(project_id)
+        if not project:
+            raise ValueError(f'Project not found: {project_id}')
+
+        # Skip update if description is unchanged
+        if project.description == description:
+            LOGGER.debug(
+                'Description unchanged for project %d, skipping update',
+                project_id,
+            )
+            return
+
+        LOGGER.debug(
+            'Updating description for project %d from "%s" to "%s"',
+            project_id,
+            project.description,
+            description,
+        )
+
+        payload = [
+            {'op': 'replace', 'path': '/description', 'value': description}
+        ]
+        response = await self.patch(f'/projects/{project_id}', json=payload)
+
+        # HTTP 304 Not Modified is success (no changes needed)
+        if response.status_code == 304:
+            LOGGER.debug(
+                'Description already set for project %d (HTTP 304)', project_id
+            )
+            return
+
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            try:
+                error_body = response.text
+            except (AttributeError, UnicodeDecodeError):
+                error_body = '<unable to read response body>'
+            LOGGER.error(
+                'Failed to update description for project %d: HTTP %d - %s',
+                project_id,
+                response.status_code,
+                error_body,
+            )
+            raise
+
     async def update_project_github_identifier(
         self, project_id: int, identifier_name: str, value: int | str | None
     ) -> None:

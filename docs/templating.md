@@ -142,6 +142,38 @@ Starting commit: {{ starting_commit }}
 
 The templating system provides custom functions accessible within templates:
 
+#### `read_file(file_path)`
+
+Reads the contents of a file and returns it as a string.
+
+**Parameters:**
+
+- `file_path` - Path to file (supports ResourceUrl schemes: `repository:///`, `workflow:///`, `extracted:///`, etc.)
+
+**Returns:** File contents as string
+
+**Example:**
+```jinja2
+Description: {{ read_file('repository:///DESCRIPTION.txt').strip() }}
+```
+
+**Usage in Imbi actions:**
+```toml
+[[actions]]
+name = "set-description-from-file"
+type = "imbi"
+command = "set_project_description"
+description = "{{ read_file('repository:///GENERATED_DESCRIPTION.txt').strip() }}"
+```
+
+**Use cases:**
+- Load AI-generated content from files
+- Read README excerpts for descriptions
+- Extract version strings from files
+- Load configuration snippets
+
+**Available in:** Template actions, Imbi action fields, Claude prompts
+
 #### `extract_image_from_dockerfile(dockerfile_path)`
 Extracts the base Docker image from a Dockerfile.
 

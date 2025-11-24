@@ -26,6 +26,13 @@ project_facts = {"Programming Language" = "Python 3.12"}
 project_environments = ["production", "staging"]
 github_identifier_required = true
 github_workflow_status_exclude = ["success"]
+
+# New: Flexible field filtering
+[filter.project.description]
+is_empty = true
+
+[filter.project.name]
+regex = "^api-.*"
 ```
 
 **Filter Logic:** ALL filter criteria must match (AND logic). A project must satisfy every filter to be included.
@@ -210,6 +217,91 @@ github_identifier_required = true
 ```
 
 **Why this filter?** Workflow creates pull requests, so GitHub integration is required.
+
+### project
+
+Filter projects based on arbitrary field conditions with flexible operators.
+
+**Type:** `dict[string, ProjectFieldFilter]`
+
+**Default:** `{}` (no field filtering)
+
+**Available operators:**
+
+- `is_null` - Check if field is None
+- `is_not_null` - Check if field is not None
+- `is_empty` - Check if field is None OR empty string
+- `equals` - Exact value match
+- `not_equals` - Value must not match
+- `contains` - Substring search (strings only)
+- `regex` - Pattern matching (strings only)
+
+**Key constraint:** Only ONE operator per field filter.
+
+```toml
+# Filter projects without descriptions
+[filter.project.description]
+is_empty = true
+
+# Filter projects by name pattern
+[filter.project.name]
+regex = "^api-.*"
+
+# Filter projects with specific archived status
+[filter.project.archived]
+equals = false
+```
+
+**Common use cases:**
+
+**Find projects missing metadata:**
+```toml
+[filter.project.description]
+is_empty = true
+```
+
+**Target projects by name pattern:**
+```toml
+[filter.project.name]
+regex = "^(api|service)-"
+```
+
+**Exclude archived projects:**
+```toml
+[filter.project.archived]
+equals = false
+```
+
+**Find projects with specific text:**
+```toml
+[filter.project.description]
+contains = "legacy"
+```
+
+**Available project fields:**
+
+- `name` - Project name
+- `slug` - Project slug
+- `description` - Project description
+- `archived` - Whether project is archived
+- `project_type_name` - Project type name
+- `project_type_slug` - Project type slug
+- `namespace_slug` - Namespace slug
+- Any custom fields on `ImbiProject` model
+
+**Real-world example:**
+```toml
+# Find Python projects without descriptions
+[filter]
+project_facts = {"Programming Language" = "Python 3.12"}
+
+[filter.project.description]
+is_empty = true
+```
+
+**Performance:** Field filters evaluate against cached Imbi data, making them very fast.
+
+**Validation:** Fields are checked for existence at runtime. Non-existent fields cause projects to be filtered out with a warning.
 
 ### github_workflow_status_exclude
 

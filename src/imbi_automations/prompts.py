@@ -67,6 +67,11 @@ def render(
                 'python_init_file_path': (
                     lambda: utils.python_init_file_path(context)
                 ),
+                'read_file': (
+                    lambda path: utils.resolve_path(context, path).read_text(
+                        encoding='utf-8'
+                    )
+                ),
             }
         )
         kwargs.update(context.model_dump())
@@ -114,3 +119,40 @@ def has_template_syntax(value: str) -> bool:
         '{#',  # Comments
     ]
     return any(pattern in value for pattern in template_patterns)
+
+
+def render_template_string(template_string: str, **kwargs: typing.Any) -> str:
+    """Render a template string with provided variables.
+
+    Args:
+        template_string: Template string to render.
+        **kwargs: Variables to pass to template rendering.
+
+    Returns:
+        Rendered string.
+    """
+    env = jinja2.Environment(
+        autoescape=False,  # noqa: S701
+        undefined=jinja2.StrictUndefined,
+    )
+
+    # Add context if workflow context is provided
+    if 'workflow' in kwargs:
+        context = models.WorkflowContext(
+            workflow=kwargs['workflow'],
+            github_repository=kwargs.get('github_repository'),
+            imbi_project=kwargs.get('imbi_project'),
+            working_directory=kwargs.get('working_directory'),
+            starting_commit=kwargs.get('starting_commit'),
+        )
+        env.globals.update(
+            {
+                'read_file': (
+                    lambda path: utils.resolve_path(context, path).read_text(
+                        encoding='utf-8'
+                    )
+                )
+            }
+        )
+
+    return env.from_string(template_string).render(**kwargs)

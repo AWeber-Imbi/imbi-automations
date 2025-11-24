@@ -48,7 +48,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             config, verbose
         )
         self.configuration = config
-        self.github = clients.GitHub.get_instance(config=config.github)
+        self.github = clients.GitHub.get_instance(config=config)
         self.last_error_path: pathlib.Path | None = None
         self.registry = registry
         self.resume_state = resume_state

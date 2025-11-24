@@ -2,7 +2,7 @@
 
 import httpx
 
-from imbi_automations import clients, mixins, models
+from imbi_automations import clients, mixins, models, prompts
 
 
 class ImbiActions(mixins.WorkflowLoggerMixin):
@@ -38,6 +38,8 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 await self._set_project_fact(action)
             case models.WorkflowImbiActionCommand.set_environments:
                 await self._set_environments(action)
+            case models.WorkflowImbiActionCommand.set_project_description:
+                await self._set_project_description(action)
             case _:
                 raise RuntimeError(f'Unsupported command: {action.command}')
 
@@ -108,6 +110,74 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
         else:
             self.logger.info(
                 '%s [%s/%s] %s successfully updated environments for '
+                'project %d',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
+                self.context.imbi_project.id,
+            )
+
+    async def _set_project_description(
+        self, action: models.WorkflowImbiAction
+    ) -> None:
+        """Set project description via Imbi API.
+
+        Args:
+            action: Action with description string (supports Jinja2 templates)
+
+        Raises:
+            ValueError: If description is missing
+            httpx.HTTPError: If API request fails
+
+        """
+        if not action.description:
+            raise ValueError(
+                'description is required for set_project_description'
+            )
+
+        # Render Jinja2 template in description field
+        description = prompts.render_template_string(
+            action.description,
+            workflow=self.context.workflow,
+            github_repository=self.context.github_repository,
+            imbi_project=self.context.imbi_project,
+            working_directory=self.context.working_directory,
+            starting_commit=self.context.starting_commit,
+        )
+
+        client = clients.Imbi.get_instance(config=self.configuration.imbi)
+
+        self.logger.debug(
+            '%s [%s/%s] %s setting description to "%s" for project %d (%s)',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            description,
+            self.context.imbi_project.id,
+            self.context.imbi_project.name,
+        )
+
+        try:
+            await client.update_project_description(
+                project_id=self.context.imbi_project.id,
+                description=description,
+            )
+        except (httpx.HTTPError, ValueError) as exc:
+            self.logger.error(
+                '%s [%s/%s] %s failed to set description for project %d: %s',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
+                self.context.imbi_project.id,
+                exc,
+            )
+            raise
+        else:
+            self.logger.info(
+                '%s [%s/%s] %s successfully updated description for '
                 'project %d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
