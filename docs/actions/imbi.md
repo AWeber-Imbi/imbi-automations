@@ -59,6 +59,81 @@ type = "github"
 command = "sync_environments"
 ```
 
+### set_project_description
+
+Updates the description field for the current project in Imbi.
+
+**Configuration:**
+```toml
+[[actions]]
+name = "update-description"
+type = "imbi"
+command = "set_project_description"
+description = "REST API for user authentication and profile management"
+```
+
+**Fields:**
+
+- `description` (string, required): New description text (supports Jinja2 templates)
+
+**Features:**
+
+- **Template Support**: Description field supports full Jinja2 templating with workflow context
+- **Read File Function**: Use `read_file()` to load descriptions from files
+- **Smart Updates**: Only makes API calls when description differs from current value
+- **HTTP 304 Handling**: Properly handles "Not Modified" responses
+- **Non-Committable**: Does not create git commits (modifies Imbi state only)
+
+**Use Cases:**
+
+- Generate project descriptions using AI (Claude actions)
+- Standardize description formats across projects
+- Update descriptions from repository README files
+- Auto-generate descriptions from code analysis
+
+**Basic Example:**
+```toml
+[[actions]]
+name = "set-description"
+type = "imbi"
+command = "set_project_description"
+description = "Python API for {{ imbi_project.name }}"
+```
+
+**With File Reading:**
+```toml
+[[actions]]
+name = "generate-description-with-ai"
+type = "claude"
+task_prompt = "prompts/generate-description.md"
+committable = false
+
+[[actions]]
+name = "update-description-from-file"
+type = "imbi"
+command = "set_project_description"
+description = "{{ read_file('repository:///GENERATED_DESCRIPTION.txt').strip() }}"
+
+[[actions.conditions]]
+file_exists = "repository:///GENERATED_DESCRIPTION.txt"
+```
+
+**From README:**
+```toml
+[[actions]]
+name = "extract-description-from-readme"
+type = "shell"
+command = "head -n 3 README.md | tail -n 1"
+working_directory = "repository:///"
+committable = false
+
+[[actions]]
+name = "set-description-from-readme"
+type = "imbi"
+command = "set_project_description"
+description = "{{ read_file('repository:///README.md').split('\\n')[2] }}"
+```
+
 ### set_project_fact
 
 Updates or creates a fact for the current project in Imbi.
@@ -219,6 +294,7 @@ fact_value = "FastAPI"
 |---------|-------------|
 | `set_environments` | Update project environments with smart validation |
 | `set_project_fact` | Update or create project facts with validation |
+| `set_project_description` | Update project description with template support |
 
 ## Integration with Other Actions
 
