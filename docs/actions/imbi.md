@@ -59,45 +59,59 @@ type = "github"
 command = "sync_environments"
 ```
 
-### set_project_description
+### update_project
 
-Updates the description field for the current project in Imbi.
+Updates one or more project attributes in Imbi using a generic, flexible approach.
 
 **Configuration:**
 ```toml
 [[actions]]
-name = "update-description"
+name = "update-project-metadata"
 type = "imbi"
-command = "set_project_description"
-description = "REST API for user authentication and profile management"
+command = "update_project"
+attributes = {
+    description = "REST API for user authentication and profile management",
+    name = "{{ imbi_project.name }} v2"
+}
 ```
 
 **Fields:**
 
-- `description` (string, required): New description text (supports Jinja2 templates)
+- `attributes` (dict, required): Dictionary of attribute names to new values. Keys should match ImbiProject model fields (e.g., `description`, `name`, `namespace`, etc.). String values support Jinja2 templates.
 
 **Features:**
 
-- **Template Support**: Description field supports full Jinja2 templating with workflow context
-- **Read File Function**: Use `read_file()` to load descriptions from files
-- **Smart Updates**: Only makes API calls when description differs from current value
+- **Generic Updates**: Update any project attribute in a single action
+- **Template Support**: String values support full Jinja2 templating with workflow context
+- **Smart Updates**: Only sends PATCH requests for attributes that have changed
+- **Batch Operations**: Update multiple attributes in a single API call
 - **HTTP 304 Handling**: Properly handles "Not Modified" responses
 - **Non-Committable**: Does not create git commits (modifies Imbi state only)
 
+**Available Attributes:**
+
+Project attributes that can be updated:
+- `description` - Project description text
+- `name` - Project display name
+- Any other writable field on the ImbiProject model
+
 **Use Cases:**
 
-- Generate project descriptions using AI (Claude actions)
-- Standardize description formats across projects
-- Update descriptions from repository README files
-- Auto-generate descriptions from code analysis
+- Update project metadata after repository analysis
+- Sync project information with repository changes
+- Standardize project attributes across organization
+- Update multiple fields atomically
+- Generate descriptions using AI (Claude actions)
 
 **Basic Example:**
 ```toml
 [[actions]]
-name = "set-description"
+name = "update-description"
 type = "imbi"
-command = "set_project_description"
-description = "Python API for {{ imbi_project.name }}"
+command = "update_project"
+attributes = {
+    description = "Python API for {{ imbi_project.name }}"
+}
 ```
 
 **With File Reading:**
@@ -109,10 +123,12 @@ task_prompt = "prompts/generate-description.md"
 committable = false
 
 [[actions]]
-name = "update-description-from-file"
+name = "update-from-generated-file"
 type = "imbi"
-command = "set_project_description"
-description = "{{ read_file('repository:///GENERATED_DESCRIPTION.txt').strip() }}"
+command = "update_project"
+attributes = {
+    description = "{{ read_file('repository:///GENERATED_DESCRIPTION.txt').strip() }}"
+}
 
 [[actions.conditions]]
 file_exists = "repository:///GENERATED_DESCRIPTION.txt"
@@ -121,17 +137,25 @@ file_exists = "repository:///GENERATED_DESCRIPTION.txt"
 **From README:**
 ```toml
 [[actions]]
-name = "extract-description-from-readme"
-type = "shell"
-command = "head -n 3 README.md | tail -n 1"
-working_directory = "repository:///"
-committable = false
-
-[[actions]]
-name = "set-description-from-readme"
+name = "sync-metadata-from-repo"
 type = "imbi"
-command = "set_project_description"
-description = "{{ read_file('repository:///README.md').split('\\n')[2] }}"
+command = "update_project"
+attributes = {
+    description = "{{ read_file('repository:///README.md').split('\\n')[2] }}",
+    name = "{{ imbi_project.namespace }} / {{ imbi_project.slug }}"
+}
+```
+
+**Multiple Attributes:**
+```toml
+[[actions]]
+name = "update-project-info"
+type = "imbi"
+command = "update_project"
+attributes = {
+    description = "{{ imbi_project.description | default('No description') }}",
+    name = "{{ imbi_project.name }} (Production Ready)"
+}
 ```
 
 ### set_project_fact
@@ -294,7 +318,7 @@ fact_value = "FastAPI"
 |---------|-------------|
 | `set_environments` | Update project environments with smart validation |
 | `set_project_fact` | Update or create project facts with validation |
-| `set_project_description` | Update project description with template support |
+| `update_project` | Update any project attributes with template support |
 
 ## Integration with Other Actions
 

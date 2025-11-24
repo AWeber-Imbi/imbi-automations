@@ -160,10 +160,12 @@ Description: {{ read_file('repository:///DESCRIPTION.txt').strip() }}
 **Usage in Imbi actions:**
 ```toml
 [[actions]]
-name = "set-description-from-file"
+name = "update-from-generated-file"
 type = "imbi"
-command = "set_project_description"
-description = "{{ read_file('repository:///GENERATED_DESCRIPTION.txt').strip() }}"
+command = "update_project"
+attributes = {
+    description = "{{ read_file('repository:///GENERATED_DESCRIPTION.txt').strip() }}"
+}
 ```
 
 **Use cases:**

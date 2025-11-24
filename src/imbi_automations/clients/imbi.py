@@ -553,48 +553,90 @@ class Imbi(http.BaseURLHTTPClient):
             )
             raise
 
-    async def update_project_description(
-        self, project_id: int, description: str
+    async def update_project_attributes(
+        self, project_id: int, attributes: dict[str, typing.Any]
     ) -> None:
-        """Update description for a project using JSON Patch.
+        """Update project attributes using JSON Patch.
+
+        Generic method for updating any project attributes. Constructs JSON
+        Patch operations for changed attributes, skipping unchanged values.
 
         Args:
             project_id: Imbi project ID
-            description: New description text
+            attributes: Dict of attribute names to new values. Keys should
+                match ImbiProject model field names (e.g., 'description',
+                'name', etc.). Values support any JSON-serializable type.
 
         Raises:
+            ValueError: If project not found or no attributes provided
             httpx.HTTPError: If API request fails
 
+        Example:
+            await client.update_project_attributes(
+                project_id=123,
+                attributes={
+                    'description': 'New description',
+                    'name': 'Updated Name',
+                }
+            )
+
         """
-        # Get current project data to check existing description
+        if not attributes:
+            raise ValueError('attributes dict cannot be empty')
+
+        # Get current project data to check existing values
         project = await self.get_project(project_id)
         if not project:
             raise ValueError(f'Project not found: {project_id}')
 
-        # Skip update if description is unchanged
-        if project.description == description:
+        # Build JSON Patch operations for changed attributes
+        patch_ops = []
+        for attr_name, new_value in attributes.items():
+            # Get current value from project (use getattr for safety)
+            current_value = getattr(project, attr_name, None)
+
+            # Skip if value unchanged
+            if current_value == new_value:
+                LOGGER.debug(
+                    'Attribute "%s" unchanged for project %d, skipping',
+                    attr_name,
+                    project_id,
+                )
+                continue
+
             LOGGER.debug(
-                'Description unchanged for project %d, skipping update',
+                'Updating %s for project %d from "%s" to "%s"',
+                attr_name,
+                project_id,
+                current_value,
+                new_value,
+            )
+
+            patch_ops.append(
+                {'op': 'replace', 'path': f'/{attr_name}', 'value': new_value}
+            )
+
+        # Skip API call if no changes needed
+        if not patch_ops:
+            LOGGER.debug(
+                'No attribute changes for project %d, skipping update',
                 project_id,
             )
             return
 
         LOGGER.debug(
-            'Updating description for project %d from "%s" to "%s"',
+            'Sending PATCH to project %d with %d operations: %s',
             project_id,
-            project.description,
-            description,
+            len(patch_ops),
+            patch_ops,
         )
 
-        payload = [
-            {'op': 'replace', 'path': '/description', 'value': description}
-        ]
-        response = await self.patch(f'/projects/{project_id}', json=payload)
+        response = await self.patch(f'/projects/{project_id}', json=patch_ops)
 
         # HTTP 304 Not Modified is success (no changes needed)
         if response.status_code == 304:
             LOGGER.debug(
-                'Description already set for project %d (HTTP 304)', project_id
+                'Attributes already set for project %d (HTTP 304)', project_id
             )
             return
 
@@ -606,7 +648,7 @@ class Imbi(http.BaseURLHTTPClient):
             except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
-                'Failed to update description for project %d: HTTP %d - %s',
+                'Failed to update attributes for project %d: HTTP %d - %s',
                 project_id,
                 response.status_code,
                 error_body,

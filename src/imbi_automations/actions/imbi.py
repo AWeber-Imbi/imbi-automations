@@ -38,8 +38,8 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 await self._set_project_fact(action)
             case models.WorkflowImbiActionCommand.set_environments:
                 await self._set_environments(action)
-            case models.WorkflowImbiActionCommand.set_project_description:
-                await self._set_project_description(action)
+            case models.WorkflowImbiActionCommand.update_project:
+                await self._update_project(action)
             case _:
                 raise RuntimeError(f'Unsupported command: {action.command}')
 
@@ -118,55 +118,63 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 self.context.imbi_project.id,
             )
 
-    async def _set_project_description(
-        self, action: models.WorkflowImbiAction
-    ) -> None:
-        """Set project description via Imbi API.
+    async def _update_project(self, action: models.WorkflowImbiAction) -> None:
+        """Update project attributes via Imbi API.
 
         Args:
-            action: Action with description string (supports Jinja2 templates)
+            action: Action with attributes dict (supports Jinja2 templates)
 
         Raises:
-            ValueError: If description is missing
+            ValueError: If attributes is missing or empty
             httpx.HTTPError: If API request fails
 
         """
-        if not action.description:
-            raise ValueError(
-                'description is required for set_project_description'
-            )
+        if not action.attributes:
+            raise ValueError('attributes is required for update_project')
 
-        # Render Jinja2 template in description field
-        description = prompts.render_template_string(
-            action.description,
-            workflow=self.context.workflow,
-            github_repository=self.context.github_repository,
-            imbi_project=self.context.imbi_project,
-            working_directory=self.context.working_directory,
-            starting_commit=self.context.starting_commit,
-        )
+        # Render Jinja2 templates in attribute values
+        rendered_attributes = {}
+        for attr_name, attr_value in action.attributes.items():
+            # Only render string values (templates)
+            if isinstance(attr_value, str):
+                rendered_value = prompts.render_template_string(
+                    attr_value,
+                    workflow=self.context.workflow,
+                    github_repository=self.context.github_repository,
+                    imbi_project=self.context.imbi_project,
+                    working_directory=self.context.working_directory,
+                    starting_commit=self.context.starting_commit,
+                )
+                rendered_attributes[attr_name] = rendered_value
+            else:
+                # Pass through non-string values unchanged
+                rendered_attributes[attr_name] = attr_value
 
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
 
+        # Log which attributes are being updated
+        attr_summary = ', '.join(
+            f'{k}="{v}"' for k, v in rendered_attributes.items()
+        )
         self.logger.debug(
-            '%s [%s/%s] %s setting description to "%s" for project %d (%s)',
+            '%s [%s/%s] %s updating project %d (%s) with: %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            description,
             self.context.imbi_project.id,
             self.context.imbi_project.name,
+            attr_summary,
         )
 
         try:
-            await client.update_project_description(
+            await client.update_project_attributes(
                 project_id=self.context.imbi_project.id,
-                description=description,
+                attributes=rendered_attributes,
             )
         except (httpx.HTTPError, ValueError) as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to set description for project %d: %s',
+                '%s [%s/%s] %s failed to update project %d: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
@@ -177,8 +185,7 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             raise
         else:
             self.logger.info(
-                '%s [%s/%s] %s successfully updated description for '
-                'project %d',
+                '%s [%s/%s] %s successfully updated project %d',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
