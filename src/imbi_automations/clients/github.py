@@ -7,6 +7,7 @@ remote file checking.
 """
 
 import logging
+import typing
 
 import httpx
 
@@ -714,5 +715,49 @@ class GitHub(http.BaseURLHTTPClient):
         except httpx.HTTPError as exc:
             LOGGER.error(
                 'Failed to get repository tree for %s/%s: %s', org, repo, exc
+            )
+            raise
+
+    async def update_repository(
+        self, org: str, repo: str, attributes: dict[str, typing.Any]
+    ) -> models.GitHubRepository:
+        """Update repository attributes via GitHub API.
+
+        Args:
+            org: Organization name
+            repo: Repository name
+            attributes: Dictionary of attributes to update (e.g., description,
+                homepage, private, has_issues, has_projects, has_wiki, etc.)
+
+        Returns:
+            Updated GitHubRepository object
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        base_path = self._repository_base_path(org=org, repo_name=repo)
+
+        LOGGER.debug(
+            'Updating repository %s/%s with attributes: %s',
+            org,
+            repo,
+            attributes,
+        )
+
+        try:
+            response = await self.patch(base_path, json=attributes)
+            response.raise_for_status()
+
+            repo_data = response.json()
+            repository = models.GitHubRepository.model_validate(repo_data)
+
+            LOGGER.info('Updated repository %s/%s successfully', org, repo)
+
+            return repository
+
+        except httpx.HTTPError as exc:
+            LOGGER.error(
+                'Failed to update repository %s/%s: %s', org, repo, exc
             )
             raise

@@ -157,7 +157,7 @@ PyPI publishing uses trusted publishing and does not require secrets.
 - **Docker Actions** (`actions/docker.py`): Docker container operations and file extractions
 - **File Actions** (`actions/filea.py`): File manipulation (copy with glob support, move, delete, regex replacement)
 - **Git Actions** (`actions/git.py`): Git operations (revert, extract, branch management)
-- **GitHub Actions** (`actions/github.py`): GitHub-specific operations and integrations (sync_environments command)
+- **GitHub Actions** (`actions/github.py`): GitHub-specific operations and integrations (sync_environments, update_repository commands)
 - **Imbi Actions** (`actions/imbi.py`): Imbi project fact management (set_project_fact command)
 - **Shell Actions** (`actions/shell.py`): Shell command execution with glob expansion via subprocess_shell
 - **Template Actions** (`actions/template.py`): Jinja2 template rendering with full workflow context
@@ -649,6 +649,40 @@ The GitHub Actions module syncs repository environments with Imbi project defini
 
 **Filter Support** (`workflow_filter.py:_filter_environments`):
 - Filters by environment using name OR slug matching (AND logic for multiple filters)
+
+### GitHub Repository Updates
+The GitHub Actions module provides generic repository attribute updates via the `update_repository` command:
+
+**Implementation** (`actions/github.py:_update_repository`):
+- Updates any GitHub repository attribute (description, homepage, topics, has_issues, etc.)
+- Supports Jinja2 templates in attribute values (e.g., `"{{ imbi_project.description }}"`)
+- Compares new values with current repository state and skips update if unchanged
+- Only sends attributes that differ from current values to minimize API calls
+- Uses GitHub PATCH `/repos/{org}/{repo}` endpoint
+
+**Available Attributes**:
+- `description`: Repository description
+- `homepage`: Repository homepage URL
+- `private`: Whether repository is private (boolean)
+- `has_issues`, `has_projects`, `has_wiki`: Feature toggles (boolean)
+- `default_branch`: Default branch name
+- `topics`: Repository topics (array of strings)
+- And other repository settings supported by GitHub API
+
+**Workflow Example** (`workflows/sync-description/config.toml`):
+```toml
+[[actions]]
+name = "sync-description"
+type = "github"
+command = "update_repository"
+committable = false  # No repository changes, only API operations
+
+[actions.attributes]
+description = "{{ imbi_project.description }}"
+homepage = "{{ imbi_project.urls.homepage }}"
+```
+
+**Skip Logic**: The action automatically skips updates when the new value matches the current repository attribute, logging the skip at debug level. Only changed attributes are sent in the API request.
 
 ### Shell Actions and Git Operations
 - **Shell Actions**: Use `subprocess_shell` for glob expansion, env vars, pipes, Jinja2 templates

@@ -369,10 +369,12 @@ class WorkflowGitAction(WorkflowAction):
 class WorkflowGitHubCommand(enum.StrEnum):
     """GitHub-specific operation commands.
 
-    Defines available GitHub operations including environment synchronization.
+    Defines available GitHub operations including environment synchronization
+    and repository attribute updates.
     """
 
     sync_environments = 'sync_environments'
+    update_repository = 'update_repository'
 
 
 class WorkflowGitHubAction(WorkflowAction):
@@ -385,6 +387,9 @@ class WorkflowGitHubAction(WorkflowAction):
     type: typing.Literal['github'] = 'github'
     command: WorkflowGitHubCommand
     committable: bool = False
+
+    # Fields for update_repository command
+    attributes: dict[str, typing.Any] = {}
 
 
 class WorkflowImbiActionCommand(enum.StrEnum):
