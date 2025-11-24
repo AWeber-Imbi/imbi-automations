@@ -6,6 +6,7 @@ efficient batch processing.
 """
 
 import logging
+import re
 
 from imbi_automations import clients, mixins, models
 
@@ -73,6 +74,10 @@ class Filter(mixins.WorkflowLoggerMixin):
                 and project.project_type_slug
                 not in workflow_filter.project_types
             )
+            or (
+                workflow_filter.project_field_filters
+                and not self._filter_project_fields(project, workflow_filter)
+            )
         ):
             return None
 
@@ -130,4 +135,131 @@ class Filter(mixins.WorkflowLoggerMixin):
                     value,
                 )
                 return None
+        return project
+
+    @staticmethod
+    def _filter_project_fields(
+        project: models.ImbiProject, workflow_filter: models.WorkflowFilter
+    ) -> models.ImbiProject | None:
+        """Filter projects based on arbitrary field conditions.
+
+        Supports various operators: is_null, is_not_null, equals, not_equals,
+        contains, regex, and is_empty.
+        """
+        for (
+            field_name,
+            field_filter,
+        ) in workflow_filter.project_field_filters.items():
+            # Get the field value from the project
+            if not hasattr(project, field_name):
+                LOGGER.warning(
+                    'Project field "%s" does not exist, skipping filter',
+                    field_name,
+                )
+                return None
+
+            field_value = getattr(project, field_name)
+
+            # Apply the filter operator
+            if field_filter.is_null is not None:
+                if field_filter.is_null and field_value is not None:
+                    LOGGER.debug(
+                        'Field %s is not null (value: %s)',
+                        field_name,
+                        field_value,
+                    )
+                    return None
+                if not field_filter.is_null and field_value is None:
+                    LOGGER.debug('Field %s is null', field_name)
+                    return None
+
+            elif field_filter.is_not_null is not None:
+                if field_filter.is_not_null and field_value is None:
+                    LOGGER.debug('Field %s is null', field_name)
+                    return None
+                if not field_filter.is_not_null and field_value is not None:
+                    LOGGER.debug(
+                        'Field %s is not null (value: %s)',
+                        field_name,
+                        field_value,
+                    )
+                    return None
+
+            elif field_filter.is_empty is not None:
+                is_empty = field_value is None or (
+                    isinstance(field_value, str) and field_value.strip() == ''
+                )
+                if field_filter.is_empty and not is_empty:
+                    LOGGER.debug(
+                        'Field %s is not empty (value: %s)',
+                        field_name,
+                        field_value,
+                    )
+                    return None
+                if not field_filter.is_empty and is_empty:
+                    LOGGER.debug('Field %s is empty', field_name)
+                    return None
+
+            elif field_filter.equals is not None:
+                if field_value != field_filter.equals:
+                    LOGGER.debug(
+                        'Field %s value "%s" does not equal "%s"',
+                        field_name,
+                        field_value,
+                        field_filter.equals,
+                    )
+                    return None
+
+            elif field_filter.not_equals is not None:
+                if field_value == field_filter.not_equals:
+                    LOGGER.debug(
+                        'Field %s value "%s" equals "%s" (expected not equal)',
+                        field_name,
+                        field_value,
+                        field_filter.not_equals,
+                    )
+                    return None
+
+            elif field_filter.contains is not None:
+                if not isinstance(field_value, str):
+                    LOGGER.debug(
+                        'Field %s is not a string (type: %s)',
+                        field_name,
+                        type(field_value),
+                    )
+                    return None
+                if field_filter.contains not in field_value:
+                    LOGGER.debug(
+                        'Field %s value "%s" does not contain "%s"',
+                        field_name,
+                        field_value,
+                        field_filter.contains,
+                    )
+                    return None
+
+            elif field_filter.regex is not None:
+                if not isinstance(field_value, str):
+                    LOGGER.debug(
+                        'Field %s is not a string (type: %s)',
+                        field_name,
+                        type(field_value),
+                    )
+                    return None
+                try:
+                    if not re.search(field_filter.regex, field_value):
+                        LOGGER.debug(
+                            'Field %s value "%s" does not match regex "%s"',
+                            field_name,
+                            field_value,
+                            field_filter.regex,
+                        )
+                        return None
+                except re.error as exc:
+                    LOGGER.error(
+                        'Invalid regex pattern "%s": %s',
+                        field_filter.regex,
+                        exc,
+                    )
+                    return None
+
         return project

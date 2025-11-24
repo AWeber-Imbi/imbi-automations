@@ -40,6 +40,41 @@ ResourceUrl: type[AnyUrl] = typing.Annotated[
 ]
 
 
+class ProjectFieldFilter(pydantic.BaseModel):
+    """Filter conditions for project fields with various operators.
+
+    Supports checking for null values, equality, pattern matching, and
+    emptiness. Only one operator should be specified per filter.
+    """
+
+    is_null: bool | None = None
+    is_not_null: bool | None = None
+    equals: typing.Any | None = None
+    not_equals: typing.Any | None = None
+    contains: str | None = None
+    regex: str | None = None
+    is_empty: bool | None = None
+
+    @pydantic.model_validator(mode='after')
+    def validate_single_operator(self) -> 'ProjectFieldFilter':
+        """Ensure only one operator is specified."""
+        operators = [
+            self.is_null,
+            self.is_not_null,
+            self.equals,
+            self.not_equals,
+            self.contains,
+            self.regex,
+            self.is_empty,
+        ]
+        specified = [op for op in operators if op is not None]
+        if len(specified) == 0:
+            raise ValueError('At least one filter operator must be specified')
+        if len(specified) > 1:
+            raise ValueError('Only one filter operator can be specified')
+        return self
+
+
 class WorkflowFilter(pydantic.BaseModel):
     """Filter criteria for targeting specific projects in workflow execution.
 
@@ -56,6 +91,7 @@ class WorkflowFilter(pydantic.BaseModel):
     project_environments: set[str] = set()
     github_identifier_required: bool = False
     github_workflow_status_exclude: set[str] = set()
+    project_field_filters: dict[str, ProjectFieldFilter] = {}
 
 
 class WorkflowActionTypes(enum.StrEnum):
@@ -359,6 +395,7 @@ class WorkflowImbiActionCommand(enum.StrEnum):
 
     set_environments = 'set_environments'
     set_project_fact = 'set_project_fact'
+    set_project_description = 'set_project_description'
 
 
 class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
@@ -381,11 +418,15 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     # Attributes for set_environments command
     values: list[str] = []
 
+    # Fields for set_project_description command
+    description: str | None = None
+
     # CommandRulesMixin configuration
     command_field: typing.ClassVar[str] = 'command'
     required_fields: typing.ClassVar[dict[object, set[str]]] = {
         WorkflowImbiActionCommand.set_environments: {'values'},
         WorkflowImbiActionCommand.set_project_fact: {'fact_name', 'value'},
+        WorkflowImbiActionCommand.set_project_description: {'description'},
     }
     allowed_fields: typing.ClassVar[dict[object, set[str]]] = {
         WorkflowImbiActionCommand.set_environments: {'values'},
@@ -394,6 +435,7 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
             'value',
             'skip_validations',
         },
+        WorkflowImbiActionCommand.set_project_description: {'description'},
     }
 
 
