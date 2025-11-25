@@ -82,12 +82,13 @@ class WorkflowFilter(pydantic.BaseModel):
     workflow status to efficiently target subsets of projects.
 
     Note: project_facts keys are automatically normalized to slug format
-    (lowercase with underscores) to match OpenSearch data format.
+    (lowercase with underscores) to match OpenSearch data format. Fact values
+    can be boolean, integer, float, or string to match Imbi fact data types.
     """
 
     project_ids: set[int] = set()
     project_types: set[str] = set()
-    project_facts: dict[str, str] = {}
+    project_facts: dict[str, bool | int | float | str] = {}
     project_environments: set[str] = set()
     github_identifier_required: bool = False
     github_workflow_status_exclude: set[str] = set()
