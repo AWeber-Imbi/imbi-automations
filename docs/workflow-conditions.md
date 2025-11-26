@@ -277,6 +277,125 @@ file_doesnt_contain = "python.*2\\."
 file = "setup.py"
 ```
 
+### Template Conditions (Post-Clone)
+
+Template conditions use Jinja2 expressions for complex logic. They have access to template functions like `compare_semver()` and `get_component_version()`.
+
+**Advantages:**
+
+- ✅ Complex conditional logic
+- ✅ Version comparison support
+- ✅ Access to workflow context
+- ✅ Dependency version extraction
+
+**Disadvantages:**
+
+- 🐌 Requires git clone first
+- ⏱️ Template evaluation overhead
+
+#### when
+
+Evaluate a Jinja2 template expression. If the result is truthy, the condition passes.
+
+**Type:** `string` (Jinja2 template)
+
+**Truthiness evaluation:**
+
+- **Truthy:** `True`, `true`, `1`, `yes`, any non-empty string
+- **Falsy:** `False`, `false`, `0`, `no`, `none`, empty string
+
+```toml
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///package.json', 'react'), '19.0.0').is_older }}"
+```
+
+**Template functions available:**
+
+- `compare_semver(current, target)` - Compare two semantic versions
+- `get_component_version(path, component)` - Extract dependency version from package.json or pyproject.toml
+
+##### compare_semver(current, target)
+
+Compares two semantic versions and returns a dict with comparison results.
+
+**Arguments:**
+
+- `current`: Current version string (e.g., "18.2.0", "3.9.18-4")
+- `target`: Target version string to compare against
+
+**Returns:** Dict with:
+
+- `is_older`: True if current < target
+- `is_equal`: True if current == target
+- `is_newer`: True if current > target
+- `comparison`: -1 (older), 0 (equal), or 1 (newer)
+- `current_major`, `current_minor`, `current_patch`, `current_build`
+- `target_major`, `target_minor`, `target_patch`, `target_build`
+
+**Version handling:**
+
+- Strips prefixes like `v`, `^`, `~`, `>=`
+- Handles partial versions (e.g., "3.9" → "3.9.0")
+- Supports build numbers (e.g., "3.9.18-4")
+
+```toml
+# Check if React is older than 19.0.0
+[[conditions]]
+when = "{{ compare_semver('18.2.0', '19.0.0').is_older }}"
+
+# Check major version
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///package.json', 'react'), '18.0.0').current_major >= 17 }}"
+```
+
+##### get_component_version(path, component)
+
+Extracts a dependency version from a manifest file.
+
+**Arguments:**
+
+- `path`: ResourceUrl path to manifest file (e.g., "repository:///package.json")
+- `component`: Name of the dependency to extract
+
+**Supported file types:**
+
+- `package.json`: Searches dependencies, devDependencies, peerDependencies
+- `pyproject.toml`: Searches project.dependencies, optional-dependencies, Poetry dependencies
+
+**Returns:** Clean version string without prefixes
+
+```toml
+# Check React version in package.json
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///package.json', 'react'), '19.0.0').is_older }}"
+
+# Check Pydantic version in pyproject.toml
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///pyproject.toml', 'pydantic'), '2.0.0').is_older }}"
+```
+
+##### Combined examples
+
+```toml
+# Skip upgrade workflow if already on target version
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///package.json', 'react'), '19.0.0').is_older }}"
+
+# Complex negation
+[[conditions]]
+when = "{{ not compare_semver(get_component_version('repository:///pyproject.toml', 'pydantic'), '2.0.0').is_newer }}"
+
+# String checks on version
+[[conditions]]
+when = "{{ get_component_version('repository:///pyproject.toml', 'python').startswith('3.9') }}"
+
+# Access workflow context
+[[conditions]]
+when = "{{ workflow.configuration.name == 'upgrade-react' }}"
+```
+
+**Note:** Template conditions are skipped during remote checks (pre-clone) since they require filesystem access. Use remote conditions for pre-clone filtering.
+
 ## Condition Evaluation
 
 ### condition_type

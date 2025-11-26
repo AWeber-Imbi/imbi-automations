@@ -6,8 +6,8 @@ from imbi_automations import mixins, models
 class UtilityActions(mixins.WorkflowLoggerMixin):
     """Executes utility helper operations for common workflow tasks.
 
-    Provides Docker tag parsing, Dockerfile analysis, semantic versioning
-    comparison, and Python constraint parsing utilities.
+    Provides Docker tag parsing, Dockerfile analysis, and Python
+    constraint parsing utilities.
     """
 
     def __init__(
@@ -30,10 +30,6 @@ class UtilityActions(mixins.WorkflowLoggerMixin):
             case models.WorkflowUtilityCommands.dockerfile_from:
                 raise NotImplementedError(
                     'Utility dockerfile_from not yet supported'
-                )
-            case models.WorkflowUtilityCommands.compare_semver:
-                raise NotImplementedError(
-                    'Utility compare_semver not yet supported'
                 )
             case models.WorkflowUtilityCommands.parse_python_constraints:
                 raise NotImplementedError(

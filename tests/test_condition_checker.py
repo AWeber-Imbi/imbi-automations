@@ -702,6 +702,211 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
 
         self.assertFalse(result)
 
+    def test_when_true_literal(self) -> None:
+        """Test when condition with True literal."""
+        condition = models.WorkflowCondition(when='{{ True }}')
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_when_false_literal(self) -> None:
+        """Test when condition with False literal."""
+        condition = models.WorkflowCondition(when='{{ False }}')
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_when_truthy_string_yes(self) -> None:
+        """Test when condition with 'yes' as truthy."""
+        condition = models.WorkflowCondition(when="{{ 'yes' }}")
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_when_falsy_string_no(self) -> None:
+        """Test when condition with 'no' as falsy."""
+        condition = models.WorkflowCondition(when="{{ 'no' }}")
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_when_empty_string_falsy(self) -> None:
+        """Test when condition with empty string as falsy."""
+        condition = models.WorkflowCondition(when="{{ '' }}")
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_when_falsy_zero(self) -> None:
+        """Test when condition with '0' as falsy."""
+        condition = models.WorkflowCondition(when='{{ 0 }}')
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_when_truthy_one(self) -> None:
+        """Test when condition with '1' as truthy."""
+        condition = models.WorkflowCondition(when='{{ 1 }}')
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_when_none_falsy(self) -> None:
+        """Test when condition with 'none' as falsy."""
+        condition = models.WorkflowCondition(when="{{ 'none' }}")
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_when_compare_semver_is_older(self) -> None:
+        """Test when condition with compare_semver() returning is_older."""
+        condition = models.WorkflowCondition(
+            when="{{ compare_semver('18.2.0', '19.0.0').is_older }}"
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_when_compare_semver_is_newer(self) -> None:
+        """Test when condition with compare_semver() returning is_newer."""
+        condition = models.WorkflowCondition(
+            when="{{ compare_semver('20.0.0', '19.0.0').is_newer }}"
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_when_compare_semver_is_equal(self) -> None:
+        """Test when condition with compare_semver() returning is_equal."""
+        condition = models.WorkflowCondition(
+            when="{{ compare_semver('19.0.0', '19.0.0').is_equal }}"
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_when_compare_semver_not_older(self) -> None:
+        """Test when condition with negated compare_semver()."""
+        condition = models.WorkflowCondition(
+            when="{{ not compare_semver('20.0.0', '19.0.0').is_older }}"
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_when_get_component_version_package_json(self) -> None:
+        """Test when with get_component_version() from package.json."""
+        # Create a package.json with react dependency
+        (self.repository_dir / 'package.json').write_text(
+            '{"dependencies": {"react": "^18.2.0"}}'
+        )
+
+        condition = models.WorkflowCondition(
+            when=(
+                '{{ compare_semver('
+                "get_component_version('repository:///package.json', "
+                "'react'), '19.0.0').is_older }}"
+            )
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)  # 18.2.0 is older than 19.0.0
+
+    def test_when_get_component_version_pyproject(self) -> None:
+        """Test when with get_component_version() from pyproject.toml."""
+        (self.repository_dir / 'pyproject.toml').write_text(
+            '[project]\ndependencies = ["pydantic>=2.5.0"]'
+        )
+
+        condition = models.WorkflowCondition(
+            when=(
+                '{{ compare_semver('
+                'get_component_version('
+                "'repository:///pyproject.toml', 'pydantic'), "
+                "'2.0.0').is_newer }}"
+            )
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)  # 2.5.0 is newer than 2.0.0
+
+    def test_when_template_error_returns_false(self) -> None:
+        """Test when condition gracefully handles template errors."""
+        # Undefined variable should cause error and return False
+        condition = models.WorkflowCondition(when='{{ undefined_variable }}')
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_when_with_context_variable(self) -> None:
+        """Test when condition using workflow context variables."""
+        condition = models.WorkflowCondition(
+            when="{{ workflow.configuration.name == 'test-workflow' }}"
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    async def test_when_skipped_in_remote(self) -> None:
+        """Test that when conditions are skipped in remote checks."""
+        condition = models.WorkflowCondition(when='{{ True }}')
+
+        # When conditions should be skipped in remote check
+        result = await self.checker.check_remote(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        # Returns True because no remote conditions checked
+        self.assertTrue(result)
+
 
 if __name__ == '__main__':
     unittest.main()

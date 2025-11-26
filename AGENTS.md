@@ -278,7 +278,69 @@ destination_path = "repository/config/"     # Relative to working directory
 - `source_path` is relative to workflow directory
 - `destination_path` is relative to working directory (temp directory root)
 - For directories, use `"ci"` not `"ci/*"` (directory rendering is automatic)
-- Template context includes: `workflow`, `github_repository`, `imbi_project`, `working_directory`, `starting_commit`
+- Template context includes: `workflow`, `github_repository`, `imbi_project`, `working_directory`, `starting_commit`, `variables`
+
+#### Utility Action Usage
+
+Utility actions provide helper operations for common workflow tasks:
+
+```toml
+[[actions]]
+name = "check-version"
+type = "utility"
+command = "compare_semver"
+committable = false
+args = ["3.9.18", "3.12.0"]
+kwargs = { output = "version_check" }
+```
+
+**Available Commands:**
+- `compare_semver` - Compare two semantic versions (implemented)
+- `docker_tag` - Parse Docker image tags (not implemented)
+- `dockerfile_from` - Extract FROM directive from Dockerfile (not implemented)
+- `parse_python_constraints` - Parse Python version constraints (not implemented)
+
+**compare_semver Command:**
+
+Compares two semantic versions and stores a rich result object in `context.variables` for access by subsequent actions via Jinja2 templates.
+
+**Arguments:**
+- Positional: `args = ["current_version", "target_version"]`
+- Or keyword: `kwargs = { current_version = "1.0.0", target_version = "2.0.0" }`
+- `output` (optional): Variable name to store result (default: `semver_result`)
+
+**Supports:**
+- Standard semver: `1.2.3`, `2.0.0`
+- Build numbers: `3.9.18-0`, `3.9.18-4`
+- Jinja2 templates in version strings: `"{{ imbi_project.facts.get('Python Version') }}"`
+
+**Result Object (SemverComparisonResult):**
+```python
+{
+    "current_version": "3.9.18-0",     # Original input
+    "target_version": "3.12.0",         # Original input
+    "comparison": -1,                   # -1=older, 0=equal, 1=newer
+    "is_older": True,                   # Convenience boolean
+    "is_equal": False,                  # Convenience boolean
+    "is_newer": False,                  # Convenience boolean
+    "current_major": 3,                 # Parsed components
+    "current_minor": 9,
+    "current_patch": 18,
+    "current_build": 0,                 # Build number (None if not present)
+    "target_major": 3,
+    "target_minor": 12,
+    "target_patch": 0,
+    "target_build": None
+}
+```
+
+**Template Access:**
+```jinja2
+{% if variables.version_check.is_older %}
+Upgrade needed from {{ variables.version_check.current_version }}
+to {{ variables.version_check.target_version }}
+{% endif %}
+```
 
 ### Workflow Structure
 
@@ -369,6 +431,22 @@ Evaluated after cloning the repository:
 - **`file_exists`**: Check if a file exists (supports exact paths, glob patterns like `**/*.tf`, or regex)
 - **`file_not_exists`**: Check if a file does not exist (supports exact paths, glob patterns, or regex)
 - **`file_contains`**: Check if a file contains specified text or matches a regex pattern
+
+#### Template Conditions (Post-Clone)
+Evaluated after cloning using Jinja2 template expressions:
+- **`when`**: Evaluate a Jinja2 template expression - if truthy, condition passes
+
+**Template Functions Available in `when`:**
+- `compare_semver(current, target)`: Compare semantic versions, returns dict with `is_older`, `is_equal`, `is_newer`
+- `get_component_version(path, component)`: Extract dependency version from package.json or pyproject.toml
+
+**Example:**
+```toml
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///package.json', 'react'), '19.0.0').is_older }}"
+```
+
+**Truthiness evaluation:** `True`, `1`, `yes` → truthy; `False`, `0`, `no`, `none`, `""` → falsy
 
 #### Remote Conditions (Pre-Clone)
 Evaluated before cloning using GitHub API, providing performance benefits:

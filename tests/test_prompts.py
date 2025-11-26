@@ -251,3 +251,283 @@ class RenderFileTestCase(PromptsTestBase):
         self.assertEqual(
             destination.read_text(encoding='utf-8'), 'Hello test-workflow'
         )
+
+
+class CompareSemverTestCase(unittest.TestCase):
+    """Tests for compare_semver template function."""
+
+    def test_compare_semver_returns_dict(self) -> None:
+        """Test compare_semver returns dict with expected keys."""
+        result = prompts.compare_semver('18.2.0', '19.0.0')
+
+        self.assertIsInstance(result, dict)
+        expected_keys = {
+            'current_version',
+            'target_version',
+            'comparison',
+            'is_older',
+            'is_equal',
+            'is_newer',
+            'current_major',
+            'current_minor',
+            'current_patch',
+            'current_build',
+            'target_major',
+            'target_minor',
+            'target_patch',
+            'target_build',
+        }
+        self.assertEqual(set(result.keys()), expected_keys)
+
+    def test_compare_semver_is_older(self) -> None:
+        """Test compare_semver detects older version."""
+        result = prompts.compare_semver('18.2.0', '19.0.0')
+
+        self.assertTrue(result['is_older'])
+        self.assertFalse(result['is_equal'])
+        self.assertFalse(result['is_newer'])
+        self.assertEqual(result['comparison'], -1)
+
+    def test_compare_semver_is_newer(self) -> None:
+        """Test compare_semver detects newer version."""
+        result = prompts.compare_semver('20.0.0', '19.0.0')
+
+        self.assertFalse(result['is_older'])
+        self.assertFalse(result['is_equal'])
+        self.assertTrue(result['is_newer'])
+        self.assertEqual(result['comparison'], 1)
+
+    def test_compare_semver_is_equal(self) -> None:
+        """Test compare_semver detects equal versions."""
+        result = prompts.compare_semver('19.0.0', '19.0.0')
+
+        self.assertFalse(result['is_older'])
+        self.assertTrue(result['is_equal'])
+        self.assertFalse(result['is_newer'])
+        self.assertEqual(result['comparison'], 0)
+
+    def test_compare_semver_with_build_numbers(self) -> None:
+        """Test compare_semver handles build numbers (e.g., 3.9.18-4)."""
+        result = prompts.compare_semver('3.9.18-3', '3.9.18-4')
+
+        self.assertTrue(result['is_older'])
+        self.assertEqual(result['current_build'], 3)
+        self.assertEqual(result['target_build'], 4)
+
+    def test_compare_semver_with_partial_versions(self) -> None:
+        """Test compare_semver handles partial versions (e.g., 3.9)."""
+        result = prompts.compare_semver('3.9', '3.10')
+
+        self.assertTrue(result['is_older'])
+        self.assertEqual(result['current_minor'], 9)
+        self.assertEqual(result['target_minor'], 10)
+
+    def test_compare_semver_strips_prefixes(self) -> None:
+        """Test compare_semver strips version prefixes."""
+        result = prompts.compare_semver('^18.2.0', '^19.0.0')
+
+        self.assertTrue(result['is_older'])
+        self.assertEqual(result['current_major'], 18)
+        self.assertEqual(result['target_major'], 19)
+
+    def test_compare_semver_v_prefix(self) -> None:
+        """Test compare_semver strips v prefix."""
+        result = prompts.compare_semver('v1.2.3', 'v1.2.4')
+
+        self.assertTrue(result['is_older'])
+
+    def test_compare_semver_extracts_components(self) -> None:
+        """Test compare_semver extracts major/minor/patch correctly."""
+        result = prompts.compare_semver('18.2.1', '19.3.5')
+
+        self.assertEqual(result['current_major'], 18)
+        self.assertEqual(result['current_minor'], 2)
+        self.assertEqual(result['current_patch'], 1)
+        self.assertEqual(result['target_major'], 19)
+        self.assertEqual(result['target_minor'], 3)
+        self.assertEqual(result['target_patch'], 5)
+
+
+class GetComponentVersionTestCase(PromptsTestBase):
+    """Tests for get_component_version template function."""
+
+    def test_get_component_version_package_json(self) -> None:
+        """Test get_component_version from package.json dependencies."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'package.json').write_text(
+            '{"dependencies": {"react": "^18.2.0"}}', encoding='utf-8'
+        )
+
+        result = prompts.get_component_version(
+            self.context, 'repository:///package.json', 'react'
+        )
+
+        self.assertEqual(result, '18.2.0')
+
+    def test_get_component_version_package_json_dev_deps(self) -> None:
+        """Test get_component_version from package.json devDependencies."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'package.json').write_text(
+            '{"devDependencies": {"jest": "~29.7.0"}}', encoding='utf-8'
+        )
+
+        result = prompts.get_component_version(
+            self.context, 'repository:///package.json', 'jest'
+        )
+
+        self.assertEqual(result, '29.7.0')
+
+    def test_get_component_version_pyproject_pep508(self) -> None:
+        """Test get_component_version from pyproject.toml PEP 508 format."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'pyproject.toml').write_text(
+            '[project]\ndependencies = ["pydantic>=2.5.0"]', encoding='utf-8'
+        )
+
+        result = prompts.get_component_version(
+            self.context, 'repository:///pyproject.toml', 'pydantic'
+        )
+
+        self.assertEqual(result, '2.5.0')
+
+    def test_get_component_version_pyproject_poetry(self) -> None:
+        """Test get_component_version from pyproject.toml Poetry format."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'pyproject.toml').write_text(
+            '[tool.poetry.dependencies]\npython = "^3.12"\nhttpx = "^0.27.0"',
+            encoding='utf-8',
+        )
+
+        result = prompts.get_component_version(
+            self.context, 'repository:///pyproject.toml', 'httpx'
+        )
+
+        self.assertEqual(result, '0.27.0')
+
+    def test_get_component_version_pyproject_optional_deps(self) -> None:
+        """Test get_component_version from optional-dependencies."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'pyproject.toml').write_text(
+            '[project.optional-dependencies]\ndev = ["pytest>=8.0.0"]',
+            encoding='utf-8',
+        )
+
+        result = prompts.get_component_version(
+            self.context, 'repository:///pyproject.toml', 'pytest'
+        )
+
+        self.assertEqual(result, '8.0.0')
+
+    def test_get_component_version_strips_prefixes(self) -> None:
+        """Test get_component_version strips version prefixes."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'package.json').write_text(
+            '{"dependencies": {"lodash": ">=4.17.21"}}', encoding='utf-8'
+        )
+
+        result = prompts.get_component_version(
+            self.context, 'repository:///package.json', 'lodash'
+        )
+
+        self.assertEqual(result, '4.17.21')
+
+    def test_get_component_version_missing_raises(self) -> None:
+        """Test get_component_version raises for missing component."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'package.json').write_text(
+            '{"dependencies": {"react": "^18.0.0"}}', encoding='utf-8'
+        )
+
+        with self.assertRaises(ValueError) as cm:
+            prompts.get_component_version(
+                self.context, 'repository:///package.json', 'vue'
+            )
+
+        self.assertIn('vue', str(cm.exception))
+        self.assertIn('not found', str(cm.exception))
+
+    def test_get_component_version_unsupported_file_raises(self) -> None:
+        """Test get_component_version raises for unsupported file types."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'requirements.txt').write_text(
+            'pydantic>=2.5.0', encoding='utf-8'
+        )
+
+        with self.assertRaises(ValueError) as cm:
+            prompts.get_component_version(
+                self.context, 'repository:///requirements.txt', 'pydantic'
+            )
+
+        self.assertIn('Unsupported file type', str(cm.exception))
+
+    def test_get_component_version_case_insensitive(self) -> None:
+        """Test get_component_version is case-insensitive for pyproject."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'pyproject.toml').write_text(
+            '[project]\ndependencies = ["Pydantic>=2.5.0"]', encoding='utf-8'
+        )
+
+        result = prompts.get_component_version(
+            self.context, 'repository:///pyproject.toml', 'pydantic'
+        )
+
+        self.assertEqual(result, '2.5.0')
+
+
+class TemplateFunctionIntegrationTestCase(PromptsTestBase):
+    """Integration tests for template functions in render()."""
+
+    def test_render_with_compare_semver(self) -> None:
+        """Test render with compare_semver in template."""
+        result = prompts.render(
+            self.context,
+            template="{{ compare_semver('18.0.0', '19.0.0').is_older }}",
+        )
+
+        self.assertEqual(result, 'True')
+
+    def test_render_with_get_component_version(self) -> None:
+        """Test render with get_component_version in template."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'package.json').write_text(
+            '{"dependencies": {"react": "^18.2.0"}}', encoding='utf-8'
+        )
+
+        result = prompts.render(
+            self.context,
+            template=(
+                '{{ get_component_version('
+                "'repository:///package.json', 'react') }}"
+            ),
+        )
+
+        self.assertEqual(result, '18.2.0')
+
+    def test_render_with_combined_functions(self) -> None:
+        """Test render with compare_semver and get_component_version."""
+        repo_dir = self.working_dir / 'repository'
+        repo_dir.mkdir(parents=True, exist_ok=True)
+        (repo_dir / 'package.json').write_text(
+            '{"dependencies": {"react": "^18.2.0"}}', encoding='utf-8'
+        )
+
+        result = prompts.render(
+            self.context,
+            template=(
+                '{{ compare_semver('
+                "get_component_version('repository:///package.json', "
+                "'react'), '19.0.0').is_older }}"
+            ),
+        )
+
+        self.assertEqual(result, 'True')

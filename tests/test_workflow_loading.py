@@ -72,7 +72,6 @@ class WorkflowLoadingTestCase(unittest.TestCase):
         expected_utility_commands = {
             'docker_tag',
             'dockerfile_from',
-            'compare_semver',
             'parse_python_constraints',
         }
 
