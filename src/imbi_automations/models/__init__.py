@@ -4,7 +4,7 @@ Centralizes imports for configuration, API responses (GitHub, GitLab, Imbi),
 workflow definitions, git operations, and Claude Code integration models.
 """
 
-from . import configuration, imbi
+from . import configuration, imbi, mcp
 from .claude import (
     ClaudeAgentPlanningResult,
     ClaudeAgentTaskResult,
@@ -41,6 +41,7 @@ from .imbi import (
     ImbiProjectLink,
     ImbiProjectType,
 )
+from .mcp import McpHttpServer, McpServerConfig, McpSSEServer, McpStdioServer
 from .resume_state import ResumeState
 from .workflow import (
     ResourceUrl,
@@ -79,6 +80,7 @@ from .workflow import (
 __all__ = [
     'configuration',
     'imbi',
+    'mcp',
     'AnthropicConfiguration',
     'ClaudeAgentPlanningResult',
     'ClaudeAgentTaskResult',
@@ -109,6 +111,10 @@ __all__ = [
     'ImbiProjectFactTypeRange',
     'ImbiProjectType',
     'ImbiProjectLink',
+    'McpHttpServer',
+    'McpServerConfig',
+    'McpSSEServer',
+    'McpStdioServer',
     'ResourceUrl',
     'ResumeState',
     'Workflow',

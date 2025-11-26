@@ -14,7 +14,7 @@ import pydantic
 import pydantic_core
 from pydantic import AnyUrl
 
-from . import github, imbi, validators
+from . import github, imbi, mcp, validators
 
 
 def _ensure_file_scheme(v: str | pathlib.Path | pydantic.AnyUrl) -> str:
@@ -642,6 +642,7 @@ class WorkflowConfiguration(pydantic.BaseModel):
     git: WorkflowGit = pydantic.Field(default_factory=WorkflowGit)
     github: WorkflowGitHub = pydantic.Field(default_factory=WorkflowGitHub)
     filter: WorkflowFilter | None = None
+    mcp_servers: dict[str, mcp.McpServerConfig] = {}
     use_devcontainers: bool = False
 
     condition_type: WorkflowConditionType = WorkflowConditionType.all

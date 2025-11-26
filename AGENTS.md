@@ -144,6 +144,7 @@ PyPI publishing uses trusted publishing and does not require secrets.
   - **ImbiEnvironment**: Environment model with auto-slug generation (sanitizes special chars, normalizes spaces)
   - **ImbiProject**: Project model with `environments: list[ImbiEnvironment]` for type-safe environment handling
 - **Claude** (`models/claude.py`): Claude Code integration models
+- **MCP** (`models/mcp.py`): MCP (Model Context Protocol) server configuration models for workflow-defined MCP servers
 - **SonarQube** (`models/sonarqube.py`): SonarQube integration models
 - **Git** (`models/git.py`): Git operation models
 - **Base** (`models/base.py`): Common base models and utilities
@@ -296,6 +297,68 @@ Each workflow's `config.toml` file contains:
 - **Actions**: Sequence of operations to perform
 - **Conditions**: Repository state requirements for execution
 - **Filters**: Project targeting and filtering criteria
+- **MCP Servers**: Optional MCP servers for Claude actions (see MCP Server Configuration below)
+
+### MCP Server Configuration
+
+Workflows can define MCP (Model Context Protocol) servers that are available to Claude Code during `claude` type action execution. MCP servers are configured at the workflow level and are automatically merged with the internal `agent_tools` MCP server.
+
+**Supported Transport Types:**
+- **stdio**: Launch MCP server as subprocess (command + args + env)
+- **sse**: Connect via Server-Sent Events (url + headers)
+- **http**: Connect via HTTP (url + headers)
+
+**Environment Variable Expansion:**
+MCP server configurations support shell-style environment variable expansion using `$VAR` or `${VAR}` syntax. This allows secrets and credentials to be injected from the environment rather than hardcoded in workflow files.
+
+```toml
+# Environment variables are expanded at runtime
+[mcp_servers.my-postgres]
+type = "stdio"
+command = "uvx"
+args = ["mcp-server-postgres", "${DATABASE_URL}"]
+
+[mcp_servers.my-api]
+type = "http"
+url = "https://api.example.com/mcp"
+headers = { Authorization = "Bearer ${API_KEY}" }
+```
+
+If a referenced environment variable is not set, a `ValueError` is raised with a clear error message.
+
+**Example Configuration:**
+```toml
+name = "data-analysis-workflow"
+description = "Workflow with database MCP access"
+
+# Define MCP servers available to Claude actions
+[mcp_servers.my-postgres]
+type = "stdio"
+command = "uvx"
+args = ["mcp-server-postgres", "${DATABASE_URL}"]
+env = { PG_PASSWORD = "${PG_PASSWORD}" }
+
+[mcp_servers.my-api]
+type = "http"
+url = "https://api.example.com/mcp"
+headers = { Authorization = "Bearer ${API_KEY}" }
+
+[mcp_servers.my-sse-server]
+type = "sse"
+url = "https://api.example.com/mcp/sse"
+
+[[actions]]
+name = "analyze-data"
+type = "claude"
+task_prompt = "prompts/task.md.j2"
+```
+
+**Implementation Details:**
+- MCP servers are defined in `models/mcp.py` with Pydantic discriminated unions
+- Environment variable expansion is handled by `_expand_mcp_config()` in `claude.py`
+- Servers are merged into `ClaudeAgentOptions.mcp_servers` in `claude.py`
+- The `agent_tools` MCP server (for submit_planning/task/validation_response) is always included automatically
+- MCP server configurations are converted to SDK-compatible dicts via `model_dump()`
 
 ### Workflow Conditions
 

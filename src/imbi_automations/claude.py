@@ -7,7 +7,9 @@ workflows and direct Anthropic API queries.
 
 import json
 import logging
+import os
 import pathlib
+import re
 import typing
 from email import utils as email_utils
 
@@ -25,6 +27,62 @@ COMMIT = 'commit'
 SUBMIT_PLANNING_RESPONSE = 'submit_planning_response'
 SUBMIT_TASK_RESPONSE = 'submit_task_response'
 SUBMIT_VALIDATION_RESPONSE = 'submit_validation_response'
+
+
+def _expand_env_vars(value: str) -> str:
+    """Expand $VAR and ${VAR} patterns in a string.
+
+    Uses os.path.expandvars for standard shell-style expansion and validates
+    that all referenced environment variables are set.
+
+    Args:
+        value: String potentially containing environment variable references
+
+    Returns:
+        String with all environment variables expanded
+
+    Raises:
+        ValueError: If any referenced environment variable is not set
+
+    """
+    expanded = os.path.expandvars(value)
+    # Check for unexpanded variables (os.path.expandvars leaves them unchanged)
+    remaining = re.findall(r'\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?', expanded)
+    for var in remaining:
+        if var not in os.environ:
+            raise ValueError(f'Environment variable {var} not set')
+    return expanded
+
+
+def _expand_mcp_config(config: dict[str, typing.Any]) -> dict[str, typing.Any]:
+    """Recursively expand environment variables in MCP server config.
+
+    Handles strings, lists of strings, and dicts with string values.
+    Non-string values are passed through unchanged.
+
+    Args:
+        config: MCP server configuration dict from model_dump()
+
+    Returns:
+        New dict with all string values expanded
+
+    """
+    result: dict[str, typing.Any] = {}
+    for key, value in config.items():
+        if isinstance(value, str):
+            result[key] = _expand_env_vars(value)
+        elif isinstance(value, list):
+            result[key] = [
+                _expand_env_vars(v) if isinstance(v, str) else v for v in value
+            ]
+        elif isinstance(value, dict):
+            result[key] = {
+                k: _expand_env_vars(v) if isinstance(v, str) else v
+                for k, v in value.items()
+            }
+        else:
+            result[key] = value
+    return result
 
 
 class Agents(typing.TypedDict):
@@ -244,6 +302,15 @@ class Claude(mixins.WorkflowLoggerMixin):
             else:
                 raise RuntimeError
 
+        # Build MCP servers dict with agent_tools and workflow-defined servers
+        mcp_servers: dict[str, typing.Any] = {'agent_tools': agent_tools}
+        for (
+            name,
+            config,
+        ) in self.context.workflow.configuration.mcp_servers.items():
+            mcp_servers[name] = _expand_mcp_config(config.model_dump())
+            LOGGER.debug('Added workflow MCP server: %s', name)
+
         options = claude_agent_sdk.ClaudeAgentOptions(
             agents=dict(self.agents),
             allowed_tools=[
@@ -267,7 +334,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 f'mcp__agent_tools__{SUBMIT_VALIDATION_RESPONSE}',
             ],
             cwd=self.context.working_directory / 'repository',
-            mcp_servers={'agent_tools': agent_tools},
+            mcp_servers=mcp_servers,
             model=self.configuration.claude_code.model,
             settings=str(settings),
             setting_sources=['local'],

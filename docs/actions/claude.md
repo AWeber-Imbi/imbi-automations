@@ -642,6 +642,66 @@ command = "git log -1 --pretty=%B"
 working_directory = "repository:///"
 ```
 
+## MCP Servers
+
+Claude actions automatically have access to MCP (Model Context Protocol) servers configured at the workflow level. These servers provide Claude with tools to access external data sources and APIs during task execution.
+
+### Configuration
+
+MCP servers are configured in the workflow's `config.toml` file under the `[mcp_servers]` section. See [MCP Server Configuration](../workflow-configuration.md#mcp-server-configuration) for full documentation.
+
+### Available Servers
+
+During Claude action execution, the following MCP servers are available:
+
+1. **`agent_tools`** (built-in): Provides workflow submission functions:
+   - `mcp__agent_tools__submit_planning_response()` - For planning agents
+   - `mcp__agent_tools__submit_task_response()` - For task agents
+   - `mcp__agent_tools__submit_validation_response()` - For validation agents
+
+2. **Workflow-configured servers**: Any MCP servers defined in `[mcp_servers.*]` sections
+
+### Example: Database Access
+
+```toml
+# Workflow config.toml
+[mcp_servers.postgres]
+type = "stdio"
+command = "uvx"
+args = ["mcp-server-postgres", "${DATABASE_URL}"]
+
+[[actions]]
+name = "analyze-schema"
+type = "claude"
+task_prompt = "prompts/analyze-schema.md"
+```
+
+**Prompt (`prompts/analyze-schema.md`):**
+```markdown
+# Analyze Database Schema
+
+Use the postgres MCP server to analyze the database schema.
+
+1. List all tables in the database
+2. Identify relationships between tables
+3. Generate a summary of the schema structure
+
+Use the `mcp__postgres__*` tools to query the database.
+```
+
+### Environment Variables in MCP Configs
+
+MCP server configurations support shell-style environment variable expansion (`$VAR` or `${VAR}`) for secure credential injection. Variables are expanded at runtime when the Claude client is created.
+
+```toml
+[mcp_servers.secure-api]
+type = "http"
+url = "https://api.example.com/mcp"
+headers = { Authorization = "Bearer ${API_TOKEN}" }
+```
+
+If a referenced environment variable is not set, a clear error is raised before execution begins.
+
 ## Performance Considerations
 
 - **API Costs**: Each cycle makes Claude API calls
