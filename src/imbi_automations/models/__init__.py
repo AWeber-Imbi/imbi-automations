@@ -43,6 +43,7 @@ from .imbi import (
 )
 from .mcp import McpHttpServer, McpServerConfig, McpSSEServer, McpStdioServer
 from .resume_state import ResumeState
+from .utility import SemverComparisonResult
 from .workflow import (
     ResourceUrl,
     Workflow,
@@ -147,4 +148,5 @@ __all__ = [
     'WorkflowTemplateAction',
     'WorkflowUtilityAction',
     'WorkflowUtilityCommands',
+    'SemverComparisonResult',
 ]

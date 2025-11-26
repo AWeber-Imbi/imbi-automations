@@ -138,6 +138,33 @@ Git commit SHA of the repository HEAD when workflow execution started.
 Starting commit: {{ starting_commit }}
 ```
 
+#### `variables` (dict)
+Dictionary containing results from utility actions and other inter-action data. Populated by actions like `compare_semver` that store structured output for use by subsequent actions.
+
+**Example:**
+```jinja2
+{% if variables.version_check %}
+Version comparison result:
+- Current: {{ variables.version_check.current_version }}
+- Target: {{ variables.version_check.target_version }}
+- Is Older: {{ variables.version_check.is_older }}
+{% endif %}
+```
+
+**Usage with compare_semver:**
+```jinja2
+{% if variables.semver_result.is_older %}
+Upgrade needed from {{ variables.semver_result.current_version }}
+to {{ variables.semver_result.target_version }}
+{% elif variables.semver_result.is_newer %}
+Already on a newer version - no action needed.
+{% else %}
+Versions are equal.
+{% endif %}
+```
+
+**Note:** The variable name depends on what the action specifies. For `compare_semver`, the default is `semver_result` but can be customized via the `output` kwarg.
+
 ### Custom Template Functions
 
 The templating system provides custom functions accessible within templates:

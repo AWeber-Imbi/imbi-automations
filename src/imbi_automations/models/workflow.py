@@ -692,3 +692,4 @@ class WorkflowContext(pydantic.BaseModel):
     registry: typing.Any = None  # ImbiMetadataCache (avoid circular import)
     current_action_index: int | None = None  # 1-indexed position in workflow
     total_actions: int | None = None  # Total actions in workflow
+    variables: dict[str, typing.Any] = {}  # Inter-action data passing
