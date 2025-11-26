@@ -250,6 +250,141 @@ replace_branch = true  # Force-replace existing PR branch
 
 **Warning:** Destroys existing PR branch and its history.
 
+## MCP Server Configuration
+
+The `[mcp_servers]` section allows configuring Model Context Protocol (MCP) servers that will be available to Claude actions during workflow execution. MCP servers provide Claude with access to external tools and data sources.
+
+### Supported Transport Types
+
+Three MCP transport types are supported, matching the Claude Agent SDK:
+
+#### stdio (Standard I/O)
+
+Launch a local MCP server process:
+
+```toml
+[mcp_servers.my-postgres]
+type = "stdio"
+command = "uvx"
+args = ["mcp-server-postgres", "${DATABASE_URL}"]
+env = { DATABASE_URL = "${DATABASE_URL}" }
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | `"stdio"` | Yes | Transport type |
+| `command` | `string` | Yes | Executable to run |
+| `args` | `list[string]` | No | Command arguments (default: `[]`) |
+| `env` | `dict[string, string]` | No | Environment variables (default: `{}`) |
+
+#### http (HTTP)
+
+Connect to an HTTP-based MCP server:
+
+```toml
+[mcp_servers.my-api]
+type = "http"
+url = "https://api.example.com/mcp"
+headers = { Authorization = "Bearer ${API_TOKEN}" }
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | `"http"` | Yes | Transport type |
+| `url` | `string` | Yes | Server endpoint URL |
+| `headers` | `dict[string, string]` | No | HTTP headers (default: `{}`) |
+
+#### sse (Server-Sent Events)
+
+Connect to an SSE-based MCP server:
+
+```toml
+[mcp_servers.my-events]
+type = "sse"
+url = "https://api.example.com/mcp/sse"
+headers = { Authorization = "Bearer ${API_TOKEN}" }
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | `"sse"` | Yes | Transport type |
+| `url` | `string` | Yes | SSE endpoint URL |
+| `headers` | `dict[string, string]` | No | HTTP headers (default: `{}`) |
+
+### Environment Variable Expansion
+
+MCP server configurations support shell-style environment variable expansion for secure credential injection:
+
+- **`$VAR`** - Basic expansion
+- **`${VAR}`** - Braced expansion (recommended)
+
+Environment variables are expanded at runtime when the Claude client is created, not at configuration parse time.
+
+**Example:**
+
+```toml
+[mcp_servers.production-db]
+type = "stdio"
+command = "uvx"
+args = ["mcp-server-postgres", "${PROD_DATABASE_URL}"]
+
+[mcp_servers.internal-api]
+type = "http"
+url = "https://api.internal.example.com/mcp"
+headers = { Authorization = "Bearer ${INTERNAL_API_TOKEN}" }
+```
+
+**Supported Locations:**
+
+- `args` list values
+- `env` dict values
+- `url` string
+- `headers` dict values
+
+**Error Handling:**
+
+If a referenced environment variable is not set, a clear error is raised:
+
+```
+ValueError: Environment variable PROD_DATABASE_URL not set
+```
+
+### Complete Example
+
+```toml
+name = "Data Analysis Workflow"
+description = "Analyze project data using MCP-connected databases"
+
+[mcp_servers.postgres]
+type = "stdio"
+command = "uvx"
+args = ["mcp-server-postgres", "${DATABASE_URL}"]
+
+[mcp_servers.clickhouse]
+type = "http"
+url = "https://clickhouse.example.com/mcp"
+headers = { Authorization = "Bearer ${CLICKHOUSE_TOKEN}" }
+
+[mcp_servers.neo4j]
+type = "stdio"
+command = "uvx"
+args = ["mcp-server-neo4j"]
+env = { NEO4J_URL = "${NEO4J_URL}", NEO4J_PASSWORD = "${NEO4J_PASSWORD}" }
+
+[[actions]]
+name = "analyze-data"
+type = "claude"
+task_prompt = "prompts/analyze.md"
+```
+
+In Claude actions, these MCP servers are available alongside the built-in `agent_tools` server that provides workflow submission functions.
+
 ## Workflow-Level Conditions
 
 Workflow conditions determine if the entire workflow should execute for a project. See [Workflow Conditions](workflow-conditions.md) for detailed documentation.
