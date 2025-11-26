@@ -71,8 +71,28 @@ class WorkflowEnginePullRequestTestCase(base.AsyncTestCase):
         self.engine.claude = mock.AsyncMock()
         self.engine.claude.query.return_value = 'Generated PR body'
         self.engine.github = mock.AsyncMock()
+        # Return a GitHubPullRequest model from create_pull_request
         self.engine.github.create_pull_request.return_value = (
-            'https://example.com/pr/1'
+            models.GitHubPullRequest(
+                id=1,
+                number=1,
+                title='Test PR',
+                state='open',
+                created_at='2024-01-01T00:00:00Z',
+                html_url='https://example.com/pr/1',
+                url='https://api.example.com/pr/1',
+                head={'sha': 'abc123', 'ref': 'test-branch'},
+                base={'sha': 'def456', 'ref': 'main'},
+                user=models.GitHubUser(
+                    login='test-user',
+                    id=1,
+                    node_id='test',
+                    avatar_url='https://example.com/avatar',
+                    url='https://example.com/user',
+                    html_url='https://example.com/user',
+                    type='User',
+                ),
+            )
         )
 
     def tearDown(self) -> None:

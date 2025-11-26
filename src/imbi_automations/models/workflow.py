@@ -125,6 +125,17 @@ class WorkflowConditionType(enum.StrEnum):
     any = 'any'
 
 
+class WorkflowActionStage(enum.StrEnum):
+    """Execution stage for workflow actions.
+
+    Primary actions execute first and can create repository changes.
+    Followup actions execute after PR creation and can monitor/respond.
+    """
+
+    primary = 'primary'
+    followup = 'followup'
+
+
 class WorkflowAction(pydantic.BaseModel):
     """Base class for workflow actions with common configuration.
 
@@ -136,6 +147,7 @@ class WorkflowAction(pydantic.BaseModel):
 
     name: str
     type: WorkflowActionTypes = WorkflowActionTypes.callable
+    stage: WorkflowActionStage = WorkflowActionStage.primary
     ai_commit: bool = False
     commit_message: str | None = None
     conditions: list['WorkflowCondition'] = []
@@ -650,6 +662,7 @@ class WorkflowConfiguration(pydantic.BaseModel):
     filter: WorkflowFilter | None = None
     mcp_servers: dict[str, mcp.McpServerConfig] = {}
     use_devcontainers: bool = False
+    max_followup_cycles: int = 5
 
     condition_type: WorkflowConditionType = WorkflowConditionType.all
     conditions: list[WorkflowCondition] = []
@@ -697,3 +710,7 @@ class WorkflowContext(pydantic.BaseModel):
     registry: typing.Any = None  # ImbiMetadataCache (avoid circular import)
     current_action_index: int | None = None  # 1-indexed position in workflow
     total_actions: int | None = None  # Total actions in workflow
+
+    # PR information (populated after PR creation, available in followup stage)
+    pull_request: github.GitHubPullRequest | None = None
+    pr_branch: str | None = None

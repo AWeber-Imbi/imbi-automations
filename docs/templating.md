@@ -138,6 +138,42 @@ Git commit SHA of the repository HEAD when workflow execution started.
 Starting commit: {{ starting_commit }}
 ```
 
+#### `pull_request` (GitHubPullRequest | None)
+Pull request information, available only in followup stage actions after PR creation.
+
+**Available fields:**
+
+- `pull_request.number` - PR number (integer)
+- `pull_request.html_url` - PR URL on GitHub
+- `pull_request.state` - PR state ("open", "closed", "merged")
+- `pull_request.title` - PR title
+- `pull_request.head.sha` - Head commit SHA
+- `pull_request.head.ref` - Head branch name
+- `pull_request.base.ref` - Base branch name
+- `pull_request.mergeable` - Whether PR can be merged (boolean or None)
+- `pull_request.mergeable_state` - Merge state ("clean", "dirty", "blocked", etc.)
+
+**Example:**
+```jinja2
+{% if pull_request %}
+PR #{{ pull_request.number }}: {{ pull_request.html_url }}
+Head SHA: {{ pull_request.head.sha }}
+State: {{ pull_request.state }}
+{% endif %}
+```
+
+#### `pr_branch` (str | None)
+Branch name for the pull request, available only in followup stage actions.
+
+**Example:**
+```jinja2
+{% if pr_branch %}
+PR Branch: {{ pr_branch }}
+{% endif %}
+```
+
+See [Action Stages](action-stages.md) for followup stage documentation.
+
 ### Custom Template Functions
 
 The templating system provides custom functions accessible within templates:

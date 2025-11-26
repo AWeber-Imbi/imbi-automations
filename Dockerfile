@@ -1,66 +1,47 @@
-# Multi-stage Dockerfile for imbi-automations with Claude Code
-FROM python:3.12-trixie AS builder
-
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create virtual environment
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Copy source files needed for build
-COPY pyproject.toml README.md /app/
-COPY src/ /app/src/
-WORKDIR /app
-
-# Install imbi-automations and dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir .
-
-# Final stage
 FROM python:3.12-trixie
 
-# Install runtime dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        git \
-        openssh-client \
-        curl \
+ENV GIT_USER_NAME="Imbi Automations" \
+    GIT_USER_EMAIL="imbi-automations@aweber.com" \
+    IMBI_AUTOMATIONS_CACHE_DIR=/home/imbi-automations/cache \
+    IMBI_AUTOMATIONS_CONFIG=/home/imbi-automations/config/config.toml
+
+COPY dist/imbi-automations-*.whl /tmp/
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
         ca-certificates \
+        curl \
+        git \
         gnupg \
-    && rm -rf /var/lib/apt/lists/*
+        openssh-client \
+ && rm -rf /var/lib/apt/lists/* \
+ && curl -fsSL https://claude.ai/install.sh | bash  \
+ && pip install --root-user-action ignore --break-system-packages --no-cache-dir --upgrade pip && \
+ && pip install --root-user-action ignore --break-system-packages --no-cache-dir /tmp/imbi-automations*.whl \
+ && rm /tmp/*.whl \
+ && groupadd --gid 1000 imbi-automations \
+ && useradd --uid 1000 --gid 1000 \
+            --home-dir /home/imbi-automations--create-home \
+            --shell /bin/bash \
+            imbi-automations
 
-# Install Claude Code standalone using official installer
-# Note: The installer requires bash, not sh
-RUN curl -fsSL https://claude.ai/install.sh | bash
+USER imbi-automations
+WORKDIR /home/imbi-automations
 
-# Copy virtual environment from builder (already has imbi-automations installed)
-COPY --from=builder /opt/venv /opt/venv
+RUN mkdir -p /home/imbi-automations/config \
+             /home/imbi-automations/errors \
+             /home/imbi-automations/workflows \
+          /home/imbi-automations/root/.ssh \
+ && chmod 700 /home/imbi-automations/.ssh \
+ && git config --global user.name ${GIT_USER_NAME} && \
+    git config --global user.email ${GIT_USER_EMAIL}
 
-# Add both venv and claude to PATH
-ENV PATH="/root/.local/bin:/opt/venv/bin:$PATH"
+VOLUME [
+  "/home/imbi-automations/config",
+  "/home/imbi-automations/errors",
+  "/home/imbi-automations/workflows"
+]
 
-# Create directories for mounted volumes
-RUN mkdir -p /config /workflows /cache /workspace /root/.ssh && \
-    chmod 700 /root/.ssh
-
-# Set up git configuration (can be overridden by environment variables)
-RUN git config --global user.name "Imbi Automations" && \
-    git config --global user.email "imbi-automations@example.com"
-
-# Environment variables for configuration
-ENV IMBI_AUTOMATIONS_CACHE_DIR=/cache
-ENV IMBI_AUTOMATIONS_CONFIG=/config/config.toml
-
-# Default working directory for temporary repo clones
-WORKDIR /workspace
-
-# Default entrypoint
 ENTRYPOINT ["imbi-automations"]
 
-# Default command (can be overridden)
 CMD ["--help"]

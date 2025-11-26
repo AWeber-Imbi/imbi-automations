@@ -330,8 +330,8 @@ class GitHub(http.BaseURLHTTPClient):
         body: str,
         head_branch: str,
         base_branch: str = 'main',
-    ) -> str:
-        """Create a pull request and return the PR URL.
+    ) -> models.GitHubPullRequest:
+        """Create a pull request and return the PR object.
 
         Args:
             context: Workflow context containing GitHub repository info
@@ -341,7 +341,7 @@ class GitHub(http.BaseURLHTTPClient):
             base_branch: Target branch name (default: 'main')
 
         Returns:
-            Pull request URL
+            GitHubPullRequest object with full PR details
 
         Raises:
             httpx.HTTPError: If pull request creation fails
@@ -372,18 +372,17 @@ class GitHub(http.BaseURLHTTPClient):
         response = await self.post(f'{base_path}/pulls', json=payload)
         response.raise_for_status()
 
-        pr_data = response.json()
-        pr_url = pr_data['html_url']
+        pr = models.GitHubPullRequest.model_validate(response.json())
 
         LOGGER.info(
             'Created pull request #%d for %s/%s: %s',
-            pr_data['number'],
+            pr.number,
             org,
             repo,
-            pr_url,
+            pr.html_url,
         )
 
-        return pr_url
+        return pr
 
     async def _get_most_recent_workflow_run_id(
         self, org: str, repo_name: str, branch: str = 'main'
@@ -761,3 +760,99 @@ class GitHub(http.BaseURLHTTPClient):
                 'Failed to update repository %s/%s: %s', org, repo, exc
             )
             raise
+
+    async def get_pull_request(
+        self, org: str, repo: str, pr_number: int
+    ) -> models.GitHubPullRequest:
+        """Get pull request details by number.
+
+        Args:
+            org: Organization name
+            repo: Repository name
+            pr_number: Pull request number
+
+        Returns:
+            GitHubPullRequest with current status
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        base_path = self._repository_base_path(org=org, repo_name=repo)
+
+        response = await self.get(f'{base_path}/pulls/{pr_number}')
+        response.raise_for_status()
+
+        return models.GitHubPullRequest.model_validate(response.json())
+
+    async def get_pr_check_runs(
+        self, org: str, repo: str, ref: str
+    ) -> list[dict[str, typing.Any]]:
+        """Get check runs for a commit (typically PR head).
+
+        Args:
+            org: Organization name
+            repo: Repository name
+            ref: Git ref (commit SHA, branch, or tag)
+
+        Returns:
+            List of check run dictionaries
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        base_path = self._repository_base_path(org=org, repo_name=repo)
+
+        response = await self.get(f'{base_path}/commits/{ref}/check-runs')
+        response.raise_for_status()
+
+        return response.json().get('check_runs', [])
+
+    async def get_pr_reviews(
+        self, org: str, repo: str, pr_number: int
+    ) -> list[dict[str, typing.Any]]:
+        """Get reviews for a pull request.
+
+        Args:
+            org: Organization name
+            repo: Repository name
+            pr_number: Pull request number
+
+        Returns:
+            List of review dictionaries
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        base_path = self._repository_base_path(org=org, repo_name=repo)
+
+        response = await self.get(f'{base_path}/pulls/{pr_number}/reviews')
+        response.raise_for_status()
+
+        return response.json()
+
+    async def get_pr_comments(
+        self, org: str, repo: str, pr_number: int
+    ) -> list[dict[str, typing.Any]]:
+        """Get review comments for a pull request.
+
+        Args:
+            org: Organization name
+            repo: Repository name
+            pr_number: Pull request number
+
+        Returns:
+            List of comment dictionaries
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        base_path = self._repository_base_path(org=org, repo_name=repo)
+
+        response = await self.get(f'{base_path}/pulls/{pr_number}/comments')
+        response.raise_for_status()
+
+        return response.json()

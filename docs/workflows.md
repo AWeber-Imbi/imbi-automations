@@ -111,6 +111,30 @@ Workflows support multiple action types for different operations:
 
 See the [Actions Reference](actions/index.md) for complete documentation.
 
+### Action Stages
+
+Actions can be organized into execution stages:
+
+- **Primary** (default): Execute before PR creation - standard workflow actions
+- **Followup**: Execute after PR creation - for monitoring CI, responding to feedback
+
+```toml
+[[actions]]
+name = "update-deps"
+type = "claude"
+# stage = "primary"  # Default, can be omitted
+task_prompt = "prompts/update.md.j2"
+
+[[actions]]
+name = "monitor-ci"
+type = "claude"
+stage = "followup"
+task_prompt = "prompts/monitor.md.j2"
+committable = true
+```
+
+Followup actions receive PR context (`pull_request.number`, `pull_request.html_url`, `pr_branch`) in templates. See [Action Stages](action-stages.md) for detailed documentation.
+
 ### Conditional Execution
 
 **Remote Conditions** (checked via API before cloning):
@@ -349,6 +373,7 @@ file_exists = "pyproject.toml"
 ## Learn More
 
 - **[Workflow Configuration](workflow-configuration.md)** - Detailed configuration reference with all fields and options
+- **[Action Stages](action-stages.md)** - Primary and followup stage execution for CI monitoring
 - **[Actions Reference](actions/index.md)** - Complete action types documentation
 - **[Debugging Workflows](debugging.md)** - Troubleshooting and debugging techniques
 - **[CLI Reference](cli.md)** - Command-line options and usage
