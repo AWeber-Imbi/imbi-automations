@@ -176,49 +176,55 @@ Versions are equal - no upgrade required.
 {% endif %}
 ```
 
-**Example - Conditional Action Execution:**
+**Example - Conditional Action Execution (React Upgrade):**
 
-Use action-level conditions to skip actions based on comparison results:
+Check if the React version in package.json is older than 19.2.0, and if so, run an upgrade action:
 
 ```toml
-# First, compare versions
+# Extract current React version from package.json
 [[actions]]
-name = "check-version"
+name = "get-react-version"
+type = "shell"
+command = "node -p \"require('./package.json').dependencies.react.replace(/[^0-9.]/g, '')\""
+working_directory = "repository:///"
+committable = false
+
+# Compare versions (use the extracted version from a project fact or hardcode for demo)
+[[actions]]
+name = "check-react-version"
 type = "utility"
 command = "compare_semver"
 committable = false
 kwargs = {
-    current_version = "{{ imbi_project.facts.get('Python Version', '3.9.0') }}",
-    target_version = "3.12.0",
-    output = "version_check"
+    current_version = "18.2.0",  # Or use {{ imbi_project.facts.get('React Version') }}
+    target_version = "19.2.0",
+    output = "react_check"
 }
 
-# Only run upgrade if current version is older
+# Only run upgrade if React version is older than 19.2.0
 [[actions]]
-name = "upgrade-python"
+name = "upgrade-react"
 type = "claude"
-task_prompt = "prompts/upgrade.md.j2"
+task_prompt = "prompts/upgrade-react.md.j2"
 
 [[actions.conditions]]
-file_contains = "{{ variables.version_check.is_older }}"
-file = "True"  # Condition passes when is_older equals "True"
+file_contains = "True"
+file = "{{ variables.react_check.is_older }}"
 ```
 
-Alternatively, use Jinja2 conditionals directly in shell commands:
+**Prompt template (`prompts/upgrade-react.md.j2`):**
 
-```toml
-[[actions]]
-name = "conditional-upgrade"
-type = "shell"
-command = """
-{% if variables.version_check.is_older %}
-echo "Upgrading from {{ variables.version_check.current_version }} to {{ variables.version_check.target_version }}"
-# Run upgrade commands here
-{% else %}
-echo "No upgrade needed"
-{% endif %}
-"""
-committable = false
+```jinja2
+# Upgrade React to 19.2.0
+
+The project is using React {{ variables.react_check.current_version }} which is
+older than the target version {{ variables.react_check.target_version }}.
+
+Please upgrade:
+1. Update `react` and `react-dom` in package.json to ^19.2.0
+2. Review and update any deprecated API usage
+3. Run `npm install` to update package-lock.json
+4. Fix any TypeScript errors related to the upgrade
 ```
 
 **Example - Build Number Comparison:**
