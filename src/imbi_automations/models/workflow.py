@@ -475,13 +475,11 @@ class WorkflowUtilityCommands(enum.StrEnum):
     """Utility helper operation commands.
 
     Defines available utility operations including docker tag parsing,
-    Dockerfile base image extraction, semver comparison, and Python
-    constraint parsing.
+    Dockerfile base image extraction, and Python constraint parsing.
     """
 
     docker_tag = 'docker_tag'
     dockerfile_from = 'dockerfile_from'
-    compare_semver = 'compare_semver'
     parse_python_constraints = 'parse_python_constraints'
 
 
@@ -526,18 +524,24 @@ class WorkflowConditionRemoteClient(enum.StrEnum):
 
 
 class WorkflowCondition(validators.ExclusiveGroupsMixin, pydantic.BaseModel):
-    """Workflow execution condition with local and remote file checks.
+    """Workflow execution condition with local, remote, and template checks.
 
     Supports both local (post-clone) and remote (pre-clone) file existence,
     absence, and content matching with glob patterns and regex support.
+    Also supports template-based conditions via the `when` field.
     """
 
+    # Local (post-clone) file conditions
     file_exists: ResourceUrl | str | None = None
     file_not_exists: ResourceUrl | str | None = None
     file_contains: str | None = None
     file_doesnt_contain: str | None = None
     file: ResourceUrl | str | None = None
 
+    # Template-based condition (Ansible-style)
+    when: str | None = None  # Jinja2 template that must evaluate to truthy
+
+    # Remote (pre-clone) conditions
     remote_client: WorkflowConditionRemoteClient = (
         WorkflowConditionRemoteClient.github
     )
@@ -563,6 +567,7 @@ class WorkflowCondition(validators.ExclusiveGroupsMixin, pydantic.BaseModel):
             requires_all=('file_doesnt_contain', 'file'),
             paired=(('file_doesnt_contain', 'file'),),
         ),
+        validators.Variant(name='when', requires_all=('when',)),
     )
 
     variants_b: typing.ClassVar[tuple[validators.Variant, ...]] = (
@@ -692,4 +697,3 @@ class WorkflowContext(pydantic.BaseModel):
     registry: typing.Any = None  # ImbiMetadataCache (avoid circular import)
     current_action_index: int | None = None  # 1-indexed position in workflow
     total_actions: int | None = None  # Total actions in workflow
-    variables: dict[str, typing.Any] = {}  # Inter-action data passing

@@ -432,6 +432,22 @@ Evaluated after cloning the repository:
 - **`file_not_exists`**: Check if a file does not exist (supports exact paths, glob patterns, or regex)
 - **`file_contains`**: Check if a file contains specified text or matches a regex pattern
 
+#### Template Conditions (Post-Clone)
+Evaluated after cloning using Jinja2 template expressions:
+- **`when`**: Evaluate a Jinja2 template expression - if truthy, condition passes
+
+**Template Functions Available in `when`:**
+- `compare_semver(current, target)`: Compare semantic versions, returns dict with `is_older`, `is_equal`, `is_newer`
+- `get_component_version(path, component)`: Extract dependency version from package.json or pyproject.toml
+
+**Example:**
+```toml
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///package.json', 'react'), '19.0.0').is_older }}"
+```
+
+**Truthiness evaluation:** `True`, `1`, `yes` → truthy; `False`, `0`, `no`, `none`, `""` → falsy
+
 #### Remote Conditions (Pre-Clone)
 Evaluated before cloning using GitHub API, providing performance benefits:
 - **`remote_file_exists`**: Check if a file exists (supports exact paths or glob patterns like `**/*.tf`)

@@ -11,7 +11,7 @@
 # - All action types: claude, docker, file, git, github, shell, template, utility
 # - All file commands: append, copy, delete (path & pattern), move, rename, write
 # - All docker commands: build, extract, pull, push (with and without tags)
-# - All utility commands: docker_tag, dockerfile_from, compare_semver, parse_python_constraints
+# - All utility commands: docker_tag, dockerfile_from, parse_python_constraints
 # - Both local and remote conditions
 # - Complex filter configurations
 # - Action-level conditions and failure handling
@@ -241,14 +241,6 @@ name = "test-utility-dockerfile-from"
 type = "utility"
 command = "dockerfile_from"
 path = "docker/Dockerfile"
-
-# Utility compare_semver
-[[actions]]
-name = "test-utility-compare-semver"
-type = "utility"
-command = "compare_semver"
-args = ["1.2.3", "1.2.4"]
-kwargs = {comparison = "lt"}
 
 # Utility parse_python_constraints
 [[actions]]

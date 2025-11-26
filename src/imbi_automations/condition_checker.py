@@ -11,8 +11,9 @@ import pathlib
 import re
 
 import httpx
+import jinja2
 
-from imbi_automations import clients, mixins, models, utils
+from imbi_automations import clients, mixins, models, prompts, utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -68,6 +69,8 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
                         file_path, condition.file_not_exists
                     )
                 )
+            elif condition.when:
+                results.append(self._check_when(context, condition))
         if condition_type == models.WorkflowConditionType.any:
             return any(results)
         return all(results)
@@ -88,8 +91,13 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
         for condition in conditions:
             self.logger.debug('%r', condition.model_dump())
 
-            # Skip local-only conditions (file_exists, file_not_exists)
-            if condition.file_exists or condition.file_not_exists:
+            # Skip local-only conditions (file_exists, file_not_exists, when)
+            # when conditions require local filesystem access for templates
+            if (
+                condition.file_exists
+                or condition.file_not_exists
+                or condition.when
+            ):
                 continue
 
             # Handle remote conditions
@@ -225,6 +233,37 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
         return not self._match_string_or_regex(
             condition.file_doesnt_contain, file_content
         )
+
+    def _check_when(
+        self,
+        context: models.WorkflowContext,
+        condition: models.WorkflowCondition,
+    ) -> bool:
+        """Evaluate a Jinja2 template and check if result is truthy.
+
+        Lenient evaluation:
+        - Truthy: 'True', 'true', '1', 'yes', any non-empty string
+        - Falsy: 'False', 'false', '0', 'no', 'none', ''
+
+        Args:
+            context: Workflow context for template rendering.
+            condition: Workflow condition with when field.
+
+        Returns:
+            True if template evaluates to truthy value, False otherwise.
+        """
+        if not condition.when:
+            return False
+
+        try:
+            rendered = prompts.render(context, template=condition.when).strip()
+            self.logger.debug('when condition rendered to: %r', rendered)
+
+            # Falsy: explicit false values; everything else is truthy
+            return rendered.lower() not in ('false', '0', 'no', 'none', '')
+        except (ValueError, TypeError, jinja2.TemplateError) as exc:
+            self.logger.warning('when condition failed: %s', exc)
+            return False
 
     @staticmethod
     def _check_file_pattern_exists(

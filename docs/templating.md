@@ -138,33 +138,6 @@ Git commit SHA of the repository HEAD when workflow execution started.
 Starting commit: {{ starting_commit }}
 ```
 
-#### `variables` (dict)
-Dictionary containing results from utility actions and other inter-action data. Populated by actions like `compare_semver` that store structured output for use by subsequent actions.
-
-**Example:**
-```jinja2
-{% if variables.version_check %}
-Version comparison result:
-- Current: {{ variables.version_check.current_version }}
-- Target: {{ variables.version_check.target_version }}
-- Is Older: {{ variables.version_check.is_older }}
-{% endif %}
-```
-
-**Usage with compare_semver:**
-```jinja2
-{% if variables.semver_result.is_older %}
-Upgrade needed from {{ variables.semver_result.current_version }}
-to {{ variables.semver_result.target_version }}
-{% elif variables.semver_result.is_newer %}
-Already on a newer version - no action needed.
-{% else %}
-Versions are equal.
-{% endif %}
-```
-
-**Note:** The variable name depends on what the action specifies. For `compare_semver`, the default is `semver_result` but can be customized via the `output` kwarg.
-
 ### Custom Template Functions
 
 The templating system provides custom functions accessible within templates:
@@ -227,6 +200,71 @@ image = "{{ extract_image_from_dockerfile('repository:///Dockerfile') }}"
 source = "/tmp/constraints.txt"
 destination = "extracted:///constraints.txt"
 ```
+
+#### `compare_semver(current, target)`
+Compares two semantic versions and returns a dict with comparison results.
+
+**Parameters:**
+
+- `current` - Current version string (e.g., "18.2.0", "3.9.18-4")
+- `target` - Target version string to compare against
+
+**Returns:** Dict with:
+
+- `is_older`: True if current < target
+- `is_equal`: True if current == target
+- `is_newer`: True if current > target
+- `comparison`: -1 (older), 0 (equal), or 1 (newer)
+- `current_major`, `current_minor`, `current_patch`, `current_build`
+- `target_major`, `target_minor`, `target_patch`, `target_build`
+
+**Version handling:**
+
+- Strips prefixes like `v`, `^`, `~`, `>=`
+- Handles partial versions (e.g., "3.9" → "3.9.0")
+- Supports build numbers (e.g., "3.9.18-4")
+
+**Example:**
+```jinja2
+{% set result = compare_semver('18.2.0', '19.0.0') %}
+{% if result.is_older %}
+Current version {{ result.current_version }} is older than {{ result.target_version }}
+{% endif %}
+```
+
+**Available in:** All templates, `when` conditions
+
+#### `get_component_version(path, component)`
+Extracts a dependency version from a manifest file.
+
+**Parameters:**
+
+- `path` - ResourceUrl path to manifest file (e.g., "repository:///package.json")
+- `component` - Name of the dependency to extract
+
+**Supported file types:**
+
+- `package.json`: Searches dependencies, devDependencies, peerDependencies
+- `pyproject.toml`: Searches project.dependencies, optional-dependencies, Poetry dependencies
+
+**Returns:** Clean version string without prefixes
+
+**Example:**
+```jinja2
+React version: {{ get_component_version('repository:///package.json', 'react') }}
+Pydantic version: {{ get_component_version('repository:///pyproject.toml', 'pydantic') }}
+```
+
+**Combined with compare_semver:**
+```jinja2
+{% set react_version = get_component_version('repository:///package.json', 'react') %}
+{% set comparison = compare_semver(react_version, '19.0.0') %}
+{% if comparison.is_older %}
+React {{ react_version }} is older than 19.0.0 - upgrade recommended
+{% endif %}
+```
+
+**Available in:** All templates, `when` conditions
 
 ## Template Usage
 
