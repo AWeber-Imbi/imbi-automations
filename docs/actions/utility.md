@@ -176,6 +176,51 @@ Versions are equal - no upgrade required.
 {% endif %}
 ```
 
+**Example - Conditional Action Execution:**
+
+Use action-level conditions to skip actions based on comparison results:
+
+```toml
+# First, compare versions
+[[actions]]
+name = "check-version"
+type = "utility"
+command = "compare_semver"
+committable = false
+kwargs = {
+    current_version = "{{ imbi_project.facts.get('Python Version', '3.9.0') }}",
+    target_version = "3.12.0",
+    output = "version_check"
+}
+
+# Only run upgrade if current version is older
+[[actions]]
+name = "upgrade-python"
+type = "claude"
+task_prompt = "prompts/upgrade.md.j2"
+
+[[actions.conditions]]
+file_contains = "{{ variables.version_check.is_older }}"
+file = "True"  # Condition passes when is_older equals "True"
+```
+
+Alternatively, use Jinja2 conditionals directly in shell commands:
+
+```toml
+[[actions]]
+name = "conditional-upgrade"
+type = "shell"
+command = """
+{% if variables.version_check.is_older %}
+echo "Upgrading from {{ variables.version_check.current_version }} to {{ variables.version_check.target_version }}"
+# Run upgrade commands here
+{% else %}
+echo "No upgrade needed"
+{% endif %}
+"""
+committable = false
+```
+
 **Example - Build Number Comparison:**
 
 ```toml
