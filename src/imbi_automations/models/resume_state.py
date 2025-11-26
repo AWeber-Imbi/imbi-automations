@@ -35,10 +35,19 @@ class ResumeState(pydantic.BaseModel):
     failed_action_name: str
     completed_action_indices: list[int]
 
+    # Stage tracking (for stage-aware resumability)
+    current_stage: str = 'primary'  # 'primary' or 'followup'
+    followup_cycle: int = 0  # Followup cycle number (0 = primary stage)
+
     # WorkflowContext restoration
     starting_commit: str | None
     has_repository_changes: bool
     github_repository: github.GitHubRepository | None
+
+    # PR information (for resuming followup stage)
+    pull_request_number: int | None = None
+    pull_request_url: str | None = None
+    pr_branch: str | None = None
 
     # Error details
     error_message: str

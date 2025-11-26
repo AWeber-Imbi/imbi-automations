@@ -153,11 +153,35 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             )
             return False
 
-        # Set total actions for progress tracking
-        context.total_actions = len(self.workflow.configuration.actions)
+        # Separate actions by stage
+        all_actions = list(enumerate(self.workflow.configuration.actions))
+        primary_actions = [
+            (i, a)
+            for i, a in all_actions
+            if a.stage == models.WorkflowActionStage.primary
+        ]
+        followup_actions = [
+            (i, a)
+            for i, a in all_actions
+            if a.stage == models.WorkflowActionStage.followup
+        ]
 
-        # Execute actions (all actions for normal mode, remaining for resume)
-        for idx, action in actions_to_run:
+        # Set total actions for progress tracking (primary stage only)
+        context.total_actions = len(primary_actions)
+
+        # Filter actions_to_run to only include primary stage actions
+        # (for resume mode, we filter the already-subset actions_to_run)
+        if self.resume_state:
+            primary_actions_to_run = [
+                (i, a)
+                for i, a in actions_to_run
+                if a.stage == models.WorkflowActionStage.primary
+            ]
+        else:
+            primary_actions_to_run = primary_actions
+
+        # Execute PRIMARY stage actions
+        for idx, action in primary_actions_to_run:
             # Update current action index for progress tracking
             context.current_action_index = idx + 1
 
@@ -212,18 +236,28 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 context.imbi_project.slug,
                 self.configuration.dry_run_dir,
             )
+            if followup_actions:
+                self.logger.warning(
+                    '%s dry-run mode: skipping %d followup actions '
+                    '(no PR created)',
+                    context.imbi_project.slug,
+                    len(followup_actions),
+                )
             self._preserve_working_directory(
                 context, working_directory, self.configuration.dry_run_dir
             )
             working_directory.cleanup()
             return True
 
+        # Create PR or push changes
         if context.has_repository_changes:
             if (
                 self.workflow.configuration.github.create_pull_request
                 and self.configuration.claude_code.enabled
             ):
-                await self._create_pull_request(context)
+                pr, branch_name = await self._create_pull_request(context)
+                context.pull_request = pr
+                context.pr_branch = branch_name
                 self.tracker.incr('pull_requests_created')
             else:
                 await git.push_changes(
@@ -238,6 +272,12 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 context.imbi_project.slug,
             )
 
+        # Execute FOLLOWUP stage (if followup actions exist)
+        if followup_actions:
+            await self._execute_followup_stage(
+                context, followup_actions, working_directory
+            )
+
         # Clean up successfully resumed state
         if self.resume_state:
             self._cleanup_resume_state(self.resume_state)
@@ -247,8 +287,13 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
 
     async def _create_pull_request(
         self, context: models.WorkflowContext
-    ) -> None:
-        """Create a pull request by creating a branch and pushing changes."""
+    ) -> tuple[models.GitHubPullRequest, str]:
+        """Create a pull request by creating a branch and pushing changes.
+
+        Returns:
+            Tuple of (GitHubPullRequest, branch_name)
+
+        """
         repository_dir = context.working_directory / 'repository'
 
         branch_name = f'imbi-automations/{context.workflow.slug}'
@@ -312,7 +357,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         client = claude.Claude(self.configuration, context, self.verbose)
         body = await client.anthropic_query(prompt)
 
-        pr_url = await self.github.create_pull_request(
+        pr = await self.github.create_pull_request(
             context=context,
             title=f'imbi-automations: {context.workflow.configuration.name}',
             body=body,
@@ -321,7 +366,132 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         self.logger.info(
             'Created pull request for %s: %s',
             context.imbi_project.slug,
-            pr_url,
+            pr.html_url,
+        )
+
+        return pr, branch_name
+
+    async def _execute_followup_stage(
+        self,
+        context: models.WorkflowContext,
+        followup_actions: list[tuple[int, models.WorkflowActions]],
+        working_directory: 'tempfile.TemporaryDirectory',
+    ) -> None:
+        """Execute followup stage actions with commit cycling.
+
+        Followup actions can make commits. After each commit cycle completes,
+        if any commits were made, the followup stage restarts to allow
+        monitoring of the new changes.
+
+        Args:
+            context: Workflow context with PR information
+            followup_actions: List of (index, action) tuples for followup stage
+            working_directory: Temporary directory for error preservation
+
+        Raises:
+            RuntimeError: If max_followup_cycles reached without success
+
+        """
+        max_cycles = self.workflow.configuration.max_followup_cycles
+
+        for cycle in range(1, max_cycles + 1):
+            self.logger.info(
+                '%s followup stage cycle %d/%d',
+                context.imbi_project.slug,
+                cycle,
+                max_cycles,
+            )
+
+            cycle_made_commits = False
+
+            for idx, action in followup_actions:
+                context.current_action_index = idx + 1
+
+                try:
+                    executed = await self._execute_action(context, action)
+
+                    if executed:
+                        self.tracker.incr('followup_actions_executed')
+                        self.tracker.incr(
+                            f'followup_actions_executed_{action.type}'
+                        )
+
+                        if action.committable:
+                            committed = await self.committer.commit(
+                                context, action
+                            )
+                            if committed:
+                                # Push to PR branch or main
+                                branch = context.pr_branch or 'main'
+                                repo_dir = (
+                                    context.working_directory / 'repository'
+                                )
+                                await git.push_changes(
+                                    working_directory=repo_dir,
+                                    remote='origin',
+                                    branch=branch,
+                                    set_upstream=False,
+                                )
+                                context.has_repository_changes = True
+                                cycle_made_commits = True
+                                self.tracker.incr('followup_commits')
+
+                except Exception as exc:  # noqa: BLE001
+                    self.logger.error(
+                        '%s error in followup action "%s": %s',
+                        context.imbi_project.slug,
+                        action.name,
+                        exc,
+                    )
+                    if self.configuration.preserve_on_error:
+                        self.last_error_path = (
+                            self._preserve_working_directory(
+                                context,
+                                working_directory,
+                                self.configuration.error_dir,
+                                failed_action_index=idx,
+                                failed_action_name=action.name,
+                                completed_action_indices=[],
+                                error_message=str(exc),
+                            )
+                        )
+                    working_directory.cleanup()
+                    raise
+
+            # If no commits were made this cycle, followup is complete
+            if not cycle_made_commits:
+                self.logger.info(
+                    '%s followup stage completed (no commits in cycle %d)',
+                    context.imbi_project.slug,
+                    cycle,
+                )
+                return
+
+            # Refresh PR status for next cycle (if PR exists)
+            if context.pull_request:
+                context.pull_request = await self._refresh_pr_status(context)
+
+        # Max cycles reached - fail the workflow
+        raise RuntimeError(
+            f'Followup stage reached max cycles ({max_cycles}) for '
+            f'{context.imbi_project.slug}'
+        )
+
+    async def _refresh_pr_status(
+        self, context: models.WorkflowContext
+    ) -> models.GitHubPullRequest | None:
+        """Refresh PR status from GitHub API.
+
+        Called between followup cycles to get updated check status,
+        comments, reviews, etc.
+
+        """
+        if not context.pull_request or not context.github_repository:
+            return None
+
+        org, repo = context.github_repository.full_name.split('/', 1)
+        return await self.github.get_pull_request(
+            org, repo, context.pull_request.number
         )
 
     async def _execute_action(

@@ -138,6 +138,7 @@ PyPI publishing uses trusted publishing and does not require secrets.
 - **Configuration** (`models/configuration.py`): TOML-based configuration with Pydantic validation
 - **Workflow** (`models/workflow.py`): Comprehensive workflow definition with actions, conditions, and filters
   - **Action Types**: `callable`, `claude`, `docker`, `git`, `file`, `shell`, `utility`, `template`, `github`, `imbi`
+  - **Action Stages**: `primary` (default) executes before PR, `followup` executes after PR creation
   - **Filter Validation**: Automatic validation of project_types and project_facts against ImbiMetadataCache
 - **GitHub** (`models/github.py`): GitHub repository and API response models
 - **Imbi** (`models/imbi.py`): Imbi project management system models including fact types, environments, and project types
@@ -361,6 +362,61 @@ Each workflow's `config.toml` file contains:
 - **Filters**: Project targeting and filtering criteria
 - **MCP Servers**: Optional MCP servers for Claude actions (see MCP Server Configuration below)
 
+### Action Stages
+
+Actions support a `stage` field that controls when they execute relative to PR creation:
+
+**Stage Values:**
+- **`primary`** (default): Execute before PR creation. Standard workflow actions.
+- **`followup`**: Execute after PR is created. Used for monitoring CI, responding to reviewer feedback.
+
+**Execution Flow:**
+1. Primary stage actions execute sequentially with commits
+2. PR is created (if `create_pull_request=true` and changes exist)
+3. Followup stage actions execute with commit cycling
+
+**Followup Stage Behavior:**
+- Followup actions can commit changes (push to PR branch)
+- If any followup action commits, the followup stage cycles again
+- Cycles continue until no commits are made or `max_followup_cycles` is reached
+- If max cycles reached without success, workflow fails
+
+**Configuration:**
+```toml
+# Top-level workflow configuration
+max_followup_cycles = 5  # Default: 5
+
+[[actions]]
+name = "update-deps"
+type = "claude"
+stage = "primary"  # Default, can be omitted
+task_prompt = "prompts/update.md.j2"
+
+[[actions]]
+name = "monitor-ci"
+type = "claude"
+stage = "followup"
+task_prompt = "prompts/monitor.md.j2"
+committable = true  # Enable commits for fixes
+```
+
+**Template Context for Followup Actions:**
+
+Followup actions receive PR information in the template context:
+```jinja2
+PR Number: {{ pull_request.number }}
+PR URL: {{ pull_request.html_url }}
+PR Branch: {{ pr_branch }}
+PR State: {{ pull_request.state }}
+Head SHA: {{ pull_request.head.sha }}
+```
+
+**Use Cases:**
+- Monitor GitHub Actions workflow status
+- Wait for CI to complete and fix failures
+- Respond to automated code review comments
+- Handle PR reviewer feedback
+
 ### MCP Server Configuration
 
 Workflows can define MCP (Model Context Protocol) servers that are available to Claude Code during `claude` type action execution. MCP servers are configured at the workflow level and are automatically merged with the internal `agent_tools` MCP server.
@@ -518,7 +574,9 @@ imbi-automations config.toml workflows/my-workflow --resume ./errors/my-workflow
 - Workflow identification (slug, path)
 - Project information (ID, slug)
 - Execution state (failed action index, failed action name, completed action indices list)
+- Stage tracking (current_stage: 'primary' or 'followup', followup_cycle number)
 - WorkflowContext restoration data (starting commit, repository changes flag, GitHub repository model)
+- PR information for followup resumption (pull_request_number, pull_request_url, pr_branch)
 - Error details (message, timestamp)
 - Preserved directory path (absolute path to working directory copy)
 - Configuration hash (SHA256 first 16 chars to detect config changes between runs)
@@ -845,6 +903,8 @@ homepage = "{{ imbi_project.urls.homepage }}"
 
 **Repository Change Tracking**:
 - `WorkflowContext.has_repository_changes` tracks if any commits were made
+- `WorkflowContext.pull_request` contains GitHubPullRequest after PR creation (for followup stage)
+- `WorkflowContext.pr_branch` contains branch name for PR operations
 - `Committer.commit()` returns `bool` indicating if a commit was created
 - Workflow engine only pushes/creates PR when `has_repository_changes = True`
 - Prevents unnecessary git operations for extract-only workflows

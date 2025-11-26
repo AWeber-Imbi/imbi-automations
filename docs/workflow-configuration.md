@@ -250,6 +250,35 @@ replace_branch = true  # Force-replace existing PR branch
 
 **Warning:** Destroys existing PR branch and its history.
 
+## Followup Stage Configuration
+
+### max_followup_cycles
+
+Maximum number of cycles for followup stage execution.
+
+**Type:** `integer`
+
+**Default:** `5`
+
+```toml
+max_followup_cycles = 3
+```
+
+**Behavior:**
+
+- Followup actions execute after PR creation
+- If any followup action commits, the stage cycles again
+- If no commits made during a cycle, followup is complete
+- If max cycles reached without completion, workflow fails
+
+**Use cases:**
+
+- Limit iterations when monitoring CI
+- Control retry behavior for feedback loops
+- Prevent infinite loops in automated fixes
+
+See [Action Stages](action-stages.md) for complete followup stage documentation.
+
 ## MCP Server Configuration
 
 The `[mcp_servers]` section allows configuring Model Context Protocol (MCP) servers that will be available to Claude actions during workflow execution. MCP servers provide Claude with access to external tools and data sources.
@@ -484,6 +513,36 @@ type = "file"
 ```
 
 See [Actions Reference](actions/index.md) for complete documentation of each action type.
+
+#### stage (optional)
+
+Execution stage for this action.
+
+**Type:** `string`
+
+**Values:** `"primary"` (default), `"followup"`
+
+
+```toml
+[[actions]]
+name = "monitor-ci"
+type = "claude"
+stage = "followup"
+task_prompt = "prompts/monitor.md.j2"
+```
+
+**Stage behaviors:**
+
+- **`primary`**: Executes before PR creation (default behavior)
+- **`followup`**: Executes after PR is created, with access to PR context
+
+**Followup stage features:**
+
+- Receives `pull_request` and `pr_branch` in template context
+- Can commit changes that push to PR branch
+- Cycles if commits are made (up to `max_followup_cycles`)
+
+See [Action Stages](action-stages.md) for detailed stage documentation.
 
 #### ai_commit (optional)
 
