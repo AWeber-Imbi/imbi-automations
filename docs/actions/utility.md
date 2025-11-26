@@ -12,7 +12,6 @@ command = "docker_tag|dockerfile_from|compare_semver|parse_python_constraints"
 path = "repository:///path/to/file"  # Optional
 args = []      # Optional
 kwargs = {}    # Optional
-committable = false  # Typically false for utility actions
 ```
 
 ## Fields
@@ -117,7 +116,6 @@ The result is stored in `context.variables[output_name]` as a dictionary:
 name = "check-python-version"
 type = "utility"
 command = "compare_semver"
-committable = false
 args = ["3.9.18", "3.12.0"]
 kwargs = { output = "python_version_check" }
 ```
@@ -129,7 +127,6 @@ kwargs = { output = "python_version_check" }
 name = "compare-project-version"
 type = "utility"
 command = "compare_semver"
-committable = false
 kwargs = {
     current_version = "{{ imbi_project.facts.get('Python Version', '3.9.0') }}",
     target_version = "3.12.0",
@@ -145,7 +142,6 @@ kwargs = {
 name = "check-version"
 type = "utility"
 command = "compare_semver"
-committable = false
 args = ["3.9.18-0", "3.12.0"]
 kwargs = { output = "version_check" }
 
@@ -187,14 +183,12 @@ name = "get-react-version"
 type = "shell"
 command = "node -p \"require('./package.json').dependencies.react.replace(/[^0-9.]/g, '')\""
 working_directory = "repository:///"
-committable = false
 
 # Compare versions (use the extracted version from a project fact or hardcode for demo)
 [[actions]]
 name = "check-react-version"
 type = "utility"
 command = "compare_semver"
-committable = false
 kwargs = {
     current_version = "18.2.0",  # Or use {{ imbi_project.facts.get('React Version') }}
     target_version = "19.2.0",
@@ -234,7 +228,6 @@ Please upgrade:
 name = "check-build"
 type = "utility"
 command = "compare_semver"
-committable = false
 args = ["3.9.18-0", "3.9.18-4"]
 kwargs = { output = "build_check" }
 ```
@@ -334,5 +327,4 @@ Until the remaining utility commands are implemented, use alternative approaches
 - **Model:** `src/imbi_automations/models/workflow.py` (WorkflowUtilityAction)
 - **Result Model:** `src/imbi_automations/models/utility.py` (SemverComparisonResult)
 - **Tests:** `tests/actions/test_utility.py`
-- Utility actions are typically non-committable (`committable = false`)
 - Results stored in `context.variables` are serialized as dictionaries
