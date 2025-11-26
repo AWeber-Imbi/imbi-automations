@@ -6,6 +6,7 @@ ENV GIT_USER_NAME="Imbi Automations" \
     IMBI_AUTOMATIONS_CONFIG=/home/imbi-automations/config/config.toml
 
 COPY dist/imbi_automations*.whl /tmp/
+COPY docker-entrypoint.sh /usr/local/bin/
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -29,8 +30,9 @@ RUN apt-get update \
  && mkdir -p /home/imbi-automations/.ssh \
  && chmod 700 /home/imbi-automations/.ssh \
  && chown -R imbi-automations:imbi-automations /opt \
- && git config --global user.name "${GIT_USER_NAME}" && \
-    git config --global user.email "${GIT_USER_EMAIL}"
+ && chmod +x /usr/local/bin/docker-entrypoint.sh \
+ && git config --global user.name "${GIT_USER_NAME}" \
+ && git config --global user.email "${GIT_USER_EMAIL}"
 
 USER imbi-automations
 
@@ -38,6 +40,6 @@ WORKDIR /opt
 
 VOLUME /opt/config /opt/errors /opt/workflows
 
-ENTRYPOINT ["imbi-automations"]
+ENTRYPOINT ["docker-entrypoint.sh", "imbi-automations"]
 
 CMD ["--help"]
