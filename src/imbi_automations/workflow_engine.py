@@ -453,6 +453,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                                 failed_action_name=action.name,
                                 completed_action_indices=[],
                                 error_message=str(exc),
+                                current_stage='followup',
+                                followup_cycle=cycle,
                             )
                         )
                     working_directory.cleanup()
@@ -574,6 +576,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         failed_action_name: str | None = None,
         completed_action_indices: list[int] | None = None,
         error_message: str | None = None,
+        current_stage: str = 'primary',
+        followup_cycle: int = 0,
     ) -> pathlib.Path | None:
         """Preserve working directory state to a specified directory.
 
@@ -589,6 +593,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             failed_action_name: Optional name of failed action (for .state)
             completed_action_indices: Optional list of completed indices
             error_message: Optional error message for .state file
+            current_stage: Stage where failure occurred ('primary' or
+                'followup')
+            followup_cycle: Followup cycle number (0 for primary stage)
 
         Returns:
             Path to preserved directory, or None if preservation failed
@@ -626,6 +633,8 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             ):
                 from imbi_automations import utils
 
+                # Extract PR info from context if available
+                pr = context.pull_request
                 state = models.ResumeState(
                     workflow_slug=workflow_slug,
                     workflow_path=context.workflow.path,
@@ -643,6 +652,11 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     configuration_hash=utils.hash_configuration(
                         self.configuration
                     ),
+                    current_stage=current_stage,
+                    followup_cycle=followup_cycle,
+                    pull_request_number=pr.number if pr else None,
+                    pull_request_url=pr.html_url if pr else None,
+                    pr_branch=context.pr_branch,
                 )
 
                 state_file = target_path / '.state'
