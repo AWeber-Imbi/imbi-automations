@@ -2,8 +2,7 @@ FROM python:3.12-trixie
 
 ENV GIT_USER_NAME="Imbi Automations" \
     GIT_USER_EMAIL="imbi-automations@aweber.com" \
-    IMBI_AUTOMATIONS_CACHE_DIR=/home/imbi-automations/cache \
-    IMBI_AUTOMATIONS_CONFIG=/home/imbi-automations/config/config.toml
+    IMBI_AUTOMATIONS_CONFIG=/opt/config/config.toml
 
 COPY dist/imbi_automations*.whl /tmp/
 COPY docker-entrypoint.sh /usr/local/bin/
