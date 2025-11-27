@@ -5,43 +5,41 @@ ENV GIT_USER_NAME="Imbi Automations" \
     IMBI_AUTOMATIONS_CACHE_DIR=/home/imbi-automations/cache \
     IMBI_AUTOMATIONS_CONFIG=/home/imbi-automations/config/config.toml
 
-COPY dist/imbi-automations-*.whl /tmp/
+COPY dist/imbi_automations*.whl /tmp/
+COPY docker-entrypoint.sh /usr/local/bin/
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
+        gh \
         git \
         gnupg \
         openssh-client \
+        ripgrep \
  && rm -rf /var/lib/apt/lists/* \
  && curl -fsSL https://claude.ai/install.sh | bash  \
- && pip install --root-user-action ignore --break-system-packages --no-cache-dir --upgrade pip && \
- && pip install --root-user-action ignore --break-system-packages --no-cache-dir /tmp/imbi-automations*.whl \
+ && pip install --root-user-action ignore --break-system-packages --no-cache-dir --upgrade pip \
+ && pip install --root-user-action ignore --break-system-packages --no-cache-dir /tmp/imbi_automations*.whl \
  && rm /tmp/*.whl \
+ && mkdir -p /opt/config /opt/errors /opt/workflows  \
  && groupadd --gid 1000 imbi-automations \
- && useradd --uid 1000 --gid 1000 \
-            --home-dir /home/imbi-automations--create-home \
-            --shell /bin/bash \
-            imbi-automations
+ && useradd --uid 1000 --gid 1000 --shell /bin/bash \
+            --home-dir /home/imbi-automations --create-home \
+            imbi-automations \
+ && mkdir -p /home/imbi-automations/.ssh \
+ && chmod 700 /home/imbi-automations/.ssh \
+ && chown -R imbi-automations:imbi-automations /opt \
+ && chmod +x /usr/local/bin/docker-entrypoint.sh \
+ && git config --global user.name "${GIT_USER_NAME}" \
+ && git config --global user.email "${GIT_USER_EMAIL}"
 
 USER imbi-automations
-WORKDIR /home/imbi-automations
 
-RUN mkdir -p /home/imbi-automations/config \
-             /home/imbi-automations/errors \
-             /home/imbi-automations/workflows \
-          /home/imbi-automations/root/.ssh \
- && chmod 700 /home/imbi-automations/.ssh \
- && git config --global user.name ${GIT_USER_NAME} && \
-    git config --global user.email ${GIT_USER_EMAIL}
+WORKDIR /opt
 
-VOLUME [
-  "/home/imbi-automations/config",
-  "/home/imbi-automations/errors",
-  "/home/imbi-automations/workflows"
-]
+VOLUME /opt/config /opt/errors /opt/workflows
 
-ENTRYPOINT ["imbi-automations"]
+ENTRYPOINT ["docker-entrypoint.sh", "imbi-automations"]
 
 CMD ["--help"]

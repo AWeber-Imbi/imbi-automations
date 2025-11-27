@@ -8,6 +8,7 @@ nav:
   - Home: index.md
   - Architecture: architecture.md
   - Configuration: configuration.md
+  - Docker: docker.md
   - Workflows:
     - Overview: workflows.md
     - Configuration: workflow-configuration.md
