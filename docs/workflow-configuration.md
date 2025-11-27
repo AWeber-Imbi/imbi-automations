@@ -468,6 +468,9 @@ Array of condition objects. See [Workflow Conditions](workflow-conditions.md) fo
   - `file_exists` / `file_not_exists`
   - `file_contains` / `file_doesnt_contain` + `file`
 
+- **Template conditions** (checked after cloning)
+  - `when` - Jinja2 expression for complex logic
+
 **Example:**
 ```toml
 [[conditions]]
@@ -476,6 +479,9 @@ remote_file_exists = "Dockerfile"
 [[conditions]]
 remote_file_contains = "FROM python:3"
 remote_file = "Dockerfile"
+
+[[conditions]]
+when = "{{ compare_semver(get_component_version('repository:///package.json', 'react'), '19.0.0').is_older }}"
 ```
 
 ## Actions
