@@ -17,6 +17,7 @@ nav:
     - Path Schemes: path-schemes.md
     - Actions:
       - actions/index.md
+      - actions/stages.md
       - Callable: actions/callable.md
       - Claude: actions/claude.md
       - Docker: actions/docker.md

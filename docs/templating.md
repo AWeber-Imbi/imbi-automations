@@ -172,7 +172,7 @@ PR Branch: {{ pr_branch }}
 {% endif %}
 ```
 
-See [Action Stages](action-stages.md) for followup stage documentation.
+See [Action Stages](actions/stages.md) for followup stage documentation.
 
 ### Custom Template Functions
 

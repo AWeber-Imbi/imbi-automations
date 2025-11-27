@@ -369,7 +369,7 @@ ai_commit = true
 
 ## See Also
 
-- [Workflow Configuration](workflow-configuration.md) - `max_followup_cycles` setting
-- [Claude Actions](actions/claude.md) - AI-powered transformations
-- [Templating](templating.md) - PR context variables
-- [Workflows](workflows.md) - Workflow overview
+- [Workflow Configuration](../workflow-configuration.md) - `max_followup_cycles` setting
+- [Claude Actions](claude.md) - AI-powered transformations
+- [Templating](../templating.md) - PR context variables
+- [Workflows](../workflows.md) - Workflow overview

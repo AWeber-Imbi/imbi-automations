@@ -133,7 +133,7 @@ task_prompt = "prompts/monitor.md.j2"
 committable = true
 ```
 
-Followup actions receive PR context (`pull_request.number`, `pull_request.html_url`, `pr_branch`) in templates. See [Action Stages](action-stages.md) for detailed documentation.
+Followup actions receive PR context (`pull_request.number`, `pull_request.html_url`, `pr_branch`) in templates. See [Action Stages](actions/stages.md) for detailed documentation.
 
 ### Conditional Execution
 
@@ -373,7 +373,7 @@ file_exists = "pyproject.toml"
 ## Learn More
 
 - **[Workflow Configuration](workflow-configuration.md)** - Detailed configuration reference with all fields and options
-- **[Action Stages](action-stages.md)** - Primary and followup stage execution for CI monitoring
+- **[Action Stages](actions/stages.md)** - Primary and followup stage execution for CI monitoring
 - **[Actions Reference](actions/index.md)** - Complete action types documentation
 - **[Debugging Workflows](debugging.md)** - Troubleshooting and debugging techniques
 - **[CLI Reference](cli.md)** - Command-line options and usage

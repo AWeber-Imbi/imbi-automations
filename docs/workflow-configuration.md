@@ -277,7 +277,7 @@ max_followup_cycles = 3
 - Control retry behavior for feedback loops
 - Prevent infinite loops in automated fixes
 
-See [Action Stages](action-stages.md) for complete followup stage documentation.
+See [Action Stages](actions/stages.md) for complete followup stage documentation.
 
 ## MCP Server Configuration
 
@@ -542,7 +542,7 @@ task_prompt = "prompts/monitor.md.j2"
 - Can commit changes that push to PR branch
 - Cycles if commits are made (up to `max_followup_cycles`)
 
-See [Action Stages](action-stages.md) for detailed stage documentation.
+See [Action Stages](actions/stages.md) for detailed stage documentation.
 
 #### ai_commit (optional)
 

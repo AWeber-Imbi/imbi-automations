@@ -212,7 +212,40 @@ imbi-automations config.toml workflows/my-workflow \
 - Requires same machine (absolute paths)
 - Configuration changes between runs may cause issues (warning shown)
 
-**See Also:** [Workflow Resumability](../AGENTS.md#workflow-resumability) in AGENTS.md for implementation details
+## Dry Run Mode
+
+The `--dry-run` flag executes workflows without pushing changes or creating pull requests, useful for testing and validation.
+
+**Usage:**
+```bash
+imbi-automations config.toml workflows/my-workflow \
+  --project-id 123 \
+  --dry-run
+```
+
+**Behavior:**
+
+- Clones repositories and executes all actions normally
+- Creates commits locally
+- **Skips** pushing to remote and creating PRs
+- Preserves working directory to `./dry-runs/` (or `--dry-run-dir`)
+
+**Use Cases:**
+
+- Testing workflows before production runs
+- Validating changes without affecting remote repositories
+- Reviewing commit messages and file changes
+- Training and demonstration
+
+**Inspecting Results:**
+```bash
+cd dry-runs/workflow-name/project-slug-timestamp/repository/
+git log -1          # View commit that would be pushed
+git show HEAD       # View commit details
+git diff HEAD~1     # View all changes
+```
+
+**See Also:** [CLI Reference - --dry-run](cli.md#-dry-run) for complete options
 
 ## debug.log File
 

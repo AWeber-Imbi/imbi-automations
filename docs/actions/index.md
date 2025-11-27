@@ -2,6 +2,32 @@
 
 Workflow actions are the core building blocks of automation in Imbi Automations. Each action type provides specific capabilities for interacting with repositories, external services, and project files.
 
+## Action Stages
+
+Actions can specify a `stage` field to control when they execute:
+
+| Stage | When | Use Case |
+|-------|------|----------|
+| `primary` (default) | Before PR creation | Standard workflow actions |
+| `followup` | After PR creation | CI monitoring, feedback response |
+
+```toml
+[[actions]]
+name = "update-code"
+type = "claude"
+# stage = "primary"  # Default
+task_prompt = "prompts/update.md.j2"
+
+[[actions]]
+name = "monitor-ci"
+type = "claude"
+stage = "followup"
+task_prompt = "prompts/monitor.md.j2"
+committable = true
+```
+
+See [Action Stages](stages.md) for complete stage documentation.
+
 ## Action Types Overview
 
 | Action Type | Purpose | Use Cases |
@@ -242,32 +268,6 @@ All actions execute with access to these context variables (via Jinja2 templatin
 - `pull_request`: GitHubPullRequest model (number, html_url, state, head.sha, etc.)
 - `pr_branch`: Branch name for the PR (e.g., `imbi-automations/workflow-slug`)
 
-See [Action Stages](../action-stages.md) for followup stage documentation.
-
-## Action Stages
-
-Actions can specify a `stage` field to control when they execute:
-
-| Stage | When | Use Case |
-|-------|------|----------|
-| `primary` (default) | Before PR creation | Standard workflow actions |
-| `followup` | After PR creation | CI monitoring, feedback response |
-
-```toml
-[[actions]]
-name = "update-code"
-type = "claude"
-# stage = "primary"  # Default
-task_prompt = "prompts/update.md.j2"
-
-[[actions]]
-name = "monitor-ci"
-type = "claude"
-stage = "followup"
-task_prompt = "prompts/monitor.md.j2"
-committable = true
-```
-
-See [Action Stages](../action-stages.md) for complete stage documentation.
+See [Action Stages](stages.md) for followup stage documentation.
 
 See individual action type documentation for specific configuration options and examples.
