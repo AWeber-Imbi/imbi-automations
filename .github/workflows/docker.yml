@@ -19,9 +19,10 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
+      attestations: write
       contents: read
-      packages: write
       id-token: write
+      packages: write
 
     steps:
       - name: Checkout repository
