@@ -11,7 +11,7 @@ for key in ~/.ssh/id_ed25519 ~/.ssh/id_rsa ~/.ssh/id_ecdsa; do
     fi
 done
 
-if [ -n "$SSH_KEY_PATH" ]; then
+if [ -n "$SSH_KEY_PATH" ] && [ -f "${SSH_KEY_PATH}.pub" ]; then
     echo "Configuring git commit signing with SSH key: $SSH_KEY_PATH"
     git config --global gpg.format ssh
     git config --global user.signingkey "${SSH_KEY_PATH}.pub"
