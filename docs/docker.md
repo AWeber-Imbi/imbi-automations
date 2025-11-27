@@ -2,22 +2,10 @@
 
 This guide covers running imbi-automations in Docker containers.
 
-## Building the Image
+Pre-built images are available from Docker Hub and GitHub Container Registry:
 
-Build the wheel first, then the Docker image:
-
-```bash
-pip install build
-python -m build --wheel
-docker build -t imbi-automations:latest .
-```
-
-### Multi-Architecture Build
-
-```bash
-docker buildx build --platform linux/amd64,linux/arm64 \
-    -t imbi-automations:latest .
-```
+- `aweber/imbi-automations:latest`
+- `ghcr.io/aweber-imbi/imbi-automations:latest`
 
 ## Running Workflows
 
@@ -26,9 +14,8 @@ docker run --rm \
     -v $(pwd)/config.toml:/opt/config/config.toml:ro \
     -v $(pwd)/workflows:/opt/workflows:ro \
     -v ~/.ssh:/home/imbi-automations/.ssh:ro \
-    -v imbi-cache:/home/imbi-automations/cache \
     -e GH_TOKEN="ghp_your_token" \
-    imbi-automations:latest \
+    aweber/imbi-automations:latest \
     /opt/config/config.toml \
     /opt/workflows/my-workflow \
     --all-projects
@@ -41,7 +28,6 @@ docker run --rm \
 | `/opt/config/config.toml` | Configuration file | Mount as read-only |
 | `/opt/workflows` | Workflow definitions | Mount as read-only |
 | `/home/imbi-automations/.ssh` | SSH keys | Mount as read-only; enables commit signing |
-| `/home/imbi-automations/cache` | Metadata cache | Use named volume for persistence |
 | `/opt/errors` | Error preservation | Mount if using `--preserve-on-error` |
 
 ## Environment Variables
@@ -51,8 +37,6 @@ docker run --rm \
 | `GIT_USER_NAME` | `Imbi Automations` | Git commit author name |
 | `GIT_USER_EMAIL` | `imbi-automations@aweber.com` | Git commit author email |
 | `GH_TOKEN` | - | GitHub personal access token |
-| `IMBI_AUTOMATIONS_CACHE_DIR` | `/home/imbi-automations/cache` | Cache directory path |
-| `IMBI_AUTOMATIONS_CONFIG` | `/home/imbi-automations/config/config.toml` | Default config path |
 
 ## SSH Commit Signing
 
@@ -84,7 +68,7 @@ The `gh` CLI is pre-installed. Authentication is configured automatically using 
 ```bash
 docker run --rm \
     -e GH_TOKEN="ghp_your_personal_access_token" \
-    imbi-automations:latest ...
+    aweber/imbi-automations:latest ...
 ```
 
 ### Using Token File
@@ -96,7 +80,7 @@ echo "ghp_your_token" > gh-token
 # Mount it
 docker run --rm \
     -v $(pwd)/gh-token:/config/gh-token:ro \
-    imbi-automations:latest ...
+    aweber/imbi-automations:latest ...
 ```
 
 ### Required Token Scopes
@@ -116,7 +100,7 @@ docker run --rm -it \
     -v $(pwd)/config.toml:/opt/config/config.toml:ro \
     -v $(pwd)/workflows:/opt/workflows:ro \
     --entrypoint /bin/bash \
-    imbi-automations:latest
+    aweber/imbi-automations:latest
 ```
 
 ### View Entrypoint Output
@@ -143,47 +127,20 @@ gh auth status
 ssh -T git@github.com
 ```
 
-## Performance Tips
-
-### Use tmpfs for Workspace
-
-For faster repository operations:
-
-```bash
-docker run --rm \
-    --tmpfs /opt/workspace:exec,size=4g \
-    imbi-automations:latest ...
-```
-
-### Persist Metadata Cache
-
-Use a named volume to avoid re-fetching Imbi metadata:
-
-```bash
-docker volume create imbi-cache
-docker run --rm \
-    -v imbi-cache:/home/imbi-automations/cache \
-    imbi-automations:latest ...
-```
-
 ## Docker Compose Example
 
 ```yaml
 services:
   imbi-automations:
-    image: imbi-automations:latest
+    image: aweber/imbi-automations:latest
     volumes:
       - ./config.toml:/opt/config/config.toml:ro
       - ./workflows:/opt/workflows:ro
       - ~/.ssh:/home/imbi-automations/.ssh:ro
-      - imbi-cache:/home/imbi-automations/cache
     environment:
       - GIT_USER_NAME=Imbi Automations
       - GIT_USER_EMAIL=imbi-automations@example.com
       - GH_TOKEN=${GH_TOKEN}
-
-volumes:
-  imbi-cache:
 ```
 
 Run with:
