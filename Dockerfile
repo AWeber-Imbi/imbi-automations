@@ -27,7 +27,7 @@ RUN apt-get update \
  && useradd --uid 1000 --gid 1000 --shell /bin/bash \
             --home-dir /home/imbi-automations --create-home \
             imbi-automations \
- && echo "imbi-automations ALL=(ALL) NOPASSWD: /usr/bin/apt-get, /bin/rm" >> /etc/sudoers.d/imbi-automations \
+ && echo "imbi-automations ALL=(ALL) NOPASSWD: /usr/bin/apt-get, /usr/bin/apt, /usr/bin/rm" >> /etc/sudoers.d/imbi-automations \
  && chmod 0440 /etc/sudoers.d/imbi-automations \
  && mkdir -p /home/imbi-automations/.ssh \
  && chmod 700 /home/imbi-automations/.ssh \
