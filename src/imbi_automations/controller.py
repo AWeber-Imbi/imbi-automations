@@ -419,13 +419,19 @@ class Automation(mixins.WorkflowLoggerMixin):
             self.registry.project_fact_type_names,
         )
         for name in self.workflow.configuration.filter.project_facts:
-            if self.workflow.configuration.filter.project_facts[
-                name
-            ] not in self.registry.project_fact_type_values(name):
-                value = self.workflow.configuration.filter.project_facts[name]
-                raise RuntimeError(
-                    f'Invalid value for fact type {name}: "{value}"'
-                )
+            value = self.workflow.configuration.filter.project_facts[name]
+            if not self.registry.validate_project_fact_value(name, value):
+                fact_type = self.registry.get_project_fact_type(name)
+                if fact_type:
+                    raise RuntimeError(
+                        f'Invalid value for fact type {name}: "{value}" '
+                        f'(expected {fact_type.data_type} '
+                        f'{fact_type.fact_type})'
+                    )
+                else:
+                    raise RuntimeError(
+                        f'Invalid value for fact type {name}: "{value}"'
+                    )
 
     def _validate_workflow_filter_project_types(self) -> None:
         """Validate workflow filter environments against Imbi values

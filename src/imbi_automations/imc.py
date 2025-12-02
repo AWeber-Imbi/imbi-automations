@@ -85,6 +85,84 @@ class ImbiMetadataCache:
             if datum.fact_type_id in fact_type_ids
         }
 
+    def get_project_fact_type(
+        self, name: str
+    ) -> imbi.ImbiProjectFactType | None:
+        """Get the ImbiProjectFactType for a given fact type name.
+
+        Args:
+            name: The name of the fact type
+
+        Returns:
+            The ImbiProjectFactType if found, None otherwise
+
+        """
+        return next(
+            (
+                fact_type
+                for fact_type in self.cache_data.project_fact_types
+                if fact_type.name == name
+            ),
+            None,
+        )
+
+    def validate_project_fact_value(
+        self, name: str, value: bool | int | float | str
+    ) -> bool:
+        """Validate a project fact value against its type definition.
+
+        Args:
+            name: The name of the fact type
+            value: The value to validate
+
+        Returns:
+            True if the value is valid for the fact type
+
+        """
+        fact_type = self.get_project_fact_type(name)
+        if not fact_type:
+            return False
+
+        # For boolean data types, validate boolean values
+        if fact_type.data_type == 'boolean':
+            return isinstance(value, bool)
+
+        # For enum fact types, check against allowed values
+        if fact_type.fact_type == 'enum':
+            enum_values = self.project_fact_type_values(name)
+            # Convert value to string for comparison with enum values
+            return str(value) in enum_values
+
+        # For range fact types, check against min/max values
+        if fact_type.fact_type == 'range':
+            fact_type_ranges = [
+                r
+                for r in self.cache_data.project_fact_type_ranges
+                if r.fact_type_id == fact_type.id
+            ]
+            if not fact_type_ranges:
+                return False
+            # Check if value falls within any of the defined ranges
+            if isinstance(value, int | float):
+                return any(
+                    r.min_value <= value <= r.max_value
+                    for r in fact_type_ranges
+                )
+            return False
+
+        # For free-form fact types, validate against data type
+        if fact_type.fact_type == 'free-form':
+            if fact_type.data_type == 'integer':
+                return isinstance(value, int)
+            if fact_type.data_type == 'decimal':
+                return isinstance(value, int | float)
+            if fact_type.data_type == 'string':
+                return isinstance(value, str)
+            # Other data types like date, timestamp need more parsing
+            return True
+
+        return False
+
     @property
     def project_types(self) -> set[str]:
         return self.project_type_names.union(self.project_type_slugs)
