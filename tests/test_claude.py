@@ -132,6 +132,237 @@ class ResponseValidatorTestCase(unittest.TestCase):
         self.assertEqual(result, 'Response is valid')
 
 
+class ClaudePluginModelTestCase(unittest.TestCase):
+    """Test cases for Claude plugin configuration models."""
+
+    def test_marketplace_source_github_valid(self) -> None:
+        """Test ClaudeMarketplaceSource with valid github source."""
+        source = models.ClaudeMarketplaceSource(
+            source=models.ClaudeMarketplaceSourceType.github,
+            repo='company/claude-plugins',
+        )
+        self.assertEqual(
+            source.source, models.ClaudeMarketplaceSourceType.github
+        )
+        self.assertEqual(source.repo, 'company/claude-plugins')
+        self.assertIsNone(source.url)
+        self.assertIsNone(source.path)
+
+    def test_marketplace_source_github_missing_repo(self) -> None:
+        """Test ClaudeMarketplaceSource github requires repo."""
+        with self.assertRaises(ValueError) as exc_context:
+            models.ClaudeMarketplaceSource(
+                source=models.ClaudeMarketplaceSourceType.github
+            )
+        self.assertIn("'repo' is required", str(exc_context.exception))
+
+    def test_marketplace_source_git_valid(self) -> None:
+        """Test ClaudeMarketplaceSource with valid git source."""
+        source = models.ClaudeMarketplaceSource(
+            source=models.ClaudeMarketplaceSourceType.git,
+            url='https://git.example.com/plugins.git',
+        )
+        self.assertEqual(source.source, models.ClaudeMarketplaceSourceType.git)
+        self.assertEqual(source.url, 'https://git.example.com/plugins.git')
+
+    def test_marketplace_source_git_missing_url(self) -> None:
+        """Test ClaudeMarketplaceSource git requires url."""
+        with self.assertRaises(ValueError) as exc_context:
+            models.ClaudeMarketplaceSource(
+                source=models.ClaudeMarketplaceSourceType.git
+            )
+        self.assertIn("'url' is required", str(exc_context.exception))
+
+    def test_marketplace_source_directory_valid(self) -> None:
+        """Test ClaudeMarketplaceSource with valid directory source."""
+        source = models.ClaudeMarketplaceSource(
+            source=models.ClaudeMarketplaceSourceType.directory,
+            path='/local/plugins',
+        )
+        self.assertEqual(
+            source.source, models.ClaudeMarketplaceSourceType.directory
+        )
+        self.assertEqual(source.path, '/local/plugins')
+
+    def test_marketplace_source_directory_missing_path(self) -> None:
+        """Test ClaudeMarketplaceSource directory requires path."""
+        with self.assertRaises(ValueError) as exc_context:
+            models.ClaudeMarketplaceSource(
+                source=models.ClaudeMarketplaceSourceType.directory
+            )
+        self.assertIn("'path' is required", str(exc_context.exception))
+
+    def test_marketplace_shorthand_source_format(self) -> None:
+        """Test ClaudeMarketplace accepts shorthand source format."""
+        # Shorthand: source and repo at top level
+        marketplace = models.ClaudeMarketplace.model_validate(
+            {'source': 'github', 'repo': 'org/plugins'}
+        )
+        self.assertEqual(
+            marketplace.source.source,
+            models.ClaudeMarketplaceSourceType.github,
+        )
+        self.assertEqual(marketplace.source.repo, 'org/plugins')
+
+    def test_marketplace_nested_source_format(self) -> None:
+        """Test ClaudeMarketplace accepts nested source format."""
+        # Nested: source as a dict
+        marketplace = models.ClaudeMarketplace.model_validate(
+            {
+                'source': {
+                    'source': 'git',
+                    'url': 'https://example.com/plugins.git',
+                }
+            }
+        )
+        self.assertEqual(
+            marketplace.source.source, models.ClaudeMarketplaceSourceType.git
+        )
+        self.assertEqual(
+            marketplace.source.url, 'https://example.com/plugins.git'
+        )
+
+    def test_local_plugin_valid(self) -> None:
+        """Test ClaudeLocalPlugin creation."""
+        plugin = models.ClaudeLocalPlugin(path='/path/to/plugin')
+        self.assertEqual(plugin.path, '/path/to/plugin')
+
+    def test_plugin_config_defaults(self) -> None:
+        """Test ClaudePluginConfig default values."""
+        config = models.ClaudePluginConfig()
+        self.assertEqual(config.enabled_plugins, {})
+        self.assertEqual(config.marketplaces, {})
+        self.assertEqual(config.local_plugins, [])
+
+    def test_plugin_config_with_values(self) -> None:
+        """Test ClaudePluginConfig with actual values."""
+        marketplace = models.ClaudeMarketplace(
+            source=models.ClaudeMarketplaceSource(
+                source=models.ClaudeMarketplaceSourceType.github,
+                repo='org/plugins',
+            )
+        )
+        config = models.ClaudePluginConfig(
+            enabled_plugins={'plugin@market': True, 'other@market': False},
+            marketplaces={'company': marketplace},
+            local_plugins=[models.ClaudeLocalPlugin(path='/local/plugin')],
+        )
+        self.assertEqual(config.enabled_plugins['plugin@market'], True)
+        self.assertEqual(config.enabled_plugins['other@market'], False)
+        self.assertIn('company', config.marketplaces)
+        self.assertEqual(len(config.local_plugins), 1)
+
+
+class MergePluginConfigsTestCase(unittest.TestCase):
+    """Test cases for _merge_plugin_configs function."""
+
+    def test_merge_empty_configs(self) -> None:
+        """Test merging two empty configs."""
+        main = models.ClaudePluginConfig()
+        workflow = models.ClaudePluginConfig()
+
+        result = claude._merge_plugin_configs(main, workflow)
+
+        self.assertEqual(result.enabled_plugins, {})
+        self.assertEqual(result.marketplaces, {})
+        self.assertEqual(result.local_plugins, [])
+
+    def test_merge_enabled_plugins_workflow_overrides(self) -> None:
+        """Test workflow enabled_plugins override main config."""
+        main = models.ClaudePluginConfig(
+            enabled_plugins={'plugin@market': True, 'other@market': True}
+        )
+        workflow = models.ClaudePluginConfig(
+            enabled_plugins={'plugin@market': False, 'new@market': True}
+        )
+
+        result = claude._merge_plugin_configs(main, workflow)
+
+        # Workflow overrides main
+        self.assertEqual(result.enabled_plugins['plugin@market'], False)
+        # Main value preserved
+        self.assertEqual(result.enabled_plugins['other@market'], True)
+        # New workflow value added
+        self.assertEqual(result.enabled_plugins['new@market'], True)
+
+    def test_merge_marketplaces(self) -> None:
+        """Test marketplaces are merged with workflow taking precedence."""
+        main_marketplace = models.ClaudeMarketplace(
+            source=models.ClaudeMarketplaceSource(
+                source=models.ClaudeMarketplaceSourceType.github,
+                repo='main-org/plugins',
+            )
+        )
+        workflow_marketplace = models.ClaudeMarketplace(
+            source=models.ClaudeMarketplaceSource(
+                source=models.ClaudeMarketplaceSourceType.github,
+                repo='workflow-org/plugins',
+            )
+        )
+        main = models.ClaudePluginConfig(
+            marketplaces={
+                'shared': main_marketplace,
+                'main-only': main_marketplace,
+            }
+        )
+        workflow = models.ClaudePluginConfig(
+            marketplaces={
+                'shared': workflow_marketplace,
+                'workflow-only': workflow_marketplace,
+            }
+        )
+
+        result = claude._merge_plugin_configs(main, workflow)
+
+        # Workflow overrides shared key
+        self.assertEqual(
+            result.marketplaces['shared'].source.repo, 'workflow-org/plugins'
+        )
+        # Main-only preserved
+        self.assertIn('main-only', result.marketplaces)
+        # Workflow-only added
+        self.assertIn('workflow-only', result.marketplaces)
+
+    def test_merge_local_plugins_concatenated(self) -> None:
+        """Test local plugins are concatenated."""
+        main = models.ClaudePluginConfig(
+            local_plugins=[
+                models.ClaudeLocalPlugin(path='/main/plugin1'),
+                models.ClaudeLocalPlugin(path='/main/plugin2'),
+            ]
+        )
+        workflow = models.ClaudePluginConfig(
+            local_plugins=[models.ClaudeLocalPlugin(path='/workflow/plugin')]
+        )
+
+        result = claude._merge_plugin_configs(main, workflow)
+
+        self.assertEqual(len(result.local_plugins), 3)
+        paths = [p.path for p in result.local_plugins]
+        self.assertIn('/main/plugin1', paths)
+        self.assertIn('/main/plugin2', paths)
+        self.assertIn('/workflow/plugin', paths)
+
+    def test_merge_local_plugins_deduplicates(self) -> None:
+        """Test duplicate local plugin paths are removed."""
+        main = models.ClaudePluginConfig(
+            local_plugins=[models.ClaudeLocalPlugin(path='/shared/plugin')]
+        )
+        workflow = models.ClaudePluginConfig(
+            local_plugins=[
+                models.ClaudeLocalPlugin(path='/shared/plugin'),
+                models.ClaudeLocalPlugin(path='/unique/plugin'),
+            ]
+        )
+
+        result = claude._merge_plugin_configs(main, workflow)
+
+        self.assertEqual(len(result.local_plugins), 2)
+        paths = [p.path for p in result.local_plugins]
+        self.assertIn('/shared/plugin', paths)
+        self.assertIn('/unique/plugin', paths)
+
+
 class AgentPlanTestCase(unittest.TestCase):
     """Test cases for ClaudeAgentPlanningResult model."""
 

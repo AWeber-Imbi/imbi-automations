@@ -93,6 +93,47 @@ class Agents(typing.TypedDict):
     validation: types.AgentDefinition | None
 
 
+def _merge_plugin_configs(
+    main_config: models.ClaudePluginConfig,
+    workflow_config: models.ClaudePluginConfig,
+) -> models.ClaudePluginConfig:
+    """Merge workflow plugin config with main config.
+
+    Workflow config values take precedence for enabled_plugins.
+    Marketplaces are merged with workflow values taking precedence.
+    Local plugins are concatenated.
+
+    Args:
+        main_config: Plugin config from main Configuration
+        workflow_config: Plugin config from WorkflowConfiguration
+
+    Returns:
+        Merged ClaudePluginConfig
+
+    """
+    # Merge enabled_plugins (workflow overrides main)
+    merged_enabled = {**main_config.enabled_plugins}
+    merged_enabled.update(workflow_config.enabled_plugins)
+
+    # Merge marketplaces (workflow overrides main for same key)
+    merged_marketplaces = {**main_config.marketplaces}
+    merged_marketplaces.update(workflow_config.marketplaces)
+
+    # Concatenate local plugins (deduplicate by path)
+    seen_paths: set[str] = set()
+    merged_local: list[models.ClaudeLocalPlugin] = []
+    for plugin in main_config.local_plugins + workflow_config.local_plugins:
+        if plugin.path not in seen_paths:
+            seen_paths.add(plugin.path)
+            merged_local.append(plugin)
+
+    return models.ClaudePluginConfig(
+        enabled_plugins=merged_enabled,
+        marketplaces=merged_marketplaces,
+        local_plugins=merged_local,
+    )
+
+
 AgentResult = (
     models.ClaudeAgentPlanningResult
     | models.ClaudeAgentTaskResult
@@ -137,6 +178,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         self.tracker = tracker.Tracker.get_instance()
         self._set_workflow_logger(self.context.workflow)
         self._submitted_response: AgentResult | None = None
+        self._merged_local_plugins: list[models.ClaudeLocalPlugin] = []
         self.client = self._create_client()
 
     async def agent_query(self, prompt: str) -> AgentResult | None:
@@ -311,6 +353,12 @@ class Claude(mixins.WorkflowLoggerMixin):
             mcp_servers[name] = _expand_mcp_config(config.model_dump())
             LOGGER.debug('Added workflow MCP server: %s', name)
 
+        # Build local plugins list for SDK
+        sdk_plugins: list[types.SdkPluginConfig] = [
+            types.SdkPluginConfig(type='local', path=plugin.path)
+            for plugin in self._merged_local_plugins
+        ]
+
         options = claude_agent_sdk.ClaudeAgentOptions(
             agents=dict(self.agents),
             allowed_tools=[
@@ -336,6 +384,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             cwd=self.context.working_directory / 'repository',
             mcp_servers=mcp_servers,
             model=self.configuration.claude_code.model,
+            plugins=sdk_plugins,
             settings=str(settings),
             setting_sources=['local'],
             system_prompt=types.SystemPromptPreset(
@@ -376,11 +425,39 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         # Create custom settings.json - disable all global settings
         settings = claude_dir / 'settings.json'
-        settings_config = {
+        settings_config: dict[str, typing.Any] = {
             'hooks': {},
             'outputStyle': 'json',
             'settingSources': ['project', 'local'],
         }
+
+        # Add merged plugin configuration
+        merged_plugins = _merge_plugin_configs(
+            self.configuration.claude_code.plugins,
+            self.context.workflow.configuration.plugins,
+        )
+
+        # Add enabled plugins to settings
+        if merged_plugins.enabled_plugins:
+            settings_config['enabledPlugins'] = merged_plugins.enabled_plugins
+
+        # Add extra marketplaces to settings
+        if merged_plugins.marketplaces:
+            extra_marketplaces: dict[str, typing.Any] = {}
+            for name, marketplace in merged_plugins.marketplaces.items():
+                source = marketplace.source
+                source_config: dict[str, str] = {'source': source.source.value}
+                if source.repo:
+                    source_config['repo'] = source.repo
+                if source.url:
+                    source_config['url'] = source.url
+                if source.path:
+                    source_config['path'] = source.path
+                extra_marketplaces[name] = {'source': source_config}
+            settings_config['extraKnownMarketplaces'] = extra_marketplaces
+
+        # Store merged local plugins for use in _create_client
+        self._merged_local_plugins = merged_plugins.local_plugins
 
         # Add git configuration if signing is enabled
         if self.configuration.git.gpg_sign:

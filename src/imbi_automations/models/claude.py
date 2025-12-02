@@ -2,12 +2,120 @@
 
 Defines models for Claude Code SDK agent execution results, including
 success/failure status and error messages for AI-powered transformation
-workflows.
+workflows. Also includes marketplace and plugin configuration models.
 """
 
 import enum
+import typing
 
 import pydantic
+
+
+class ClaudeMarketplaceSourceType(enum.StrEnum):
+    """Source types for Claude Code marketplaces.
+
+    Defines how marketplace plugin catalogs are retrieved:
+    - github: Uses a GitHub repository as the source
+    - git: Uses any git URL as the source
+    - directory: Uses a local directory path (development only)
+    """
+
+    github = 'github'
+    git = 'git'
+    directory = 'directory'
+
+
+class ClaudeMarketplaceSource(pydantic.BaseModel):
+    """Source configuration for a Claude Code marketplace.
+
+    Defines where to fetch the marketplace plugin catalog from.
+    Only one of repo, url, or path should be specified based on source type.
+    """
+
+    source: ClaudeMarketplaceSourceType
+    repo: str | None = None  # For 'github' source type
+    url: str | None = None  # For 'git' source type
+    path: str | None = None  # For 'directory' source type
+
+    @pydantic.model_validator(mode='after')
+    def validate_source_fields(self) -> 'ClaudeMarketplaceSource':
+        """Validate that the correct field is set for the source type."""
+        if self.source == ClaudeMarketplaceSourceType.github and not self.repo:
+            raise ValueError("'repo' is required for 'github' source type")
+        if self.source == ClaudeMarketplaceSourceType.git and not self.url:
+            raise ValueError("'url' is required for 'git' source type")
+        if (
+            self.source == ClaudeMarketplaceSourceType.directory
+            and not self.path
+        ):
+            raise ValueError("'path' is required for 'directory' source type")
+        return self
+
+
+class ClaudeMarketplace(pydantic.BaseModel):
+    """Claude Code marketplace configuration.
+
+    Defines a marketplace that provides plugins for Claude Code.
+
+    Example:
+        [marketplaces.company-tools]
+        source = "github"
+        repo = "company-org/claude-plugins"
+    """
+
+    source: ClaudeMarketplaceSource
+
+    @pydantic.model_validator(mode='before')
+    @classmethod
+    def wrap_source(cls, data: typing.Any) -> typing.Any:
+        """Allow shorthand source specification.
+
+        Supports both:
+            source = { source = "github", repo = "..." }
+        And:
+            source = "github"
+            repo = "..."
+        """
+        if (
+            isinstance(data, dict)
+            and 'source' in data
+            and isinstance(data['source'], str)
+        ):
+            # Shorthand format: source, repo/url/path at top level
+            source_type = data.pop('source')
+            source_dict = {'source': source_type}
+            for key in ('repo', 'url', 'path'):
+                if key in data:
+                    source_dict[key] = data.pop(key)
+            data['source'] = source_dict
+        return data
+
+
+class ClaudeLocalPlugin(pydantic.BaseModel):
+    """Local plugin configuration for Claude Code SDK.
+
+    Specifies a local plugin directory to load directly into the SDK.
+
+    Example:
+        [[local_plugins]]
+        path = "/path/to/plugin"
+    """
+
+    path: str
+
+
+class ClaudePluginConfig(pydantic.BaseModel):
+    """Combined marketplace and plugin configuration.
+
+    Contains all plugin-related settings for Claude Code including:
+    - enabled_plugins: Map of "plugin@marketplace" to enabled state
+    - marketplaces: Additional marketplace sources
+    - local_plugins: Local plugin directories to load via SDK
+    """
+
+    enabled_plugins: dict[str, bool] = {}
+    marketplaces: dict[str, ClaudeMarketplace] = {}
+    local_plugins: list[ClaudeLocalPlugin] = []
 
 
 class ClaudeAgentType(enum.StrEnum):

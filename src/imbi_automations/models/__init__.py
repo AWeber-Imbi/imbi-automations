@@ -10,6 +10,11 @@ from .claude import (
     ClaudeAgentTaskResult,
     ClaudeAgentType,
     ClaudeAgentValidationResult,
+    ClaudeLocalPlugin,
+    ClaudeMarketplace,
+    ClaudeMarketplaceSource,
+    ClaudeMarketplaceSourceType,
+    ClaudePluginConfig,
 )
 from .configuration import (
     AnthropicConfiguration,
@@ -88,6 +93,11 @@ __all__ = [
     'ClaudeAgentType',
     'ClaudeAgentValidationResult',
     'ClaudeCodeConfiguration',
+    'ClaudeLocalPlugin',
+    'ClaudeMarketplace',
+    'ClaudeMarketplaceSource',
+    'ClaudeMarketplaceSourceType',
+    'ClaudePluginConfig',
     'Configuration',
     'GitCommit',
     'GitCommitSummary',
