@@ -12,6 +12,8 @@ import typing
 
 import pydantic
 
+from . import claude as claude_models
+
 
 class AnthropicConfiguration(pydantic.BaseModel):
     """Anthropic API configuration for Claude models.
@@ -84,13 +86,36 @@ class ClaudeCodeConfiguration(pydantic.BaseModel):
     """Claude Code SDK configuration.
 
     Configures the Claude Code executable path, base prompt file, model
-    selection, and whether AI-powered transformations are enabled.
+    selection, whether AI-powered transformations are enabled, and
+    marketplace/plugin settings.
+
+    Plugin configuration supports:
+    - enabled_plugins: Map of "plugin@marketplace" to enabled state
+    - marketplaces: Additional marketplace sources to register
+    - local_plugins: Local plugin directories loaded via SDK
+
+    Example TOML:
+        [claude_code]
+        model = "claude-sonnet-4"
+
+        [claude_code.plugins.enabled_plugins]
+        "code-formatter@team-tools" = true
+
+        [claude_code.plugins.marketplaces.team-tools]
+        source = "github"
+        repo = "company/claude-plugins"
+
+        [[claude_code.plugins.local_plugins]]
+        path = "/path/to/local/plugin"
     """
 
     executable: str = 'claude'  # Claude Code executable path
     base_prompt: pathlib.Path | None = None
     enabled: bool = True
     model: str = pydantic.Field(default='claude-haiku-4-5')
+    plugins: claude_models.ClaudePluginConfig = pydantic.Field(
+        default_factory=claude_models.ClaudePluginConfig
+    )
 
     def __init__(self, **kwargs: typing.Any) -> None:
         super().__init__(**kwargs)

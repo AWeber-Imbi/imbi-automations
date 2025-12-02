@@ -14,6 +14,7 @@ import pydantic
 import pydantic_core
 from pydantic import AnyUrl
 
+from . import claude as claude_models
 from . import github, imbi, mcp, validators
 
 
@@ -651,7 +652,21 @@ class WorkflowConfiguration(pydantic.BaseModel):
     """Complete workflow configuration with actions, conditions, and filters.
 
     Defines the full workflow structure including provider configurations,
-    execution conditions, filtering criteria, and action sequences.
+    execution conditions, filtering criteria, action sequences, and
+    Claude Code plugin settings.
+
+    Workflow-level plugin configuration merges with main config settings:
+    - enabled_plugins: Merged with main config (workflow can enable/disable)
+    - marketplaces: Merged with main config (workflow can add more)
+    - local_plugins: Concatenated with main config plugins
+
+    Example TOML:
+        [plugins.enabled_plugins]
+        "workflow-specific-plugin@marketplace" = true
+
+        [plugins.marketplaces.workflow-marketplace]
+        source = "github"
+        repo = "org/workflow-plugins"
     """
 
     name: str
@@ -661,6 +676,9 @@ class WorkflowConfiguration(pydantic.BaseModel):
     github: WorkflowGitHub = pydantic.Field(default_factory=WorkflowGitHub)
     filter: WorkflowFilter | None = None
     mcp_servers: dict[str, mcp.McpServerConfig] = {}
+    plugins: claude_models.ClaudePluginConfig = pydantic.Field(
+        default_factory=claude_models.ClaudePluginConfig
+    )
     use_devcontainers: bool = False
     max_followup_cycles: int = 5
 

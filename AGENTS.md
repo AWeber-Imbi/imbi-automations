@@ -151,6 +151,46 @@ args = ["mcp-server-postgres", "${DATABASE_URL}"]
 
 Supports `stdio`, `sse`, `http` transports. Environment variables expanded at runtime.
 
+### Claude Code Plugins
+
+Plugin configuration can be specified in both the main configuration file and workflow files. Workflow settings merge with main config (workflow values take precedence).
+
+**Main configuration (`config.toml`):**
+```toml
+[claude_code.plugins.enabled_plugins]
+"code-formatter@company-tools" = true
+"linter@company-tools" = true
+
+[claude_code.plugins.marketplaces.company-tools]
+source = "github"
+repo = "company-org/claude-plugins"
+
+[[claude_code.plugins.local_plugins]]
+path = "/path/to/local/plugin"
+```
+
+**Workflow configuration (`workflow.toml`):**
+```toml
+[plugins.enabled_plugins]
+"workflow-specific@marketplace" = true
+
+[plugins.marketplaces.workflow-marketplace]
+source = "git"
+url = "https://git.example.com/plugins.git"
+```
+
+**Marketplace source types:**
+| Type | Required Field | Description |
+|------|----------------|-------------|
+| `github` | `repo` | GitHub repository (e.g., `org/repo`) |
+| `git` | `url` | Any git URL |
+| `directory` | `path` | Local directory (dev only) |
+
+**Merging behavior:**
+- `enabled_plugins`: Merged, workflow overrides main
+- `marketplaces`: Merged, workflow overrides same-key entries
+- `local_plugins`: Concatenated, duplicates removed by path
+
 ## Workflow Resumability
 
 ```bash
@@ -176,7 +216,7 @@ State saved in `.state` file (MessagePack format) with:
 
 - Base class: `AsyncTestCase` (extends `unittest.IsolatedAsyncioTestCase`)
 - HTTP mocking: `httpx.MockTransport` with JSON fixtures in `tests/data/`
-- 459 tests with full async support
+- 475 tests with full async support
 
 ## CI/CD
 
