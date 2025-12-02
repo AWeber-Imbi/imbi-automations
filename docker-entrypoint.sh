@@ -1,6 +1,65 @@
 #!/bin/bash
 set -e
 
+# --- Initialization Directory Processing ---
+# Similar to database images' /docker-entrypoint-initdb.d pattern
+# Supports: .apt (system packages), .pip (pip packages), .sh (scripts)
+# Files are processed in sorted order (use numeric prefixes for ordering)
+INIT_DIR="/docker-entrypoint-init.d"
+
+if [ -d "$INIT_DIR" ] && [ "$(ls -A $INIT_DIR 2>/dev/null)" ]; then
+    echo "Processing initialization files from $INIT_DIR..."
+
+    # Collect files by type
+    APT_PACKAGES=""
+    PIP_FILES=""
+    SH_FILES=""
+
+    for f in $(find "$INIT_DIR" -maxdepth 1 -type f | sort); do
+        case "$f" in
+            *.apt)
+                echo "  Found apt package list: $f"
+                # Filter out comments and empty lines, collect packages
+                APT_PACKAGES="$APT_PACKAGES $(grep -v '^\s*#' "$f" | grep -v '^\s*$' | tr '\n' ' ')"
+                ;;
+            *.pip)
+                echo "  Found pip requirements: $f"
+                PIP_FILES="$PIP_FILES $f"
+                ;;
+            *.sh)
+                echo "  Found shell script: $f"
+                SH_FILES="$SH_FILES $f"
+                ;;
+            *)
+                echo "  Skipping unknown file type: $f"
+                ;;
+        esac
+    done
+
+    # Install apt packages (batch for efficiency)
+    if [ -n "$APT_PACKAGES" ]; then
+        echo "Installing system packages: $APT_PACKAGES"
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends $APT_PACKAGES
+        sudo apt-get clean
+        sudo rm -rf /var/lib/apt/lists/*
+    fi
+
+    # Install pip packages
+    for f in $PIP_FILES; do
+        echo "Installing pip packages from: $f"
+        pip install --user --no-cache-dir -r "$f"
+    done
+
+    # Run shell scripts
+    for f in $SH_FILES; do
+        echo "Running script: $f"
+        bash "$f"
+    done
+
+    echo "Initialization complete."
+fi
+
 # --- Git SSH Commit Signing ---
 # Auto-detect SSH key and configure git signing if found
 SSH_KEY_PATH=""

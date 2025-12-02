@@ -29,6 +29,7 @@ docker run --rm \
 | `/opt/workflows` | Workflow definitions | Mount as read-only |
 | `/home/imbi-automations/.ssh` | SSH keys | Mount as read-only; enables commit signing |
 | `/opt/errors` | Error preservation | Mount if using `--preserve-on-error` |
+| `/docker-entrypoint-init.d` | Initialization scripts | See [Initialization Directory](#initialization-directory) |
 
 ## Environment Variables
 
@@ -90,6 +91,81 @@ For full functionality, your token needs:
 - `repo` - Repository access
 - `read:org` - Organization membership (for org repos)
 - `workflow` - GitHub Actions (if syncing workflows)
+
+## Initialization Directory
+
+The container supports an initialization directory at `/docker-entrypoint-init.d/` for installing additional packages or running setup scripts at container startup. This pattern is similar to database images like PostgreSQL's `/docker-entrypoint-initdb.d`.
+
+Files are processed in sorted order (use numeric prefixes for ordering) and support three extensions:
+
+| Extension | Purpose | Processing |
+|-----------|---------|------------|
+| `.apt` | System packages | Installed via `apt-get install` |
+| `.pip` | Python packages | Installed via `pip install -r` |
+| `.sh` | Shell scripts | Executed with `bash` |
+
+### Example Files
+
+**`10-system.apt`** - System packages (one per line, comments supported):
+
+```
+# Build dependencies
+build-essential
+libpq-dev
+
+# Other tools
+jq
+```
+
+**`20-python.pip`** - Python packages (standard requirements format):
+
+```
+pandas>=2.0
+sqlalchemy
+requests
+```
+
+**`30-custom.sh`** - Custom setup script:
+
+```bash
+#!/bin/bash
+npm install -g some-tool
+```
+
+### Usage
+
+Mount individual files:
+
+```bash
+docker run --rm \
+    -v ./my-packages.apt:/docker-entrypoint-init.d/10-packages.apt:ro \
+    -v ./requirements.pip:/docker-entrypoint-init.d/20-python.pip:ro \
+    aweber/imbi-automations:latest ...
+```
+
+Or mount a directory containing multiple init files:
+
+```bash
+docker run --rm \
+    -v ./init.d:/docker-entrypoint-init.d:ro \
+    aweber/imbi-automations:latest ...
+```
+
+### Docker Compose Example
+
+```yaml
+services:
+  imbi-automations:
+    image: aweber/imbi-automations:latest
+    volumes:
+      - ./config.toml:/opt/config/config.toml:ro
+      - ./workflows:/opt/workflows:ro
+      - ./init.d:/docker-entrypoint-init.d:ro
+```
+
+!!! note
+    Initialization runs on every container start. For production workflows with
+    many dependencies, consider building a custom image instead.
 
 ## Debugging
 

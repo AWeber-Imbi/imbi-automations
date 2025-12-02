@@ -16,19 +16,22 @@ RUN apt-get update \
         gnupg \
         openssh-client \
         ripgrep \
+        sudo \
  && rm -rf /var/lib/apt/lists/* \
  && curl -fsSL https://claude.ai/install.sh | bash  \
  && pip install --root-user-action ignore --break-system-packages --no-cache-dir --upgrade pip \
  && pip install --root-user-action ignore --break-system-packages --no-cache-dir /tmp/imbi_automations*.whl \
  && rm /tmp/*.whl \
- && mkdir -p /opt/config /opt/errors /opt/workflows  \
+ && mkdir -p /opt/config /opt/errors /opt/workflows /docker-entrypoint-init.d \
  && groupadd --gid 1000 imbi-automations \
  && useradd --uid 1000 --gid 1000 --shell /bin/bash \
             --home-dir /home/imbi-automations --create-home \
             imbi-automations \
+ && echo "imbi-automations ALL=(ALL) NOPASSWD: /usr/bin/apt-get, /bin/rm" >> /etc/sudoers.d/imbi-automations \
+ && chmod 0440 /etc/sudoers.d/imbi-automations \
  && mkdir -p /home/imbi-automations/.ssh \
  && chmod 700 /home/imbi-automations/.ssh \
- && chown -R imbi-automations:imbi-automations /opt \
+ && chown -R imbi-automations:imbi-automations /opt /docker-entrypoint-init.d \
  && chmod +x /usr/local/bin/docker-entrypoint.sh \
  && git config --global user.name "${GIT_USER_NAME}" \
  && git config --global user.email "${GIT_USER_EMAIL}"
@@ -37,7 +40,7 @@ USER imbi-automations
 
 WORKDIR /opt
 
-VOLUME /opt/config /opt/errors /opt/workflows
+VOLUME /opt/config /opt/errors /opt/workflows /docker-entrypoint-init.d
 
 ENTRYPOINT ["docker-entrypoint.sh", "imbi-automations"]
 
