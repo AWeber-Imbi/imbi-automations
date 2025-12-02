@@ -259,6 +259,98 @@ Custom base prompt file for Claude Code sessions.
 base_prompt = "/path/to/custom-prompt.md"
 ```
 
+### [claude_code].plugins
+
+Plugin and marketplace configuration for Claude Code. These settings are merged with workflow-level plugin settings (workflow values take precedence).
+
+**Type:** `ClaudePluginConfig` object
+
+**Default:** Empty (no plugins)
+
+#### [claude_code.plugins].enabled_plugins
+
+Enable or disable specific plugins from marketplaces.
+
+**Type:** `dict[string, boolean]`
+
+**Format:** `"plugin-name@marketplace-name" = true/false`
+
+```toml
+[claude_code.plugins.enabled_plugins]
+"git-repository@aweber-marketplace" = true
+"python-developer@aweber-marketplace" = true
+"grafana-mcp@aweber-marketplace" = false
+```
+
+#### [claude_code.plugins.marketplaces]
+
+Configure additional marketplace sources for plugins.
+
+**Type:** `dict[string, ClaudeMarketplace]`
+
+Each marketplace requires a `source` type and corresponding field:
+
+| Source Type | Required Field | Description |
+|-------------|----------------|-------------|
+| `github` | `repo` | GitHub repository (e.g., `org/repo`) |
+| `git` | `url` | Any git URL |
+| `directory` | `path` | Local directory (development only) |
+
+```toml
+# GitHub marketplace
+[claude_code.plugins.marketplaces.company-tools]
+source = "github"
+repo = "company-org/claude-plugins"
+
+# Git URL marketplace (e.g., GitHub Enterprise)
+[claude_code.plugins.marketplaces.enterprise-tools]
+source = "git"
+url = "https://github.enterprise.com/org/claude-plugins.git"
+
+# Local directory (development)
+[claude_code.plugins.marketplaces.dev-plugins]
+source = "directory"
+path = "/path/to/local/marketplace"
+```
+
+#### [[claude_code.plugins.local_plugins]]
+
+Load local plugin directories directly via the Claude Agent SDK.
+
+**Type:** `list[ClaudeLocalPlugin]`
+
+```toml
+[[claude_code.plugins.local_plugins]]
+path = "/path/to/local/plugin"
+
+[[claude_code.plugins.local_plugins]]
+path = "/another/plugin/directory"
+```
+
+#### Complete Plugin Configuration Example
+
+```toml
+[claude_code]
+enabled = true
+model = "claude-sonnet-4"
+
+[claude_code.plugins.enabled_plugins]
+"git-repository@aweber-marketplace" = true
+"python-developer@aweber-marketplace" = true
+"grafana-mcp@aweber-marketplace" = false
+
+[claude_code.plugins.marketplaces.aweber-marketplace]
+source = "git"
+url = "https://github.enterprise.com/claude/marketplace.git"
+
+[claude_code.plugins.marketplaces.community]
+source = "github"
+repo = "anthropics/claude-plugins"
+
+[[claude_code.plugins.local_plugins]]
+path = "/home/user/my-custom-plugin"
+```
+
 ## GitHub Configuration
 
 Configuration for GitHub API integration.

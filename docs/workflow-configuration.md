@@ -414,6 +414,83 @@ task_prompt = "prompts/analyze.md"
 
 In Claude actions, these MCP servers are available alongside the built-in `agent_tools` server that provides workflow submission functions.
 
+## Claude Code Plugin Configuration
+
+The `[plugins]` section allows configuring Claude Code plugins and marketplaces at the workflow level. These settings are merged with the main configuration's `[claude_code.plugins]` settings.
+
+### Merge Behavior
+
+| Setting | Merge Behavior |
+|---------|----------------|
+| `enabled_plugins` | Workflow values override main config |
+| `marketplaces` | Workflow values override main config for same keys |
+| `local_plugins` | Concatenated (duplicates removed by path) |
+
+### [plugins].enabled_plugins
+
+Enable or disable specific plugins for this workflow.
+
+**Type:** `dict[string, boolean]`
+
+```toml
+[plugins.enabled_plugins]
+"workflow-specific-plugin@marketplace" = true
+"grafana-mcp@aweber-marketplace" = true  # Override main config
+```
+
+### [plugins.marketplaces]
+
+Add workflow-specific marketplace sources.
+
+**Type:** `dict[string, ClaudeMarketplace]`
+
+```toml
+[plugins.marketplaces.workflow-marketplace]
+source = "github"
+repo = "org/workflow-specific-plugins"
+
+[plugins.marketplaces.local-dev]
+source = "directory"
+path = "/path/to/dev/marketplace"
+```
+
+### [[plugins.local_plugins]]
+
+Add workflow-specific local plugins.
+
+**Type:** `list[ClaudeLocalPlugin]`
+
+```toml
+[[plugins.local_plugins]]
+path = "/path/to/workflow/plugin"
+```
+
+### Complete Workflow Plugin Example
+
+```toml
+name = "Data Analysis Workflow"
+description = "Analyze data using specialized plugins"
+
+# Enable workflow-specific plugins
+[plugins.enabled_plugins]
+"data-analyzer@analytics-marketplace" = true
+"grafana-mcp@aweber-marketplace" = true  # Enable for this workflow
+
+# Add workflow-specific marketplace
+[plugins.marketplaces.analytics-marketplace]
+source = "github"
+repo = "company/analytics-plugins"
+
+# Add local development plugin
+[[plugins.local_plugins]]
+path = "/home/user/data-analysis-plugin"
+
+[[actions]]
+name = "analyze-data"
+type = "claude"
+task_prompt = "prompts/analyze.md"
+```
+
 ## Workflow-Level Conditions
 
 Workflow conditions determine if the entire workflow should execute for a project. See [Workflow Conditions](workflow-conditions.md) for detailed documentation.
