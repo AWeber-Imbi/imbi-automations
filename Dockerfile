@@ -13,6 +13,7 @@ RUN apt-get update \
         curl \
         gh \
         git \
+        git-lfs \
         gnupg \
         openssh-client \
         ripgrep \
