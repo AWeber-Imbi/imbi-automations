@@ -33,9 +33,7 @@ RUN apt-get update \
  && mkdir -p /home/imbi-automations/.ssh \
  && chmod 700 /home/imbi-automations/.ssh \
  && chown -R imbi-automations:imbi-automations /opt /docker-entrypoint-init.d \
- && chmod +x /usr/local/bin/docker-entrypoint.sh \
- && git config --global user.name "${GIT_USER_NAME}" \
- && git config --global user.email "${GIT_USER_EMAIL}"
+ && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 USER imbi-automations
 
