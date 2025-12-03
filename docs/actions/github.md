@@ -26,7 +26,7 @@ type = "github"
 command = "sync_environments"
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Reads environment data from Imbi project (`imbi_project.environments: list[ImbiEnvironment]`)
 - Extracts slugs directly from `ImbiEnvironment` objects (provided by Imbi API)
@@ -37,7 +37,7 @@ command = "sync_environments"
 - Logs all operations (created, deleted, errors)
 - Raises error if sync fails
 
-**Environment Slugs:**
+**Environment Slugs:**  
 - Slugs are provided by the Imbi API (no local transformation)
 - The `ImbiEnvironment` model contains both `name` and `slug` fields
 - Slug format is controlled by Imbi (typically lowercase with hyphens)
@@ -82,13 +82,13 @@ The GitHub action implementation:
 - No repository cloning needed (API-only operations)
 - Skips projects with no environments defined in Imbi
 
-**Type Safety:**
+**Type Safety:**  
 - Uses `ImbiEnvironment` model objects (not plain strings) for type-safe environment handling
 - Each environment has `name`, `slug`, `icon_class`, and optional `description` fields
 - Slugs provided directly by Imbi API (no local transformation)
 - Imbi client creates `ImbiEnvironment` objects from API response data
 
-**Filter Support:**
+**Filter Support:**  
 - Workflow filters can target specific environments using `project_environments` field
 - Supports both environment names ("Production") and slugs ("production")
 - Filter checks against both `name` and `slug` fields for flexibility

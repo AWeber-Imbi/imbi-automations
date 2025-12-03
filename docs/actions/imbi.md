@@ -30,14 +30,14 @@ values = ["testing", "staging", "production"]
 
 - `values` (list of strings, required): List of environment names or slugs to set for the project
 
-**Features:**
+**Features:**  
 
 - **Flexible Input**: Accepts both environment names (e.g., "Testing") and slugs (e.g., "testing")
 - **Smart Updates**: Only makes API calls when environments actually differ from current state
 - **Automatic Translation**: Converts environment slugs to names using ImbiMetadataCache
 - **Non-Committable**: Does not create git commits (modifies Imbi state only)
 
-**Use Cases:**
+**Use Cases:**  
 
 - Standardize environments across projects
 - Sync environment configuration after infrastructure changes
@@ -79,7 +79,7 @@ attributes = {
 
 - `attributes` (dict, required): Dictionary of attribute names to new values. Keys should match ImbiProject model fields (e.g., `description`, `name`, `namespace`, etc.). String values support Jinja2 templates.
 
-**Features:**
+**Features:**  
 
 - **Generic Updates**: Update any project attribute in a single action
 - **Template Support**: String values support full Jinja2 templating with workflow context
@@ -95,7 +95,7 @@ Project attributes that can be updated:
 - `name` - Project display name
 - Any other writable field on the ImbiProject model
 
-**Use Cases:**
+**Use Cases:**  
 
 - Update project metadata after repository analysis
 - Sync project information with repository changes
@@ -178,7 +178,7 @@ value = "3.12"
 - `value` (string|number|boolean, required): Value to assign to the fact
 - `skip_validations` (boolean, optional): Skip fact validation (default: false)
 
-**Use Cases:**
+**Use Cases:**  
 
 - Update project metadata after automated changes
 - Track migration status across projects

@@ -43,9 +43,9 @@ regex = "^api-.*"
 
 Target specific projects by their Imbi project ID.
 
-**Type:** `list[int]`
+**Type:** `list[int]`  
 
-**Default:** `[]` (no ID filtering)
+**Default:** `[]` (no ID filtering)  
 
 
 ```toml
@@ -70,9 +70,9 @@ project_ids = [123, 456, 789]
 
 Filter by project type slugs from Imbi.
 
-**Type:** `list[string]`
+**Type:** `list[string]`  
 
-**Default:** `[]` (no type filtering)
+**Default:** `[]` (no type filtering)  
 
 
 **Common project types:**
@@ -113,9 +113,9 @@ project_types = [
 
 Filter by exact Imbi project fact values.
 
-**Type:** `dict[string, string]`
+**Type:** `dict[string, string]`  
 
-**Default:** `{}` (no fact filtering)
+**Default:** `{}` (no fact filtering)  
 
 
 **Fact matching:**
@@ -154,9 +154,9 @@ project_facts = {"programming_language" = "Python 3.9"}
 
 Filter by Imbi project environments.
 
-**Type:** `list[string]`
+**Type:** `list[string]`  
 
-**Default:** `[]` (no environment filtering)
+**Default:** `[]` (no environment filtering)  
 
 
 **Environment matching:**
@@ -194,9 +194,9 @@ The filter checks against both the original environment name and the auto-genera
 
 Require projects to have a GitHub repository identifier.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `false`
+**Default:** `false`  
 
 
 ```toml
@@ -222,9 +222,9 @@ github_identifier_required = true
 
 Filter projects based on arbitrary field conditions with flexible operators.
 
-**Type:** `dict[string, ProjectFieldFilter]`
+**Type:** `dict[string, ProjectFieldFilter]`  
 
-**Default:** `{}` (no field filtering)
+**Default:** `{}` (no field filtering)  
 
 **Available operators:**
 
@@ -307,9 +307,9 @@ is_empty = true
 
 Exclude projects with specific GitHub Actions workflow statuses.
 
-**Type:** `list[string]`
+**Type:** `list[string]`  
 
-**Default:** `[]` (no status filtering)
+**Default:** `[]` (no status filtering)  
 
 
 **Valid statuses:**
@@ -462,7 +462,7 @@ project_facts = {"Programming Language" = "Python"}  # Won't work - needs exact 
 # Better: Use multiple workflows or no filter + conditions
 ```
 
-**Note:** Fact filtering requires exact matches. For partial matching, use workflow conditions with regex.
+**Note:** Fact filtering requires exact matches. For partial matching, use workflow conditions with regex.  
 
 ### Projects Needing GitHub Actions
 

@@ -19,15 +19,15 @@ image = "image:tag"     # Required
 
 Extract files from a Docker container image.
 
-**Status:** ✅ Implemented
+**Status:** ✅ Implemented  
 
-**Required Fields:**
+**Required Fields:**  
 
 - `image` (string): Docker image name (tag can be separate or in format `image:tag`)
 - `source` ([pathlib.Path][]): Path inside container to extract from
 - `destination` ([`ResourceUrl`](index.md#resourceurl-path-system)): Local path to extract to (typically `extracted:///`)
 
-**Optional Fields:**
+**Optional Fields:**  
 
 - `tag` (string): Image tag (default: `latest`) - only used if image doesn't contain `:tag`
 
@@ -43,7 +43,7 @@ source = "/usr/local/lib/python3.12/"
 destination = "extracted:///python-libs/"
 ```
 
-**Behavior:**
+**Behavior:**  
 
 1. Pulls the image if not available locally (`docker pull`)
 2. Creates temporary container from image (`docker create`)
@@ -53,44 +53,44 @@ destination = "extracted:///python-libs/"
 
 ### build
 
-**Status:** ❌ Not yet implemented (raises NotImplementedError)
+**Status:** ❌ Not yet implemented (raises NotImplementedError)  
 
 Build a Docker image from a Dockerfile.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `image`: Image name to create
 - `path`: Path to Dockerfile directory ([`ResourceUrl`](index.md#resourceurl-path-system))
 
-**Optional Fields:**
+**Optional Fields:**  
 
 - `tag`: Image tag (default: `latest`)
 
 ### pull
 
-**Status:** ❌ Not yet implemented (raises NotImplementedError)
+**Status:** ❌ Not yet implemented (raises NotImplementedError)  
 
 Pull a Docker image from registry.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `image`: Image name to pull
 
-**Optional Fields:**
+**Optional Fields:**  
 
 - `tag`: Image tag (default: `latest`)
 
 ### push
 
-**Status:** ❌ Not yet implemented (raises NotImplementedError)
+**Status:** ❌ Not yet implemented (raises NotImplementedError)  
 
 Push a Docker image to registry.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `image`: Image name to push
 
-**Optional Fields:**
+**Optional Fields:**  
 
 - `tag`: Image tag (default: `latest`)
 

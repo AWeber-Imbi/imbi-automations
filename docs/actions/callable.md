@@ -22,11 +22,11 @@ ai_commit = true                 # Optional, default: true
 
 Python import string specifying the callable to invoke. Uses Pydantic's `ImportString` format.
 
-**Type:** `string` (ImportString format: `"module.path:callable_name"`)
+**Type:** `string` (ImportString format: `"module.path:callable_name"`)  
 
-**Format:** `"package.module:function"` or `"package.module.submodule:ClassName.method"`
+**Format:** `"package.module:function"` or `"package.module.submodule:ClassName.method"`  
 
-**Examples:**
+**Examples:**  
 ```toml
 # Function from module
 callable = "os.path:join"
@@ -41,7 +41,7 @@ callable = "asyncio:sleep"
 callable = "my_package.utils:process_data"
 ```
 
-**Import Resolution:**
+**Import Resolution:**  
 - The string before `:` is the module path to import
 - The string after `:` is the attribute name to retrieve from the module
 - Supports nested attributes (e.g., `Class.method`)
@@ -51,9 +51,9 @@ callable = "my_package.utils:process_data"
 
 Positional arguments to pass to the callable. Arguments are passed in order.
 
-**Type:** `list[Any]`
+**Type:** `list[Any]`  
 
-**Default:** `[]`
+**Default:** `[]`  
 
 **Supports:**
 - Primitive types (int, float, bool, string)
@@ -61,7 +61,7 @@ Positional arguments to pass to the callable. Arguments are passed in order.
 - Jinja2 template strings (automatically rendered)
 - Mixed types
 
-**Template Rendering:**
+**Template Rendering:**  
 ```toml
 args = [
     42,                              # Literal integer
@@ -77,16 +77,16 @@ args = [
 
 Keyword arguments to pass to the callable.
 
-**Type:** `dict[string, Any]`
+**Type:** `dict[string, Any]`  
 
-**Default:** `{}`
+**Default:** `{}`  
 
 **Supports:**
 - Same types as `args`
 - Jinja2 template rendering in string values
 - Nested structures
 
-**Template Rendering:**
+**Template Rendering:**  
 ```toml
 [actions.kwargs]
 project_name = "{{ imbi_project.name }}"      # Template (rendered)
@@ -99,11 +99,11 @@ config = {nested = "value"}                    # Nested dict
 
 Whether to use AI-generated commit messages for repository changes made by this action.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `true`
+**Default:** `true`  
 
-**Note:** Only relevant if the callable makes repository changes and `committable = true`.
+**Note:** Only relevant if the callable makes repository changes and `committable = true`.  
 
 ## Template Context
 
@@ -117,7 +117,7 @@ String arguments support Jinja2 templating with full workflow context:
 | `working_directory` | Execution directory path | `{{ working_directory }}` |
 | `starting_commit` | Initial commit SHA | `{{ starting_commit }}` |
 
-**Template Detection:**
+**Template Detection:**  
 - Only `string` values are checked for templates
 - Templates must contain `{{`, `{%`, or `{#` syntax
 - Non-string types (int, bool, list, dict) pass through unchanged
@@ -127,7 +127,7 @@ String arguments support Jinja2 templating with full workflow context:
 
 The action automatically detects whether the callable is synchronous or asynchronous using `asyncio.iscoroutinefunction()` and executes accordingly to maintain async safety.
 
-**Async callables:**
+**Async callables:**  
 ```python
 async def my_async_function(arg1: int, arg2: str) -> None:
     await asyncio.sleep(1)
@@ -143,7 +143,7 @@ args = [42, "hello"]
 # Automatically awaited with: await action.callable(*args, **kwargs)
 ```
 
-**Sync callables:**
+**Sync callables:**  
 ```python
 def my_sync_function(arg1: int, arg2: str) -> None:
     # ... sync work (may be blocking)
@@ -159,7 +159,7 @@ args = [42, "hello"]
 # Executed in thread pool: await asyncio.to_thread(callable, *args, **kwargs)
 ```
 
-**Detection and Execution:**
+**Detection and Execution:**  
 - **Detection Method:** Uses `asyncio.iscoroutinefunction()` to detect async callables
 - **Async Execution:** Coroutines are directly awaited: `await callable(*args, **kwargs)`
 - **Sync Execution:** Regular functions run in thread pool via `asyncio.to_thread()` to prevent blocking the event loop
@@ -366,12 +366,12 @@ The original exception is preserved via `__cause__` for debugging.
 
 ### Logging
 
-**Debug logging:**
+**Debug logging:**  
 ```
 DEBUG: Executing my_module:my_function([1, 2], {'key': 'value'})
 ```
 
-**Exception logging:**
+**Exception logging:**  
 ```
 ERROR: Error invoking callable: Something went wrong
 <full exception traceback>

@@ -51,8 +51,8 @@ github_link = "GitHub Repository"
 
 Enable AI-powered commit message generation.
 
-**Type:** `boolean`
-**Default:** `false`
+**Type:** `boolean`  
+**Default:** `false`  
 
 When enabled, uses Anthropic API to generate commit messages based on changes.
 
@@ -64,9 +64,9 @@ ai_commits = true
 
 Git commit author information for automated commits.
 
-**Type:** `string`
-**Default:** `"Imbi Automations <noreply@aweber.com>"`
-**Format:** `"Name <email>"`
+**Type:** `string`  
+**Default:** `"Imbi Automations <noreply@aweber.com>"`  
+**Format:** `"Name <email>"`  
 
 
 ```toml
@@ -77,9 +77,9 @@ commit_author = "Bot User <bot@example.com>"
 
 Directory to store error logs and debugging information when workflows fail.
 
-**Type:** `path`
+**Type:** `path`  
 
-**Default:** `"./errors"`
+**Default:** `"./errors"`  
 
 ```toml
 error_dir = "/var/log/imbi-automations/errors"
@@ -89,8 +89,8 @@ error_dir = "/var/log/imbi-automations/errors"
 
 Preserve working directories when errors occur for debugging.
 
-**Type:** `boolean`
-**Default:** `false`
+**Type:** `boolean`  
+**Default:** `false`  
 
 When `true`, temporary directories are not cleaned up after failures, allowing manual inspection.
 
@@ -102,8 +102,8 @@ preserve_on_error = true
 
 Execute workflows without pushing changes or creating pull requests.
 
-**Type:** `boolean`
-**Default:** `false`
+**Type:** `boolean`  
+**Default:** `false`  
 
 When enabled, workflows execute completely (clone, actions, commits) but skip remote operations:
 
@@ -111,7 +111,7 @@ When enabled, workflows execute completely (clone, actions, commits) but skip re
 dry_run = true
 ```
 
-**Behavior:**
+**Behavior:**  
 - ✓ Clones repositories
 - ✓ Runs all actions
 - ✓ Makes file changes
@@ -119,7 +119,7 @@ dry_run = true
 - ✗ Skips pushing to remote
 - ✗ Skips creating pull requests
 
-**Use Cases:**
+**Use Cases:**  
 - Testing new workflows safely
 - Validating changes before production runs
 - Reviewing commit messages and diffs
@@ -128,20 +128,20 @@ dry_run = true
 
 Working directories are preserved to `dry_run_dir` for inspection.
 
-**Note:** Can be overridden by `--dry-run` CLI flag.
+**Note:** Can be overridden by `--dry-run` CLI flag.  
 
 ### dry_run_dir
 
 Directory for saving repository state during dry-run executions.
 
-**Type:** `path`
-**Default:** `"./dry-runs"`
+**Type:** `path`  
+**Default:** `"./dry-runs"`  
 
 ```toml
 dry_run_dir = "./review-changes"
 ```
 
-**Directory Structure:**
+**Directory Structure:**  
 ```
 ./review-changes/
 └── workflow-name/
@@ -151,7 +151,7 @@ dry_run_dir = "./review-changes"
         └── extracted/     # Docker extracted files (if any)
 ```
 
-**Example Inspection:**
+**Example Inspection:**  
 ```bash
 # View commits that would have been pushed
 cd ./dry-runs/update-deps/my-project-20250103-143052/repository
@@ -160,7 +160,7 @@ git show HEAD
 git diff HEAD~1
 ```
 
-**Note:** Can be overridden by `--dry-run-dir` CLI flag.
+**Note:** Can be overridden by `--dry-run-dir` CLI flag.  
 
 ## Anthropic Configuration
 
@@ -170,9 +170,9 @@ Configuration for Anthropic Claude API used in Claude actions and AI commit gene
 
 Anthropic API key for Claude models.
 
-**Type:** `string` (secret)
-**Default:** `$ANTHROPIC_API_KEY` environment variable
-**Required:** For Claude actions or `ai_commits = true`
+**Type:** `string` (secret)  
+**Default:** `$ANTHROPIC_API_KEY` environment variable  
+**Required:** For Claude actions or `ai_commits = true`  
 
 ```toml
 [anthropic]
@@ -188,24 +188,24 @@ export ANTHROPIC_API_KEY="sk-ant-api03-..."
 
 Use AWS Bedrock instead of direct Anthropic API.
 
-**Type:** `boolean`
-**Default:** `false`
+**Type:** `boolean`  
+**Default:** `false`  
 
 ```toml
 [anthropic]
 bedrock = true
 ```
 
-**Note:** Requires AWS credentials configured separately.
+**Note:** Requires AWS credentials configured separately.  
 
 ### [anthropic].model
 
 Claude model to use for API requests.
 
-**Type:** `string`
-**Default:** `"claude-3-5-haiku-latest"`
+**Type:** `string`  
+**Default:** `"claude-3-5-haiku-latest"`  
 
-**Available Models:**
+**Available Models:**  
 
 - `claude-3-5-sonnet-latest` - Most capable, higher cost
 - `claude-3-5-haiku-latest` - Fast and efficient (default)
@@ -224,8 +224,8 @@ Configuration for Claude Code SDK integration.
 
 Path or command name for Claude Code executable.
 
-**Type:** `string`
-**Default:** `"claude"`
+**Type:** `string`  
+**Default:** `"claude"`  
 
 ```toml
 [claude_code]
@@ -236,8 +236,8 @@ executable = "/usr/local/bin/claude"
 
 Enable Claude Code actions in workflows.
 
-**Type:** `boolean`
-**Default:** `true`
+**Type:** `boolean`  
+**Default:** `true`  
 
 Set to `false` to disable all Claude actions:
 
@@ -250,9 +250,9 @@ enabled = false
 
 Custom base prompt file for Claude Code sessions.
 
-**Type:** `path`
+**Type:** `path`  
 
-**Default:** `src/imbi_automations/prompts/claude.md`
+**Default:** `src/imbi_automations/prompts/claude.md`  
 
 ```toml
 [claude_code]
@@ -265,15 +265,15 @@ Plugin and marketplace configuration for Claude Code. These settings are merged 
 
 **Type:** `ClaudePluginConfig` object
 
-**Default:** Empty (no plugins)
+**Default:** Empty (no plugins)  
 
 #### [claude_code.plugins].enabled_plugins
 
 Enable or disable specific plugins from marketplaces.
 
-**Type:** `dict[string, boolean]`
+**Type:** `dict[string, boolean]`  
 
-**Format:** `"plugin-name@marketplace-name" = true/false`
+**Format:** `"plugin-name@marketplace-name" = true/false`  
 
 ```toml
 [claude_code.plugins.enabled_plugins]
@@ -286,7 +286,7 @@ Enable or disable specific plugins from marketplaces.
 
 Configure additional marketplace sources for plugins.
 
-**Type:** `dict[string, ClaudeMarketplace]`
+**Type:** `dict[string, ClaudeMarketplace]`  
 
 Each marketplace requires a `source` type and corresponding field:
 
@@ -317,7 +317,7 @@ path = "/path/to/local/marketplace"
 
 Load local plugin directories directly via the Claude Agent SDK.
 
-**Type:** `list[ClaudeLocalPlugin]`
+**Type:** `list[ClaudeLocalPlugin]`  
 
 ```toml
 [[claude_code.plugins.local_plugins]]
@@ -359,10 +359,10 @@ Configuration for GitHub API integration.
 
 GitHub personal access token or fine-grained token.
 
-**Type:** `string` (secret)
-**Required:** For GitHub workflows
+**Type:** `string` (secret)  
+**Required:** For GitHub workflows  
 
-**Token Permissions Required:**
+**Token Permissions Required:**  
 
 - `repo` - Full repository access
 - `workflow` - Update GitHub Actions workflows
@@ -377,8 +377,8 @@ api_key = "ghp_your_github_personal_access_token"
 
 GitHub hostname for Enterprise installations.
 
-**Type:** `string`
-**Default:** `"github.com"`
+**Type:** `string`  
+**Default:** `"github.com"`  
 
 For GitHub Enterprise:
 ```toml
@@ -394,8 +394,8 @@ Configuration for Imbi project management system integration.
 
 Imbi API authentication key.
 
-**Type:** `string` (secret)
-**Required:** Always (core functionality)
+**Type:** `string` (secret)  
+**Required:** Always (core functionality)  
 
 ```toml
 [imbi]
@@ -406,8 +406,8 @@ api_key = "your-imbi-api-key-uuid"
 
 Imbi instance hostname.
 
-**Type:** `string`
-**Required:** Always
+**Type:** `string`  
+**Required:** Always  
 
 ```toml
 [imbi]
@@ -418,8 +418,8 @@ hostname = "imbi.example.com"
 
 Project identifier field names in Imbi for external systems.
 
-**Type:** `string`
-**Defaults:**
+**Type:** `string`  
+**Defaults:**  
 
 - `github_identifier = "github"`
 - `pagerduty_identifier = "pagerduty"`
@@ -437,8 +437,8 @@ github_identifier = "github-id"
 
 Link type names in Imbi for external system URLs.
 
-**Type:** `string`
-**Defaults:**
+**Type:** `string`  
+**Defaults:**  
 
 - `github_link = "GitHub Repository"`
 - `grafana_link = "Grafana Dashboard"`
@@ -459,11 +459,11 @@ The ImbiMetadataCache system caches Imbi metadata locally for improved performan
 
 ### Cache Location
 
-**Path:** `~/.cache/imbi-automations/metadata.json` (configurable via `cache_dir` setting or `--cache-dir` CLI option)
+**Path:** `~/.cache/imbi-automations/metadata.json` (configurable via `cache_dir` setting or `--cache-dir` CLI option)  
 
-**TTL:** 15 minutes
+**TTL:** 15 minutes  
 
-**Contents:**
+**Contents:**  
 
 - Environments
 - Project type slugs and IDs
@@ -731,7 +731,7 @@ imbi-automations /path/to/config.toml workflows/name --all-projects
 
 **Problem:** `401 Unauthorized` errors
 
-**Solutions:**
+**Solutions:**  
 1. Verify API key is valid and not expired
 2. Check API key has required permissions
 3. Ensure environment variables are exported
@@ -741,7 +741,7 @@ imbi-automations /path/to/config.toml workflows/name --all-projects
 
 **Problem:** `toml.decoder.TomlDecodeError`
 
-**Solutions:**
+**Solutions:**  
 1. Validate TOML syntax with online validator
 2. Check for missing quotes around strings
 3. Verify section headers use `[section]` format

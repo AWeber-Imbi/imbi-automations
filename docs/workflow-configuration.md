@@ -55,7 +55,7 @@ type = "file"
 
 Workflow display name shown in logs, reports, and pull requests.
 
-**Type:** `string`
+**Type:** `string`  
 
 
 ```toml
@@ -66,9 +66,9 @@ name = "Update Python Dependencies"
 
 Human-readable description of workflow purpose and goals.
 
-**Type:** `string`
+**Type:** `string`  
 
-**Default:** None
+**Default:** None  
 
 
 ```toml
@@ -81,7 +81,7 @@ Base prompt file for Claude Code actions. This prompt is prepended to all Claude
 
 **Type:** [`ResourceUrl`](actions/index.md#resourceurl-path-system) (path to prompt template file)
 
-**Default:** None
+**Default:** None  
 
 
 ```toml
@@ -98,9 +98,9 @@ The `[git]` section controls repository cloning and commit behavior.
 
 Whether to clone the repository from the remote.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `true`
+**Default:** `true`  
 
 
 ```toml
@@ -114,9 +114,9 @@ clone = true
 
 Shallow clone depth (number of commits to fetch).
 
-**Type:** `integer`
+**Type:** `integer`  
 
-**Default:** `1`
+**Default:** `1`  
 
 
 ```toml
@@ -138,9 +138,9 @@ depth = 100  # More history available for git operations
 
 Git reference (branch, tag, or commit SHA) to clone.
 
-**Type:** `string`
+**Type:** `string`  
 
-**Default:** Repository's default branch
+**Default:** Repository's default branch  
 
 
 ```toml
@@ -162,9 +162,9 @@ ref = "abc123"  # Clone specific commit
 
 Branch name to use as starting point for workflow branch.
 
-**Type:** `string`
+**Type:** `string`  
 
-**Default:** Repository's default branch
+**Default:** Repository's default branch  
 
 
 ```toml
@@ -176,9 +176,9 @@ starting_branch = "develop"  # Branch from develop instead of main
 
 Whether to skip CI/CD checks in commit messages.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `false`
+**Default:** `false`  
 
 
 ```toml
@@ -190,7 +190,7 @@ ci_skip_checks = true  # Adds [skip ci] to commit messages
 
 Protocol to use for cloning repositories.
 
-**Type:** `string`
+**Type:** `string`  
 
 **Values:** `"ssh"` (default), `"http"`
 
@@ -213,9 +213,9 @@ The `[github]` section controls GitHub pull request creation and branch manageme
 
 Whether to create a pull request after committing changes.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `true`
+**Default:** `true`  
 
 
 ```toml
@@ -229,9 +229,9 @@ create_pull_request = true
 
 Delete and recreate remote branch if it already exists.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `false`
+**Default:** `false`  
 
 
 ```toml
@@ -256,15 +256,15 @@ replace_branch = true  # Force-replace existing PR branch
 
 Maximum number of cycles for followup stage execution.
 
-**Type:** `integer`
+**Type:** `integer`  
 
-**Default:** `5`
+**Default:** `5`  
 
 ```toml
 max_followup_cycles = 3
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Followup actions execute after PR creation
 - If any followup action commits, the stage cycles again
@@ -430,7 +430,7 @@ The `[plugins]` section allows configuring Claude Code plugins and marketplaces 
 
 Enable or disable specific plugins for this workflow.
 
-**Type:** `dict[string, boolean]`
+**Type:** `dict[string, boolean]`  
 
 ```toml
 [plugins.enabled_plugins]
@@ -442,7 +442,7 @@ Enable or disable specific plugins for this workflow.
 
 Add workflow-specific marketplace sources.
 
-**Type:** `dict[string, ClaudeMarketplace]`
+**Type:** `dict[string, ClaudeMarketplace]`  
 
 ```toml
 [plugins.marketplaces.workflow-marketplace]
@@ -458,7 +458,7 @@ path = "/path/to/dev/marketplace"
 
 Add workflow-specific local plugins.
 
-**Type:** `list[ClaudeLocalPlugin]`
+**Type:** `list[ClaudeLocalPlugin]`  
 
 ```toml
 [[plugins.local_plugins]]
@@ -499,11 +499,11 @@ Workflow conditions determine if the entire workflow should execute for a projec
 
 How to evaluate multiple conditions.
 
-**Type:** `string`
+**Type:** `string`  
 
 **Values:** `"all"` (AND logic), `"any"` (OR logic)
 
-**Default:** `"all"`
+**Default:** `"all"`  
 
 
 ```toml
@@ -573,7 +573,7 @@ All actions support these fields:
 
 Action identifier for logging and error messages.
 
-**Type:** `string`
+**Type:** `string`  
 
 
 ```toml
@@ -585,7 +585,7 @@ name = "copy-gitignore"
 
 Action type determines which operation to perform.
 
-**Type:** `string`
+**Type:** `string`  
 
 **Values:** `callable`, `claude`, `docker`, `file`, `git`, `github`, `imbi`, `shell`, `template`, `utility`
 
@@ -601,7 +601,7 @@ See [Actions Reference](actions/index.md) for complete documentation of each act
 
 Execution stage for this action.
 
-**Type:** `string`
+**Type:** `string`  
 
 **Values:** `"primary"` (default), `"followup"`
 
@@ -631,9 +631,9 @@ See [Action Stages](actions/stages.md) for detailed stage documentation.
 
 Use AI to generate commit message for this action's changes.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `false`
+**Default:** `false`  
 
 **Requires:** Anthropic API key configured
 
@@ -649,9 +649,9 @@ ai_commit = true  # AI-generated commit message
 
 Specify a custom commit message for this action's changes. Only valid when `ai_commit` is `false` (or unset) and `committable` is `true`.
 
-**Type:** `string`
+**Type:** `string`  
 
-**Default:** `null` (uses auto-generated message)
+**Default:** `null` (uses auto-generated message)  
 
 **Validation:**
 
@@ -689,9 +689,9 @@ commit_message = "Update Python dependencies to latest versions"
 
 Whether this action's changes should be included in git commits.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `true`
+**Default:** `true`  
 
 
 ```toml
@@ -712,7 +712,7 @@ committable = false  # Don't commit this file
 
 Action name to jump to if this action succeeds.
 
-**Type:** `string` (action name)
+**Type:** `string` (action name)  
 
 
 ```toml
@@ -735,7 +735,7 @@ name = "skip-slow-method"
 
 Action name to restart from if this action fails after all retry cycles.
 
-**Type:** `string` (action name)
+**Type:** `string` (action name)  
 
 **Max Retries:** 3 per action
 
@@ -766,9 +766,9 @@ destination = "repository:///src/"
 
 Maximum execution time for action in seconds.
 
-**Type:** `integer`
+**Type:** `integer`  
 
-**Default:** `3600` (1 hour)
+**Default:** `3600` (1 hour)  
 
 
 ```toml
@@ -800,7 +800,7 @@ project_types = ["api"]
 
 How to evaluate multiple action conditions.
 
-**Type:** `string`
+**Type:** `string`  
 
 **Values:** `"all"` (default), `"any"`
 
@@ -845,9 +845,9 @@ See [Workflow Conditions](workflow-conditions.md) for detailed condition documen
 
 Custom data dictionary for action-specific use.
 
-**Type:** `dict[string, any]`
+**Type:** `dict[string, any]`  
 
-**Default:** `{}`
+**Default:** `{}`  
 
 
 ```toml

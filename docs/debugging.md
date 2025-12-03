@@ -40,7 +40,7 @@ imbi-automations config.toml workflows/my-workflow \
   --preserve-on-error
 ```
 
-**Default:** `false` (working directories are cleaned up)
+**Default:** `false` (working directories are cleaned up)  
 
 **When to Use:**
 
@@ -62,9 +62,9 @@ imbi-automations config.toml workflows/my-workflow \
   --error-dir /tmp/imbi-errors
 ```
 
-**Default:** `./errors`
+**Default:** `./errors`  
 
-**Directory Structure:**
+**Directory Structure:**  
 ```
 errors/
 └── workflow-name/
@@ -102,7 +102,7 @@ imbi-automations config.toml workflows/my-workflow \
   --debug
 ```
 
-**Default:** `false` (INFO level)
+**Default:** `false` (INFO level)  
 
 **What Gets Logged:**
 
@@ -134,7 +134,7 @@ imbi-automations config.toml workflows/my-workflow \
   --verbose
 ```
 
-**Default:** `false`
+**Default:** `false`  
 
 **What Gets Logged:**
 
@@ -161,7 +161,7 @@ imbi-automations config.toml workflows/my-workflow \
   --exit-on-error
 ```
 
-**Default:** `false` (continue with other projects)
+**Default:** `false` (continue with other projects)  
 
 **When to Use:**
 
@@ -186,14 +186,14 @@ imbi-automations config.toml workflows/my-workflow \
   --resume ./errors/my-workflow/project-slug-20251026-150000
 ```
 
-**Default:** Not set (normal execution)
+**Default:** Not set (normal execution)  
 
 **Requirements:**
 - Error directory must contain `.state` file
 - Original workflow must have used `--preserve-on-error`
 - Must run from same machine (absolute paths in state)
 
-**Behavior:**
+**Behavior:**  
 - Reuses exact preserved working directory (repository, workflow, extracted files)
 - Retries from the **failed action** (not the next action)
 - Skips remote/local conditions (already validated)
@@ -223,14 +223,14 @@ imbi-automations config.toml workflows/my-workflow \
   --dry-run
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Clones repositories and executes all actions normally
 - Creates commits locally
 - **Skips** pushing to remote and creating PRs
 - Preserves working directory to `./dry-runs/` (or `--dry-run-dir`)
 
-**Use Cases:**
+**Use Cases:**  
 
 - Testing workflows before production runs
 - Validating changes without affecting remote repositories
@@ -300,7 +300,7 @@ Complete clone of the Git repository at the point of failure:
 - Working tree changes (staged and unstaged)
 - Any files created by workflow actions
 
-**Use Cases:**
+**Use Cases:**  
 
 - Examine file modifications made by actions
 - Check what Claude Code changed
@@ -322,7 +322,7 @@ Copy of workflow resources:
 - Static resources
 - Any files copied from workflow directory
 
-**Use Cases:**
+**Use Cases:**  
 
 - Verify template content
 - Check prompt files
@@ -335,7 +335,7 @@ Files extracted from Docker containers by docker actions:
 - Binary artifacts
 - Library files
 
-**Use Cases:**
+**Use Cases:**  
 
 - Verify Docker extraction worked
 - Check extracted file contents
@@ -355,12 +355,12 @@ MessagePack binary file containing resume state:
 - Configuration hash for compatibility checking
 - Error details (message, timestamp)
 
-**Use Cases:**
+**Use Cases:**  
 - Resume workflow from failure point using `--resume`
 - Inspect state with msgpack-tools: `msgpack-python -d < .state`
 - Verify configuration compatibility before retry
 
-**Note:** `.state` file only created when using `--preserve-on-error`
+**Note:** `.state` file only created when using `--preserve-on-error`  
 
 ### Other Files
 
@@ -624,7 +624,7 @@ preserve_on_error = true
 error_dir = "/var/log/imbi-errors"
 ```
 
-**Note:** CLI flags override config file settings.
+**Note:** CLI flags override config file settings.  
 
 ## Log Levels
 

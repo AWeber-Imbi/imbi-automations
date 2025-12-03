@@ -28,7 +28,7 @@ Path to template file or directory. Can be:
 
 **Type:** [`ResourceUrl`](index.md#resourceurl-path-system) (string path)
 
-**Conventions:**
+**Conventions:**  
 
 - Template files should use `.j2` extension
 - Directory paths should NOT include wildcards
@@ -41,7 +41,7 @@ Output location for rendered templates.
 
 **Type:** [`ResourceUrl`](index.md#resourceurl-path-system) (string path)
 
-**Behavior:**
+**Behavior:**  
 
 - For single file: Output file path
 - For directory: Output directory (structure mirrored)
@@ -52,7 +52,7 @@ Output location for rendered templates.
 
 ⚠️ **KNOWN ISSUE**: The current implementation does NOT pass context variables to templates. Template variables like `{{ imbi_project.name }}` will raise `UndefinedError` until this bug is fixed.
 
-**Expected variables (not currently available):**
+**Expected variables (not currently available):**  
 
 | Variable | Type | Description |
 |----------|------|-------------|
@@ -62,7 +62,7 @@ Output location for rendered templates.
 | `working_directory` | `Path` | Workflow execution directory |
 | `starting_commit` | `str` | Initial Git commit SHA |
 
-**Technical Details:**
+**Technical Details:**  
 
 The template action calls `prompts.render(self.context, source_path)` but does not pass `**self.context.model_dump()` as kwargs, unlike shell and claude actions which do pass context variables. This means all template examples below will fail in the current implementation.
 

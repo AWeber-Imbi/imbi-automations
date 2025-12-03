@@ -20,9 +20,9 @@ kwargs = {}    # Optional
 
 The utility operation to perform.
 
-**Type:** `string`
+**Type:** `string`  
 
-**Options:**
+**Options:**  
 
 - `compare_semver` - Compare semantic version strings ✅ **Implemented**
 - `docker_tag` - Parse Docker image tags (not implemented)
@@ -35,32 +35,32 @@ File path for operations that require file input.
 
 **Type:** [`ResourceUrl`](index.md#resourceurl-path-system) (string path)
 
-**Default:** None
+**Default:** None  
 
 
 ### args (optional)
 
 Positional arguments for the utility operation.
 
-**Type:** `list`
+**Type:** `list`  
 
-**Default:** `[]`
+**Default:** `[]`  
 
 
 ### kwargs (optional)
 
 Keyword arguments for the utility operation.
 
-**Type:** `dict`
+**Type:** `dict`  
 
-**Default:** `{}`
+**Default:** `{}`  
 
 
 ## Commands
 
 ### compare_semver
 
-**Status:** ✅ Implemented
+**Status:** ✅ Implemented  
 
 Compare two semantic version strings and store the result in workflow variables for access by subsequent actions.
 
@@ -260,7 +260,7 @@ Result:
 
 ### docker_tag
 
-**Status:** ❌ Not implemented (raises NotImplementedError)
+**Status:** ❌ Not implemented (raises NotImplementedError)  
 
 Parse and manipulate Docker image tags.
 
@@ -275,7 +275,7 @@ args = ["python:3.12-slim"]
 
 ### dockerfile_from
 
-**Status:** ❌ Not implemented (raises NotImplementedError)
+**Status:** ❌ Not implemented (raises NotImplementedError)  
 
 Extract the base image FROM directive from a Dockerfile.
 
@@ -290,7 +290,7 @@ path = "repository:///Dockerfile"
 
 ### parse_python_constraints
 
-**Status:** ❌ Not implemented (raises NotImplementedError)
+**Status:** ❌ Not implemented (raises NotImplementedError)  
 
 Parse Python version constraint strings (e.g., `>=3.8,<4.0`).
 

@@ -49,7 +49,7 @@ Remote conditions are checked via API before cloning the repository. They are **
 
 Check if a file exists using GitHub/GitLab API.
 
-**Type:** `string` (file path or glob pattern)
+**Type:** `string` (file path or glob pattern)  
 
 
 ```toml
@@ -75,7 +75,7 @@ remote_file_exists = "setup.cfg"
 
 Check if a file does NOT exist using GitHub/GitLab API.
 
-**Type:** `string` (file path or glob pattern)
+**Type:** `string` (file path or glob pattern)  
 
 
 ```toml
@@ -95,7 +95,7 @@ remote_file_not_exists = "pyproject.toml"
 
 Check if a file contains specific text or matches a regex pattern.
 
-**Type:** `string` (pattern to search for)
+**Type:** `string` (pattern to search for)  
 
 **Requires:** `remote_file` field with target file path
 
@@ -140,7 +140,7 @@ remote_file = "pyproject.toml"
 
 Specify which API client to use for remote checks.
 
-**Type:** `string`
+**Type:** `string`  
 
 **Values:** `"github"` (default), `"gitlab"`
 
@@ -236,7 +236,7 @@ file_not_exists = "extracted:///compose.original.yaml"
 
 Check if a file contains specific text or matches a regex pattern.
 
-**Type:** `string` (pattern to search for)
+**Type:** `string` (pattern to search for)  
 
 **Requires:** `file` field with target file path
 
@@ -297,7 +297,7 @@ Template conditions use Jinja2 expressions for complex logic. They have access t
 
 Evaluate a Jinja2 template expression. If the result is truthy, the condition passes.
 
-**Type:** `string` (Jinja2 template)
+**Type:** `string` (Jinja2 template)  
 
 **Truthiness evaluation:**
 
@@ -394,7 +394,7 @@ when = "{{ get_component_version('repository:///pyproject.toml', 'python').start
 when = "{{ workflow.configuration.name == 'upgrade-react' }}"
 ```
 
-**Note:** Template conditions are skipped during remote checks (pre-clone) since they require filesystem access. Use remote conditions for pre-clone filtering.
+**Note:** Template conditions are skipped during remote checks (pre-clone) since they require filesystem access. Use remote conditions for pre-clone filtering.  
 
 ## Condition Evaluation
 
@@ -402,11 +402,11 @@ when = "{{ workflow.configuration.name == 'upgrade-react' }}"
 
 Controls how multiple conditions are evaluated.
 
-**Type:** `string`
+**Type:** `string`  
 
 **Values:** `"all"` (AND logic), `"any"` (OR logic)
 
-**Default:** `"all"`
+**Default:** `"all"`  
 
 
 #### AND Logic (condition_type = "all")

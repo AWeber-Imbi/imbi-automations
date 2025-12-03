@@ -56,7 +56,7 @@ task_prompt = "prompts/monitor-ci.md.j2"
 committable = true  # Can commit fixes
 ```
 
-**Followup Behavior:**
+**Followup Behavior:**  
 
 1. All followup actions execute in sequence
 2. If any action commits, changes push to PR branch

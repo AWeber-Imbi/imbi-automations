@@ -22,37 +22,37 @@ ai_commit = true                                # Optional, default: true
 
 Path to Jinja2 template file containing the planning prompt for the planning agent.
 
-**Type:** `string` (path relative to workflow directory)
+**Type:** `string` (path relative to workflow directory)  
 
-**Format:** Jinja2 template (`.j2` extension) or plain markdown
+**Format:** Jinja2 template (`.j2` extension) or plain markdown  
 
-**Location:** Relative to workflow directory (e.g., `prompts/planning.md`)
+**Location:** Relative to workflow directory (e.g., `prompts/planning.md`)  
 
-**When Provided:**
+**When Provided:**  
 - Enables three-phase execution: Planning → Task → Validation
 - Planning agent analyzes codebase before task agent makes changes
 - Returns structured plan that gets injected into task prompt
 - Plan regenerated fresh at start of each cycle
 
-**Agent Tools:** Read, Glob, Grep, Bash (read-only operations)
+**Agent Tools:** Read, Glob, Grep, Bash (read-only operations)  
 
-**Response Format:** `mcp__agent_tools__submit_planning_response(plan=[...], analysis="...")`
+**Response Format:** `mcp__agent_tools__submit_planning_response(plan=[...], analysis="...")`  
 
 ### task_prompt (required)
 
 Path to Jinja2 template file containing the task prompt for Claude (formerly named `prompt`).
 
-**Type:** `string` (path relative to workflow directory)
+**Type:** `string` (path relative to workflow directory)  
 
-**Format:** Jinja2 template (`.j2` extension) or plain markdown
+**Format:** Jinja2 template (`.j2` extension) or plain markdown  
 
-**Location:** Relative to workflow directory (e.g., `prompts/update-python.md`)
+**Location:** Relative to workflow directory (e.g., `prompts/update-python.md`)  
 
-**Working Directory:** Claude SDK runs in `working_directory/repository/` subdirectory
+**Working Directory:** Claude SDK runs in `working_directory/repository/` subdirectory  
 
-**Agent Tools:** Read, Write, Edit, Bash (write operations allowed)
+**Agent Tools:** Read, Write, Edit, Bash (write operations allowed)  
 
-**Response Format:** `mcp__agent_tools__submit_task_response(message="...")`
+**Response Format:** `mcp__agent_tools__submit_task_response(message="...")`  
 
 
 
@@ -60,15 +60,15 @@ Path to Jinja2 template file containing the task prompt for Claude (formerly nam
 
 Path to validation prompt template. If provided, Claude will run a validation cycle after the task cycle.
 
-**Type:** `string` (path relative to workflow directory)
+**Type:** `string` (path relative to workflow directory)  
 
-**Format:** Jinja2 template (`.j2` extension) or plain markdown
+**Format:** Jinja2 template (`.j2` extension) or plain markdown  
 
-**Agent Tools:** Read, Bash (read-only verification)
+**Agent Tools:** Read, Bash (read-only verification)  
 
-**Response Format:** `mcp__agent_tools__submit_validation_response(validated=bool, errors=[])`
+**Response Format:** `mcp__agent_tools__submit_validation_response(validated=bool, errors=[])`  
 
-**When Provided:**
+**When Provided:**  
 - Validation agent checks task agent's work after each cycle
 - Returns success (`validated=True`) or failure (`validated=False`) with error list
 - Validation failures trigger retry with errors injected into next cycle's prompt
@@ -78,11 +78,11 @@ Path to validation prompt template. If provided, Claude will run a validation cy
 
 Maximum number of retry cycles if transformation fails validation.
 
-**Type:** `integer`
+**Type:** `integer`  
 
-**Default:** `3`
+**Default:** `3`  
 
-**Behavior:**
+**Behavior:**  
 - Each cycle runs: Planning (if enabled) → Task → Validation (if enabled)
 - Logs warning at 60% of max cycles (e.g., "Cycle 3 of 5, approaching max_cycles limit")
 - If all cycles exhausted, triggers `on_failure` action (if configured)
@@ -93,16 +93,16 @@ Maximum number of retry cycles if transformation fails validation.
 
 Action name to restart from if this action fails after all retry cycles.
 
-**Type:** `string` (action name)
+**Type:** `string` (action name)  
 
 
 ### ai_commit (optional)
 
 Whether to use AI-generated commit messages for changes made by this action.
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `true`
+**Default:** `true`  
 
 
 ## Planning Agent Feature
@@ -111,20 +111,20 @@ The planning agent is an optional pre-execution analysis phase that explores the
 
 ### When to Use Planning
 
-**Use planning when:**
+**Use planning when:**  
 - Transformation requires analysis of multiple files
 - Dependencies or patterns need to be identified first
 - Task complexity benefits from structured approach
 - You want AI to explore before modifying
 
-**Skip planning when:**
+**Skip planning when:**  
 - Simple, single-file modifications
 - Task is straightforward and well-defined
 - Speed is more important than thorough analysis
 
 ### Planning Workflow
 
-**Per-Cycle Execution:**
+**Per-Cycle Execution:**  
 
 1. **Planning Phase** (if `planning_prompt` configured):
    - Planning agent uses read-only tools (Read, Glob, Grep, Bash)
@@ -147,9 +147,9 @@ The planning agent is an optional pre-execution analysis phase that explores the
 
 ### Planning Error Handling
 
-**When planning fails:** Cycle aborts immediately (no task execution)
+**When planning fails:** Cycle aborts immediately (no task execution)  
 
-**When validation fails:**
+**When validation fails:**  
 - Planning agent receives `planning-with-errors.md.j2` template
 - Explicitly instructed to create NEW PLAN (not fix errors directly)
 - Re-analyzes with context of what failed previously
@@ -507,7 +507,7 @@ max_cycles = 5        # Try up to 5 times
 on_failure = "cleanup" # Run cleanup action if all cycles fail
 ```
 
-**Cycle behavior:**
+**Cycle behavior:**  
 
 1. Execute transformation
 2. Check for failure files

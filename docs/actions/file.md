@@ -18,12 +18,12 @@ command = "copy|move|rename|delete|append|write"
 
 Copy files or directories with glob pattern support.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `source`: Source file/directory path or glob pattern
 - `destination`: Destination path
 
-**Examples:**
+**Examples:**  
 
 ```toml
 # Copy single file
@@ -59,14 +59,14 @@ source = "workflow:///**/*.py"
 destination = "repository:///scripts/"
 ```
 
-**Glob Pattern Support:**
+**Glob Pattern Support:**  
 
 - `*` - Matches any characters within a filename
 - `?` - Matches single character
 - `[...]` - Matches character ranges
 - `**/` - Recursive directory matching
 
-**Behavior:**
+**Behavior:**  
 
 - Creates destination parent directories automatically
 - For glob patterns, destination must be a directory
@@ -79,12 +79,12 @@ destination = "repository:///scripts/"
 
 Move (rename across directories) files or directories.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `source`: Source file/directory path
 - `destination`: Destination path
 
-**Examples:**
+**Examples:**  
 
 ```toml
 # Move file to different directory
@@ -104,7 +104,7 @@ source = "repository:///old_tests/"
 destination = "repository:///tests/"
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Source file/directory is removed after move
 - Creates destination parent directories automatically
@@ -116,12 +116,12 @@ destination = "repository:///tests/"
 
 Rename files within the same directory or move to different location.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `source`: Source file path
 - `destination`: Destination file path
 
-**Examples:**
+**Examples:**  
 
 ```toml
 # Simple rename
@@ -141,7 +141,7 @@ source = "repository:///src/old_module.py"
 destination = "repository:///src/new_module.py"
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Similar to `move` but semantically for file renaming
 - Creates destination parent directories automatically
@@ -152,12 +152,12 @@ destination = "repository:///src/new_module.py"
 
 Delete files or directories, with regex pattern matching support.
 
-**Required Fields:** One of:
+**Required Fields:** One of:  
 
 - `path`: Specific file/directory path
 - `pattern`: Regex pattern for matching files
 
-**Examples:**
+**Examples:**  
 
 ```toml
 # Delete specific file
@@ -189,7 +189,7 @@ command = "delete"
 pattern = ".*\\.(tmp|bak|swp)$"
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - For `path`: Deletes specific file or directory (recursive)
 - For `pattern`: Searches recursively and deletes all matching files
@@ -202,16 +202,16 @@ pattern = ".*\\.(tmp|bak|swp)$"
 
 Append content to existing files or create new files.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `path`: Target file path
 - `content`: Content to append (string or bytes)
 
-**Optional Fields:**
+**Optional Fields:**  
 
 - `encoding`: Character encoding (default: `utf-8`)
 
-**Examples:**
+**Examples:**  
 
 ```toml
 # Append text to existing file
@@ -249,7 +249,7 @@ content = "Hello 世界\n"
 encoding = "utf-16"
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Creates file if it doesn't exist
 - Creates parent directories automatically
@@ -262,16 +262,16 @@ encoding = "utf-16"
 
 Write content to files, overwriting if they exist.
 
-**Required Fields:**
+**Required Fields:**  
 
 - `path`: Target file path
 - `content`: Content to write (string or bytes)
 
-**Optional Fields:**
+**Optional Fields:**  
 
 - `encoding`: Character encoding (default: `utf-8`)
 
-**Examples:**
+**Examples:**  
 
 ```toml
 # Write text file
@@ -316,7 +316,7 @@ content = "Unicode content: 你好"
 encoding = "utf-16"
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Overwrites existing files
 - Creates file if it doesn't exist
@@ -341,7 +341,7 @@ File actions support all ResourceUrl schemes:
 | `extracted:///` | Docker extracts | Extracted files |
 | `external:///` | Absolute path | Files outside working directory |
 
-**Examples:**
+**Examples:**  
 
 ```toml
 # Repository to repository
@@ -381,7 +381,7 @@ path = "temp-file.txt"  # Same as file:///temp-file.txt
 content = "temporary data"
 ```
 
-**Note:** The `external:///` scheme allows writing files to absolute paths outside the temporary working directory. This is useful for:
+**Note:** The `external:///` scheme allows writing files to absolute paths outside the temporary working directory. This is useful for:  
 - Extracting configuration files for analysis
 - Exporting reports or artifacts
 - Creating backups in known locations

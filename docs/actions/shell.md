@@ -19,10 +19,10 @@ ignore_errors = false       # Optional, default: false
 
 The shell command to execute. Supports full Jinja2 template syntax for variable substitution.
 
-**Type:** `string`
+**Type:** `string`  
 
 
-**Template Variables Available:**
+**Template Variables Available:**  
 
 - `workflow`: Workflow configuration object
 - `imbi_project`: Complete Imbi project data
@@ -36,16 +36,16 @@ Directory to execute the command in.
 
 **Type:** [`ResourceUrl`](index.md#resourceurl-path-system) (string path)
 
-**Default:** `repository:///` (the cloned repository directory)
+**Default:** `repository:///` (the cloned repository directory)  
 
 
 ### ignore_errors (optional)
 
 Whether to continue workflow execution if the command fails (non-zero exit code).
 
-**Type:** `boolean`
+**Type:** `boolean`  
 
-**Default:** `false`
+**Default:** `false`  
 
 
 ## Examples
@@ -81,7 +81,7 @@ working_directory = "repository:///"
 
 ### Multi-Step Script Execution
 
-**Note:** Shell actions execute commands directly without a shell, so shell operators like `&&`, `||`, `;`, and `|` do not work. For multi-step operations, use a shell wrapper:
+**Note:** Shell actions execute commands directly without a shell, so shell operators like `&&`, `||`, `;`, and `|` do not work. For multi-step operations, use a shell wrapper:  
 
 ```toml
 [[actions]]

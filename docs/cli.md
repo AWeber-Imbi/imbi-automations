@@ -46,9 +46,9 @@ imbi-automations [-h] [-V] [--debug] [-v]
 Path to configuration file containing API credentials and settings.
 
 **Type:** File path
-**Format:** TOML file
+**Format:** TOML file  
 
-**Required:** Yes
+**Required:** Yes  
 
 **Example:**
 ```bash
@@ -63,7 +63,7 @@ imbi-automations /etc/imbi/prod.toml workflows/deploy --all-projects
 Path to workflow directory containing `config.toml`.
 
 **Type:** Directory path
-**Required:** Yes
+**Required:** Yes  
 **Must Contain:** `config.toml` file
 
 **Example:**
@@ -159,7 +159,7 @@ Processing 664 projects...
 Process a single GitHub repository by URL.
 
 **Type:** URL string
-**Format:** `https://github.com/org/repo` or `org/repo`
+**Format:** `https://github.com/org/repo` or `org/repo`  
 
 **Use Case:** Target specific GitHub repository
 
@@ -211,7 +211,7 @@ imbi-automations config.toml workflows/security-update \
   --all-github-repositories
 ```
 
-**Note:** Discovers repositories from all organizations the API key has access to.
+**Note:** Discovers repositories from all organizations the API key has access to.  
 
 ## Execution Control Options
 
@@ -235,7 +235,7 @@ imbi-automations config.toml workflows/update-all \
   --start-from-project my-project-slug
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - Skips all projects up to and including the specified project
 - Starts processing from the next project
@@ -259,7 +259,7 @@ imbi-automations config.toml workflows/big-update \
 Set maximum number of concurrent workflow executions.
 
 **Type:** Integer
-**Default:** `1` (sequential)
+**Default:** `1` (sequential)  
 **Range:** 1-100 (practical limit depends on system resources)
 
 **Example:**
@@ -301,7 +301,7 @@ imbi-automations config.toml workflows/update-deps \
 Stop immediately when any project fails.
 
 **Type:** Flag (boolean)
-**Default:** `false` (continue with other projects)
+**Default:** `false` (continue with other projects)  
 
 **Example:**
 ```bash
@@ -310,12 +310,12 @@ imbi-automations config.toml workflows/critical-update \
   --exit-on-error
 ```
 
-**Behavior:**
+**Behavior:**  
 
 - **Without flag:** Logs error, continues to next project
 - **With flag:** Exits immediately with error code
 
-**Use Cases:**
+**Use Cases:**  
 
 - CI/CD pipelines requiring atomic success
 - Testing workflows before batch runs
@@ -342,7 +342,7 @@ imbi-automations config.toml workflows/update --all-projects --exit-on-error
 Save working directory state when workflows fail.
 
 **Type:** Flag (boolean)
-**Default:** `false`
+**Default:** `false`  
 
 **Example:**
 ```bash
@@ -368,7 +368,7 @@ imbi-automations config.toml workflows/failing-workflow \
 Specify directory for saving error states.
 
 **Type:** Directory path
-**Default:** `./errors`
+**Default:** `./errors`  
 
 **Example:**
 ```bash
@@ -378,7 +378,7 @@ imbi-automations config.toml workflows/test \
   --error-dir /tmp/workflow-errors
 ```
 
-**Directory Structure:**
+**Directory Structure:**  
 ```
 /tmp/workflow-errors/
 └── workflow-name/
@@ -393,7 +393,7 @@ imbi-automations config.toml workflows/test \
 Execute workflows without pushing changes or creating pull requests.
 
 **Type:** Flag (boolean)
-**Default:** `false`
+**Default:** `false`  
 
 **Example:**
 ```bash
@@ -402,7 +402,7 @@ imbi-automations config.toml workflows/update-deps \
   --dry-run
 ```
 
-**Behavior:**
+**Behavior:**  
 
 When enabled, the workflow executes normally including:
 - Cloning repositories
@@ -416,7 +416,7 @@ When enabled, the workflow executes normally including:
 
 **Working directory is preserved to:** `./dry-runs/workflow-name/project-slug-timestamp/`
 
-**Use Cases:**
+**Use Cases:**  
 
 - Testing workflows before production runs
 - Validating changes without affecting remote repositories
@@ -452,7 +452,7 @@ git diff HEAD~1
 Specify directory for saving dry-run repository states.
 
 **Type:** Directory path
-**Default:** `./dry-runs`
+**Default:** `./dry-runs`  
 
 **Example:**
 ```bash
@@ -462,7 +462,7 @@ imbi-automations config.toml workflows/update \
   --dry-run-dir /tmp/review-changes
 ```
 
-**Directory Structure:**
+**Directory Structure:**  
 ```
 /tmp/review-changes/
 └── workflow-name/
@@ -472,7 +472,7 @@ imbi-automations config.toml workflows/update \
         └── extracted/         # Docker extracted files (if any)
 ```
 
-**Use Cases:**
+**Use Cases:**  
 
 - Organize dry runs by date or workflow
 - Review changes across multiple projects
@@ -502,7 +502,7 @@ done
 Specify directory for Imbi metadata cache storage.
 
 **Type:** Directory path
-**Default:** `~/.cache/imbi-automations`
+**Default:** `~/.cache/imbi-automations`  
 
 **Example:**
 ```bash
@@ -511,7 +511,7 @@ imbi-automations config.toml workflows/update \
   --cache-dir /tmp/imbi-cache
 ```
 
-**Use Cases:**
+**Use Cases:**  
 
 - Custom cache location for multi-user systems
 - Temporary cache for testing
@@ -529,7 +529,7 @@ The cache directory will contain `metadata.json` with Imbi metadata including en
 Enable DEBUG level logging for all components.
 
 **Type:** Flag (boolean)
-**Default:** `false` (INFO level)
+**Default:** `false` (INFO level)  
 
 **Example:**
 ```bash
@@ -561,7 +561,7 @@ imbi-automations config.toml workflows/test \
 Show action start/end INFO messages.
 
 **Type:** Flag (boolean)
-**Default:** `false`
+**Default:** `false`  
 
 **Example:**
 ```bash

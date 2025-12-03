@@ -18,13 +18,13 @@ command = "extract"  # or "clone"
 
 Extract a specific file from Git commit history. Useful for retrieving old versions of files from before certain changes were made.
 
-**Required Fields:**
+**Required Fields:**  
 
 
 - `source` ([pathlib.Path][]): Path to the file in the repository
 - `destination` ([`ResourceUrl`](index.md#resourceurl-path-system)): Where to write the extracted file
 
-**Optional Fields:**
+**Optional Fields:**  
 
 
 - `commit_keyword` (string): Keyword to search for in commit messages. If not provided, extracts from current HEAD (default: None)
@@ -43,7 +43,7 @@ commit_keyword = "update config"
 search_strategy = "before_last_match"
 ```
 
-**Search Strategies:**
+**Search Strategies:**  
 
 - `before_first_match`: Extract file from commit before the first match of keyword
 - `before_last_match` (default): Extract file from commit before the last match of keyword
@@ -52,13 +52,13 @@ search_strategy = "before_last_match"
 
 Clone a Git repository to a specific location.
 
-**Required Fields:**
+**Required Fields:**  
 
 
 - `url` (string): Git repository URL to clone
 - `destination` ([`ResourceUrl`](index.md#resourceurl-path-system)): Where to clone the repository
 
-**Optional Fields:**
+**Optional Fields:**  
 
 
 - `branch` (string): Specific branch to clone
