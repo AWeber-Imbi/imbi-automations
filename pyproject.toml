@@ -42,6 +42,7 @@ dependencies = [
   "jinja2",
   "msgpack>=1.0.0",
   "pydantic",
+  "pydantic-settings",
   "rich",
   "semver",
   "truststore",
