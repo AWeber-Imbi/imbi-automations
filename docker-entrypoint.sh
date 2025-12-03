@@ -60,15 +60,63 @@ if [ -d "$INIT_DIR" ] && [ "$(ls -A $INIT_DIR 2>/dev/null)" ]; then
     echo "Initialization complete."
 fi
 
-# --- Git SSH Commit Signing ---
-# Auto-detect SSH key and configure git signing if found
-SSH_KEY_PATH=""
+# --- SSH Configuration ---
+# Auto-detect SSH key and configure for git operations
+# Copy keys to writable location since mounted .ssh may be read-only
+MOUNTED_SSH_KEY=""
 for key in ~/.ssh/id_ed25519 ~/.ssh/id_rsa ~/.ssh/id_ecdsa; do
     if [ -f "$key" ]; then
-        SSH_KEY_PATH="$key"
+        MOUNTED_SSH_KEY="$key"
         break
     fi
 done
+
+SSH_KEY_PATH=""
+if [ -n "$MOUNTED_SSH_KEY" ]; then
+    # Create writable .ssh directory and copy keys with correct permissions
+    SSH_DIR=~/.ssh-runtime
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+
+    KEY_NAME=$(basename "$MOUNTED_SSH_KEY")
+    cp "$MOUNTED_SSH_KEY" "$SSH_DIR/$KEY_NAME"
+    chmod 600 "$SSH_DIR/$KEY_NAME"
+    SSH_KEY_PATH="$SSH_DIR/$KEY_NAME"
+
+    if [ -f "${MOUNTED_SSH_KEY}.pub" ]; then
+        cp "${MOUNTED_SSH_KEY}.pub" "$SSH_DIR/${KEY_NAME}.pub"
+        chmod 644 "$SSH_DIR/${KEY_NAME}.pub"
+    fi
+
+    # Copy config if present
+    if [ -f ~/.ssh/config ]; then
+        cp ~/.ssh/config "$SSH_DIR/config"
+        chmod 600 "$SSH_DIR/config"
+    fi
+
+    # Create SSH config to use our runtime directory
+    cat > "$SSH_DIR/config" <<EOF
+Host *
+    IdentityFile $SSH_KEY_PATH
+    UserKnownHostsFile $SSH_DIR/known_hosts
+    StrictHostKeyChecking accept-new
+EOF
+
+    # Add GitHub hosts to known_hosts
+    for host in github.com; do
+        ssh-keyscan -t ed25519,rsa "$host" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
+    done
+
+    # Scan GHE host if GITHUB_HOSTNAME is set (strip api. prefix if present)
+    if [ -n "$GITHUB_HOSTNAME" ]; then
+        GHE_HOST=$(echo "$GITHUB_HOSTNAME" | sed 's/^api\.//')
+        ssh-keyscan -t ed25519,rsa "$GHE_HOST" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
+    fi
+
+    # Point SSH to our runtime config
+    export GIT_SSH_COMMAND="ssh -F $SSH_DIR/config"
+    echo "Configured SSH with key: $SSH_KEY_PATH"
+fi
 
 if [ -n "$SSH_KEY_PATH" ] && [ -f "${SSH_KEY_PATH}.pub" ]; then
     echo "Configuring git commit signing with SSH key: $SSH_KEY_PATH"
@@ -78,11 +126,9 @@ if [ -n "$SSH_KEY_PATH" ] && [ -f "${SSH_KEY_PATH}.pub" ]; then
     git config --global tag.gpgsign true
 
     # Create allowed_signers file for verification
-    SIGNERS_FILE=~/.ssh/allowed_signers
-    if [ ! -f "$SIGNERS_FILE" ]; then
-        echo "${GIT_USER_EMAIL} $(cat "${SSH_KEY_PATH}.pub")" > "$SIGNERS_FILE"
-        git config --global gpg.ssh.allowedSignersFile "$SIGNERS_FILE"
-    fi
+    SIGNERS_FILE="$SSH_DIR/allowed_signers"
+    echo "${GIT_USER_EMAIL} $(cat "${SSH_KEY_PATH}.pub")" > "$SIGNERS_FILE"
+    git config --global gpg.ssh.allowedSignersFile "$SIGNERS_FILE"
 fi
 
 # --- GitHub CLI Authentication ---
