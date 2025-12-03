@@ -430,10 +430,10 @@ Include specific error details and affected files in the failure response.
 ## Success Criteria
 
 You must:
-- ✓ Update all Dockerfiles
-- ✓ Maintain working configuration
-- ✓ Create a git commit
-- ✓ Include descriptive commit message
+✓ Update all Dockerfiles  
+✓ Maintain working configuration  
+✓ Create a git commit  
+✓ Include descriptive commit message  
 
 ## Failure Indication
 

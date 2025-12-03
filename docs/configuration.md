@@ -113,12 +113,12 @@ dry_run = true
 
 **Behavior:**
 
-- ✓ Clones repositories
-- ✓ Runs all actions
-- ✓ Makes file changes
-- ✓ Creates commits locally
-- ✗ Skips pushing to remote
-- ✗ Skips creating pull requests
+✓ Clones repositories  
+✓ Runs all actions  
+✓ Makes file changes  
+✓ Creates commits locally  
+✗ Skips pushing to remote  
+✗ Skips creating pull requests  
 
 **Use Cases:**
 
