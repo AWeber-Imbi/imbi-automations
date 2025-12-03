@@ -12,14 +12,13 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKERHUB_IMAGE: aweber/imbi-automations
+  DOCKERHUB_IMAGE: index.docker.io/aweber/imbi-automations
   GHCR_IMAGE: ghcr.io/${{ github.repository_owner }}/imbi-automations
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      attestations: write
       contents: read
       id-token: write
       packages: write
