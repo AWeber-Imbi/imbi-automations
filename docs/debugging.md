@@ -189,11 +189,13 @@ imbi-automations config.toml workflows/my-workflow \
 **Default:** Not set (normal execution)  
 
 **Requirements:**
+
 - Error directory must contain `.state` file
 - Original workflow must have used `--preserve-on-error`
 - Must run from same machine (absolute paths in state)
 
 **Behavior:**  
+
 - Reuses exact preserved working directory (repository, workflow, extracted files)
 - Retries from the **failed action** (not the next action)
 - Skips remote/local conditions (already validated)
@@ -202,12 +204,14 @@ imbi-automations config.toml workflows/my-workflow \
 - Cleans up preserved state after successful completion
 
 **When to Use:**
+
 - Workflow failed due to transient issues (network, API limits)
 - Need to investigate failure before retrying
 - Manual fixes required before retry (e.g., fix pre-commit hooks)
 - Multi-retry debugging of same failure
 
 **Limitations:**
+
 - Single-project only (no `--all-projects` with `--resume`)
 - Requires same machine (absolute paths)
 - Configuration changes between runs may cause issues (warning shown)
@@ -356,6 +360,7 @@ MessagePack binary file containing resume state:
 - Error details (message, timestamp)
 
 **Use Cases:**  
+
 - Resume workflow from failure point using `--resume`
 - Inspect state with msgpack-tools: `msgpack-python -d < .state`
 - Verify configuration compatibility before retry
@@ -604,12 +609,14 @@ Any temporary files created during workflow execution:
 6. On success, preserved directory automatically cleaned up
 
 **Benefits:**
+
 - Skips successful actions (no re-execution)
 - Reuses exact repository state at failure
 - No need to re-clone or re-run conditions
 - Can retry multiple times from same state
 
 **Common Resume Scenarios:**
+
 - **Transient Network Failure:** API call failed, network restored, retry
 - **Pre-commit Hook Failure:** Fixed ruff/linting issues, retry commit
 - **API Rate Limit:** Waited for rate limit reset, retry
@@ -655,6 +662,7 @@ Imbi Automations uses Python's standard logging levels:
 ### --preserve-on-error
 
 **Impact:** Minimal during execution, significant on failure
+
 - No overhead during successful workflows
 - On failure: Copies entire working directory (can be large)
 - Storage: Requires disk space for preserved directories
@@ -664,6 +672,7 @@ Imbi Automations uses Python's standard logging levels:
 ### --debug
 
 **Impact:** Moderate logging overhead
+
 - Increases log volume significantly
 - Slightly slower due to additional logging calls
 - Memory impact from buffering logs
@@ -673,6 +682,7 @@ Imbi Automations uses Python's standard logging levels:
 ### --verbose
 
 **Impact:** Minimal
+
 - Only logs action start/end messages
 - Negligible performance impact
 

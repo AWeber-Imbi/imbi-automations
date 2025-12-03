@@ -382,6 +382,7 @@ content = "temporary data"
 ```
 
 **Note:** The `external:///` scheme allows writing files to absolute paths outside the temporary working directory. This is useful for:  
+
 - Extracting configuration files for analysis
 - Exporting reports or artifacts
 - Creating backups in known locations

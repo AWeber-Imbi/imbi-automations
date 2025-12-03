@@ -42,6 +42,7 @@ callable = "my_package.utils:process_data"
 ```
 
 **Import Resolution:**  
+
 - The string before `:` is the module path to import
 - The string after `:` is the attribute name to retrieve from the module
 - Supports nested attributes (e.g., `Class.method`)
@@ -56,6 +57,7 @@ Positional arguments to pass to the callable. Arguments are passed in order.
 **Default:** `[]`  
 
 **Supports:**
+
 - Primitive types (int, float, bool, string)
 - Lists and dictionaries
 - Jinja2 template strings (automatically rendered)
@@ -82,6 +84,7 @@ Keyword arguments to pass to the callable.
 **Default:** `{}`  
 
 **Supports:**
+
 - Same types as `args`
 - Jinja2 template rendering in string values
 - Nested structures
@@ -118,6 +121,7 @@ String arguments support Jinja2 templating with full workflow context:
 | `starting_commit` | Initial commit SHA | `{{ starting_commit }}` |
 
 **Template Detection:**  
+
 - Only `string` values are checked for templates
 - Templates must contain `{{`, `{%`, or `{#` syntax
 - Non-string types (int, bool, list, dict) pass through unchanged
@@ -160,12 +164,14 @@ args = [42, "hello"]
 ```
 
 **Detection and Execution:**  
+
 - **Detection Method:** Uses `asyncio.iscoroutinefunction()` to detect async callables
 - **Async Execution:** Coroutines are directly awaited: `await callable(*args, **kwargs)`
 - **Sync Execution:** Regular functions run in thread pool via `asyncio.to_thread()` to prevent blocking the event loop
 - **Thread Pool Benefit:** Sync callables can perform blocking I/O without freezing async workflows
 
 **Recent Fix (commit dc48d25):**
+
 - Sync callables now properly use `asyncio.to_thread()` instead of direct execution
 - Prevents blocking the event loop when sync callables perform blocking operations
 - Maintains async safety across all callable types
@@ -516,6 +522,7 @@ args = ["arg1", "arg2"]
 ```
 
 **Benefits:**
+
 - Type safety and validation
 - Better error messages
 - No shell escaping issues

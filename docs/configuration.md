@@ -111,7 +111,8 @@ When enabled, workflows execute completely (clone, actions, commits) but skip re
 dry_run = true
 ```
 
-**Behavior:**  
+**Behavior:**
+
 - ✓ Clones repositories
 - ✓ Runs all actions
 - ✓ Makes file changes
@@ -119,7 +120,8 @@ dry_run = true
 - ✗ Skips pushing to remote
 - ✗ Skips creating pull requests
 
-**Use Cases:**  
+**Use Cases:**
+
 - Testing new workflows safely
 - Validating changes before production runs
 - Reviewing commit messages and diffs

@@ -291,6 +291,7 @@ imbi-automations config.toml workflows/update-deps \
 ```
 
 **Warning:** Higher concurrency increases:
+
 - Memory usage (each workflow uses ~100-500MB)
 - API rate limit pressure
 - Disk I/O (simultaneous git clones)
@@ -411,6 +412,7 @@ When enabled, the workflow executes normally including:
 - Creating commits locally
 
 **But skips:**
+
 - Pushing commits to remote
 - Creating pull requests
 

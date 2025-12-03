@@ -205,6 +205,7 @@ attributes = {
 ```
 
 **Use cases:**
+
 - Load AI-generated content from files
 - Read README excerpts for descriptions
 - Extract version strings from files

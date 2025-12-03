@@ -29,6 +29,7 @@ Path to Jinja2 template file containing the planning prompt for the planning age
 **Location:** Relative to workflow directory (e.g., `prompts/planning.md`)  
 
 **When Provided:**  
+
 - Enables three-phase execution: Planning → Task → Validation
 - Planning agent analyzes codebase before task agent makes changes
 - Returns structured plan that gets injected into task prompt
@@ -69,6 +70,7 @@ Path to validation prompt template. If provided, Claude will run a validation cy
 **Response Format:** `mcp__agent_tools__submit_validation_response(validated=bool, errors=[])`  
 
 **When Provided:**  
+
 - Validation agent checks task agent's work after each cycle
 - Returns success (`validated=True`) or failure (`validated=False`) with error list
 - Validation failures trigger retry with errors injected into next cycle's prompt
@@ -83,6 +85,7 @@ Maximum number of retry cycles if transformation fails validation.
 **Default:** `3`  
 
 **Behavior:**  
+
 - Each cycle runs: Planning (if enabled) → Task → Validation (if enabled)
 - Logs warning at 60% of max cycles (e.g., "Cycle 3 of 5, approaching max_cycles limit")
 - If all cycles exhausted, triggers `on_failure` action (if configured)
@@ -112,12 +115,14 @@ The planning agent is an optional pre-execution analysis phase that explores the
 ### When to Use Planning
 
 **Use planning when:**  
+
 - Transformation requires analysis of multiple files
 - Dependencies or patterns need to be identified first
 - Task complexity benefits from structured approach
 - You want AI to explore before modifying
 
 **Skip planning when:**  
+
 - Simple, single-file modifications
 - Task is straightforward and well-defined
 - Speed is more important than thorough analysis
@@ -150,11 +155,13 @@ The planning agent is an optional pre-execution analysis phase that explores the
 **When planning fails:** Cycle aborts immediately (no task execution)  
 
 **When validation fails:**  
+
 - Planning agent receives `planning-with-errors.md.j2` template
 - Explicitly instructed to create NEW PLAN (not fix errors directly)
 - Re-analyzes with context of what failed previously
 
 **Critical Fix (commit 561909f):**
+
 - Planning agent was incorrectly trying to fix errors itself
 - Now properly re-plans based on validation failures
 - Creates new strategy each cycle
