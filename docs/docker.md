@@ -14,7 +14,9 @@ docker run --rm \
     -v $(pwd)/config.toml:/opt/config/config.toml:ro \
     -v $(pwd)/workflows:/opt/workflows:ro \
     -v ~/.ssh:/home/imbi-automations/.ssh:ro \
-    -e GH_TOKEN="ghp_your_token" \
+    -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" \
+    -e IMBI_API_KEY="$IMBI_API_KEY" \
+    -e GH_TOKEN="$GH_TOKEN" \
     aweber/imbi-automations:latest \
     /opt/config/config.toml \
     /opt/workflows/my-workflow \
@@ -33,11 +35,26 @@ docker run --rm \
 
 ## Environment Variables
 
+### Required Variables
+
+The following environment variables **must** be set when running the container. The entrypoint will exit with an error if any are missing:
+
+| Variable | Description |
+|----------|-------------|
+| `ANTHROPIC_API_KEY` | Anthropic API key for Claude |
+| `IMBI_API_KEY` | Imbi API key |
+| `GH_TOKEN` | GitHub personal access token |
+
+!!! note
+    These variables are required even if the same values are specified in the configuration file. When running in Docker, the configuration file does not need to include `anthropic.api_key`, `imbi.api_key`, or `github.token` - they are automatically loaded from environment variables via pydantic-settings.
+
+### Optional Variables
+
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `GIT_USER_NAME` | `Imbi Automations` | Git commit author name |
 | `GIT_USER_EMAIL` | `imbi-automations@aweber.com` | Git commit author email |
-| `GH_TOKEN` | - | GitHub personal access token |
+| `GH_HOST` | `github.com` | GitHub hostname (for GitHub Enterprise) |
 
 ## SSH Commit Signing
 
@@ -214,9 +231,13 @@ services:
       - ./workflows:/opt/workflows:ro
       - ~/.ssh:/home/imbi-automations/.ssh:ro
     environment:
+      # Required
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - IMBI_API_KEY=${IMBI_API_KEY}
+      - GH_TOKEN=${GH_TOKEN}
+      # Optional
       - GIT_USER_NAME=Imbi Automations
       - GIT_USER_EMAIL=imbi-automations@example.com
-      - GH_TOKEN=${GH_TOKEN}
 ```
 
 Run with:
