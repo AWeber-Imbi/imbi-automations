@@ -1,4 +1,4 @@
-# Configuration
+# Configuration File
 
 Imbi Automations uses TOML-based configuration files with Pydantic validation for all settings. This document describes all available configuration options.
 
@@ -15,7 +15,6 @@ imbi-automations config.toml workflows/workflow-name --all-projects
 ```toml
 # Global Settings
 ai_commits = false
-commit_author = "Imbi Automations <noreply@example.com>"
 dry_run = false
 dry_run_dir = "./dry-runs"
 error_dir = "./errors"
@@ -27,15 +26,20 @@ api_key = "${ANTHROPIC_API_KEY}"  # Or set directly
 bedrock = false
 model = "claude-3-5-sonnet-latest"
 
-# Claude Code SDK Configuration
-[claude_code]
+# Claude Agent SDK Configuration
+[claude]
 executable = "claude"
 enabled = true
 
+# Git Configuration
+[git]
+user_name = "Imbi Automations"
+user_email = "automations@imbi.ai"
+
 # GitHub API Configuration
 [github]
-api_key = "ghp_your_github_token"
-hostname = "github.com"
+token = "ghp_your_github_token"
+host = "github.com"
 
 # Imbi Project Management Configuration
 [imbi]
@@ -60,26 +64,12 @@ When enabled, uses Anthropic API to generate commit messages based on changes.
 ai_commits = true
 ```
 
-### commit_author
-
-Git commit author information for automated commits.
-
-**Type:** `string`  
-**Default:** `"Imbi Automations <noreply@aweber.com>"`  
-**Format:** `"Name <email>"`  
-
-
-```toml
-commit_author = "Bot User <bot@example.com>"
-```
-
 ### error_dir
 
 Directory to store error logs and debugging information when workflows fail.
 
 **Type:** `path`  
-
-**Default:** `"./errors"`  
+**Default:** `./errors`  
 
 ```toml
 error_dir = "/var/log/imbi-automations/errors"
@@ -137,7 +127,7 @@ Working directories are preserved to `dry_run_dir` for inspection.
 Directory for saving repository state during dry-run executions.
 
 **Type:** `path`  
-**Default:** `"./dry-runs"`  
+**Default:** `./dry-runs`  
 
 ```toml
 dry_run_dir = "./review-changes"
@@ -205,86 +195,77 @@ bedrock = true
 Claude model to use for API requests.
 
 **Type:** `string`  
-**Default:** `"claude-3-5-haiku-latest"`  
-
-**Available Models:**  
-
-- `claude-3-5-sonnet-latest` - Most capable, higher cost
-- `claude-3-5-haiku-latest` - Fast and efficient (default)
-- `claude-3-opus-latest` - Highest capability, highest cost
+**Default:** `claude-haiku-4-5-20251001`  
 
 ```toml
 [anthropic]
-model = "claude-3-5-sonnet-latest"
+model = "claude-opus-4-5"
 ```
 
-## Claude Code Configuration
+## Claude Configuration
 
-Configuration for Claude Code SDK integration.
+Configuration for Claude Agent SDK integration.
 
-### [claude_code].executable
+### [claude].executable
 
 Path or command name for Claude Code executable.
 
-**Type:** `string`  
-**Default:** `"claude"`  
+**Type:** `string`
+**Default:** `claude`
 
 ```toml
-[claude_code]
+[claude]
 executable = "/usr/local/bin/claude"
 ```
 
-### [claude_code].enabled
+### [claude].enabled
 
 Enable Claude Code actions in workflows.
 
-**Type:** `boolean`  
-**Default:** `true`  
+**Type:** `boolean`
+**Default:** `true`
 
 Set to `false` to disable all Claude actions:
 
 ```toml
-[claude_code]
+[claude]
 enabled = false
 ```
 
-### [claude_code].base_prompt
+### [claude].base_prompt
 
 Custom base prompt file for Claude Code sessions.
 
-**Type:** `path`  
-
-**Default:** `src/imbi_automations/prompts/claude.md`  
+**Type:** `path`
+**Default:** `src/imbi_automations/prompts/claude.md`
 
 ```toml
-[claude_code]
+[claude]
 base_prompt = "/path/to/custom-prompt.md"
 ```
 
-### [claude_code].plugins
+### [claude].plugins
 
 Plugin and marketplace configuration for Claude Code. These settings are merged with workflow-level plugin settings (workflow values take precedence).
 
 **Type:** `ClaudePluginConfig` object
+**Default:** Empty (no plugins)
 
-**Default:** Empty (no plugins)  
-
-#### [claude_code.plugins].enabled_plugins
+#### [claude.plugins].enabled_plugins
 
 Enable or disable specific plugins from marketplaces.
 
 **Type:** `dict[string, boolean]`  
-
-**Format:** `"plugin-name@marketplace-name" = true/false`  
+**Format:** `plugin-name@marketplace-name" = true/false`  
 
 ```toml
-[claude_code.plugins.enabled_plugins]
+[claude.plugins.enabled_plugins]
 "git-repository@aweber-marketplace" = true
 "python-developer@aweber-marketplace" = true
 "grafana-mcp@aweber-marketplace" = false
 ```
 
-#### [claude_code.plugins.marketplaces]
+#### [claude.plugins.marketplaces]
 
 Configure additional marketplace sources for plugins.
 
@@ -300,71 +281,149 @@ Each marketplace requires a `source` type and corresponding field:
 
 ```toml
 # GitHub marketplace
-[claude_code.plugins.marketplaces.company-tools]
+[claude.plugins.marketplaces.company-tools]
 source = "github"
 repo = "company-org/claude-plugins"
 
 # Git URL marketplace (e.g., GitHub Enterprise)
-[claude_code.plugins.marketplaces.enterprise-tools]
+[claude.plugins.marketplaces.enterprise-tools]
 source = "git"
 url = "https://github.enterprise.com/org/claude-plugins.git"
 
 # Local directory (development)
-[claude_code.plugins.marketplaces.dev-plugins]
+[claude.plugins.marketplaces.dev-plugins]
 source = "directory"
 path = "/path/to/local/marketplace"
 ```
 
-#### [[claude_code.plugins.local_plugins]]
+#### [[claude.plugins.local_plugins]]
 
 Load local plugin directories directly via the Claude Agent SDK.
 
 **Type:** `list[ClaudeLocalPlugin]`  
 
 ```toml
-[[claude_code.plugins.local_plugins]]
+[[claude.plugins.local_plugins]]
 path = "/path/to/local/plugin"
 
-[[claude_code.plugins.local_plugins]]
+[[claude.plugins.local_plugins]]
 path = "/another/plugin/directory"
 ```
 
 #### Complete Plugin Configuration Example
 
 ```toml
-[claude_code]
+[claude]
 enabled = true
 model = "claude-sonnet-4"
 
-[claude_code.plugins.enabled_plugins]
+[claude.plugins.enabled_plugins]
 "git-repository@aweber-marketplace" = true
 "python-developer@aweber-marketplace" = true
 "grafana-mcp@aweber-marketplace" = false
 
-[claude_code.plugins.marketplaces.aweber-marketplace]
+[claude.plugins.marketplaces.aweber-marketplace]
 source = "git"
 url = "https://github.enterprise.com/claude/marketplace.git"
 
-[claude_code.plugins.marketplaces.community]
+[claude.plugins.marketplaces.community]
 source = "github"
 repo = "anthropics/claude-plugins"
 
-[[claude_code.plugins.local_plugins]]
+[[claude.plugins.local_plugins]]
 path = "/home/user/my-custom-plugin"
+```
+
+## Git Configuration
+
+Configuration for git commit operations.
+
+### [git].user_name
+
+Git commit author name.
+
+**Type:** `string`
+**Default:** `Imbi Automations`
+
+```toml
+[git]
+user_name = "Bot User"
+```
+
+### [git].user_email
+
+Git commit author email address.
+
+**Type:** `string`
+**Default:** `automations@imbi.ai`
+
+```toml
+[git]
+user_email = "bot@example.com"
+```
+
+### [git].gpg_sign
+
+Enable GPG signing for commits.
+
+**Type:** `boolean`
+**Default:** `false`
+
+```toml
+[git]
+gpg_sign = true
+signing_key = "ABCD1234..."
+```
+
+### [git].gpg_format
+
+GPG signing format.
+
+**Type:** `string`
+**Default:** `null`
+**Options:** `gpg`, `ssh`, `x509`, `openpgp`
+
+```toml
+[git]
+gpg_format = "ssh"
+```
+
+### [git].signing_key
+
+GPG or SSH signing key identifier.
+
+**Type:** `string`
+**Default:** `null`
+
+```toml
+[git]
+signing_key = "~/.ssh/id_ed25519.pub"
+```
+
+### [git].commit_args
+
+Additional arguments to pass to git commit commands.
+
+**Type:** `string`
+**Default:** `""`
+
+```toml
+[git]
+commit_args = "--no-verify"
 ```
 
 ## GitHub Configuration
 
 Configuration for GitHub API integration.
 
-### [github].api_key
+### [github].token
 
 GitHub personal access token or fine-grained token.
 
-**Type:** `string` (secret)  
-**Required:** For GitHub workflows  
+**Type:** `string` (secret)
+**Required:** For GitHub workflows
 
-**Token Permissions Required:**  
+**Token Permissions Required:**
 
 - `repo` - Full repository access
 - `workflow` - Update GitHub Actions workflows
@@ -372,20 +431,20 @@ GitHub personal access token or fine-grained token.
 
 ```toml
 [github]
-api_key = "ghp_your_github_personal_access_token"
+token = "ghp_your_github_personal_access_token"
 ```
 
-### [github].hostname
+### [github].host
 
 GitHub hostname for Enterprise installations.
 
-**Type:** `string`  
-**Default:** `"github.com"`  
+**Type:** `string`
+**Default:** `github.com`
 
 For GitHub Enterprise:
 ```toml
 [github]
-hostname = "github.enterprise.com"
+host = "github.enterprise.com"
 ```
 
 ## Imbi Configuration
@@ -423,10 +482,10 @@ Project identifier field names in Imbi for external systems.
 **Type:** `string`  
 **Defaults:**  
 
-- `github_identifier = "github"`
-- `pagerduty_identifier = "pagerduty"`
-- `sonarqube_identifier = "sonarqube"`
-- `sentry_identifier = "sentry"`
+- `github_identifier = "github`
+- `pagerduty_identifier = "pagerduty`
+- `sonarqube_identifier = "sonarqube`
+- `sentry_identifier = "sentry`
 
 These specify which Imbi project identifier fields contain external system references:
 
@@ -442,11 +501,11 @@ Link type names in Imbi for external system URLs.
 **Type:** `string`  
 **Defaults:**  
 
-- `github_link = "GitHub Repository"`
-- `grafana_link = "Grafana Dashboard"`
-- `pagerduty_link = "PagerDuty"`
-- `sentry_link = "Sentry"`
-- `sonarqube_link = "SonarQube"`
+- `github_link = "GitHub Repository`
+- `grafana_link = "Grafana Dashboard`
+- `pagerduty_link = "PagerDuty`
+- `sentry_link = "Sentry`
+- `sonarqube_link = "SonarQube`
 
 These specify the link type names used in Imbi to store external URLs:
 
@@ -521,28 +580,33 @@ cat ~/.cache/imbi-automations/metadata.json | jq .
 
 ## Environment Variables
 
-Several configuration values support environment variable substitution:
+All configuration sections support automatic environment variable loading via Pydantic Settings. Each section has a prefix:
 
-### Supported in Configuration File
+| Section | Prefix | Example Variable |
+|---------|--------|------------------|
+| `[anthropic]` | `ANTHROPIC_` | `ANTHROPIC_API_KEY` |
+| `[claude]` | `CLAUDE_` | `CLAUDE_MODEL` |
+| `[git]` | `GIT_` | `GIT_USER_NAME` |
+| `[github]` | `GH_` | `GH_TOKEN` |
+| `[imbi]` | `IMBI_` | `IMBI_API_KEY` |
+
+For a complete reference of all available environment variables, see [Environment Variables](environment-variables.md).
+
+### Quick Example
+
+```bash
+# Set required environment variables
+export GH_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
+export IMBI_API_KEY="your-api-key-uuid"
+export IMBI_HOSTNAME="imbi.example.com"
+```
+
+Then use empty sections in your config to load from environment:
 
 ```toml
 [github]
-api_key = "${GITHUB_TOKEN}"
-
-[anthropic]
-api_key = "${ANTHROPIC_API_KEY}"
-
 [imbi]
-api_key = "${IMBI_API_KEY}"
 ```
-
-### Environment Variable Defaults
-
-Some fields use environment variables as defaults if not specified:
-
-| Configuration Field | Environment Variable |
-|---------------------|---------------------|
-| `anthropic.api_key` | `ANTHROPIC_API_KEY` |
 
 ## Minimal Configuration
 
@@ -550,7 +614,7 @@ The absolute minimum configuration for basic GitHub workflows:
 
 ```toml
 [github]
-api_key = "ghp_your_token"
+token = "ghp_your_token"
 
 [imbi]
 api_key = "your-imbi-key"
@@ -565,17 +629,17 @@ Configuration is validated at startup using Pydantic. Common errors:
 
 ```
 ValidationError: 1 validation error for Configuration
-github.api_key
+github.token
   field required (type=value_error.missing)
 ```
 
 **Solution:** Add the required field to your config.toml
 
-### Invalid API Key Format
+### Invalid Token Format
 
 ```
 ValidationError: 1 validation error for Configuration
-github.api_key
+github.token
   string does not match regex (type=value_error.str.regex)
 ```
 
@@ -600,11 +664,11 @@ imbi.hostname
 ```toml
 # ❌ BAD - Keys in config file
 [github]
-api_key = "ghp_actual_key_here"
+token = "ghp_actual_key_here"
 
 # ✅ GOOD - Environment variables
 [github]
-api_key = "${GITHUB_TOKEN}"
+token = "${GITHUB_TOKEN}"
 ```
 
 ### File Permissions
@@ -644,10 +708,12 @@ imbi-automations config.prod.toml workflows/deploy
 ### GitHub Only Workflows
 
 ```toml
-commit_author = "GitHub Bot <bot@example.com>"
+[git]
+user_name = "GitHub Bot"
+user_email = "bot@example.com"
 
 [github]
-api_key = "${GITHUB_TOKEN}"
+token = "${GITHUB_TOKEN}"
 
 [imbi]
 api_key = "${IMBI_API_KEY}"
@@ -658,8 +724,8 @@ hostname = "imbi.example.com"
 
 ```toml
 [github]
-api_key = "${GITHUB_ENTERPRISE_TOKEN}"
-hostname = "github.enterprise.com"
+token = "${GITHUB_ENTERPRISE_TOKEN}"
+host = "github.enterprise.com"
 
 [imbi]
 api_key = "${IMBI_API_KEY}"
@@ -675,12 +741,12 @@ ai_commits = true
 api_key = "${ANTHROPIC_API_KEY}"
 model = "claude-3-5-sonnet-latest"
 
-[claude_code]
+[claude]
 enabled = true
 executable = "claude"
 
 [github]
-api_key = "${GITHUB_TOKEN}"
+token = "${GITHUB_TOKEN}"
 
 [imbi]
 api_key = "${IMBI_API_KEY}"
@@ -694,7 +760,7 @@ preserve_on_error = true
 error_dir = "/tmp/imbi-errors"
 
 [github]
-api_key = "${GITHUB_TOKEN}"
+token = "${GITHUB_TOKEN}"
 
 [imbi]
 api_key = "${IMBI_API_KEY}"
@@ -709,7 +775,7 @@ dry_run = true
 dry_run_dir = "./review-changes"
 
 [github]
-api_key = "${GITHUB_TOKEN}"
+token = "${GITHUB_TOKEN}"
 
 [imbi]
 api_key = "${IMBI_API_KEY}"
@@ -747,7 +813,7 @@ imbi-automations /path/to/config.toml workflows/name --all-projects
 1. Validate TOML syntax with online validator
 2. Check for missing quotes around strings
 3. Verify section headers use `[section]` format
-4. Ensure key-value pairs use `key = "value"` format
+4. Ensure key-value pairs use `key = "value` format
 
 ## Advanced Configuration
 
@@ -767,19 +833,22 @@ Creates:
         └── error.log
 ```
 
-### Custom Commit Author Per Workflow
+### Custom Git Author Per Workflow
 
 Set in workflow config.toml instead:
 
 ```toml
 # workflows/my-workflow/config.toml
-commit_author = "Workflow Bot <workflow@example.com>"
+[git]
+user_name = "Workflow Bot"
+user_email = "workflow@example.com"
 ```
 
-Overrides global `commit_author` for that workflow only.
+Overrides global git author settings for that workflow only.
 
 ## See Also
 
+- [Environment Variables](environment-variables.md) - Complete environment variable reference
 - [Workflow Actions](actions/index.md) - Complete action configuration reference
 - [Architecture](architecture.md) - System design and components
 - [GitHub Actions](actions/github.md) - GitHub-specific configuration

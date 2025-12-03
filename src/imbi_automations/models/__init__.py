@@ -18,8 +18,9 @@ from .claude import (
 )
 from .configuration import (
     AnthropicConfiguration,
-    ClaudeCodeConfiguration,
+    ClaudeAgentConfiguration,
     Configuration,
+    GitConfiguration,
     GitHubConfiguration,
     ImbiConfiguration,
 )
@@ -88,11 +89,11 @@ __all__ = [
     'imbi',
     'mcp',
     'AnthropicConfiguration',
+    'ClaudeAgentConfiguration',
     'ClaudeAgentPlanningResult',
     'ClaudeAgentTaskResult',
     'ClaudeAgentType',
     'ClaudeAgentValidationResult',
-    'ClaudeCodeConfiguration',
     'ClaudeLocalPlugin',
     'ClaudeMarketplace',
     'ClaudeMarketplaceSource',
@@ -101,6 +102,7 @@ __all__ = [
     'Configuration',
     'GitCommit',
     'GitCommitSummary',
+    'GitConfiguration',
     'GitFileChange',
     'GitHubConfiguration',
     'GitHubEnvironment',

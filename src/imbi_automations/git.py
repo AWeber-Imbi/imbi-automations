@@ -263,14 +263,16 @@ async def remove_files(
 async def commit_changes(
     working_directory: pathlib.Path,
     message: str,
-    commit_author: str | None = None,
+    user_name: str | None = None,
+    user_email: str | None = None,
 ) -> str:
     """Commit staged changes to git repository.
 
     Args:
         working_directory: Git repository working directory
         message: Commit message
-        commit_author: Commit author name and email (default: None)
+        user_name: Commit author name (default: None)
+        user_email: Commit author email (default: None)
 
     Returns:
         Commit SHA hash
@@ -289,8 +291,8 @@ async def commit_changes(
     command = ['git', 'commit', '-F', '../commit-msg.txt']
 
     # Add author information if provided
-    if commit_author:
-        command.extend(['--author', f'"{commit_author}"'])
+    if user_name and user_email:
+        command.extend(['--author', f'"{user_name} <{user_email}>"'])
 
     command += ['--all']
 

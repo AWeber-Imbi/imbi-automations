@@ -52,7 +52,9 @@ class DockerTestCase(base.AsyncTestCase):
         )
 
         self.configuration = models.Configuration(
-            github=models.GitHubConfiguration(api_key='test-key'),
+            github=models.GitHubConfiguration(
+                token='test-key'  # noqa: S106
+            ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key', hostname='imbi.example.com'
             ),

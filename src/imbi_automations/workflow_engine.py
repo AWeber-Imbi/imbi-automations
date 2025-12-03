@@ -59,7 +59,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         )
         self._set_workflow_logger(workflow)
 
-        if not self.configuration.claude_code.enabled and (
+        if not self.configuration.claude.enabled and (
             self._needs_claude_code
             or workflow.configuration.github.create_pull_request
         ):
@@ -253,7 +253,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         if context.has_repository_changes:
             if (
                 self.workflow.configuration.github.create_pull_request
-                and self.configuration.claude_code.enabled
+                and self.configuration.claude.enabled
             ):
                 pr, branch_name = await self._create_pull_request(context)
                 context.pull_request = pr

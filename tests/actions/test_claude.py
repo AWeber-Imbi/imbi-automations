@@ -18,11 +18,15 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.working_directory = pathlib.Path(self.temp_dir.name)
         self.config = models.Configuration(
-            claude_code=models.ClaudeCodeConfiguration(executable='claude'),
+            claude=models.ClaudeAgentConfiguration(executable='claude'),
             anthropic=models.AnthropicConfiguration(),
+            git=models.GitConfiguration(
+                user_name='Test Author', user_email='test@example.com'
+            ),
             imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
-            github=models.GitHubConfiguration(api_key='test'),
-            commit_author='Test Author <test@example.com>',
+            github=models.GitHubConfiguration(
+                token='test'  # noqa: S106
+            ),
         )
 
         # Create required directory structure

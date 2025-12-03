@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source /home/imbi-automations/.profile
+
 # --- Initialization Directory Processing ---
 # Similar to database images' /docker-entrypoint-initdb.d pattern
 # Supports: .apt (system packages), .pip (pip packages), .sh (scripts)
@@ -112,9 +114,7 @@ Host *
 EOF
 
     # Add GitHub hosts to known_hosts
-    for host in github.com; do
-        ssh-keyscan -t ed25519,rsa "$host" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
-    done
+	ssh-keyscan -t ed25519,rsa "github.com" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
 
     # Scan GHE host if GITHUB_HOSTNAME is set (strip api. prefix if present)
     if [ -n "$GITHUB_HOSTNAME" ]; then
@@ -138,19 +138,6 @@ if [ -n "$SSH_KEY_PATH" ] && [ -f "${SSH_KEY_PATH}.pub" ]; then
     SIGNERS_FILE="$SSH_DIR/allowed_signers"
     echo "${GIT_USER_EMAIL} $(cat "${SSH_KEY_PATH}.pub")" > "$SIGNERS_FILE"
     git config --global gpg.ssh.allowedSignersFile "$SIGNERS_FILE"
-fi
-
-# --- GitHub CLI Authentication ---
-# Option 1: GH_TOKEN environment variable (already works natively)
-# Option 2: Token file at /config/gh-token or ~/.config/gh/token
-if [ -z "$GH_TOKEN" ]; then
-    for token_file in /config/gh-token ~/.config/gh/token; do
-        if [ -f "$token_file" ]; then
-            export GH_TOKEN=$(cat "$token_file")
-            echo "Loaded GitHub token from $token_file"
-            break
-        fi
-    done
 fi
 
 # Execute the main command
