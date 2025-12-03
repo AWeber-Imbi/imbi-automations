@@ -70,32 +70,17 @@ for key in ~/.ssh/id_ed25519 ~/.ssh/id_rsa ~/.ssh/id_ecdsa; do
     fi
 done
 
-if [ -n "$SSH_KEY_PATH" ]; then
-    PUB_KEY_PATH="${SSH_KEY_PATH}.pub"
+if [ -n "$SSH_KEY_PATH" ] && [ -f "${SSH_KEY_PATH}.pub" ]; then
+    echo "Configuring git commit signing with SSH key: $SSH_KEY_PATH"
+    git config --global gpg.format ssh
+    git config --global user.signingkey "${SSH_KEY_PATH}.pub"
+    git config --global commit.gpgsign true
+    git config --global tag.gpgsign true
 
-    # Generate public key from private key if it doesn't exist
-    # Use a temp location since .ssh may be mounted read-only
-    if [ ! -f "$PUB_KEY_PATH" ]; then
-        TEMP_PUB_KEY="/tmp/ssh_signing_key.pub"
-        echo "Generating public key from $SSH_KEY_PATH..."
-        if ssh-keygen -y -f "$SSH_KEY_PATH" > "$TEMP_PUB_KEY" 2>/dev/null; then
-            PUB_KEY_PATH="$TEMP_PUB_KEY"
-        fi
-    fi
-
-    if [ -f "$PUB_KEY_PATH" ]; then
-        echo "Configuring git commit signing with SSH key: $SSH_KEY_PATH"
-        git config --global gpg.format ssh
-        git config --global user.signingkey "$PUB_KEY_PATH"
-        git config --global commit.gpgsign true
-        git config --global tag.gpgsign true
-
-        # Create allowed_signers file for verification (use temp if .ssh is read-only)
-        SIGNERS_FILE=~/.ssh/allowed_signers
-        if [ ! -f "$SIGNERS_FILE" ]; then
-            SIGNERS_FILE="/tmp/allowed_signers"
-            echo "${GIT_USER_EMAIL} $(cat "$PUB_KEY_PATH")" > "$SIGNERS_FILE"
-        fi
+    # Create allowed_signers file for verification
+    SIGNERS_FILE=~/.ssh/allowed_signers
+    if [ ! -f "$SIGNERS_FILE" ]; then
+        echo "${GIT_USER_EMAIL} $(cat "${SSH_KEY_PATH}.pub")" > "$SIGNERS_FILE"
         git config --global gpg.ssh.allowedSignersFile "$SIGNERS_FILE"
     fi
 fi
