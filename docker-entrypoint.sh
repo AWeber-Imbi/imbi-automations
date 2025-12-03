@@ -3,6 +3,27 @@ set -e
 
 source /home/imbi-automations/.profile
 
+# --- Required Environment Variables ---
+# Check that required environment variables are set
+MISSING_VARS=""
+
+if [ -z "$ANTHROPIC_API_KEY" ] || [ "$ANTHROPIC_API_KEY" = "unspecified" ]; then
+    MISSING_VARS="$MISSING_VARS ANTHROPIC_API_KEY"
+fi
+
+if [ -z "$IMBI_API_KEY" ] || [ "$IMBI_API_KEY" = "unspecified" ]; then
+    MISSING_VARS="$MISSING_VARS IMBI_API_KEY"
+fi
+
+if [ -z "$GH_TOKEN" ] || [ "$GH_TOKEN" = "unspecified" ]; then
+    MISSING_VARS="$MISSING_VARS GH_TOKEN"
+fi
+
+if [ -n "$MISSING_VARS" ]; then
+    echo "Error: Required environment variables are not set:$MISSING_VARS" >&2
+    exit 1
+fi
+
 # --- Initialization Directory Processing ---
 # Similar to database images' /docker-entrypoint-initdb.d pattern
 # Supports: .apt (system packages), .pip (pip packages), .sh (scripts)
