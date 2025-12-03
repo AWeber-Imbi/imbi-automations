@@ -62,16 +62,16 @@ if [ -d "$INIT_DIR" ] && [ "$(ls -A $INIT_DIR 2>/dev/null)" ]; then
     # Install apt packages (batch for efficiency)
     if [ -n "$APT_PACKAGES" ]; then
         echo "Installing system packages: $APT_PACKAGES"
-        sudo apt-get update >> /var/log/entrypoint.log 2>&1
-        sudo apt-get install -y --no-install-recommends $APT_PACKAGES >> /var/log/entrypoint.log 2>&1
-        sudo apt-get clean >> /var/log/entrypoint.log 2>&1
+        sudo apt-get update >> /opt/logs/entrypoint.log 2>&1
+        sudo apt-get install -y --no-install-recommends $APT_PACKAGES >> /opt/logs/entrypoint.log 2>&1
+        sudo apt-get clean >> /opt/logs/entrypoint.log 2>&1
         sudo rm -rf /var/lib/apt/lists/*
     fi
 
     # Install pip packages
     for f in $PIP_FILES; do
         echo "Installing pip packages from: $f"
-        pip install --user --no-cache-dir -r "$f" >> /var/log/entrypoint.log 2>&1
+        pip install --user --no-cache-dir -r "$f" >> /opt/logs/entrypoint.log 2>&1
     done
 
     # Run shell scripts
