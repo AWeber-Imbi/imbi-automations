@@ -220,6 +220,59 @@ gh auth status
 ssh -T git@github.com
 ```
 
+## Wrapper Script Example
+
+For repeated use, create a wrapper script that handles image updates, authentication, and volume mounts:
+
+```bash
+#!/bin/bash
+set -e
+
+WORKFLOW=$1
+shift
+
+# Always ensure the latest image is pulled
+docker pull aweber/imbi-automations:latest
+
+# Refresh AWS SSO credentials if using AWS Bedrock
+aws sts get-caller-identity --profile my-profile > /dev/null
+export $(aws configure export-credentials --format env --profile my-profile)
+
+docker run --rm -t --group-add staff \
+    -v $(pwd)/.ssh:/home/imbi-automations/.ssh:ro \
+    -v $(pwd)/config.toml:/opt/config/config.toml:ro \
+    -v $(pwd)/docker-entrypoint-init.d:/docker-entrypoint-init.d:ro \
+    -v $(pwd)/errors:/opt/errors \
+    -v $(pwd):/opt/workflows:ro \
+    -v /var/run/docker.sock:/var/run/docker.sock:rw \
+    -e AWS_ACCESS_KEY_ID \
+    -e AWS_SECRET_ACCESS_KEY \
+    -e AWS_SESSION_TOKEN \
+    -e GH_HOST=github.example.com \
+    -e GIT_USER_NAME="Your Name" \
+    -e GIT_USER_EMAIL="you@example.com" \
+    --env-file .env \
+    aweber/imbi-automations:latest \
+    /opt/config/config.toml \
+    /opt/workflows/${WORKFLOW} \
+    "$@"
+```
+
+**Key features of this script:**
+
+- Pulls the latest image before each run
+- Refreshes AWS SSO credentials for Bedrock access
+- Uses `--env-file .env` to load secrets (containing `ANTHROPIC_API_KEY`, `IMBI_API_KEY`, `GH_TOKEN`)
+- Mounts Docker socket for workflows that use Docker actions
+- Passes additional arguments to the workflow via `"$@"`
+
+**Usage:**
+
+```bash
+./run-workflow.sh my-workflow --all-projects
+./run-workflow.sh my-workflow --project-id 123
+```
+
 ## Docker Compose Example
 
 ```yaml
@@ -229,13 +282,14 @@ services:
     volumes:
       - ./config.toml:/opt/config/config.toml:ro
       - ./workflows:/opt/workflows:ro
-      - ~/.ssh:/home/imbi-automations/.ssh:ro
+      - ./.ssh:/home/imbi-automations/.ssh:ro
+      - ./docker-entrypoint-init.d:/docker-entrypoint-init.d:ro
+      - ./errors:/opt/errors
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    env_file:
+      - .env
     environment:
-      # Required
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - IMBI_API_KEY=${IMBI_API_KEY}
-      - GH_TOKEN=${GH_TOKEN}
-      # Optional
+      # Optional overrides
       - GIT_USER_NAME=Imbi Automations
       - GIT_USER_EMAIL=imbi-automations@example.com
 ```
