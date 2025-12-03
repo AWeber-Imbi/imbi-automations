@@ -41,7 +41,7 @@ class Committer(mixins.WorkflowLoggerMixin):
         if (
             action.ai_commit
             and self.configuration.ai_commits
-            and self.configuration.claude_code.enabled
+            and self.configuration.claude.enabled
         ):
             return await self._claude_commit(context, action)
         else:
@@ -114,7 +114,8 @@ class Committer(mixins.WorkflowLoggerMixin):
             commit_sha = await git.commit_changes(
                 working_directory=repo_dir,
                 message=message,
-                commit_author=self.configuration.commit_author,
+                user_name=self.configuration.git.user_name,
+                user_email=self.configuration.git.user_email,
             )
         except RuntimeError as exc:
             self.logger.error(

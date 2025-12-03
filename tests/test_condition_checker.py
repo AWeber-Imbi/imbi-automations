@@ -39,7 +39,8 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
                 api_key='test-key', hostname='imbi.test.com'
             ),
             github=models.GitHubConfiguration(
-                api_key='test-github-key', hostname='github.com'
+                token='test-github-key',  # noqa: S106
+                host='github.com',
             ),
         )
         self.checker = condition_checker.ConditionChecker(

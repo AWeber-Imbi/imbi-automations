@@ -38,6 +38,53 @@ class AnthropicConfiguration(pydantic_settings.BaseSettings):
     model: str = 'claude-haiku-4-5-20251001'
 
 
+class ClaudeAgentConfiguration(pydantic_settings.BaseSettings):
+    """Claude Agent SDK configuration.
+
+    Configures the Claude Agent SDK executable path, base prompt file, model
+    selection, whether AI-powered transformations are enabled, and
+    marketplace/plugin settings.
+
+    Plugin configuration supports:
+    - enabled_plugins: Map of "plugin@marketplace" to enabled state
+    - marketplaces: Additional marketplace sources to register
+    - local_plugins: Local plugin directories loaded via SDK
+
+    Example TOML:
+        [claude]
+        model = "claude-sonnet-4"
+
+        [claude.plugins.enabled_plugins]
+        "code-formatter@team-tools" = true
+
+        [claude.plugins.marketplaces.team-tools]
+        source = "github"
+        repo = "company/claude-plugins"
+
+        [[claude.plugins.local_plugins]]
+        path = "/path/to/local/plugin"
+    """
+
+    model_config = pydantic_settings.SettingsConfigDict(
+        env_prefix='CLAUDE_', **BASE_SETTINGS
+    )
+
+    executable: str = 'claude'  # Claude Code executable path
+    base_prompt: pathlib.Path | None = None
+    enabled: bool = True
+    model: str = pydantic.Field(default='claude-haiku-4-5')
+    plugins: claude_models.ClaudePluginConfig = pydantic.Field(
+        default_factory=claude_models.ClaudePluginConfig
+    )
+
+    def __init__(self, **kwargs: typing.Any) -> None:
+        super().__init__(**kwargs)
+        if self.base_prompt is None:
+            self.base_prompt = (
+                pathlib.Path(__file__).parent / 'prompts' / 'claude.md'
+            )
+
+
 class GitConfiguration(pydantic_settings.BaseSettings):
     """Git configuration for repository operations.
 
@@ -55,6 +102,8 @@ class GitConfiguration(pydantic_settings.BaseSettings):
     signing_key: str | None = None
     ssh_program: str | None = None
     gpg_program: str | None = None
+    user_name: str = 'Imbi Automations'
+    user_email: str = 'automations@imbi.ai'
 
 
 class GitHubConfiguration(pydantic_settings.BaseSettings):
@@ -65,11 +114,11 @@ class GitHubConfiguration(pydantic_settings.BaseSettings):
     """
 
     model_config = pydantic_settings.SettingsConfigDict(
-        env_prefix='GITHUB_', **BASE_SETTINGS
+        env_prefix='GH_', **BASE_SETTINGS
     )
 
-    api_key: pydantic.SecretStr
-    hostname: str = pydantic.Field(default='github.com')
+    host: str = pydantic.Field(default='github.com')
+    token: pydantic.SecretStr
 
 
 class ImbiConfiguration(pydantic_settings.BaseSettings):
@@ -94,53 +143,6 @@ class ImbiConfiguration(pydantic_settings.BaseSettings):
     pagerduty_link: str = 'PagerDuty'
     sentry_link: str = 'Sentry'
     sonarqube_link: str = 'SonarQube'
-
-
-class ClaudeCodeConfiguration(pydantic_settings.BaseSettings):
-    """Claude Code SDK configuration.
-
-    Configures the Claude Code executable path, base prompt file, model
-    selection, whether AI-powered transformations are enabled, and
-    marketplace/plugin settings.
-
-    Plugin configuration supports:
-    - enabled_plugins: Map of "plugin@marketplace" to enabled state
-    - marketplaces: Additional marketplace sources to register
-    - local_plugins: Local plugin directories loaded via SDK
-
-    Example TOML:
-        [claude_code]
-        model = "claude-sonnet-4"
-
-        [claude_code.plugins.enabled_plugins]
-        "code-formatter@team-tools" = true
-
-        [claude_code.plugins.marketplaces.team-tools]
-        source = "github"
-        repo = "company/claude-plugins"
-
-        [[claude_code.plugins.local_plugins]]
-        path = "/path/to/local/plugin"
-    """
-
-    model_config = pydantic_settings.SettingsConfigDict(
-        env_prefix='CLAUDE_', **BASE_SETTINGS
-    )
-
-    executable: str = 'claude'  # Claude Code executable path
-    base_prompt: pathlib.Path | None = None
-    enabled: bool = True
-    model: str = pydantic.Field(default='claude-haiku-4-5')
-    plugins: claude_models.ClaudePluginConfig = pydantic.Field(
-        default_factory=claude_models.ClaudePluginConfig
-    )
-
-    def __init__(self, **kwargs: typing.Any) -> None:
-        super().__init__(**kwargs)
-        if self.base_prompt is None:
-            self.base_prompt = (
-                pathlib.Path(__file__).parent / 'prompts' / 'claude.md'
-            )
 
 
 class Configuration(pydantic.BaseModel):
@@ -175,7 +177,7 @@ class Configuration(pydantic.BaseModel):
         """
         settings_fields: dict[str, type[pydantic_settings.BaseSettings]] = {
             'anthropic': AnthropicConfiguration,
-            'claude_code': ClaudeCodeConfiguration,
+            'claude': ClaudeAgentConfiguration,
             'git': GitConfiguration,
             'github': GitHubConfiguration,
             'imbi': ImbiConfiguration,
@@ -195,10 +197,9 @@ class Configuration(pydantic.BaseModel):
     cache_dir: pathlib.Path = (
         pathlib.Path.home() / '.cache' / 'imbi-automations'
     )
-    claude_code: ClaudeCodeConfiguration = pydantic.Field(
-        default_factory=ClaudeCodeConfiguration
+    claude: ClaudeAgentConfiguration = pydantic.Field(
+        default_factory=ClaudeAgentConfiguration
     )
-    commit_author: str = 'Imbi Automations <noreply@aweber.com>'
     dry_run: bool = False
     dry_run_dir: pathlib.Path = pathlib.Path('./dry-runs')
     error_dir: pathlib.Path = pathlib.Path('./errors')

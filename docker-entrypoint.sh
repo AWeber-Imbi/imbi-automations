@@ -1,6 +1,29 @@
 #!/bin/bash
 set -e
 
+source /home/imbi-automations/.profile
+
+# --- Required Environment Variables ---
+# Check that required environment variables are set
+MISSING_VARS=""
+
+if [ -z "$ANTHROPIC_API_KEY" ] || [ "$ANTHROPIC_API_KEY" = "unspecified" ]; then
+    MISSING_VARS="$MISSING_VARS ANTHROPIC_API_KEY"
+fi
+
+if [ -z "$IMBI_API_KEY" ] || [ "$IMBI_API_KEY" = "unspecified" ]; then
+    MISSING_VARS="$MISSING_VARS IMBI_API_KEY"
+fi
+
+if [ -z "$GH_TOKEN" ] || [ "$GH_TOKEN" = "unspecified" ]; then
+    MISSING_VARS="$MISSING_VARS GH_TOKEN"
+fi
+
+if [ -n "$MISSING_VARS" ]; then
+    echo "Error: Required environment variables are not set:$MISSING_VARS" >&2
+    exit 1
+fi
+
 # --- Initialization Directory Processing ---
 # Similar to database images' /docker-entrypoint-initdb.d pattern
 # Supports: .apt (system packages), .pip (pip packages), .sh (scripts)
@@ -39,16 +62,16 @@ if [ -d "$INIT_DIR" ] && [ "$(ls -A $INIT_DIR 2>/dev/null)" ]; then
     # Install apt packages (batch for efficiency)
     if [ -n "$APT_PACKAGES" ]; then
         echo "Installing system packages: $APT_PACKAGES"
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends $APT_PACKAGES
-        sudo apt-get clean
+        sudo apt-get update >> /opt/logs/entrypoint.log 2>&1
+        sudo apt-get install -y --no-install-recommends $APT_PACKAGES >> /opt/logs/entrypoint.log 2>&1
+        sudo apt-get clean >> /opt/logs/entrypoint.log 2>&1
         sudo rm -rf /var/lib/apt/lists/*
     fi
 
     # Install pip packages
     for f in $PIP_FILES; do
         echo "Installing pip packages from: $f"
-        pip install --user --no-cache-dir -r "$f"
+        pip install --user --no-cache-dir -r "$f" >> /opt/logs/entrypoint.log 2>&1
     done
 
     # Run shell scripts
@@ -112,9 +135,7 @@ Host *
 EOF
 
     # Add GitHub hosts to known_hosts
-    for host in github.com; do
-        ssh-keyscan -t ed25519,rsa "$host" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
-    done
+	ssh-keyscan -t ed25519,rsa "github.com" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
 
     # Scan GHE host if GITHUB_HOSTNAME is set (strip api. prefix if present)
     if [ -n "$GITHUB_HOSTNAME" ]; then
@@ -138,19 +159,6 @@ if [ -n "$SSH_KEY_PATH" ] && [ -f "${SSH_KEY_PATH}.pub" ]; then
     SIGNERS_FILE="$SSH_DIR/allowed_signers"
     echo "${GIT_USER_EMAIL} $(cat "${SSH_KEY_PATH}.pub")" > "$SIGNERS_FILE"
     git config --global gpg.ssh.allowedSignersFile "$SIGNERS_FILE"
-fi
-
-# --- GitHub CLI Authentication ---
-# Option 1: GH_TOKEN environment variable (already works natively)
-# Option 2: Token file at /config/gh-token or ~/.config/gh/token
-if [ -z "$GH_TOKEN" ]; then
-    for token_file in /config/gh-token ~/.config/gh/token; do
-        if [ -f "$token_file" ]; then
-            export GH_TOKEN=$(cat "$token_file")
-            echo "Loaded GitHub token from $token_file"
-            break
-        fi
-    done
 fi
 
 # Execute the main command

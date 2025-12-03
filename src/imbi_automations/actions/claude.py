@@ -7,7 +7,6 @@ AI-powered code transformations.
 
 import pathlib
 import typing
-from email import utils as email_utils
 
 from imbi_automations import claude, mixins, models, prompts
 
@@ -33,11 +32,11 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self.has_planning_prompt: bool = False
         self.last_error: models.ClaudeAgentValidationResult | None = None
         self.task_plan: models.ClaudeAgentPlanningResult | None = None
-        commit_author = email_utils.parseaddr(self.configuration.commit_author)
+        git = configuration.git
         self.prompt_kwargs = {
-            'commit_author': self.configuration.commit_author,
-            'commit_author_name': commit_author[0],
-            'commit_author_address': commit_author[1],
+            'commit_author': f'{git.user_name} <{git.user_email}>',
+            'commit_author_name': git.user_name,
+            'commit_author_address': git.user_email,
             'workflow_name': context.workflow.configuration.name,
             'working_directory': self.context.working_directory,
         }

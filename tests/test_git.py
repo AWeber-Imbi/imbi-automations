@@ -1364,9 +1364,10 @@ class WorkflowEngineGitTestCase(base.AsyncTestCase):
                 api_key='test-key', hostname='imbi.test.com'
             ),
             github=models.GitHubConfiguration(
-                api_key='test-github-key', hostname='github.com'
+                token='test-github-key',  # noqa: S106
+                host='github.com',
             ),
-            claude_code=models.ClaudeCodeConfiguration(enabled=False),
+            claude=models.ClaudeAgentConfiguration(enabled=False),
         )
 
         # Create mock workflow

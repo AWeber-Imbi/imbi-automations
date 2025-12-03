@@ -239,9 +239,9 @@ Prompts have access to all workflow context variables:
 | `github_repository` | GitHub repository (if applicable) |
 | `working_directory` | Execution directory path (task agent runs in `repository/` subdirectory) |
 | `starting_commit` | Initial commit SHA |
-| `commit_author` | Git commit author (from config) |
-| `commit_author_name` | Author name only |
-| `commit_author_address` | Author email only |
+| `commit_author` | Git commit author string (e.g., "Name <email>") |
+| `commit_author_name` | Git author name (from `git.user_name`) |
+| `commit_author_address` | Git author email (from `git.user_email`) |
 | `workflow_name` | Current workflow name |
 
 ## Examples

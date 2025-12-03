@@ -11,7 +11,6 @@ import os
 import pathlib
 import re
 import typing
-from email import utils as email_utils
 
 import anthropic
 import claude_agent_sdk
@@ -166,11 +165,12 @@ class Claude(mixins.WorkflowLoggerMixin):
         self.context = context
         self.logger: logging.Logger = LOGGER
         self.session_id: str | None = None
-        commit_author = email_utils.parseaddr(self.configuration.commit_author)
         self.prompt_kwargs = {
-            'commit_author': self.configuration.commit_author,
-            'commit_author_name': commit_author[0],
-            'commit_author_address': commit_author[1],
+            'commit_author': (
+                f'{config.git.user_name} <{config.git.user_email}>'
+            ),
+            'commit_author_name': config.git.user_name,
+            'commit_author_address': config.git.user_email,
             'configuration': self.configuration,
             'workflow_name': context.workflow.configuration.name,
             'working_directory': self.context.working_directory,
@@ -383,7 +383,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             ],
             cwd=self.context.working_directory / 'repository',
             mcp_servers=mcp_servers,
-            model=self.configuration.claude_code.model,
+            model=self.configuration.claude.model,
             plugins=sdk_plugins,
             settings=str(settings),
             setting_sources=['local'],
@@ -433,7 +433,7 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         # Add merged plugin configuration
         merged_plugins = _merge_plugin_configs(
-            self.configuration.claude_code.plugins,
+            self.configuration.claude.plugins,
             self.context.workflow.configuration.plugins,
         )
 

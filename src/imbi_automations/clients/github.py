@@ -35,10 +35,9 @@ class GitHub(http.BaseURLHTTPClient):
             raise errors.ConfigurationError('GitHub configuration missing')
 
         super().__init__(transport)
-        self._base_url = f'https://{config.github.hostname}'
+        self._base_url = f'https://{config.github.host}'
         self.add_header(
-            'Authorization',
-            f'Bearer {config.github.api_key.get_secret_value()}',
+            'Authorization', f'Bearer {config.github.token.get_secret_value()}'
         )
         self.add_header('X-GitHub-Api-Version', '2022-11-28')
         self.add_header('Accept', 'application/vnd.github+json')
