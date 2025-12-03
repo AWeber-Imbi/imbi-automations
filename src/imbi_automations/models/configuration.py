@@ -6,42 +6,48 @@ use Pydantic for validation with SecretStr for sensitive data and
 environment variable defaults.
 """
 
-import os
 import pathlib
 import typing
 
 import pydantic
+import pydantic_settings
 
 from . import claude as claude_models
 
+BASE_SETTINGS = {
+    'case_sensitive': False,
+    'env_file': '.env',
+    'env_file_encoding': 'utf-8',
+    'extra': 'ignore',
+}
 
-class AnthropicConfiguration(pydantic.BaseModel):
+
+class AnthropicConfiguration(pydantic_settings.BaseSettings):
     """Anthropic API configuration for Claude models.
 
     Supports both direct API access and AWS Bedrock integration with
     configurable model selection and API key from environment variables.
     """
 
+    model_config = pydantic_settings.SettingsConfigDict(
+        env_prefix='ANTHROPIC_', **BASE_SETTINGS
+    )
+
     api_key: pydantic.SecretStr | None = None
     bedrock: bool = False
     model: str = 'claude-haiku-4-5-20251001'
 
-    @pydantic.model_validator(mode='before')
-    @classmethod
-    def _set_api_key_from_env(cls, data: typing.Any) -> typing.Any:
-        if isinstance(data, dict) and 'api_key' not in data:
-            env_key = os.environ.get('ANTHROPIC_API_KEY')
-            if env_key:
-                data['api_key'] = env_key
-        return data
 
-
-class GitConfiguration(pydantic.BaseModel):
+class GitConfiguration(pydantic_settings.BaseSettings):
     """Git configuration for repository operations.
 
     Controls git commit behavior including signing with GPG or SSH keys.
     Supports multiple signing formats: 'gpg', 'ssh', 'x509', 'openpgp'.
     """
+
+    model_config = pydantic_settings.SettingsConfigDict(
+        env_prefix='GIT_', **BASE_SETTINGS
+    )
 
     commit_args: str = ''
     gpg_sign: bool = False
@@ -51,23 +57,31 @@ class GitConfiguration(pydantic.BaseModel):
     gpg_program: str | None = None
 
 
-class GitHubConfiguration(pydantic.BaseModel):
+class GitHubConfiguration(pydantic_settings.BaseSettings):
     """GitHub API configuration.
 
     Supports both GitHub.com and GitHub Enterprise with API token
     authentication.
     """
 
+    model_config = pydantic_settings.SettingsConfigDict(
+        env_prefix='GITHUB_', **BASE_SETTINGS
+    )
+
     api_key: pydantic.SecretStr
     hostname: str = pydantic.Field(default='github.com')
 
 
-class ImbiConfiguration(pydantic.BaseModel):
+class ImbiConfiguration(pydantic_settings.BaseSettings):
     """Imbi project management system configuration.
 
     Defines project identifiers and link types for mapping external systems
     (GitHub, GitLab, PagerDuty, SonarQube, Sentry, Grafana) to Imbi projects.
     """
+
+    model_config = pydantic_settings.SettingsConfigDict(
+        env_prefix='IMBI_', **BASE_SETTINGS
+    )
 
     api_key: pydantic.SecretStr
     hostname: str
@@ -82,7 +96,7 @@ class ImbiConfiguration(pydantic.BaseModel):
     sonarqube_link: str = 'SonarQube'
 
 
-class ClaudeCodeConfiguration(pydantic.BaseModel):
+class ClaudeCodeConfiguration(pydantic_settings.BaseSettings):
     """Claude Code SDK configuration.
 
     Configures the Claude Code executable path, base prompt file, model
@@ -109,6 +123,10 @@ class ClaudeCodeConfiguration(pydantic.BaseModel):
         path = "/path/to/local/plugin"
     """
 
+    model_config = pydantic_settings.SettingsConfigDict(
+        env_prefix='CLAUDE_', **BASE_SETTINGS
+    )
+
     executable: str = 'claude'  # Claude Code executable path
     base_prompt: pathlib.Path | None = None
     enabled: bool = True
@@ -130,7 +148,45 @@ class Configuration(pydantic.BaseModel):
 
     Root configuration object combining all integration configurations with
     global settings for commits, error handling, and workflow execution.
+
+    Uses a model validator to properly merge environment variables with
+    config file values. When a nested settings section is provided in the
+    config file, environment variables serve as defaults for any fields
+    not explicitly set in the file.
     """
+
+    @pydantic.model_validator(mode='before')
+    @classmethod
+    def merge_env_with_config(
+        cls, data: dict[str, typing.Any]
+    ) -> dict[str, typing.Any]:
+        """Merge environment variables with config file data.
+
+        For each BaseSettings submodel, instantiate it with the config file
+        data as kwargs. This allows BaseSettings to use environment variables
+        as defaults for any fields not provided in the config file.
+
+        Args:
+            data: Raw config data from TOML file
+
+        Returns:
+            Config data with BaseSettings instances properly constructed
+
+        """
+        settings_fields: dict[str, type[pydantic_settings.BaseSettings]] = {
+            'anthropic': AnthropicConfiguration,
+            'claude_code': ClaudeCodeConfiguration,
+            'git': GitConfiguration,
+            'github': GitHubConfiguration,
+            'imbi': ImbiConfiguration,
+        }
+        for field, settings_cls in settings_fields.items():
+            if field in data and data[field] is not None:
+                # Skip if already an instance (e.g., from direct construction)
+                if isinstance(data[field], settings_cls):
+                    continue
+                data[field] = settings_cls(**data[field])
+        return data
 
     ai_commits: bool = False
     anthropic: AnthropicConfiguration = pydantic.Field(
