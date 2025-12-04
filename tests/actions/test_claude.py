@@ -73,7 +73,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         """Test _get_prompt method for task agent with Jinja2 template."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -110,7 +109,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         """Test _get_prompt method for validator agent with plain text."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -155,7 +153,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -201,7 +198,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -243,7 +239,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -292,7 +287,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -346,7 +340,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -377,6 +370,25 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         self.assertEqual(
             mock_agent_query.call_count, 4
         )  # 2 cycles * (task + validation)
+
+
+class GetResponseModelTestCase(unittest.TestCase):
+    """Test cases for the _get_response_model function."""
+
+    def test_get_response_model_planning(self) -> None:
+        """Test _get_response_model returns correct model for planning."""
+        result = claude._get_response_model(models.ClaudeAgentType.planning)
+        self.assertIs(result, models.ClaudeAgentPlanningResult)
+
+    def test_get_response_model_task(self) -> None:
+        """Test _get_response_model returns correct model for task."""
+        result = claude._get_response_model(models.ClaudeAgentType.task)
+        self.assertIs(result, models.ClaudeAgentTaskResult)
+
+    def test_get_response_model_validation(self) -> None:
+        """Test _get_response_model returns correct model for validation."""
+        result = claude._get_response_model(models.ClaudeAgentType.validation)
+        self.assertIs(result, models.ClaudeAgentValidationResult)
 
 
 if __name__ == '__main__':

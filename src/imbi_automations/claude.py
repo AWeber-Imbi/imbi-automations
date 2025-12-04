@@ -18,14 +18,11 @@ import pydantic
 from anthropic import types as anthropic_types
 from claude_agent_sdk import types
 
-from imbi_automations import mixins, models, prompts, tracker, version
+from imbi_automations import mixins, models, prompts, tracker
 
 LOGGER = logging.getLogger(__name__)
 BASE_PATH = pathlib.Path(__file__).parent
 COMMIT = 'commit'
-SUBMIT_PLANNING_RESPONSE = 'submit_planning_response'
-SUBMIT_TASK_RESPONSE = 'submit_task_response'
-SUBMIT_VALIDATION_RESPONSE = 'submit_validation_response'
 
 
 def _expand_env_vars(value: str) -> str:
@@ -177,20 +174,52 @@ class Claude(mixins.WorkflowLoggerMixin):
         }
         self.tracker = tracker.Tracker.get_instance()
         self._set_workflow_logger(self.context.workflow)
-        self._submitted_response: AgentResult | None = None
+        self._structured_output: dict[str, typing.Any] | None = None
         self._merged_local_plugins: list[models.ClaudeLocalPlugin] = []
         self.client = self._create_client()
 
-    async def agent_query(self, prompt: str) -> AgentResult | None:
-        self._submitted_response = None
+    async def agent_query(
+        self, prompt: str, response_model: type[AgentResult] | None = None
+    ) -> AgentResult | None:
+        """Execute an agent query and return structured output.
+
+        Args:
+            prompt: The prompt to send to the agent
+            response_model: Pydantic model for structured output validation
+
+        Returns:
+            Validated response model instance, or None if no response
+
+        Raises:
+            RuntimeError: If no response received or structured output missing
+
+        """
+        self._structured_output: dict[str, typing.Any] | None = None
         await self.client.connect()
+
+        # Set output format if response model provided
+        if response_model is not None:
+            self.client.options.output_format = {
+                'type': 'json_schema',
+                'schema': response_model.model_json_schema(),
+            }
+
         await self.client.query(prompt)
         async for message in self.client.receive_response():
             self._parse_message(message)
         await self.client.disconnect()
-        if self._submitted_response is None:
-            raise RuntimeError('No response received from Claude Code')
-        return self._submitted_response
+
+        # Clear output format for next query
+        self.client.options.output_format = None
+
+        if self._structured_output is None:
+            raise RuntimeError(
+                'No structured output received from Claude Code'
+            )
+
+        if response_model is not None:
+            return response_model.model_validate(self._structured_output)
+        return None
 
     async def anthropic_query(
         self, prompt: str, model: str | None = None
@@ -212,123 +241,9 @@ class Claude(mixins.WorkflowLoggerMixin):
         return ''
 
     def _create_client(self) -> claude_agent_sdk.ClaudeSDKClient:
-        """Create the Claude SDK client, initializing the environment"""
+        """Create the Claude SDK client, initializing the environment."""
         settings = self._initialize_working_directory()
         LOGGER.debug('Claude Code settings: %s', settings)
-
-        # Create tool functions that capture self context
-        @claude_agent_sdk.tool(
-            SUBMIT_PLANNING_RESPONSE,
-            'Submit planning result',
-            models.ClaudeAgentPlanningResult.model_json_schema(),
-        )
-        async def submit_planning_response(
-            args: dict[str, typing.Any],
-        ) -> dict[str, typing.Any]:
-            """Submit planning agent response."""
-            LOGGER.debug(
-                'submit_planning_response tool invoked with: %r', args
-            )
-            try:
-                self._submitted_response = (
-                    models.ClaudeAgentPlanningResult.model_validate(args)
-                )
-            except pydantic.ValidationError as err:
-                return {
-                    'content': [
-                        {
-                            'type': 'text',
-                            'text': f'Error: invalid response {err}',
-                        }
-                    ],
-                    'is_error': True,
-                }
-            return {
-                'content': [
-                    {
-                        'type': 'text',
-                        'text': 'Planning response submitted successfully',
-                    }
-                ]
-            }
-
-        @claude_agent_sdk.tool(
-            SUBMIT_TASK_RESPONSE,
-            'The task agent MUST use this tool to submit the task result',
-            models.ClaudeAgentTaskResult.model_json_schema(),
-        )
-        async def submit_task_response(
-            args: dict[str, typing.Any],
-        ) -> dict[str, typing.Any]:
-            """Submit task agent response."""
-            LOGGER.debug('submit_task_response tool invoked with: %r', args)
-            try:
-                self._submitted_response = (
-                    models.ClaudeAgentTaskResult.model_validate(args)
-                )
-            except pydantic.ValidationError as err:
-                return {
-                    'content': [
-                        {
-                            'type': 'text',
-                            'text': f'Error: invalid response {err}',
-                        }
-                    ],
-                    'is_error': True,
-                }
-            return {
-                'content': [
-                    {
-                        'type': 'text',
-                        'text': 'Task response submitted successfully',
-                    }
-                ]
-            }
-
-        @claude_agent_sdk.tool(
-            SUBMIT_VALIDATION_RESPONSE,
-            'The validation agent MUST use this tool to submit its result',
-            models.ClaudeAgentValidationResult.model_json_schema(),
-        )
-        async def submit_validation_response(
-            args: dict[str, typing.Any],
-        ) -> dict[str, typing.Any]:
-            """Submit validation agent response."""
-            LOGGER.debug(
-                'submit_validation_response tool invoked with: %r', args
-            )
-            try:
-                self._submitted_response = (
-                    models.ClaudeAgentValidationResult.model_validate(args)
-                )
-            except pydantic.ValidationError as err:
-                return {
-                    'content': [
-                        {
-                            'type': 'text',
-                            'text': f'Error: invalid response {err}',
-                        }
-                    ],
-                    'is_error': True,
-                }
-            return {
-                'content': [
-                    {
-                        'type': 'text',
-                        'text': 'Validation response submitted successfully',
-                    }
-                ]
-            }
-
-        agent_tools = claude_agent_sdk.create_sdk_mcp_server(
-            'agent-tools',
-            version,
-            [
-                submit_planning_response,
-                submit_task_response,
-                submit_validation_response,
-            ],
-        )
 
         system_prompt = (BASE_PATH / 'claude-code' / 'CLAUDE.md').read_text()
         if self.context.workflow.configuration.prompt:
@@ -344,8 +259,8 @@ class Claude(mixins.WorkflowLoggerMixin):
             else:
                 raise RuntimeError
 
-        # Build MCP servers dict with agent_tools and workflow-defined servers
-        mcp_servers: dict[str, typing.Any] = {'agent_tools': agent_tools}
+        # Build MCP servers dict with workflow-defined servers
+        mcp_servers: dict[str, typing.Any] = {}
         for (
             name,
             config,
@@ -373,13 +288,9 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'Read',
                 'Task',
                 'Write',
-                'Write',
                 'WebFetch',
                 'WebSearch',
                 'SlashCommand',
-                f'mcp__agent_tools__{SUBMIT_PLANNING_RESPONSE}',
-                f'mcp__agent_tools__{SUBMIT_TASK_RESPONSE}',
-                f'mcp__agent_tools__{SUBMIT_VALIDATION_RESPONSE}',
             ],
             cwd=self.context.working_directory / 'repository',
             mcp_servers=mcp_servers,
@@ -628,4 +539,10 @@ class Claude(mixins.WorkflowLoggerMixin):
             else:
                 LOGGER.debug(
                     'Result (%s): %r', message.session_id, message.result
+                )
+            # Extract structured output if present
+            if message.structured_output is not None:
+                self._structured_output = message.structured_output
+                LOGGER.debug(
+                    'Structured output received: %r', message.structured_output
                 )
