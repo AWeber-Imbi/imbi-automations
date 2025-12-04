@@ -468,21 +468,15 @@ class ClaudeTestCase(base.AsyncTestCase):
         self.temp_dir.cleanup()
 
     @mock.patch('claude_agent_sdk.ClaudeSDKClient')
-    @mock.patch('claude_agent_sdk.create_sdk_mcp_server')
     @mock.patch(
         'builtins.open',
         new_callable=mock.mock_open,
         read_data='Mock system prompt',
     )
     def test_claude_init(
-        self,
-        mock_file: mock.MagicMock,
-        mock_create_server: mock.MagicMock,
-        mock_client_class: mock.MagicMock,
+        self, mock_file: mock.MagicMock, mock_client_class: mock.MagicMock
     ) -> None:
         """Test Claude initialization."""
-        mock_server = mock.MagicMock()
-        mock_create_server.return_value = mock_server
         mock_client_instance = mock.MagicMock()
         mock_client_class.return_value = mock_client_instance
 
@@ -501,7 +495,6 @@ class ClaudeTestCase(base.AsyncTestCase):
 
         # Verify client creation was called
         mock_client_class.assert_called_once()
-        mock_create_server.assert_called_once()
 
     # Note: Removed obsolete _parse_message tests that tested return values.
     # The _parse_message method was refactored to return None and work via
@@ -511,7 +504,6 @@ class ClaudeTestCase(base.AsyncTestCase):
         """Test _parse_message with AssistantMessage."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -535,7 +527,6 @@ class ClaudeTestCase(base.AsyncTestCase):
         """Test _parse_message with SystemMessage."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -557,7 +548,6 @@ class ClaudeTestCase(base.AsyncTestCase):
         """Test _parse_message with UserMessage."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -581,7 +571,6 @@ class ClaudeTestCase(base.AsyncTestCase):
         """Test _log_message method with list of text blocks."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -623,7 +612,6 @@ class ClaudeTestCase(base.AsyncTestCase):
         """Test _log_message method with string content."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -645,7 +633,6 @@ class ClaudeTestCase(base.AsyncTestCase):
         """Test _log_message method with unknown block type."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -669,6 +656,73 @@ class ClaudeTestCase(base.AsyncTestCase):
     # Note: execute-related tests moved to tests/actions/test_claude.py
     # Note: Removed obsolete session_id update tests - _parse_message now
     # returns None
+
+    def test_parse_message_result_with_structured_output(self) -> None:
+        """Test _parse_message extracts structured_output."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # Create a proper ResultMessage-like object
+        message = claude_agent_sdk.ResultMessage(
+            subtype='success',
+            duration_ms=100,
+            duration_api_ms=90,
+            is_error=False,
+            num_turns=1,
+            session_id='test-session',
+            total_cost_usd=0.01,
+            usage=_create_mock_result_message_usage(),
+            result='Success',
+            structured_output={'message': 'Task completed successfully'},
+        )
+
+        claude_instance._parse_message(message)
+
+        self.assertEqual(
+            claude_instance._structured_output,
+            {'message': 'Task completed successfully'},
+        )
+
+    def test_parse_message_result_without_structured_output(self) -> None:
+        """Test _parse_message handles ResultMessage without output."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # Create a proper ResultMessage-like object without structured_output
+        message = claude_agent_sdk.ResultMessage(
+            subtype='success',
+            duration_ms=100,
+            duration_api_ms=90,
+            is_error=False,
+            num_turns=1,
+            session_id='test-session',
+            total_cost_usd=0.01,
+            usage=_create_mock_result_message_usage(),
+            result='Success',
+            structured_output=None,
+        )
+
+        claude_instance._parse_message(message)
+
+        self.assertIsNone(claude_instance._structured_output)
 
 
 if __name__ == '__main__':

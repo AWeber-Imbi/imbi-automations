@@ -10,6 +10,24 @@ import typing
 
 from imbi_automations import claude, mixins, models, prompts
 
+# Type alias for response model types
+ResponseModel = (
+    type[models.ClaudeAgentPlanningResult]
+    | type[models.ClaudeAgentTaskResult]
+    | type[models.ClaudeAgentValidationResult]
+)
+
+
+def _get_response_model(agent: models.ClaudeAgentType) -> ResponseModel:
+    """Return the appropriate response model for the given agent type."""
+    match agent:
+        case models.ClaudeAgentType.planning:
+            return models.ClaudeAgentPlanningResult
+        case models.ClaudeAgentType.task:
+            return models.ClaudeAgentTaskResult
+        case models.ClaudeAgentType.validation:
+            return models.ClaudeAgentValidationResult
+
 
 class ClaudeAction(mixins.WorkflowLoggerMixin):
     """Executes AI-powered code transformations using Claude Code SDK.
@@ -135,7 +153,9 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 prompt,
             )
 
-            run = await self.claude.agent_query(prompt)
+            # Select response model based on agent type
+            response_model = _get_response_model(agent)
+            run = await self.claude.agent_query(prompt, response_model)
             self.logger.info(
                 '%s [%s/%s] %s executed Claude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
