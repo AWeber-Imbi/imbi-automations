@@ -218,8 +218,15 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         action: models.WorkflowClaudeAction,
         agent: models.ClaudeAgentType,
     ) -> str:
-        """Return the rendered prompt for the given agent."""
-        prompt = f'Use the "{agent}" agent to complete the following task:\n\n'
+        """Return the rendered prompt for the given agent.
+
+        Prepends the agent's system prompt to guide behavior, then appends the
+        workflow-specific task prompt. This enables direct execution with
+        structured output format instead of spawning a subagent.
+        """
+        # Get the agent's system prompt to guide behavior
+        agent_prompt = self.claude.get_agent_prompt(agent)
+        prompt = f'{agent_prompt}\n\n---\n\n# TASK\n\n'
 
         if agent == models.ClaudeAgentType.planning:
             prompt_file = (

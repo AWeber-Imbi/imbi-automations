@@ -178,6 +178,24 @@ class Claude(mixins.WorkflowLoggerMixin):
         self._merged_local_plugins: list[models.ClaudeLocalPlugin] = []
         self.client = self._create_client()
 
+    def get_agent_prompt(self, agent_type: models.ClaudeAgentType) -> str:
+        """Get the prompt content for a specific agent type.
+
+        Args:
+            agent_type: The type of agent (planning, task, validation)
+
+        Returns:
+            The agent's prompt content
+
+        Raises:
+            ValueError: If the agent type has no definition
+
+        """
+        agent_def = self.agents.get(agent_type.value)
+        if agent_def is None:
+            raise ValueError(f'No agent definition for {agent_type.value}')
+        return agent_def.prompt
+
     async def agent_query(
         self, prompt: str, response_model: type[AgentResult] | None = None
     ) -> AgentResult | None:
@@ -195,22 +213,27 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         """
         self._structured_output: dict[str, typing.Any] | None = None
-        await self.client.connect()
 
-        # Set output format if response model provided
+        # Set output format BEFORE connecting - SDK reads it at connect time
         if response_model is not None:
-            self.client.options.output_format = {
+            output_format = {
                 'type': 'json_schema',
                 'schema': response_model.model_json_schema(),
             }
+            self.client.options.output_format = output_format
+            LOGGER.debug(
+                'Setting output_format for %s: %r',
+                response_model.__name__,
+                output_format,
+            )
+        else:
+            self.client.options.output_format = None
 
+        await self.client.connect()
         await self.client.query(prompt)
         async for message in self.client.receive_response():
             self._parse_message(message)
         await self.client.disconnect()
-
-        # Clear output format for next query
-        self.client.options.output_format = None
 
         if self._structured_output is None:
             raise RuntimeError(
