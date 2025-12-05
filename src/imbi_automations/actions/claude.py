@@ -27,6 +27,8 @@ def _get_response_model(agent: models.ClaudeAgentType) -> ResponseModel:
             return models.ClaudeAgentTaskResult
         case models.ClaudeAgentType.validation:
             return models.ClaudeAgentValidationResult
+        case _:
+            raise ValueError(f'Unknown agent type: {agent}')
 
 
 class ClaudeAction(mixins.WorkflowLoggerMixin):
