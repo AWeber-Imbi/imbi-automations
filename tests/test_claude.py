@@ -724,6 +724,56 @@ class ClaudeTestCase(base.AsyncTestCase):
 
         self.assertIsNone(claude_instance._structured_output)
 
+    def test_get_agent_prompt_returns_prompt(self) -> None:
+        """Test get_agent_prompt returns the agent's prompt content."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # Set up agents with prompt content using AgentDefinition dataclass
+        from claude_agent_sdk import types
+
+        claude_instance.agents['task'] = types.AgentDefinition(
+            description='Test agent',
+            prompt='# TASK AGENT\n\nExecute the task.',
+            tools=['Read', 'Write'],
+            model='inherit',
+        )
+
+        result = claude_instance.get_agent_prompt(models.ClaudeAgentType.task)
+
+        self.assertEqual(result, '# TASK AGENT\n\nExecute the task.')
+
+    def test_get_agent_prompt_raises_for_missing_agent(self) -> None:
+        """Test get_agent_prompt raises ValueError for missing agent."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # Ensure the agent is None (default from Agents TypedDict)
+        claude_instance.agents['planning'] = None
+
+        with self.assertRaises(ValueError) as exc_context:
+            claude_instance.get_agent_prompt(models.ClaudeAgentType.planning)
+
+        self.assertIn('No agent definition', str(exc_context.exception))
+
 
 if __name__ == '__main__':
     unittest.main()
