@@ -10,6 +10,26 @@ import typing
 
 from imbi_automations import claude, mixins, models, prompts
 
+# Type alias for response model types
+ResponseModel = (
+    type[models.ClaudeAgentPlanningResult]
+    | type[models.ClaudeAgentTaskResult]
+    | type[models.ClaudeAgentValidationResult]
+)
+
+
+def _get_response_model(agent: models.ClaudeAgentType) -> ResponseModel:
+    """Return the appropriate response model for the given agent type."""
+    match agent:
+        case models.ClaudeAgentType.planning:
+            return models.ClaudeAgentPlanningResult
+        case models.ClaudeAgentType.task:
+            return models.ClaudeAgentTaskResult
+        case models.ClaudeAgentType.validation:
+            return models.ClaudeAgentValidationResult
+        case _:
+            raise ValueError(f'Unknown agent type: {agent}')
+
 
 class ClaudeAction(mixins.WorkflowLoggerMixin):
     """Executes AI-powered code transformations using Claude Code SDK.
@@ -135,7 +155,9 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 prompt,
             )
 
-            run = await self.claude.agent_query(prompt)
+            # Select response model based on agent type
+            response_model = _get_response_model(agent)
+            run = await self.claude.agent_query(prompt, response_model)
             self.logger.info(
                 '%s [%s/%s] %s executed Claude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
@@ -198,8 +220,15 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         action: models.WorkflowClaudeAction,
         agent: models.ClaudeAgentType,
     ) -> str:
-        """Return the rendered prompt for the given agent."""
-        prompt = f'Use the "{agent}" agent to complete the following task:\n\n'
+        """Return the rendered prompt for the given agent.
+
+        Prepends the agent's system prompt to guide behavior, then appends the
+        workflow-specific task prompt. This enables direct execution with
+        structured output format instead of spawning a subagent.
+        """
+        # Get the agent's system prompt to guide behavior
+        agent_prompt = self.claude.get_agent_prompt(agent)
+        prompt = f'{agent_prompt}\n\n---\n\n# TASK\n\n'
 
         if agent == models.ClaudeAgentType.planning:
             prompt_file = (

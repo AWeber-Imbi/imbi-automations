@@ -216,7 +216,7 @@ State saved in `.state` file (MessagePack format) with:
 
 - Base class: `AsyncTestCase` (extends `unittest.IsolatedAsyncioTestCase`)
 - HTTP mocking: `httpx.MockTransport` with JSON fixtures in `tests/data/`
-- 475 tests with full async support
+- 480 tests with full async support
 
 ## CI/CD
 

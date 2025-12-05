@@ -73,7 +73,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         """Test _get_prompt method for task agent with Jinja2 template."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -94,15 +93,22 @@ class ClaudeActionTestCase(base.AsyncTestCase):
             template_content
         )
 
-        with mock.patch(
-            'imbi_automations.prompts.render',
-            return_value='Hello test-project!',
-        ) as mock_render:
+        with (
+            mock.patch(
+                'imbi_automations.prompts.render',
+                return_value='Hello test-project!',
+            ) as mock_render,
+            mock.patch.object(
+                claude_action.claude,
+                'get_agent_prompt',
+                return_value='# TASK AGENT\n\nExecute the task.',
+            ),
+        ):
             prompt = claude_action._get_prompt(
                 action, models.ClaudeAgentType.task
             )
 
-        self.assertIn('"task"', prompt)
+        self.assertIn('TASK AGENT', prompt)
         self.assertIn('Hello test-project!', prompt)
         mock_render.assert_called_once()
 
@@ -110,7 +116,6 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         """Test _get_prompt method for validator agent with plain text."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -134,16 +139,24 @@ class ClaudeActionTestCase(base.AsyncTestCase):
             self.working_directory / 'workflow' / 'test-validation.md'
         ).write_text(validation_content)
 
-        prompt = claude_action._get_prompt(
-            action, models.ClaudeAgentType.validation
-        )
+        with mock.patch.object(
+            claude_action.claude,
+            'get_agent_prompt',
+            return_value='# VALIDATION AGENT\n\nValidate the work.',
+        ):
+            prompt = claude_action._get_prompt(
+                action, models.ClaudeAgentType.validation
+            )
 
-        self.assertIn('"validation"', prompt)
+        self.assertIn('VALIDATION AGENT', prompt)
         self.assertIn('Validate the generated code', prompt)
 
     @mock.patch('imbi_automations.claude.Claude.agent_query')
+    @mock.patch('imbi_automations.claude.Claude.get_agent_prompt')
     async def test_execute_cycle_success(
-        self, mock_agent_query: mock.AsyncMock
+        self,
+        mock_get_agent_prompt: mock.Mock,
+        mock_agent_query: mock.AsyncMock,
     ) -> None:
         """Test successful execution cycle."""
         # Mock successful agent responses - task returns TaskResult,
@@ -152,10 +165,10 @@ class ClaudeActionTestCase(base.AsyncTestCase):
             models.ClaudeAgentTaskResult(message='Success'),
             models.ClaudeAgentValidationResult(validated=True, errors=[]),
         ]
+        mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -187,8 +200,11 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         self.assertEqual(mock_agent_query.call_count, 2)  # task + validator
 
     @mock.patch('imbi_automations.claude.Claude.agent_query')
+    @mock.patch('imbi_automations.claude.Claude.get_agent_prompt')
     async def test_execute_cycle_validation_failure(
-        self, mock_agent_query: mock.AsyncMock
+        self,
+        mock_get_agent_prompt: mock.Mock,
+        mock_agent_query: mock.AsyncMock,
     ) -> None:
         """Test execution cycle with validation failure."""
         # Mock task agent completing, then validation failing
@@ -198,10 +214,10 @@ class ClaudeActionTestCase(base.AsyncTestCase):
                 validated=False, errors=['Error 1']
             ),
         ]
+        mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -232,18 +248,21 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         self.assertEqual(mock_agent_query.call_count, 2)  # task + validation
 
     @mock.patch('imbi_automations.claude.Claude.agent_query')
+    @mock.patch('imbi_automations.claude.Claude.get_agent_prompt')
     async def test_execute_all_cycles_success(
-        self, mock_agent_query: mock.AsyncMock
+        self,
+        mock_get_agent_prompt: mock.Mock,
+        mock_agent_query: mock.AsyncMock,
     ) -> None:
         """Test execute with successful first cycle."""
         # Task agent without validation returns True (success)
         mock_agent_query.return_value = models.ClaudeAgentTaskResult(
             message='Success'
         )
+        mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -271,8 +290,11 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         mock_agent_query.assert_called_once()
 
     @mock.patch('imbi_automations.claude.Claude.agent_query')
+    @mock.patch('imbi_automations.claude.Claude.get_agent_prompt')
     async def test_execute_all_cycles_fail(
-        self, mock_agent_query: mock.AsyncMock
+        self,
+        mock_get_agent_prompt: mock.Mock,
+        mock_agent_query: mock.AsyncMock,
     ) -> None:
         """Test execute with all cycles failing."""
         # Task agent returns TaskResult (always succeeds at execution level).
@@ -289,10 +311,10 @@ class ClaudeActionTestCase(base.AsyncTestCase):
                 validated=False, errors=['Error']
             ),
         ]
+        mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -327,8 +349,11 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         )  # 2 cycles * (task + validation)
 
     @mock.patch('imbi_automations.claude.Claude.agent_query')
+    @mock.patch('imbi_automations.claude.Claude.get_agent_prompt')
     async def test_execute_multiple_cycles_eventual_success(
-        self, mock_agent_query: mock.AsyncMock
+        self,
+        mock_get_agent_prompt: mock.Mock,
+        mock_agent_query: mock.AsyncMock,
     ) -> None:
         """Test execute with success on second cycle."""
         # First cycle: task + validation fails,
@@ -343,10 +368,10 @@ class ClaudeActionTestCase(base.AsyncTestCase):
             models.ClaudeAgentTaskResult(message='Task completed'),
             models.ClaudeAgentValidationResult(validated=True, errors=[]),
         ]
+        mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
-            mock.patch('claude_agent_sdk.create_sdk_mcp_server'),
             mock.patch(
                 'builtins.open',
                 new_callable=mock.mock_open,
@@ -377,6 +402,25 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         self.assertEqual(
             mock_agent_query.call_count, 4
         )  # 2 cycles * (task + validation)
+
+
+class GetResponseModelTestCase(unittest.TestCase):
+    """Test cases for the _get_response_model function."""
+
+    def test_get_response_model_planning(self) -> None:
+        """Test _get_response_model returns correct model for planning."""
+        result = claude._get_response_model(models.ClaudeAgentType.planning)
+        self.assertIs(result, models.ClaudeAgentPlanningResult)
+
+    def test_get_response_model_task(self) -> None:
+        """Test _get_response_model returns correct model for task."""
+        result = claude._get_response_model(models.ClaudeAgentType.task)
+        self.assertIs(result, models.ClaudeAgentTaskResult)
+
+    def test_get_response_model_validation(self) -> None:
+        """Test _get_response_model returns correct model for validation."""
+        result = claude._get_response_model(models.ClaudeAgentType.validation)
+        self.assertIs(result, models.ClaudeAgentValidationResult)
 
 
 if __name__ == '__main__':
