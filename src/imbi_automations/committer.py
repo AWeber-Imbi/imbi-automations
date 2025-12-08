@@ -72,7 +72,7 @@ class Committer(mixins.WorkflowLoggerMixin):
             **client.prompt_kwargs,
         )
 
-        result = await client.agent_query(prompt)
+        result = await client.agent_query(prompt, models.ClaudeAgentTaskResult)
 
         # Check if agent indicated no changes to commit
         for phrase in ['no changes to commit', 'working tree is clean']:
