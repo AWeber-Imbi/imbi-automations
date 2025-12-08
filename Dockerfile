@@ -24,7 +24,7 @@ RUN apt-get update \
  && pip install --root-user-action ignore --break-system-packages --no-cache-dir --upgrade pip \
  && pip install --root-user-action ignore --break-system-packages --no-cache-dir /tmp/imbi_automations*.whl \
  && rm /tmp/*.whl \
- && mkdir -p /opt/config /opt/errors /opt/logs /opt/workflows /docker-entrypoint-init.d \
+ && mkdir -p /opt/config /opt/dry-runs /opt/errors /opt/logs /opt/workflows /docker-entrypoint-init.d \
  && groupadd --gid 1000 imbi-automations \
  && useradd --uid 1000 --gid 1000 --shell /bin/bash \
             --home-dir /home/imbi-automations --create-home \
@@ -42,7 +42,7 @@ RUN curl -fsSL https://claude.ai/install.sh | bash
 
 WORKDIR /opt
 
-VOLUME /opt/config /opt/errors /opt/workflows /docker-entrypoint-init.d
+VOLUME /opt/config /opt/dry-runs /opt/errors /opt/workflows /docker-entrypoint-init.d
 
 ENTRYPOINT ["docker-entrypoint.sh", "imbi-automations"]
 

@@ -454,7 +454,7 @@ git diff HEAD~1
 Specify directory for saving dry-run repository states.
 
 **Type:** Directory path
-**Default:** `./dry-runs`  
+**Default:** `./dry-runs`
 
 **Example:**
 ```bash
@@ -463,6 +463,8 @@ imbi-automations config.toml workflows/update \
   --dry-run \
   --dry-run-dir /tmp/review-changes
 ```
+
+**Docker:** When running in Docker, use `--dry-run-dir /opt/dry-runs` and mount a host directory to `/opt/dry-runs` to persist dry-run artifacts outside the container.
 
 **Directory Structure:**  
 ```

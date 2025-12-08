@@ -30,6 +30,7 @@ docker run --rm \
 | `/opt/config/config.toml` | Configuration file | Mount as read-only |
 | `/opt/workflows` | Workflow definitions | Mount as read-only |
 | `/home/imbi-automations/.ssh` | SSH keys | Mount as read-only; enables commit signing |
+| `/opt/dry-runs` | Dry-run artifacts | Mount if using `--dry-run` |
 | `/opt/errors` | Error preservation | Mount if using `--preserve-on-error` |
 | `/docker-entrypoint-init.d` | Initialization scripts | See [Initialization Directory](#initialization-directory) |
 
@@ -242,6 +243,7 @@ docker run --rm -t --group-add staff \
     -v $(pwd)/.ssh:/home/imbi-automations/.ssh:ro \
     -v $(pwd)/config.toml:/opt/config/config.toml:ro \
     -v $(pwd)/docker-entrypoint-init.d:/docker-entrypoint-init.d:ro \
+    -v $(pwd)/dry-runs:/opt/dry-runs \
     -v $(pwd)/errors:/opt/errors \
     -v $(pwd):/opt/workflows:ro \
     -v /var/run/docker.sock:/var/run/docker.sock:rw \
@@ -284,6 +286,7 @@ services:
       - ./workflows:/opt/workflows:ro
       - ./.ssh:/home/imbi-automations/.ssh:ro
       - ./docker-entrypoint-init.d:/docker-entrypoint-init.d:ro
+      - ./dry-runs:/opt/dry-runs
       - ./errors:/opt/errors
       - /var/run/docker.sock:/var/run/docker.sock:rw
     env_file:
