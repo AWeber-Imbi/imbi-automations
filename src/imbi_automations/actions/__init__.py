@@ -10,7 +10,7 @@ Supported action types:
 - claude: AI-powered transformations using Claude Code SDK
 - docker: Docker container operations and file extractions
 - file: File manipulation (copy, move, regex replacement)
-- git: Git operations (revert, extract, branch management)
+- git: Git operations (extract from history, clone repositories)
 - github: GitHub-specific operations and API integrations
 - imbi: Imbi API operations and integrations
 - shell: Shell command execution with templating support
