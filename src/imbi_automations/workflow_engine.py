@@ -508,7 +508,6 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             | models.WorkflowGitHubAction
             | models.WorkflowShellAction
             | models.WorkflowTemplateAction
-            | models.WorkflowUtilityAction
         ),
     ) -> bool:
         """Execute an action.

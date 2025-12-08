@@ -80,8 +80,6 @@ from .workflow import (
     WorkflowImbiActionCommand,
     WorkflowShellAction,
     WorkflowTemplateAction,
-    WorkflowUtilityAction,
-    WorkflowUtilityCommands,
 )
 
 __all__ = [
@@ -159,6 +157,4 @@ __all__ = [
     'WorkflowImbiActionCommand',
     'WorkflowShellAction',
     'WorkflowTemplateAction',
-    'WorkflowUtilityAction',
-    'WorkflowUtilityCommands',
 ]
