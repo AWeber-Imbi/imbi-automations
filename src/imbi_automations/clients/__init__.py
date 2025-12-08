@@ -1,7 +1,7 @@
 """Client exports for HTTP and API clients.
 
-Provides access to GitHub, GitLab, and Imbi API clients along with base
-HTTP client classes and HTTP status codes.
+Provides access to GitHub and Imbi API clients along with base HTTP client
+classes and HTTP status codes.
 """
 
 from .github import GitHub

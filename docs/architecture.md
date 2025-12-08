@@ -302,7 +302,7 @@ max_retries = 3
 
 - **Failure Files**: Create specific failure files to signal workflow abortion
 - **Detailed Logging**: Include actionable error information
-- **Recovery Strategies**: Configurable retry and rollback mechanisms
+- **Recovery Strategies**: Configurable retry mechanisms and `on_failure` action chains
 
 ### Resource Management
 

@@ -1,9 +1,9 @@
 """Configuration models with Pydantic validation.
 
 Defines configuration data models for all external integrations including
-Anthropic, GitHub, GitLab, Imbi, Claude Code, and SonarQube. All models
-use Pydantic for validation with SecretStr for sensitive data and
-environment variable defaults.
+Anthropic, GitHub, Imbi, Claude Code, and SonarQube. All models use Pydantic
+for validation with SecretStr for sensitive data and environment variable
+defaults.
 """
 
 import pathlib
