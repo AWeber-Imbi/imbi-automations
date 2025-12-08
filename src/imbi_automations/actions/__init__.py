@@ -15,7 +15,6 @@ Supported action types:
 - imbi: Imbi API operations and integrations
 - shell: Shell command execution with templating support
 - template: Jinja2 template rendering with full workflow context
-- utility: Helper operations for common workflow tasks
 """
 
 import logging
@@ -32,7 +31,6 @@ from . import (
     imbi,
     shell,
     template,
-    utility,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -65,7 +63,6 @@ class Actions(mixins.WorkflowLoggerMixin):
             | models.WorkflowImbiAction
             | models.WorkflowShellAction
             | models.WorkflowTemplateAction
-            | models.WorkflowUtilityAction
         ),
     ) -> None:
         self._set_workflow_logger(context.workflow)
@@ -102,10 +99,6 @@ class Actions(mixins.WorkflowLoggerMixin):
                 )
             case models.WorkflowActionTypes.template:
                 obj = template.TemplateAction(
-                    self.configuration, context, self.verbose
-                )
-            case models.WorkflowActionTypes.utility:
-                obj = utility.UtilityActions(
                     self.configuration, context, self.verbose
                 )
             case _:

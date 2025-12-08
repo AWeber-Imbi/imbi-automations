@@ -8,10 +8,9 @@
 # 4. Complex workflow configurations can be parsed successfully
 #
 # Coverage includes:
-# - All action types: claude, docker, file, git, github, shell, template, utility
+# - All action types: claude, docker, file, git, github, shell, template
 # - All file commands: append, copy, delete (path & pattern), move, rename, write
 # - All docker commands: build, extract, pull, push (with and without tags)
-# - All utility commands: docker_tag, dockerfile_from, parse_python_constraints
 # - Both local and remote conditions
 # - Complex filter configurations
 # - Action-level conditions and failure handling
@@ -220,30 +219,6 @@ name = "test-template-action"
 type = "template"
 source = "templates/docker/Dockerfile.j2"
 destination = "Dockerfile"
-
-# 9. Utility Actions - all command types
-
-# Utility docker_tag
-[[actions]]
-name = "test-utility-docker-tag"
-type = "utility"
-command = "docker_tag"
-path = "Dockerfile"
-args = ["--format", "json"]
-
-# Utility dockerfile_from
-[[actions]]
-name = "test-utility-dockerfile-from"
-type = "utility"
-command = "dockerfile_from"
-path = "docker/Dockerfile"
-
-# Utility parse_python_constraints
-[[actions]]
-name = "test-utility-python-constraints"
-type = "utility"
-command = "parse_python_constraints"
-path = "pyproject.toml"
 
 # Cleanup action (referenced by on_failure)
 [[actions]]

@@ -3,23 +3,6 @@
 This document tracks unfinished functionality, planned features, and known issues
 that should be addressed before the 1.0 release.
 
-## Unimplemented Features
-
-### Utility Actions
-
-Three utility commands raise `NotImplementedError`:
-
-| Command | File | Lines | Purpose | Priority |
-|---------|------|-------|---------|----------|
-| `docker_tag` | `src/imbi_automations/actions/utility.py` | 26-28 | Parse Docker image tags | Low |
-| `dockerfile_from` | `src/imbi_automations/actions/utility.py` | 30-32 | Extract FROM directive | Low |
-| `parse_python_constraints` | `src/imbi_automations/actions/utility.py` | 34-36 | Parse Python version constraints | Low |
-
-**Note:** The `semver_compare` command IS implemented and functional.
-
-**Recommendation for 1.0:** Either implement these utilities or remove them from
-the `WorkflowUtilityCommands` enum.
-
 ## Planned Features (Future Enhancements)
 
 These are documented as "planned" but not critical for 1.0:
@@ -46,7 +29,6 @@ Several action types lack dedicated unit tests:
 | `template` | `actions/template.py` | `test_template.py` | Missing |
 | `git` | `actions/git.py` | `test_git.py` | Missing |
 | `imbi` | `actions/imbi.py` | `test_imbi.py` | Missing |
-| `utility` | `actions/utility.py` | `test_utility.py` | Missing |
 
 **Existing tests:** callable, claude, docker, file, github, shell
 
@@ -72,19 +54,13 @@ Several action types lack dedicated unit tests:
 - API error handling
 - Fact value validation
 
-### Utility Actions
-
-**Recommendation:** Add unit tests for:
-- `semver_compare` command (the only implemented command)
-- Error handling for unimplemented commands
-
 ## Pre-1.0 Checklist
 
 ### Must Fix
 - [x] Update template action documentation to remove incorrect bug warnings
 - [x] Implement docker build/pull/push commands
-- [ ] Decide: implement or remove unimplemented utility commands
-- [ ] Add unit tests for missing action types (template, git, imbi, utility)
+- [x] Remove unimplemented utility action type (functionality available via template functions)
+- [ ] Add unit tests for missing action types (template, git, imbi)
 
 ### Should Address
 - [x] Remove GitLab references if not implementing GitLab support
