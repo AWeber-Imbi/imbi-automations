@@ -29,6 +29,7 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Database",
   "Topic :: System :: Systems Administration",
   "Typing :: Typed",
@@ -36,7 +37,7 @@ classifiers = [
 dependencies = [
   "anthropic[bedrock]",
   "async_lru",
-  "claude-agent-sdk>=0.1.10",
+  "claude-agent-sdk>=0.1.13",
   "colorlog",
   "httpx",
   "jinja2",
