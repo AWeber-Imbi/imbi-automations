@@ -55,7 +55,7 @@ Environment variables for Claude Agent SDK integration.
 **Example:**
 ```bash
 export CLAUDE_EXECUTABLE="/usr/local/bin/claude"
-export CLAUDE_MODEL="claude-sonnet-4"
+export CLAUDE_MODEL="claude-sonnet-4-5"
 export CLAUDE_ENABLED="true"
 ```
 

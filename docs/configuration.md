@@ -24,12 +24,13 @@ preserve_on_error = false
 [anthropic]
 api_key = "${ANTHROPIC_API_KEY}"  # Or set directly
 bedrock = false
-model = "claude-3-5-sonnet-latest"
+model = "claude-haiku-4-5-20251001"
 
 # Claude Agent SDK Configuration
 [claude]
 executable = "claude"
 enabled = true
+model = "claude-haiku-4-5"
 
 # Git Configuration
 [git]
@@ -232,6 +233,25 @@ Set to `false` to disable all Claude actions:
 enabled = false
 ```
 
+### [claude].model
+
+Claude model to use for Claude Code SDK operations.
+
+**Type:** `string`
+**Default:** `claude-haiku-4-5`
+**Environment Variable:** `CLAUDE_MODEL`
+
+```toml
+[claude]
+model = "claude-sonnet-4-5"
+```
+
+Available models include:
+
+- `claude-haiku-4-5` - Fast, cost-effective (default)
+- `claude-sonnet-4-5` - Balanced performance
+- `claude-opus-4-5` - Most capable
+
 ### [claude].base_prompt
 
 Custom base prompt file for Claude Code sessions.
@@ -315,7 +335,7 @@ path = "/another/plugin/directory"
 ```toml
 [claude]
 enabled = true
-model = "claude-sonnet-4"
+model = "claude-sonnet-4-5"
 
 [claude.plugins.enabled_plugins]
 "git-repository@aweber-marketplace" = true
@@ -398,6 +418,32 @@ GPG or SSH signing key identifier.
 ```toml
 [git]
 signing_key = "~/.ssh/id_ed25519.pub"
+```
+
+### [git].ssh_program
+
+SSH program for commit signing (for SSH signing with 1Password, etc.).
+
+**Type:** `string`
+**Default:** `null`
+
+```toml
+[git]
+gpg_format = "ssh"
+ssh_program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+```
+
+### [git].gpg_program
+
+GPG program path for traditional GPG signing.
+
+**Type:** `string`
+**Default:** `null`
+
+```toml
+[git]
+gpg_sign = true
+gpg_program = "/usr/local/bin/gpg"
 ```
 
 ### [git].commit_args
@@ -739,11 +785,11 @@ ai_commits = true
 
 [anthropic]
 api_key = "${ANTHROPIC_API_KEY}"
-model = "claude-3-5-sonnet-latest"
+model = "claude-sonnet-4-5-20250514"
 
 [claude]
 enabled = true
-executable = "claude"
+model = "claude-sonnet-4-5"
 
 [github]
 token = "${GITHUB_TOKEN}"
