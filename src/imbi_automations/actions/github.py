@@ -324,6 +324,7 @@ class GitHubActions(mixins.WorkflowLoggerMixin):
                     imbi_project=self.context.imbi_project,
                     working_directory=self.context.working_directory,
                     starting_commit=self.context.starting_commit,
+                    variables=self.context.variables,
                 )
                 rendered_attributes[attr_name] = rendered_value
             else:

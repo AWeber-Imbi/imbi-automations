@@ -276,6 +276,33 @@ class ImbiActionsTestCase(base.AsyncTestCase):
             project_id=123, attributes={'description': 'Project: Test Project'}
         )
 
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_update_project_with_variables(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test update_project can access workflow variables in templates."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        # Set a variable in context (as get_project_fact would do)
+        self.context.variables['old_description'] = 'Legacy API'
+
+        action = models.WorkflowImbiAction(
+            name='update-project-with-vars',
+            type='imbi',
+            command='update_project',
+            attributes={
+                'description': 'Upgraded from: {{ variables.old_description }}'
+            },
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.update_project_attributes.assert_called_once_with(
+            project_id=123,
+            attributes={'description': 'Upgraded from: Legacy API'},
+        )
+
     async def test_execute_update_project_missing_attributes(self) -> None:
         """Test update_project raises error when attributes is empty."""
         action = models.WorkflowImbiAction(
