@@ -88,8 +88,8 @@ Several action types lack dedicated unit tests:
 ### Git Actions
 
 **Recommendation:** Add unit tests for:
-- `extract_file` command
-- `revert_file` command
+- `extract` command (extract file from git history)
+- `clone` command (clone external repository)
 - Error handling for missing files/commits
 
 ### Imbi Actions
@@ -114,13 +114,12 @@ Several action types lack dedicated unit tests:
 - [ ] Add unit tests for missing action types (template, git, imbi, utility)
 
 ### Should Address
-- [ ] Remove GitLab references if not implementing GitLab support
-- [ ] Clarify rollback capabilities in documentation
+- [x] Remove GitLab references if not implementing GitLab support
+- [x] Clarify rollback capabilities in documentation
 
 ### Nice to Have
 - [ ] Implement docker build/pull/push commands
 - [ ] Implement additional Imbi actions (get_project_fact, etc.)
-- [ ] Add GitLab provider support
 
 ## Version History
 

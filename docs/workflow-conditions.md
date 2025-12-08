@@ -47,7 +47,7 @@ Remote conditions are checked via API before cloning the repository. They are **
 
 #### remote_file_exists
 
-Check if a file exists using GitHub/GitLab API.
+Check if a file exists using the GitHub API.
 
 **Type:** `string` (file path or glob pattern)  
 
@@ -73,7 +73,7 @@ remote_file_exists = "setup.cfg"
 
 #### remote_file_not_exists
 
-Check if a file does NOT exist using GitHub/GitLab API.
+Check if a file does NOT exist using the GitHub API.
 
 **Type:** `string` (file path or glob pattern)  
 
@@ -140,15 +140,15 @@ remote_file = "pyproject.toml"
 
 Specify which API client to use for remote checks.
 
-**Type:** `string`  
+**Type:** `string`
 
-**Values:** `"github"` (default), `"gitlab"`
+**Values:** `"github"` (default)
 
 
 ```toml
 [[conditions]]
-remote_client = "gitlab"
-remote_file_exists = ".gitlab-ci.yml"
+remote_client = "github"
+remote_file_exists = ".github/workflows/ci.yml"
 ```
 
 ### Local Conditions (Post-Clone)
@@ -700,7 +700,7 @@ remote_file = "setup.cfg"
 | Feature | Filters | Remote Conditions | Local Conditions |
 |---------|---------|------------------|------------------|
 | **When evaluated** | Before processing | Before cloning | After cloning |
-| **Data source** | Imbi metadata | GitHub/GitLab API | Local filesystem |
+| **Data source** | Imbi metadata | GitHub API | Local filesystem |
 | **Speed** | ⚡⚡⚡ Fastest | ⚡⚡ Fast | ⚡ Slower |
 | **Use for** | Project metadata | File existence/content | Complex patterns |
 | **Glob support** | No | Limited | Full |

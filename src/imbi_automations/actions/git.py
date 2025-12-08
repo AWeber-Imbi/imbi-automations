@@ -1,7 +1,7 @@
 """Git operation actions for version control within workflows.
 
-Provides git operations including file reversion, content extraction from
-history, and branch management for workflow automation tasks.
+Provides git operations including content extraction from history and
+repository cloning for workflow automation tasks.
 """
 
 from imbi_automations import git, mixins, models, utils
