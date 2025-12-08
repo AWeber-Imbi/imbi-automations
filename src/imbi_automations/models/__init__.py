@@ -1,6 +1,6 @@
 """Model exports for all Pydantic models used across the application.
 
-Centralizes imports for configuration, API responses (GitHub, GitLab, Imbi),
+Centralizes imports for configuration, API responses (GitHub, Imbi),
 workflow definitions, git operations, and Claude Code integration models.
 """
 
@@ -80,8 +80,6 @@ from .workflow import (
     WorkflowImbiActionCommand,
     WorkflowShellAction,
     WorkflowTemplateAction,
-    WorkflowUtilityAction,
-    WorkflowUtilityCommands,
 )
 
 __all__ = [
@@ -159,6 +157,4 @@ __all__ = [
     'WorkflowImbiActionCommand',
     'WorkflowShellAction',
     'WorkflowTemplateAction',
-    'WorkflowUtilityAction',
-    'WorkflowUtilityCommands',
 ]

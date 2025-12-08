@@ -10,12 +10,11 @@ Supported action types:
 - claude: AI-powered transformations using Claude Code SDK
 - docker: Docker container operations and file extractions
 - file: File manipulation (copy, move, regex replacement)
-- git: Git operations (revert, extract, branch management)
+- git: Git operations (extract from history, clone repositories)
 - github: GitHub-specific operations and API integrations
 - imbi: Imbi API operations and integrations
 - shell: Shell command execution with templating support
 - template: Jinja2 template rendering with full workflow context
-- utility: Helper operations for common workflow tasks
 """
 
 import logging
@@ -32,7 +31,6 @@ from . import (
     imbi,
     shell,
     template,
-    utility,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -65,7 +63,6 @@ class Actions(mixins.WorkflowLoggerMixin):
             | models.WorkflowImbiAction
             | models.WorkflowShellAction
             | models.WorkflowTemplateAction
-            | models.WorkflowUtilityAction
         ),
     ) -> None:
         self._set_workflow_logger(context.workflow)
@@ -102,10 +99,6 @@ class Actions(mixins.WorkflowLoggerMixin):
                 )
             case models.WorkflowActionTypes.template:
                 obj = template.TemplateAction(
-                    self.configuration, context, self.verbose
-                )
-            case models.WorkflowActionTypes.utility:
-                obj = utility.UtilityActions(
                     self.configuration, context, self.verbose
                 )
             case _:

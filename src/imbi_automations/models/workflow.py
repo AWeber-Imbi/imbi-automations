@@ -1,7 +1,7 @@
 """Workflow definition models with comprehensive action and condition support.
 
 Defines the complete workflow structure including actions (callable, claude,
-docker, file, git, github, shell, template, utility), conditions (local and
+docker, file, git, github, imbi, shell, template), conditions (local and
 remote file checks), filters (project targeting), and workflow context for
 execution state management.
 """
@@ -100,7 +100,7 @@ class WorkflowActionTypes(enum.StrEnum):
     """Enumeration of available workflow action types.
 
     Defines all supported action types including callable, claude, docker,
-    file, git, github, imbi, shell, template, and utility actions.
+    file, git, github, imbi, shell, and template actions.
     """
 
     callable = 'callable'
@@ -112,7 +112,6 @@ class WorkflowActionTypes(enum.StrEnum):
     imbi = 'imbi'
     shell = 'shell'
     template = 'template'
-    utility = 'utility'
 
 
 class WorkflowConditionType(enum.StrEnum):
@@ -484,32 +483,6 @@ class WorkflowTemplateAction(WorkflowAction):
     destination: ResourceUrl | str
 
 
-class WorkflowUtilityCommands(enum.StrEnum):
-    """Utility helper operation commands.
-
-    Defines available utility operations including docker tag parsing,
-    Dockerfile base image extraction, and Python constraint parsing.
-    """
-
-    docker_tag = 'docker_tag'
-    dockerfile_from = 'dockerfile_from'
-    parse_python_constraints = 'parse_python_constraints'
-
-
-class WorkflowUtilityAction(WorkflowAction):
-    """Action for utility helper operations and common workflow tasks.
-
-    Provides helper operations for Docker tag parsing, Dockerfile analysis,
-    version comparison, and constraint parsing with flexible arguments.
-    """
-
-    type: typing.Literal['utility'] = 'utility'
-    command: WorkflowUtilityCommands
-    path: ResourceUrl | None = None
-    args: list[typing.Any] = []
-    kwargs: dict[str, typing.Any] = {}
-
-
 WorkflowActions = typing.Annotated[
     (
         WorkflowCallableAction
@@ -521,7 +494,6 @@ WorkflowActions = typing.Annotated[
         | WorkflowImbiAction
         | WorkflowShellAction
         | WorkflowTemplateAction
-        | WorkflowUtilityAction
     ),
     pydantic.Field(discriminator='type'),
 ]

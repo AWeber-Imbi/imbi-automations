@@ -2,7 +2,7 @@
 
 A CLI framework for executing dynamic workflows across software project
 repositories with deep integration to the Imbi project management system.
-Supports GitHub and GitLab with AI-powered transformations via Claude Code SDK.
+Supports GitHub with AI-powered transformations via Claude Code SDK.
 """
 
 from importlib import metadata

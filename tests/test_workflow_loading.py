@@ -36,7 +36,6 @@ class WorkflowLoadingTestCase(unittest.TestCase):
             'github',
             'shell',
             'template',
-            'utility',
         }
 
         self.assertEqual(action_types, expected_types)
@@ -63,19 +62,6 @@ class WorkflowLoadingTestCase(unittest.TestCase):
         expected_docker_commands = {'build', 'extract', 'pull', 'push'}
 
         self.assertEqual(docker_commands, expected_docker_commands)
-
-        # Verify utility action commands
-        utility_actions = [
-            a for a in workflow_config.actions if a.type == 'utility'
-        ]
-        utility_commands = {a.command for a in utility_actions}
-        expected_utility_commands = {
-            'docker_tag',
-            'dockerfile_from',
-            'parse_python_constraints',
-        }
-
-        self.assertEqual(utility_commands, expected_utility_commands)
 
         # Check specific validation scenarios
 
