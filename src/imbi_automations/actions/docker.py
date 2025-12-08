@@ -52,8 +52,46 @@ class DockerActions(mixins.WorkflowLoggerMixin):
     async def _execute_build(
         self, action: models.WorkflowDockerAction
     ) -> None:
-        """Execute docker build command."""
-        raise NotImplementedError('Docker build not yet supported')
+        """Execute docker build command to build an image from a Dockerfile."""
+        image = (
+            prompts.render(self.context, template=str(action.image))
+            if prompts.has_template_syntax(action.image)
+            else action.image
+        )
+        image = f'{image}:{action.tag}' if ':' not in image else image
+
+        # Resolve build context path
+        build_path = utils.resolve_path(
+            self.context,
+            prompts.render_path(self.context, action.path),
+            default_scheme='repository',
+        )
+
+        if not build_path.exists():
+            raise RuntimeError(
+                f'Build context path does not exist: {build_path}'
+            )
+
+        self.logger.info(
+            '%s [%s/%s] %s building image %s from %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            image,
+            build_path,
+        )
+        await self._run_docker_command(
+            ['docker', 'build', '-t', image, str(build_path)], action=action
+        )
+        self.logger.info(
+            '%s [%s/%s] %s built image %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            image,
+        )
 
     async def _execute_extract(
         self, action: models.WorkflowDockerAction
@@ -131,12 +169,62 @@ class DockerActions(mixins.WorkflowLoggerMixin):
                 )
 
     async def _execute_pull(self, action: models.WorkflowDockerAction) -> None:
-        """Execute docker pull command."""
-        raise NotImplementedError('Docker pull not yet supported')
+        """Execute docker pull command to download an image from a registry."""
+        image = (
+            prompts.render(self.context, template=str(action.image))
+            if prompts.has_template_syntax(action.image)
+            else action.image
+        )
+        image = f'{image}:{action.tag}' if ':' not in image else image
+
+        self.logger.info(
+            '%s [%s/%s] %s pulling image %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            image,
+        )
+        await self._run_docker_command(
+            ['docker', 'pull', image], action=action
+        )
+        self.logger.info(
+            '%s [%s/%s] %s pulled image %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            image,
+        )
 
     async def _execute_push(self, action: models.WorkflowDockerAction) -> None:
-        """Execute docker push command."""
-        raise NotImplementedError('Docker push not yet supported')
+        """Execute docker push command to upload an image to a registry."""
+        image = (
+            prompts.render(self.context, template=str(action.image))
+            if prompts.has_template_syntax(action.image)
+            else action.image
+        )
+        image = f'{image}:{action.tag}' if ':' not in image else image
+
+        self.logger.info(
+            '%s [%s/%s] %s pushing image %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            image,
+        )
+        await self._run_docker_command(
+            ['docker', 'push', image], action=action
+        )
+        self.logger.info(
+            '%s [%s/%s] %s pushed image %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            image,
+        )
 
     async def _run_docker_command(
         self,
