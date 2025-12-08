@@ -41,7 +41,6 @@ See [Action Stages](stages.md) for complete stage documentation.
 | [Imbi](imbi.md) | Imbi project management | Update project facts and metadata |
 | [Shell](shell.md) | Command execution | Run tests, build processes, scripts |
 | [Template](template.md) | Jinja2 file generation | Generate configs, documentation |
-| [Utility](utility.md) | Helper operations | Logging, state management |
 
 ## ResourceUrl Path System
 

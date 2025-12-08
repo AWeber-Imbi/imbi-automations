@@ -29,7 +29,6 @@ nav:
       - Imbi: actions/imbi.md
       - Shell: actions/shell.md
       - Template: actions/template.md
-      - Utility: actions/utility.md
     - Templating: templating.md
     - Debugging: debugging.md
 

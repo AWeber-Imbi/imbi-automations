@@ -62,7 +62,6 @@ pre-commit run --all-files      # All hooks
 | `imbi` | `imbi.py` | Project fact management |
 | `shell` | `shell.py` | Command execution with Jinja2 |
 | `template` | `template.py` | Jinja2 file generation |
-| `utility` | `utility.py` | Helpers (semver comparison) |
 
 ## Workflow Configuration
 

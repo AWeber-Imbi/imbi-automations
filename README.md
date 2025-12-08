@@ -29,7 +29,6 @@ Imbi Automations is a comprehensive CLI framework that enables bulk automation a
 - **Git Operations**: Version control operations and branch management
 - **File Actions**: Copy, move, delete, and regex replacement operations
 - **Shell Commands**: Execute arbitrary commands with template variables
-- **Utility Actions**: Helper operations for common workflow tasks
 - **Template System**: Generate files from Jinja2 templates
 
 ## Documentation

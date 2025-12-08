@@ -587,7 +587,7 @@ Action type determines which operation to perform.
 
 **Type:** `string`  
 
-**Values:** `callable`, `claude`, `docker`, `file`, `git`, `github`, `imbi`, `shell`, `template`, `utility`
+**Values:** `callable`, `claude`, `docker`, `file`, `git`, `github`, `imbi`, `shell`, `template`
 
 
 ```toml
@@ -873,7 +873,6 @@ Each action type has additional required and optional fields. See the [Actions R
 - [Imbi Actions](actions/imbi.md) - `command`
 - [Shell Actions](actions/shell.md) - `command`, `working_directory`, `ignore_errors`
 - [Template Actions](actions/template.md) - `source_path`, `destination_path`
-- [Utility Actions](actions/utility.md) - `command`, `path`, `args`, `kwargs`
 
 ## Complete Example
 

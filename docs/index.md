@@ -50,7 +50,6 @@ The framework supports multiple transformation types:
 - **Git Operations**: Extract files from previous commits, clone repositories, etc.
 - **Imbi Actions**: Update project facts
 - **Shell Commands**: Execute arbitrary commands with template variables
-- **Utility Actions**: Helper operations for common workflow patterns
 
 ## Installation
 

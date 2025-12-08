@@ -107,7 +107,6 @@ Workflows support multiple action types for different operations:
 - **Git Actions**: Extract files from commit history, clone repositories
 - **Docker Actions**: Extract files from containers, build images
 - **GitHub/Imbi Actions**: API operations on project management platforms
-- **Utility Actions**: Helper operations for common patterns
 
 See the [Actions Reference](actions/index.md) for complete documentation.
 

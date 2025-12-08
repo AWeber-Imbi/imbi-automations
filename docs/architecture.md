@@ -110,7 +110,7 @@ Cache (`ImbiMetadataCache`) for Imbi metadata with 15-minute TTL and safe-by-def
 Centralized action execution using Python 3.12 match/case:
 
 - Type-safe action routing to specialized handlers
-- Callable, Claude, Docker, File, Git, GitHub, Imbi, Shell, Template, Utility actions
+- Callable, Claude, Docker, File, Git, GitHub, Imbi, Shell, Template actions
 - Consistent error handling across action types
 
 #### Git Operations (`git.py`)
@@ -154,7 +154,6 @@ Specialized action handlers:
 - **Imbi** (`actions/imbi.py`): Project fact management with validation
 - **Shell** (`actions/shell.py`): Command execution via `subprocess_shell` (supports globs)
 - **Template** (`actions/template.py`): Jinja2 rendering with workflow context
-- **Utility** (`actions/utility.py`): Helper operations
 
 ## Workflow System
 

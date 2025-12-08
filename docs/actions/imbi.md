@@ -378,4 +378,3 @@ Planned additions to Imbi action functionality:
 
 - [Callable Actions](callable.md) - Direct Imbi API method calls (alternative approach)
 - [Workflow Configuration](../workflows.md) - Using project facts in filters
-- [Utility Actions](utility.md) - Logging and state management
