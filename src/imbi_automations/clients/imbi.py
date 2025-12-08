@@ -484,6 +484,220 @@ class Imbi(http.BaseURLHTTPClient):
             )
             raise
 
+    async def delete_project_fact(
+        self,
+        project_id: int,
+        fact_name: str | None = None,
+        fact_type_id: int | None = None,
+    ) -> bool:
+        """Delete a project fact by setting its value to null.
+
+        Args:
+            project_id: Imbi project ID
+            fact_name: Name of the fact to delete (alternative to fact_type_id)
+            fact_type_id: ID of the fact type (alternative to fact_name)
+
+        Returns:
+            True if fact was deleted, False if fact didn't exist
+
+        Raises:
+            ValueError: If neither fact_name nor fact_type_id provided
+            httpx.HTTPError: If API request fails
+
+        """
+        if not fact_name and not fact_type_id:
+            raise ValueError(
+                'Either fact_name or fact_type_id must be provided'
+            )
+
+        # If fact_name is provided, look up the fact_type_id
+        if fact_name and not fact_type_id:
+            fact_type_id = await self.get_project_fact_type_id_by_name(
+                fact_name
+            )
+            if not fact_type_id:
+                raise ValueError(f'Fact type not found: {fact_name}')
+
+        # Check if fact currently exists
+        current_value = await self.get_project_fact_value(
+            project_id, fact_name or str(fact_type_id)
+        )
+        if current_value is None:
+            LOGGER.debug(
+                'Fact %s not set for project %d, nothing to delete',
+                fact_name or fact_type_id,
+                project_id,
+            )
+            return False
+
+        LOGGER.debug(
+            'Deleting fact %s for project %d (fact_type_id=%s)',
+            fact_name or fact_type_id,
+            project_id,
+            fact_type_id,
+        )
+
+        # Delete by sending empty value
+        response = await self.delete(
+            f'/projects/{project_id}/facts/{fact_type_id}'
+        )
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            # 404 means fact doesn't exist, which is fine for delete
+            if response.status_code == 404:
+                return False
+            try:
+                error_body = response.text
+            except (AttributeError, UnicodeDecodeError):
+                error_body = '<unable to read response body>'
+            LOGGER.error(
+                'Failed to delete fact %s for project %d: HTTP %d - %s',
+                fact_name or fact_type_id,
+                project_id,
+                response.status_code,
+                error_body,
+            )
+            raise
+        return True
+
+    async def add_project_link(
+        self, project_id: int, link_type: str, url: str
+    ) -> None:
+        """Add a link to a project.
+
+        Args:
+            project_id: Imbi project ID
+            link_type: Type of link (e.g., 'Repository', 'Documentation')
+            url: URL for the link
+
+        Raises:
+            ValueError: If link_type not found
+            httpx.HTTPError: If API request fails
+
+        """
+        # Get link type ID from name
+        link_types = await self.get_link_types()
+        link_type_obj = next(
+            (lt for lt in link_types if lt.name == link_type), None
+        )
+        if not link_type_obj:
+            raise ValueError(f'Link type not found: {link_type}')
+
+        LOGGER.debug(
+            'Adding %s link to project %d: %s', link_type, project_id, url
+        )
+
+        payload = {'link_type_id': link_type_obj.id, 'url': url}
+        response = await self.post(
+            f'/projects/{project_id}/links', json=payload
+        )
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            try:
+                error_body = response.text
+            except (AttributeError, UnicodeDecodeError):
+                error_body = '<unable to read response body>'
+            LOGGER.error(
+                'Failed to add link to project %d: HTTP %d - %s',
+                project_id,
+                response.status_code,
+                error_body,
+            )
+            raise
+
+    async def get_link_types(self) -> list[models.ImbiLinkType]:
+        """Get all link types.
+
+        Returns:
+            List of link types
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        response = await self.get('/project-link-types')
+        response.raise_for_status()
+        return [
+            models.ImbiLinkType.model_validate(link_type)
+            for link_type in response.json()
+        ]
+
+    async def update_project_type(
+        self, project_id: int, project_type_slug: str
+    ) -> None:
+        """Update the project type for a project.
+
+        Args:
+            project_id: Imbi project ID
+            project_type_slug: Slug of the new project type
+
+        Raises:
+            ValueError: If project not found or project type not found
+            httpx.HTTPError: If API request fails
+
+        """
+        # Verify project exists
+        project = await self.get_project(project_id)
+        if not project:
+            raise ValueError(f'Project not found: {project_id}')
+
+        # Skip if already the same type
+        if project.project_type_slug == project_type_slug:
+            LOGGER.debug(
+                'Project %d already has project_type_slug %s, skipping',
+                project_id,
+                project_type_slug,
+            )
+            return
+
+        # Verify project type exists
+        project_types = await self.get_project_types()
+        project_type = next(
+            (pt for pt in project_types if pt.slug == project_type_slug), None
+        )
+        if not project_type:
+            raise ValueError(f'Project type not found: {project_type_slug}')
+
+        LOGGER.debug(
+            'Updating project %d type from %s to %s',
+            project_id,
+            project.project_type_slug,
+            project_type_slug,
+        )
+
+        payload = [
+            {
+                'op': 'replace',
+                'path': '/project_type_id',
+                'value': project_type.id,
+            }
+        ]
+        response = await self.patch(f'/projects/{project_id}', json=payload)
+
+        if response.status_code == 304:
+            LOGGER.debug(
+                'Project type already set for project %d (HTTP 304)',
+                project_id,
+            )
+            return
+
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            try:
+                error_body = response.text
+            except (AttributeError, UnicodeDecodeError):
+                error_body = '<unable to read response body>'
+            LOGGER.error(
+                'Failed to update project type for project %d: HTTP %d - %s',
+                project_id,
+                response.status_code,
+                error_body,
+            )
+            raise
+
     async def update_project_environments(
         self, project_id: int, environments: list[str]
     ) -> None:

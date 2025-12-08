@@ -59,7 +59,7 @@ pre-commit run --all-files      # All hooks
 | `file` | `filea.py` | Copy/move/delete with glob support |
 | `git` | `git.py` | Extract files from history, branch ops |
 | `github` | `github.py` | Environment sync, repository updates |
-| `imbi` | `imbi.py` | Project fact management |
+| `imbi` | `imbi.py` | Project facts, links, type management |
 | `shell` | `shell.py` | Command execution with Jinja2 |
 | `template` | `template.py` | Jinja2 file generation |
 

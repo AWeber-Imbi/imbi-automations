@@ -322,6 +322,258 @@ class ImbiActionsTestCase(base.AsyncTestCase):
 
         self.assertIn('Unsupported command', str(exc_context.exception))
 
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_get_project_fact_success(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test successful project fact retrieval."""
+        mock_client = mock.AsyncMock()
+        mock_client.get_project_fact_value.return_value = 'Python 3.12'
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='get-fact',
+            type='imbi',
+            command='get_project_fact',
+            fact_name='Language',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.get_project_fact_value.assert_called_once_with(
+            project_id=123, fact_name='Language'
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_get_project_fact_with_variable(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test get_project_fact stores value in variable."""
+        mock_client = mock.AsyncMock()
+        mock_client.get_project_fact_value.return_value = 'Python 3.12'
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='get-fact',
+            type='imbi',
+            command='get_project_fact',
+            fact_name='Language',
+            variable_name='language_version',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        self.assertEqual(
+            self.context.variables['language_version'], 'Python 3.12'
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_delete_project_fact_success(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test successful project fact deletion."""
+        mock_client = mock.AsyncMock()
+        mock_client.delete_project_fact.return_value = True
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='delete-fact',
+            type='imbi',
+            command='delete_project_fact',
+            fact_name='Obsolete Fact',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.delete_project_fact.assert_called_once_with(
+            project_id=123, fact_name='Obsolete Fact'
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_delete_project_fact_not_set(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test delete_project_fact when fact doesn't exist."""
+        mock_client = mock.AsyncMock()
+        mock_client.delete_project_fact.return_value = False
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='delete-fact',
+            type='imbi',
+            command='delete_project_fact',
+            fact_name='Nonexistent Fact',
+        )
+
+        # Should not raise, just log that nothing was deleted
+        await self.imbi_executor.execute(action)
+
+        mock_client.delete_project_fact.assert_called_once()
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_add_project_link_success(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test successful project link addition."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='add-link',
+            type='imbi',
+            command='add_project_link',
+            link_type='Documentation',
+            url='https://docs.example.com/project',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.add_project_link.assert_called_once_with(
+            project_id=123,
+            link_type='Documentation',
+            url='https://docs.example.com/project',
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_add_project_link_with_template(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test add_project_link with Jinja2 template in URL."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='add-link-template',
+            type='imbi',
+            command='add_project_link',
+            link_type='Repository',
+            url='https://github.com/org/{{ imbi_project.slug }}',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.add_project_link.assert_called_once_with(
+            project_id=123,
+            link_type='Repository',
+            url='https://github.com/org/test-project',
+        )
+
+    async def test_execute_add_project_link_missing_fields(self) -> None:
+        """Test add_project_link model validation requires fields."""
+        import pydantic
+
+        with self.assertRaises(pydantic.ValidationError):
+            models.WorkflowImbiAction(
+                name='add-link-missing',
+                type='imbi',
+                command='add_project_link',
+                link_type='Documentation',
+                # Missing url
+            )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_update_project_type_success(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test successful project type update."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='update-type',
+            type='imbi',
+            command='update_project_type',
+            project_type='consumer',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.update_project_type.assert_called_once_with(
+            project_id=123, project_type_slug='consumer'
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_update_project_type_http_error(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test update_project_type handles HTTP errors."""
+        mock_client = mock.AsyncMock()
+        mock_client.update_project_type.side_effect = httpx.HTTPError(
+            'API request failed'
+        )
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='update-type-error',
+            type='imbi',
+            command='update_project_type',
+            project_type='invalid-type',
+        )
+
+        with self.assertRaises(httpx.HTTPError):
+            await self.imbi_executor.execute(action)
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_batch_update_facts_success(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test successful batch fact update."""
+        mock_client = mock.AsyncMock()
+        mock_client.get_project_fact_type_id_by_name.side_effect = [1, 2, 3]
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='batch-update',
+            type='imbi',
+            command='batch_update_facts',
+            facts={
+                'Language': 'Python 3.12',
+                'Framework': 'FastAPI',
+                'Test Coverage': 85,
+            },
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.update_project_facts.assert_called_once_with(
+            project_id=123, facts=[(1, 'Python 3.12'), (2, 'FastAPI'), (3, 85)]
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_batch_update_facts_unknown_fact(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test batch_update_facts raises error for unknown fact type."""
+        mock_client = mock.AsyncMock()
+        mock_client.get_project_fact_type_id_by_name.return_value = None
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='batch-update-unknown',
+            type='imbi',
+            command='batch_update_facts',
+            facts={'Unknown Fact': 'value'},
+        )
+
+        with self.assertRaises(ValueError) as exc_context:
+            await self.imbi_executor.execute(action)
+
+        self.assertIn('Fact type not found', str(exc_context.exception))
+
+    async def test_execute_batch_update_facts_empty_facts(self) -> None:
+        """Test batch_update_facts raises error when facts is empty."""
+        action = models.WorkflowImbiAction(
+            name='batch-update-empty',
+            type='imbi',
+            command='batch_update_facts',
+            facts={},
+        )
+
+        with self.assertRaises(ValueError) as exc_context:
+            await self.imbi_executor.execute(action)
+
+        self.assertIn('facts is required', str(exc_context.exception))
+
 
 if __name__ == '__main__':
     unittest.main()
