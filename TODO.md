@@ -5,21 +5,6 @@ that should be addressed before the 1.0 release.
 
 ## Unimplemented Features
 
-### Docker Actions
-
-The docker action type has three commands that raise `NotImplementedError`:
-
-| Command | File | Line | Priority |
-|---------|------|------|----------|
-| `build` | `src/imbi_automations/actions/docker.py` | 56 | Medium |
-| `pull` | `src/imbi_automations/actions/docker.py` | 135 | Medium |
-| `push` | `src/imbi_automations/actions/docker.py` | 139 | Medium |
-
-**Note:** The `extract` command IS implemented and functional.
-
-**Recommendation for 1.0:** Either implement these commands or remove them from the
-`DockerCommands` enum to avoid exposing non-functional options.
-
 ### Utility Actions
 
 Three utility commands raise `NotImplementedError`:
@@ -51,18 +36,6 @@ These are documented as "planned" but not critical for 1.0:
 **Current state:** Only `set_project_fact` is implemented.
 
 **Recommendation for 1.0:** Document current limitations; these can be post-1.0.
-
-## Documentation Issues
-
-### Template Action Documentation (RESOLVED)
-
-The documentation at `docs/actions/template.md` incorrectly states that context
-variables are not passed to templates. This appears to be outdated - the code at
-`src/imbi_automations/prompts.py:89` does call `kwargs.update(context.model_dump())`
-when context is provided.
-
-**Action:** Update `docs/actions/template.md` to remove the "CRITICAL BUG" warning
-and "KNOWN ISSUE" sections, as context variables ARE properly passed to templates.
 
 ## Test Coverage Gaps
 
@@ -108,8 +81,8 @@ Several action types lack dedicated unit tests:
 ## Pre-1.0 Checklist
 
 ### Must Fix
-- [ ] Update template action documentation to remove incorrect bug warnings
-- [ ] Decide: implement or remove unimplemented docker commands (build/pull/push)
+- [x] Update template action documentation to remove incorrect bug warnings
+- [x] Implement docker build/pull/push commands
 - [ ] Decide: implement or remove unimplemented utility commands
 - [ ] Add unit tests for missing action types (template, git, imbi, utility)
 
@@ -118,7 +91,6 @@ Several action types lack dedicated unit tests:
 - [x] Clarify rollback capabilities in documentation
 
 ### Nice to Have
-- [ ] Implement docker build/pull/push commands
 - [ ] Implement additional Imbi actions (get_project_fact, etc.)
 
 ## Version History
