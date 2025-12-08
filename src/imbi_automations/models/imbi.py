@@ -147,3 +147,17 @@ class ImbiProjectType(base.BaseModel):
     slug: str
     icon_class: str
     environment_urls: bool = False
+
+
+class ImbiLinkType(base.BaseModel):
+    """Link type definition in Imbi.
+
+    Defines types of links that can be associated with projects
+    (e.g., Repository, Documentation, Dashboard).
+    """
+
+    id: int
+    created_by: str | None = None
+    last_modified_by: str | None = None
+    name: str
+    icon_class: str | None = None
