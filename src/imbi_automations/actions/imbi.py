@@ -427,6 +427,7 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             imbi_project=self.context.imbi_project,
             working_directory=self.context.working_directory,
             starting_commit=self.context.starting_commit,
+            variables=self.context.variables,
         )
 
         client = clients.Imbi.get_instance(config=self.configuration.imbi)

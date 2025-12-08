@@ -458,6 +458,33 @@ class ImbiActionsTestCase(base.AsyncTestCase):
             url='https://github.com/org/test-project',
         )
 
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_add_project_link_with_variables(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test add_project_link with variables context in URL template."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        # Set a variable in the context (as get_project_fact would)
+        self.context.variables['base_url'] = 'https://docs.example.com'
+
+        action = models.WorkflowImbiAction(
+            name='add-link-with-var',
+            type='imbi',
+            command='add_project_link',
+            link_type='Documentation',
+            url='{{ variables.base_url }}/{{ imbi_project.slug }}',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.add_project_link.assert_called_once_with(
+            project_id=123,
+            link_type='Documentation',
+            url='https://docs.example.com/test-project',
+        )
+
     async def test_execute_add_project_link_missing_fields(self) -> None:
         """Test add_project_link model validation requires fields."""
         import pydantic
