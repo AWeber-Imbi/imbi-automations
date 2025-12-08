@@ -412,14 +412,9 @@ class WorkflowImbiActionCommand(enum.StrEnum):
     and generic project attribute updates.
     """
 
-    add_project_link = 'add_project_link'
-    batch_update_facts = 'batch_update_facts'
-    delete_project_fact = 'delete_project_fact'
-    get_project_fact = 'get_project_fact'
     set_environments = 'set_environments'
     set_project_fact = 'set_project_fact'
     update_project = 'update_project'
-    update_project_type = 'update_project_type'
 
 
 class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
@@ -434,13 +429,10 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     command: WorkflowImbiActionCommand
     committable: bool = False
 
-    # Fields for set_project_fact, get_project_fact, delete_project_fact
+    # Fields for set_project_fact command
     fact_name: str | None = None
     value: bool | int | float | str | None = None
     skip_validations: bool = False
-
-    # Fields for get_project_fact - variable to store the result
-    variable_name: str | None = None
 
     # Fields for set_environments command
     values: list[str] = []
@@ -448,42 +440,14 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     # Fields for update_project command
     attributes: dict[str, typing.Any] = {}
 
-    # Fields for batch_update_facts command
-    facts: dict[str, bool | int | float | str] = {}
-
-    # Fields for add_project_link command
-    link_type: str | None = None
-    url: str | None = None
-
-    # Fields for update_project_type command
-    project_type: str | None = None
-
     # CommandRulesMixin configuration
     command_field: typing.ClassVar[str] = 'command'
     required_fields: typing.ClassVar[dict[object, set[str]]] = {
-        WorkflowImbiActionCommand.add_project_link: {'link_type', 'url'},
-        WorkflowImbiActionCommand.batch_update_facts: {'facts'},
-        WorkflowImbiActionCommand.delete_project_fact: {'fact_name'},
-        WorkflowImbiActionCommand.get_project_fact: {'fact_name'},
         WorkflowImbiActionCommand.set_environments: {'values'},
         WorkflowImbiActionCommand.set_project_fact: {'fact_name', 'value'},
         WorkflowImbiActionCommand.update_project: {'attributes'},
-        WorkflowImbiActionCommand.update_project_type: {'project_type'},
     }
     allowed_fields: typing.ClassVar[dict[object, set[str]]] = {
-        WorkflowImbiActionCommand.add_project_link: {'link_type', 'url'},
-        WorkflowImbiActionCommand.batch_update_facts: {
-            'facts',
-            'skip_validations',
-        },
-        WorkflowImbiActionCommand.delete_project_fact: {
-            'fact_name',
-            'skip_validations',
-        },
-        WorkflowImbiActionCommand.get_project_fact: {
-            'fact_name',
-            'variable_name',
-        },
         WorkflowImbiActionCommand.set_environments: {'values'},
         WorkflowImbiActionCommand.set_project_fact: {
             'fact_name',
@@ -491,7 +455,6 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
             'skip_validations',
         },
         WorkflowImbiActionCommand.update_project: {'attributes'},
-        WorkflowImbiActionCommand.update_project_type: {'project_type'},
     }
 
 
@@ -741,6 +704,3 @@ class WorkflowContext(pydantic.BaseModel):
     # PR information (populated after PR creation, available in followup stage)
     pull_request: github.GitHubPullRequest | None = None
     pr_branch: str | None = None
-
-    # Custom variables set by actions (e.g., get_project_fact)
-    variables: dict[str, typing.Any] = {}

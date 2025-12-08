@@ -39,7 +39,6 @@ from .github import (
 )
 from .imbi import (
     ImbiEnvironment,
-    ImbiLinkType,
     ImbiProject,
     ImbiProjectFact,
     ImbiProjectFactType,
@@ -116,14 +115,13 @@ __all__ = [
     'GitHubWorkflowRun',
     'ImbiConfiguration',
     'ImbiEnvironment',
-    'ImbiLinkType',
     'ImbiProject',
     'ImbiProjectFact',
     'ImbiProjectFactType',
     'ImbiProjectFactTypeEnum',
     'ImbiProjectFactTypeRange',
-    'ImbiProjectLink',
     'ImbiProjectType',
+    'ImbiProjectLink',
     'McpHttpServer',
     'McpServerConfig',
     'McpSSEServer',

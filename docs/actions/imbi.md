@@ -178,181 +178,12 @@ value = "3.12"
 - `value` (string|number|boolean, required): Value to assign to the fact
 - `skip_validations` (boolean, optional): Skip fact validation (default: false)
 
-**Use Cases:**
+**Use Cases:**  
 
 - Update project metadata after automated changes
 - Track migration status across projects
 - Record version upgrades or dependency changes
 - Maintain synchronization between repository state and Imbi
-
-### get_project_fact
-
-Retrieves a fact value from the current project and optionally stores it in a workflow variable for use in subsequent actions.
-
-**Configuration:**
-```toml
-[[actions]]
-name = "get-language"
-type = "imbi"
-command = "get_project_fact"
-fact_name = "Programming Language"
-variable_name = "current_language"  # Optional
-```
-
-**Fields:**
-
-- `fact_name` (string, required): Name of the fact to retrieve
-- `variable_name` (string, optional): Variable name to store the result for use in templates
-
-**Use Cases:**
-
-- Retrieve current fact values for conditional logic
-- Store fact values for use in subsequent action templates
-- Log or audit current project state before making changes
-
-**Example with Variable:**
-```toml
-[[actions]]
-name = "get-current-version"
-type = "imbi"
-command = "get_project_fact"
-fact_name = "Python Version"
-variable_name = "old_version"
-
-[[actions]]
-name = "log-upgrade"
-type = "shell"
-command = "echo 'Upgrading from {{ variables.old_version }} to 3.12'"
-```
-
-### delete_project_fact
-
-Removes a fact from the current project.
-
-**Configuration:**
-```toml
-[[actions]]
-name = "remove-obsolete-fact"
-type = "imbi"
-command = "delete_project_fact"
-fact_name = "Legacy Framework"
-```
-
-**Fields:**
-
-- `fact_name` (string, required): Name of the fact to delete
-- `skip_validations` (boolean, optional): Skip validation (default: false)
-
-**Use Cases:**
-
-- Remove obsolete facts after migrations
-- Clean up deprecated metadata
-- Reset project facts before re-analysis
-
-**Note:** If the fact doesn't exist, the action completes successfully without error.
-
-### add_project_link
-
-Adds an external link to the current project.
-
-**Configuration:**
-```toml
-[[actions]]
-name = "add-docs-link"
-type = "imbi"
-command = "add_project_link"
-link_type = "Documentation"
-url = "https://docs.example.com/{{ imbi_project.slug }}"
-```
-
-**Fields:**
-
-- `link_type` (string, required): Type of link (e.g., "Documentation", "Repository", "Dashboard")
-- `url` (string, required): URL for the link (supports Jinja2 templates)
-
-**Use Cases:**
-
-- Add documentation links after generating docs
-- Link to monitoring dashboards
-- Add repository links for new projects
-- Connect to external services (PagerDuty, Datadog, etc.)
-
-**Example:**
-```toml
-[[actions]]
-name = "add-github-link"
-type = "imbi"
-command = "add_project_link"
-link_type = "Repository"
-url = "https://github.com/{{ github_repository.full_name }}"
-```
-
-### update_project_type
-
-Changes the project type classification.
-
-**Configuration:**
-```toml
-[[actions]]
-name = "reclassify-project"
-type = "imbi"
-command = "update_project_type"
-project_type = "consumer"
-```
-
-**Fields:**
-
-- `project_type` (string, required): Slug of the new project type
-
-**Use Cases:**
-
-- Reclassify projects after architecture changes
-- Correct project type errors
-- Migrate projects between categories
-
-**Note:** If the project is already the specified type, the action completes without making changes.
-
-### batch_update_facts
-
-Updates multiple project facts in a single operation.
-
-**Configuration:**
-```toml
-[[actions]]
-name = "update-all-facts"
-type = "imbi"
-command = "batch_update_facts"
-facts = {
-    "Python Version" = "3.12",
-    "Framework" = "FastAPI",
-    "Test Coverage" = 85
-}
-```
-
-**Fields:**
-
-- `facts` (dict, required): Dictionary mapping fact names to values
-- `skip_validations` (boolean, optional): Skip validation for all facts (default: false)
-
-**Use Cases:**
-
-- Update multiple related facts after a migration
-- Set initial facts for new projects
-- Bulk update facts based on automated analysis
-
-**Example:**
-```toml
-[[actions]]
-name = "record-analysis-results"
-type = "imbi"
-command = "batch_update_facts"
-facts = {
-    "Programming Language" = "Python 3.12",
-    "Has Tests" = true,
-    "Code Quality Score" = 87,
-    "Last Analyzed" = "2024-01-15"
-}
-```
 
 ## Context Access
 
@@ -485,14 +316,9 @@ fact_value = "FastAPI"
 
 | Command | Description |
 |---------|-------------|
-| `add_project_link` | Add external links to projects |
-| `batch_update_facts` | Update multiple facts in a single operation |
-| `delete_project_fact` | Remove obsolete project facts |
-| `get_project_fact` | Retrieve fact values for conditional logic |
 | `set_environments` | Update project environments with smart validation |
 | `set_project_fact` | Update or create project facts with validation |
 | `update_project` | Update any project attributes with template support |
-| `update_project_type` | Change project classification |
 
 ## Integration with Other Actions
 
@@ -528,6 +354,17 @@ command = "set_project_fact"
 fact_name = "Python Version"
 fact_value = "{{ shell_output }}"  # From previous action
 ```
+
+## Future Enhancements
+
+Planned additions to Imbi action functionality:
+
+- **get_project_fact**: Retrieve fact values for conditional logic
+- **delete_project_fact**: Remove obsolete facts
+- **set_project_metadata**: Update project name, description, etc.
+- **add_project_link**: Add external links to projects
+- **update_project_type**: Change project classification
+- **batch_update_facts**: Update multiple facts in one operation
 
 ## Best Practices
 
