@@ -328,6 +328,272 @@ class DockerTestCase(base.AsyncTestCase):
         self.assertIn('Docker command not found', str(exc_context.exception))
         self.assertIn('is Docker installed', str(exc_context.exception))
 
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_pull_success(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test successful docker pull operation."""
+        mock_run_docker.return_value = (0, '', '')
+
+        action = models.WorkflowDockerAction(
+            name='pull-image',
+            type='docker',
+            command='pull',
+            image='nginx',
+            tag='1.25',
+        )
+
+        await self.docker_executor.execute(action)
+
+        mock_run_docker.assert_called_once_with(
+            ['docker', 'pull', 'nginx:1.25'], action=action
+        )
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_pull_default_tag(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test docker pull with default tag."""
+        mock_run_docker.return_value = (0, '', '')
+
+        action = models.WorkflowDockerAction(
+            name='pull-image', type='docker', command='pull', image='ubuntu'
+        )
+
+        await self.docker_executor.execute(action)
+
+        mock_run_docker.assert_called_once_with(
+            ['docker', 'pull', 'ubuntu:latest'], action=action
+        )
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_pull_with_template(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test docker pull with templated image name."""
+        mock_run_docker.return_value = (0, '', '')
+
+        action = models.WorkflowDockerAction(
+            name='pull-image',
+            type='docker',
+            command='pull',
+            image='{{ imbi_project.slug }}',
+            tag='v1.0',
+        )
+
+        await self.docker_executor.execute(action)
+
+        mock_run_docker.assert_called_once_with(
+            ['docker', 'pull', 'test-project:v1.0'], action=action
+        )
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_pull_failure(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test docker pull failure."""
+        mock_run_docker.side_effect = RuntimeError(
+            'Pull failed: access denied'
+        )
+
+        action = models.WorkflowDockerAction(
+            name='pull-image',
+            type='docker',
+            command='pull',
+            image='private/image',
+        )
+
+        with self.assertRaises(RuntimeError) as exc_context:
+            await self.docker_executor.execute(action)
+
+        self.assertIn('Pull failed', str(exc_context.exception))
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_push_success(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test successful docker push operation."""
+        mock_run_docker.return_value = (0, '', '')
+
+        action = models.WorkflowDockerAction(
+            name='push-image',
+            type='docker',
+            command='push',
+            image='myregistry.com/myimage',
+            tag='v2.0',
+        )
+
+        await self.docker_executor.execute(action)
+
+        mock_run_docker.assert_called_once_with(
+            ['docker', 'push', 'myregistry.com/myimage:v2.0'], action=action
+        )
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_push_with_template(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test docker push with templated image name."""
+        mock_run_docker.return_value = (0, '', '')
+
+        action = models.WorkflowDockerAction(
+            name='push-image',
+            type='docker',
+            command='push',
+            image='registry.example.com/{{ imbi_project.namespace_slug }}/app',
+            tag='latest',
+        )
+
+        await self.docker_executor.execute(action)
+
+        mock_run_docker.assert_called_once_with(
+            [
+                'docker',
+                'push',
+                'registry.example.com/test-namespace/app:latest',
+            ],
+            action=action,
+        )
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_push_failure(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test docker push failure."""
+        mock_run_docker.side_effect = RuntimeError(
+            'Push failed: authentication required'
+        )
+
+        action = models.WorkflowDockerAction(
+            name='push-image',
+            type='docker',
+            command='push',
+            image='myregistry.com/myimage',
+        )
+
+        with self.assertRaises(RuntimeError) as exc_context:
+            await self.docker_executor.execute(action)
+
+        self.assertIn('Push failed', str(exc_context.exception))
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_build_success(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test successful docker build operation."""
+        mock_run_docker.return_value = (0, '', '')
+
+        # Create a directory for build context
+        build_dir = self.working_directory / 'repository'
+        build_dir.mkdir(parents=True)
+        (build_dir / 'Dockerfile').write_text('FROM alpine\n')
+
+        action = models.WorkflowDockerAction(
+            name='build-image',
+            type='docker',
+            command='build',
+            image='myapp',
+            tag='v1.0',
+            path=models.ResourceUrl('repository:///'),
+        )
+
+        await self.docker_executor.execute(action)
+
+        mock_run_docker.assert_called_once_with(
+            ['docker', 'build', '-t', 'myapp:v1.0', str(build_dir)],
+            action=action,
+        )
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_build_with_template(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test docker build with templated image name."""
+        mock_run_docker.return_value = (0, '', '')
+
+        # Create build context directory
+        build_dir = self.working_directory / 'repository'
+        build_dir.mkdir(parents=True)
+        (build_dir / 'Dockerfile').write_text('FROM python:3.12\n')
+
+        action = models.WorkflowDockerAction(
+            name='build-image',
+            type='docker',
+            command='build',
+            image='{{ imbi_project.slug }}',
+            tag='latest',
+            path=models.ResourceUrl('repository:///'),
+        )
+
+        await self.docker_executor.execute(action)
+
+        mock_run_docker.assert_called_once_with(
+            ['docker', 'build', '-t', 'test-project:latest', str(build_dir)],
+            action=action,
+        )
+
+    async def test_execute_build_path_not_exists(self) -> None:
+        """Test docker build with non-existent path."""
+        action = models.WorkflowDockerAction(
+            name='build-image',
+            type='docker',
+            command='build',
+            image='myapp',
+            path=models.ResourceUrl('repository:///nonexistent'),
+        )
+
+        with self.assertRaises(RuntimeError) as exc_context:
+            await self.docker_executor.execute(action)
+
+        self.assertIn('does not exist', str(exc_context.exception))
+
+    @mock.patch(
+        'imbi_automations.actions.docker.DockerActions._run_docker_command'
+    )
+    async def test_execute_build_failure(
+        self, mock_run_docker: mock.AsyncMock
+    ) -> None:
+        """Test docker build failure."""
+        mock_run_docker.side_effect = RuntimeError(
+            'Build failed: syntax error'
+        )
+
+        # Create build context directory
+        build_dir = self.working_directory / 'repository'
+        build_dir.mkdir(parents=True)
+        (build_dir / 'Dockerfile').write_text('INVALID\n')
+
+        action = models.WorkflowDockerAction(
+            name='build-image',
+            type='docker',
+            command='build',
+            image='myapp',
+            path=models.ResourceUrl('repository:///'),
+        )
+
+        with self.assertRaises(RuntimeError) as exc_context:
+            await self.docker_executor.execute(action)
+
+        self.assertIn('Build failed', str(exc_context.exception))
+
 
 if __name__ == '__main__':
     unittest.main()
