@@ -2,6 +2,7 @@
 
 import datetime
 import json
+import os
 import pathlib
 import tempfile
 from unittest import mock
@@ -463,8 +464,6 @@ class ImbiMetadataCacheTestCase(base.AsyncTestCase):
             ).timestamp()
             cache_file.touch()
             cache_file.chmod(0o644)
-            import os
-
             os.utime(cache_file, (old_time, old_time))
 
             # Mock Imbi client
