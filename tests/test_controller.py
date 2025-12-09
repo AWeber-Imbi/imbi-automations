@@ -515,7 +515,7 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
                 automation.workflow_engine, 'execute'
             ) as mock_execute,
             mock.patch.object(
-                automation, '_get_github_repository'
+                automation, '_get_github_repository', new=mock.AsyncMock()
             ) as mock_github,
         ):
             mock_filter.return_value = projects
@@ -555,7 +555,7 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
                 automation.workflow_engine, 'execute'
             ) as mock_execute,
             mock.patch.object(
-                automation, '_get_github_repository'
+                automation, '_get_github_repository', new=mock.AsyncMock()
             ) as mock_github,
         ):
             mock_filter.return_value = projects
@@ -595,7 +595,7 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
                 automation.workflow_engine, 'execute'
             ) as mock_execute,
             mock.patch.object(
-                automation, '_get_github_repository'
+                automation, '_get_github_repository', new=mock.AsyncMock()
             ) as mock_github,
         ):
             mock_filter.return_value = projects
