@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "imbi-automations"
-version = "1.0.0b1"
+version = "1.0.0b2"
 description = "CLI tool for executing automated workflows across Imbi projects with AI-powered transformations and GitHub PR integration."
 authors = [
   {name = "Gavin M. Roy", email = "gavinr@aweber.com"},
