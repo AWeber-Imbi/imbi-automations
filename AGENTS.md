@@ -73,6 +73,7 @@ max_followup_cycles = 5  # For followup stage cycling
 project_types = ["apis", "consumers"]
 project_facts = {"Programming Language" = "Python 3.12"}
 github_identifier_required = true
+exclude_open_workflow_prs = true  # Skip projects with open PRs
 
 [github]
 create_pull_request = true

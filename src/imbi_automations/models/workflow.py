@@ -93,7 +93,18 @@ class WorkflowFilter(pydantic.BaseModel):
     project_environments: set[str] = set()
     github_identifier_required: bool = False
     github_workflow_status_exclude: set[str] = set()
+    exclude_open_workflow_prs: bool | str = False
     project: dict[str, ProjectFieldFilter] = {}
+
+    @pydantic.field_validator('exclude_open_workflow_prs')
+    @classmethod
+    def validate_exclude_open_workflow_prs(cls, v: bool | str) -> bool | str:
+        """Validate exclude_open_workflow_prs field."""
+        if isinstance(v, str) and not v:
+            raise ValueError(
+                'exclude_open_workflow_prs string value cannot be empty'
+            )
+        return v
 
 
 class WorkflowActionTypes(enum.StrEnum):
