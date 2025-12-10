@@ -355,6 +355,70 @@ class GitHubPullRequestTestCase(base.AsyncTestCase):
         self.assertEqual(result.number, 123)
         self.assertEqual(result.state, 'open')
 
+    async def test_list_pull_requests_success(self) -> None:
+        """Test listing pull requests."""
+        pr_list = [
+            create_github_pr_response_data(number=1, state='open'),
+            create_github_pr_response_data(
+                number=2, state='closed', merged=True
+            ),
+        ]
+
+        self.http_client_side_effect = httpx.Response(200, json=pr_list)
+
+        result = await self.client.list_pull_requests('org', 'repo')
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].number, 1)
+        self.assertEqual(result[0].state, 'open')
+        self.assertEqual(result[1].number, 2)
+        self.assertEqual(result[1].state, 'closed')
+
+    async def test_list_pull_requests_with_filters(self) -> None:
+        """Test listing pull requests with state and head filters."""
+        pr_list = [
+            create_github_pr_response_data(
+                number=123,
+                state='open',
+                head={'ref': 'imbi-automations/test-workflow', 'sha': 'abc'},
+            )
+        ]
+
+        self.http_client_side_effect = httpx.Response(200, json=pr_list)
+
+        result = await self.client.list_pull_requests(
+            'org', 'repo', state='open', head='imbi-automations/test-workflow'
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].number, 123)
+        self.assertEqual(
+            result[0].head['ref'], 'imbi-automations/test-workflow'
+        )
+
+    async def test_list_pull_requests_empty(self) -> None:
+        """Test listing pull requests with no results."""
+        self.http_client_side_effect = httpx.Response(200, json=[])
+
+        result = await self.client.list_pull_requests('org', 'repo')
+
+        self.assertEqual(len(result), 0)
+
+    async def test_list_pull_requests_not_found(self) -> None:
+        """Test listing pull requests for non-existent repository."""
+        self.http_client_side_effect = httpx.Response(404)
+
+        result = await self.client.list_pull_requests('org', 'repo')
+
+        self.assertEqual(len(result), 0)
+
+    async def test_list_pull_requests_error(self) -> None:
+        """Test listing pull requests with API error."""
+        self.http_client_side_effect = httpx.Response(500)
+
+        with self.assertRaises(httpx.HTTPStatusError):
+            await self.client.list_pull_requests('org', 'repo')
+
     async def test_get_pr_check_runs(self) -> None:
         """Test retrieving PR check runs."""
         checks_data = {

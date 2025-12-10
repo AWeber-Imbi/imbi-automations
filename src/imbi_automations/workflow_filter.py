@@ -24,6 +24,7 @@ class Filter(mixins.WorkflowLoggerMixin):
     ) -> None:
         super().__init__(verbose)
         self.configuration = configuration
+        self.workflow = workflow
         self._set_workflow_logger(workflow)
 
     async def filter_project(
@@ -90,6 +91,14 @@ class Filter(mixins.WorkflowLoggerMixin):
             if status in workflow_filter.github_workflow_status_exclude:
                 return None
 
+        # Check for open workflow PRs
+        if workflow_filter.exclude_open_workflow_prs:
+            has_open_pr = await self._filter_open_workflow_pr(
+                project, workflow_filter
+            )
+            if has_open_pr:
+                return None
+
         return project
 
     @staticmethod
@@ -119,6 +128,86 @@ class Filter(mixins.WorkflowLoggerMixin):
         if repository is None:
             return None
         return await client.get_repository_workflow_status(repository)
+
+    async def _filter_open_workflow_pr(
+        self,
+        project: models.ImbiProject,
+        workflow_filter: models.WorkflowFilter,
+    ) -> bool:
+        """Check if project has open PRs for the workflow.
+
+        Returns:
+            True if project should be EXCLUDED (has open PRs)
+            False if project should be included (no open PRs)
+
+        """
+        # Determine workflow slug to check
+        workflow_slug: str
+        if isinstance(workflow_filter.exclude_open_workflow_prs, str):
+            workflow_slug = workflow_filter.exclude_open_workflow_prs
+        elif workflow_filter.exclude_open_workflow_prs is True:
+            workflow_slug = self.workflow.slug
+        else:
+            return False
+
+        # Get GitHub repository
+        client = clients.GitHub.get_instance(config=self.configuration)
+        repository = await client.get_repository(project)
+
+        if repository is None:
+            LOGGER.debug(
+                'No GitHub repository found for project %s, allowing',
+                project.slug,
+            )
+            return False
+
+        org, repo_name = repository.full_name.split('/', 1)
+        branch_name = f'imbi-automations/{workflow_slug}'
+
+        try:
+            # List PRs with matching branch
+            pull_requests = await client.list_pull_requests(
+                org=org, repo=repo_name, state='all', head=branch_name
+            )
+
+            # Check for blocking PR states
+            for pr in pull_requests:
+                pr_head_branch = (
+                    pr.head.get('ref') if isinstance(pr.head, dict) else None
+                )
+
+                if pr_head_branch != branch_name:
+                    continue
+
+                # Exclude if open (including drafts)
+                if pr.state == 'open':
+                    LOGGER.debug(
+                        'Project %s has open PR #%d (draft=%s), excluding',
+                        project.slug,
+                        pr.number,
+                        pr.draft,
+                    )
+                    return True
+
+                # Exclude if closed but not merged
+                if pr.state == 'closed' and not pr.merged:
+                    LOGGER.debug(
+                        'Project %s has closed unmerged PR #%d, excluding',
+                        project.slug,
+                        pr.number,
+                    )
+                    return True
+
+            return False
+
+        except (ValueError, KeyError, AttributeError, TypeError) as exc:
+            # Fail-open: allow project on errors parsing PR data
+            LOGGER.warning(
+                'Error checking PRs for project %s: %s. Allowing project.',
+                project.slug,
+                exc,
+            )
+            return False
 
     @staticmethod
     def _filter_project_facts(

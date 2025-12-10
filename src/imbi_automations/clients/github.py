@@ -819,6 +819,87 @@ class GitHub(http.BaseURLHTTPClient):
 
         return models.GitHubPullRequest.model_validate(response.json())
 
+    async def list_pull_requests(
+        self,
+        org: str,
+        repo: str,
+        state: str = 'all',
+        head: str | None = None,
+        base: str | None = None,
+        per_page: int = 100,
+    ) -> list[models.GitHubPullRequest]:
+        """List pull requests for a repository with optional filtering.
+
+        Uses GitHub API: GET /repos/{owner}/{repo}/pulls
+
+        Args:
+            org: Organization name
+            repo: Repository name
+            state: Filter by state ('open', 'closed', 'all'). Default: 'all'
+            head: Filter by head branch (format: 'user:ref-name' or 'ref-name')
+            base: Filter by base branch
+            per_page: Results per page (max 100, default 100)
+
+        Returns:
+            List of GitHubPullRequest objects. Returns empty list if
+            repository not found (404).
+
+        Raises:
+            httpx.HTTPError: If API request fails (except 404)
+
+        """
+        base_path = self._repository_base_path(org=org, repo_name=repo)
+
+        params = {'state': state, 'per_page': per_page}
+        if head:
+            params['head'] = head
+        if base:
+            params['base'] = base
+
+        LOGGER.debug(
+            'Listing pull requests for %s/%s with params: %s',
+            org,
+            repo,
+            params,
+        )
+
+        try:
+            response = await self.get(f'{base_path}/pulls', params=params)
+            response.raise_for_status()
+
+            data = response.json()
+
+            # Parse all PR objects
+            pull_requests = [
+                models.GitHubPullRequest.model_validate(pr_data)
+                for pr_data in data
+            ]
+
+            LOGGER.debug(
+                'Found %d pull requests for %s/%s',
+                len(pull_requests),
+                org,
+                repo,
+            )
+
+            return pull_requests
+
+        except httpx.HTTPError as exc:
+            if (
+                isinstance(exc, httpx.HTTPStatusError)
+                and exc.response.status_code == http.HTTPStatus.NOT_FOUND
+            ):
+                LOGGER.debug('Repository %s/%s not found (404)', org, repo)
+                return []
+            else:
+                LOGGER.error(
+                    'Failed to list pull requests for %s/%s: %s',
+                    org,
+                    repo,
+                    exc,
+                )
+                raise
+
     async def get_pr_check_runs(
         self, org: str, repo: str, ref: str
     ) -> list[dict[str, typing.Any]]:
