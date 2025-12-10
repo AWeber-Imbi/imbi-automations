@@ -451,6 +451,50 @@ class GitHubFileOperationsTestCase(base.AsyncTestCase):
 
         self.assertIsNone(result)
 
+    async def test_get_file_contents_large_file(self) -> None:
+        """Test retrieving large file contents via download_url."""
+        from unittest import mock
+
+        # For files >1MB, GitHub doesn't include content field
+        file_data = {
+            'name': 'package-lock.json',
+            'path': 'package-lock.json',
+            'type': 'file',
+            'size': 1258291,
+            'download_url': 'https://raw.githubusercontent.com/test/test/main/package-lock.json',
+        }
+
+        large_content = '{"name": "large-project", "dependencies": {}}'
+
+        # Create proper Response objects with requests
+        metadata_req = httpx.Request(
+            'GET',
+            'https://api.github.com/repos/test/test/contents/package-lock.json',
+        )
+        metadata_resp = httpx.Response(
+            200, json=file_data, request=metadata_req
+        )
+
+        download_req = httpx.Request('GET', file_data['download_url'])
+        download_resp = httpx.Response(
+            200, text=large_content, request=download_req
+        )
+
+        # Mock the second GET request for download
+        with mock.patch.object(
+            self.client, 'get', new_callable=mock.AsyncMock
+        ) as mock_get:
+            # First call returns metadata, second call returns content
+            mock_get.side_effect = [metadata_resp, download_resp]
+
+            context = create_test_workflow_context()
+            result = await self.client.get_file_contents(
+                context, 'package-lock.json'
+            )
+
+            self.assertEqual(result, large_content)
+            self.assertEqual(mock_get.call_count, 2)
+
     async def test_get_repository_tree(self) -> None:
         """Test retrieving repository file tree."""
         tree_data = {
