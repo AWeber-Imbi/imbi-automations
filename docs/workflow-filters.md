@@ -307,9 +307,9 @@ is_empty = true
 
 Exclude projects with specific GitHub Actions workflow statuses.
 
-**Type:** `list[string]`  
+**Type:** `list[string]`
 
-**Default:** `[]` (no status filtering)  
+**Default:** `[]` (no status filtering)
 
 
 **Valid statuses:**
@@ -347,6 +347,107 @@ github_workflow_status_exclude = ["success", "pending"]
 # Only process completely broken projects
 [filter]
 github_workflow_status_exclude = ["success", "pending"]
+```
+
+### exclude_open_workflow_prs
+
+Exclude projects that already have open pull requests for a specific workflow.
+
+**Type:** `bool | string`
+
+**Default:** `false` (no PR filtering)
+
+
+**Behavior:**
+
+- `false` - Filter disabled (default)
+- `true` - Exclude projects with open PRs for the **current workflow**
+- `"workflow-slug"` - Exclude projects with open PRs for the **specified workflow**
+
+**PR states that cause exclusion:**
+
+- **Open PRs** (including drafts) - Work still in progress
+- **Closed unmerged PRs** - Failed or abandoned changes
+
+**Why exclude closed-unmerged PRs?** They indicate issues or rejected changes that should be resolved before re-running the workflow.
+
+```toml
+[filter]
+exclude_open_workflow_prs = true
+```
+
+Projects with open PRs for this workflow will be skipped.
+
+**Real-world examples:**
+
+```toml
+# Prevent duplicate PRs for same workflow
+[filter]
+project_types = ["api", "consumer"]
+github_identifier_required = true
+exclude_open_workflow_prs = true  # Skip if PR already exists
+```
+
+```toml
+# Cross-workflow dependency
+name = "Secondary Workflow"
+
+[filter]
+# Only run after primary workflow PR is merged
+exclude_open_workflow_prs = "primary-workflow"
+```
+
+```toml
+# Combined with other filters
+[filter]
+project_types = ["api"]
+project_facts = {"Programming Language" = "Python 3.12"}
+github_identifier_required = true
+github_workflow_status_exclude = ["success"]
+exclude_open_workflow_prs = true  # Skip projects with pending PRs
+```
+
+**Why this filter?** Prevents creating duplicate PRs when:
+- Projects haven't updated their Imbi facts yet
+- PRs haven't been reviewed or merged yet
+- Workflow re-runs before previous execution completes
+
+**How it works:**
+
+The filter checks for PRs with head branch matching `imbi-automations/{workflow-slug}`:
+
+1. **Branch identification:** Each workflow creates PRs on branch `imbi-automations/{slug}`
+2. **PR state check:** Looks for open, draft, or closed-unmerged PRs
+3. **Exclusion logic:** If blocking PR found, skip the project
+
+**Error handling:**
+
+Uses fail-open approach: API failures or errors log warnings but allow the project through. This prevents transient GitHub API issues from blocking valid workflow executions.
+
+**Performance note:**
+
+This filter requires a GitHub API call per project, so it's placed after cheap filters (IDs, types, facts) but before repository cloning. Projects filtered out here avoid the expensive git clone operation.
+
+**Use cases:**
+
+1. **Prevent duplicate work:**
+   - Don't re-run if PR already exists
+   - Wait for facts to update before next run
+
+2. **Sequential workflows:**
+   - Workflow B waits for Workflow A's PR to merge
+   - Cross-workflow orchestration
+
+3. **Manual review workflows:**
+   - Create PR, wait for approval
+   - Don't create new PR until previous is handled
+
+**Example workflow sequence:**
+
+```
+Day 1: Workflow runs → Creates PR #42 → Left open for review
+Day 2: Workflow runs → Sees open PR #42 → Skips project
+Day 3: PR #42 merged → Facts updated → Workflow runs → Allowed
 ```
 
 ## Complete Real-World Example

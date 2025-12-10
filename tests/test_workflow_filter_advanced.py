@@ -610,6 +610,77 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
             result = await self.filter.filter_project(project, wf_filter)
             self.assertIsNotNone(result)
 
+    # Open Workflow PR Filtering Tests
+
+    async def test_filter_exclude_open_workflow_prs_open_pr_excluded(
+        self,
+    ) -> None:
+        """Test project excluded when open PR exists."""
+        project = self._create_project(
+            identifiers={'github': 'test-org/test-repo'}
+        )
+
+        # Mock the _filter_open_workflow_pr method to return True (exclude)
+        with mock.patch.object(
+            self.filter, '_filter_open_workflow_pr', return_value=True
+        ):
+            wf_filter = models.WorkflowFilter(exclude_open_workflow_prs=True)
+
+            result = await self.filter.filter_project(project, wf_filter)
+            self.assertIsNone(result)
+
+    async def test_filter_exclude_open_workflow_prs_no_pr_allowed(
+        self,
+    ) -> None:
+        """Test project allowed when no open PR exists."""
+        project = self._create_project(
+            identifiers={'github': 'test-org/test-repo'}
+        )
+
+        # Mock the _filter_open_workflow_pr method to return False (allow)
+        with mock.patch.object(
+            self.filter, '_filter_open_workflow_pr', return_value=False
+        ):
+            wf_filter = models.WorkflowFilter(exclude_open_workflow_prs=True)
+
+            result = await self.filter.filter_project(project, wf_filter)
+            self.assertIsNotNone(result)
+
+    async def test_filter_exclude_open_workflow_prs_with_workflow_slug(
+        self,
+    ) -> None:
+        """Test filter with specific workflow slug."""
+        project = self._create_project(
+            identifiers={'github': 'test-org/test-repo'}
+        )
+
+        # Mock the _filter_open_workflow_pr method
+        with mock.patch.object(
+            self.filter, '_filter_open_workflow_pr', return_value=True
+        ):
+            wf_filter = models.WorkflowFilter(
+                exclude_open_workflow_prs='other-workflow'
+            )
+
+            result = await self.filter.filter_project(project, wf_filter)
+            self.assertIsNone(result)
+
+    async def test_filter_exclude_open_workflow_prs_disabled(self) -> None:
+        """Test filter disabled by default."""
+        project = self._create_project(
+            identifiers={'github': 'test-org/test-repo'}
+        )
+
+        wf_filter = models.WorkflowFilter(exclude_open_workflow_prs=False)
+
+        # Should not call the filter method at all
+        with mock.patch.object(
+            self.filter, '_filter_open_workflow_pr'
+        ) as mock_filter:
+            result = await self.filter.filter_project(project, wf_filter)
+            self.assertIsNotNone(result)
+            mock_filter.assert_not_called()
+
     # Combined Filter Scenarios
 
     async def test_filter_project_combined_all_match(self) -> None:
