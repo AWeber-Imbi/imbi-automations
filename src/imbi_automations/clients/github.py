@@ -556,6 +556,10 @@ class GitHub(http.BaseURLHTTPClient):
     ) -> str | None:
         """Get file contents from GitHub repository.
 
+        For files >1MB, GitHub's API doesn't include the content field
+        in the response. In such cases, this method automatically downloads
+        the content via the download_url field.
+
         Args:
             context: Workflow context containing GitHub repository info
             file_path: Path to the file in the repository
@@ -625,6 +629,37 @@ class GitHub(http.BaseURLHTTPClient):
                 except (ValueError, UnicodeDecodeError) as exc:
                     LOGGER.warning(
                         'Failed to decode file %s from %s/%s: %s',
+                        file_path,
+                        org,
+                        repo,
+                        exc,
+                    )
+                    return None
+
+            # For large files (>1MB), GitHub doesn't include content field
+            # Use download_url instead
+            download_url = file_data.get('download_url')
+            if download_url:
+                LOGGER.debug(
+                    'File %s is large, downloading from %s',
+                    file_path,
+                    download_url,
+                )
+                try:
+                    download_response = await self.get(download_url)
+                    download_response.raise_for_status()
+                    file_content = download_response.text
+                    LOGGER.debug(
+                        'Downloaded %d bytes from %s in %s/%s',
+                        len(file_content),
+                        file_path,
+                        org,
+                        repo,
+                    )
+                    return file_content
+                except (httpx.HTTPError, UnicodeDecodeError) as exc:
+                    LOGGER.warning(
+                        'Failed to download file %s from %s/%s: %s',
                         file_path,
                         org,
                         repo,
