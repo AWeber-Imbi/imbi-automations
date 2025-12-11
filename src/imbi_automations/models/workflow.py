@@ -185,6 +185,11 @@ class WorkflowAction(pydantic.BaseModel):
                     f'Use Go time.Duration format '
                     f'(e.g., "5m", "1h", "1h30m", "90s")'
                 )
+            if seconds <= 0:
+                raise ValueError(
+                    f'Invalid timeout value: {v}. '
+                    f'Timeout must be greater than zero'
+                )
         except ImportError:
             raise ValueError(
                 'pytimeparse2 required for timeout parsing'
