@@ -107,6 +107,56 @@ committable = true
 
 Followup actions cycle if they commit (up to `max_followup_cycles`). They receive PR context: `{{ pull_request.number }}`, `{{ pull_request.html_url }}`, `{{ pr_branch }}`.
 
+## Action Timeouts
+
+All actions support optional timeouts using Go time.Duration format:
+
+```toml
+[[actions]]
+name = "example-action"
+type = "claude"  # or shell, docker, etc.
+timeout = "30m"  # Maximum execution time
+```
+
+**Supported Formats:**
+- Minutes: "5m", "30m"
+- Hours: "1h" (default), "2h30m"
+- Seconds: "90s"
+- Combined: "1h30m45s"
+
+**Timeout Behavior by Action Type:**
+
+| Action Type | Timeout Scope | Behavior on Timeout |
+|-------------|---------------|---------------------|
+| **Claude** | Per-cycle | Kills SDK process, fails workflow. Example: 5 cycles × 30m = up to 2.5hrs total |
+| **Shell** | Single execution | Terminates subprocess (SIGTERM → SIGKILL), fails workflow |
+| **Docker** | Single execution | Terminates docker subprocess, fails workflow |
+| **Other actions** | Not enforced | Field ignored (file, template, git, github, imbi) |
+
+**Example - Long-running migration:**
+```toml
+[[actions]]
+name = "migrate-codebase"
+type = "claude"
+task_prompt = "prompts/migration.md.j2"
+max_cycles = 10
+timeout = "1h"  # 1 hour per cycle, up to 10 hours total
+```
+
+**Example - Shell command with timeout:**
+```toml
+[[actions]]
+name = "run-tests"
+type = "shell"
+command = "pytest --slow"
+timeout = "15m"
+```
+
+**Notes:**
+- Working directory preserved for resumability after timeout
+- Timeout errors include action name, cycle info (for Claude), and duration
+- Use `--resume` to continue after investigating timeout issues
+
 ### ResourceUrl Schemes
 
 | Scheme | Maps To |

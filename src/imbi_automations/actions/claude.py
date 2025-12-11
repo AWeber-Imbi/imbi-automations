@@ -69,13 +69,14 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
         for cycle in range(1, action.max_cycles + 1):
             self.logger.debug(
-                '%s [%s/%s] %s Claude Code cycle %d/%d',
+                '%s [%s/%s] %s Claude Code cycle %d/%d timeout: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
                 cycle,
                 action.max_cycles,
+                action.timeout,
             )
 
             # Warn when approaching max cycles
@@ -93,15 +94,31 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     action.max_cycles,
                 )
 
-            if await self._execute_cycle(action, cycle):
-                self.logger.debug(
-                    '%s %s Claude Code cycle %d successful',
+            try:
+                if await self._execute_cycle(action, cycle):
+                    self.logger.debug(
+                        '%s %s Claude Code cycle %d successful',
+                        self.context.imbi_project.slug,
+                        action.name,
+                        cycle,
+                    )
+                    success = True
+                    break
+            except TimeoutError as exc:
+                self.logger.error(
+                    '%s [%s/%s] %s timed out in cycle %d/%d: %s',
                     self.context.imbi_project.slug,
+                    self.context.current_action_index,
+                    self.context.total_actions,
                     action.name,
                     cycle,
+                    action.max_cycles,
+                    exc,
                 )
-                success = True
-                break
+                raise RuntimeError(
+                    f'Claude action {action.name} timed out after '
+                    f'{action.timeout} in cycle {cycle}/{action.max_cycles}'
+                ) from exc
 
         if not success:  # Categorize failure for better diagnostics
             failure_category = self._categorize_failure()
@@ -157,7 +174,9 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
 
             # Select response model based on agent type
             response_model = _get_response_model(agent)
-            run = await self.claude.agent_query(prompt, response_model)
+            run = await self.claude.agent_query(
+                prompt, response_model, timeout=action.timeout
+            )
             self.logger.info(
                 '%s [%s/%s] %s executed Claude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,

@@ -44,6 +44,7 @@ dependencies = [
   "msgpack>=1.0.0",
   "pydantic",
   "pydantic-settings",
+  "pytimeparse2>=1.7.1",
   "rich",
   "semver",
   "truststore",
@@ -121,8 +122,9 @@ select = [
   "B905",   # zip() without explicit strict parameter
 ]
 ignore = [
-  "ANN401", # There is a time and place for typing.Any
-  "RSE",    # contradicts Python Style Guide
+  "ANN401",   # There is a time and place for typing.Any
+  "ASYNC109", # async function with timeout parameter (false positive)
+  "RSE",      # contradicts Python Style Guide
 ]
 flake8-quotes = { inline-quotes = "single" }
 isort.split-on-trailing-comma = false

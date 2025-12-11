@@ -764,19 +764,29 @@ destination = "repository:///src/"
 
 #### timeout (optional)
 
-Maximum execution time for action in seconds.
+Maximum execution time for action in Go time.Duration format.
 
-**Type:** `integer`  
+**Type:** `string`
 
-**Default:** `3600` (1 hour)  
+**Default:** `"1h"` (1 hour)
 
+**Supported formats:**
+- Minutes: `"5m"`, `"30m"`
+- Hours: `"1h"`, `"2h30m"`
+- Seconds: `"90s"`
+- Combined: `"1h30m45s"`
+
+**Behavior:**
+- **Claude actions**: Timeout applies per-cycle (each planning/task/validation gets the full duration)
+- **Shell/Docker actions**: Timeout applies to single execution
+- On timeout: Process terminated gracefully (SIGTERM → SIGKILL), workflow fails with error
 
 ```toml
 [[actions]]
 name = "long-running-build"
 type = "shell"
 command = "make build"
-timeout = 7200  # 2 hours
+timeout = "2h"  # 2 hours
 ```
 
 #### filter (optional)
@@ -928,7 +938,7 @@ name = "run-tests"
 type = "shell"
 command = "pytest tests/ -v"
 working_directory = "repository:///"
-timeout = 600
+timeout = "10m"
 
 [[actions.conditions]]
 file_exists = "tests/"

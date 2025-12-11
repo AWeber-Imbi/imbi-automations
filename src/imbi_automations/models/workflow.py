@@ -168,8 +168,28 @@ class WorkflowAction(pydantic.BaseModel):
     on_success: str | None = None
     on_failure: str | None = None
     ignore_errors: bool = False
-    timeout: int = 3600
+    timeout: str = '1h'
     data: dict[str, typing.Any] = {}
+
+    @pydantic.field_validator('timeout')
+    @classmethod
+    def validate_timeout(cls, v: str) -> str:
+        """Validate timeout uses Go time.Duration format."""
+        try:
+            import pytimeparse2
+
+            seconds = pytimeparse2.parse(v)
+            if seconds is None:
+                raise ValueError(
+                    f'Invalid timeout format: {v}. '
+                    f'Use Go time.Duration format '
+                    f'(e.g., "5m", "1h", "1h30m", "90s")'
+                )
+        except ImportError:
+            raise ValueError(
+                'pytimeparse2 required for timeout parsing'
+            ) from None
+        return v
 
     @pydantic.model_validator(mode='after')
     def validate_commit_message(self) -> 'WorkflowAction':
