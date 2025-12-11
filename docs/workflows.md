@@ -4,7 +4,7 @@ Workflows are the core automation units in Imbi Automations. Each workflow defin
 
 ## What is a Workflow?
 
-A workflow is a directory containing a `config.toml` file that defines:
+A workflow is a directory containing a workflow configuration file that defines:
 
 - **Actions**: Operations to perform (file manipulation, AI transformations, shell commands, etc.)
 - **Conditions**: Repository state checks to determine if workflow/actions should run
@@ -15,7 +15,7 @@ A workflow is a directory containing a `config.toml` file that defines:
 
 ```
 workflows/workflow-name/
-├── config.toml          # Required - workflow configuration
+├── workflow.toml        # Required - workflow configuration
 ├── prompts/             # Optional - Claude prompt templates
 │   ├── task.md.j2
 │   └── validator.md.j2

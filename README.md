@@ -40,6 +40,7 @@ Documentation is available at [https://aweber-imbi.github.io/imbi-automations/](
 
 ```bash
 # Run workflows
+# Note: Each workflow directory should contain workflow.toml (or config.toml for backward compatibility)
 imbi-automations config.toml workflows/workflow-name --all-projects
 
 # Resume from a specific project

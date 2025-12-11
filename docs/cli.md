@@ -60,11 +60,11 @@ imbi-automations /etc/imbi/prod.toml workflows/deploy --all-projects
 
 ### WORKFLOW
 
-Path to workflow directory containing `config.toml`.
+Path to workflow directory containing workflow configuration file.
 
 **Type:** Directory path
-**Required:** Yes  
-**Must Contain:** `config.toml` file
+**Required:** Yes
+**Must Contain:** `workflow.toml`
 
 **Example:**
 ```bash
@@ -75,7 +75,7 @@ imbi-automations config.toml ./my-workflow --project-id 123
 **Structure:**
 ```
 workflows/my-workflow/
-├── config.toml          # Required
+├── workflow.toml        # Required
 ├── prompts/             # Optional
 │   └── prompt.md
 └── templates/           # Optional
