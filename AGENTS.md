@@ -13,6 +13,7 @@ CLI framework for executing workflows across repositories with Imbi project mana
 pip install -e .[dev] && pre-commit install
 
 # Run CLI
+# Note: Workflow directories should contain workflow.toml (config.toml supported as fallback)
 imbi-automations config.toml workflows/workflow-name --all-projects
 imbi-automations config.toml workflows/workflow-name --project-id 123
 imbi-automations config.toml workflows/workflow-name --resume ./errors/workflow/project-timestamp
@@ -64,6 +65,8 @@ pre-commit run --all-files      # All hooks
 | `template` | `template.py` | Jinja2 file generation |
 
 ## Workflow Configuration
+
+Each workflow directory should contain `workflow.toml` (or `config.toml` for backward compatibility):
 
 ```toml
 name = "Example Workflow"

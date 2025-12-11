@@ -70,46 +70,43 @@ def workflow(path: str) -> models.Workflow:
         raise argparse.ArgumentTypeError(
             f'Workflow path is not a directory: {path}'
         )
+    for workflow_file in ('workflow.toml', 'config.toml'):
+        if (path_obj / workflow_file).is_file():
+            if workflow_file == 'config.toml':
+                LOGGER.warning('config.toml is deprecated, use workflow.toml')
+            return _load_workflow(path_obj / workflow_file)
 
-    config_file = path_obj / 'config.toml'
-    if not config_file.is_file():
-        raise argparse.ArgumentTypeError(
-            f'Missing config.toml in workflow directory: {path}\n'
-            f'Expected: {config_file}'
-        )
+    raise argparse.ArgumentTypeError(
+        f'Missing workflow configuration file in workflow directory: '
+        f'{path}\nExpected: workflow.toml'
+    )
+
+
+def _load_workflow(path: pathlib.Path | None) -> models.Workflow:
+    with path.open('r') as handle:
+        try:
+            config_data = utils.load_toml(handle)
+        except tomllib.TOMLDecodeError as exc:
+            raise argparse.ArgumentTypeError(
+                f'Failed to parse workflow config in {path}:\n{exc}'
+            ) from exc
     try:
-        with path_obj.joinpath('config.toml').open('r') as f:
-            config_data = utils.load_toml(f)
-
-        configuration = models.WorkflowConfiguration.model_validate(
-            config_data
+        return models.Workflow(
+            path=path.parent,
+            configuration=models.WorkflowConfiguration.model_validate(
+                config_data
+            ),
         )
-
-        return models.Workflow(path=path_obj, configuration=configuration)
-    except OSError as exc:
-        raise argparse.ArgumentTypeError(
-            f'Failed to read config.toml in workflow directory: {path}\n'
-            f'Error: {exc}'
-        ) from exc
-    except (tomllib.TOMLDecodeError, pydantic.ValidationError) as exc:
-        # Handle TOML parsing or Pydantic validation errors
+    except pydantic.ValidationError as exc:
+        # Extract the most relevant part of Pydantic validation errors
         error_msg = str(exc)
-        if 'validation error' in error_msg.lower():
-            # Extract the most relevant part of Pydantic validation errors
-            lines = error_msg.split('\n')
-            main_error = next(
-                (line for line in lines if 'Input should be' in line),
-                error_msg,
-            )
-            raise argparse.ArgumentTypeError(
-                f'Invalid workflow configuration in {path}/config.toml:\n'
-                f'{main_error}'
-            ) from exc
-        else:
-            raise argparse.ArgumentTypeError(
-                f'Failed to parse workflow config in {path}/config.toml:\n'
-                f'{error_msg}'
-            ) from exc
+        lines = error_msg.split('\n')
+        main_error = next(
+            (line for line in lines if 'Input should be' in line), error_msg
+        )
+        raise argparse.ArgumentTypeError(
+            f'Invalid workflow configuration in {path}:\n{main_error}'
+        ) from exc
 
 
 def parse_args(args: list[str] | None = None) -> argparse.Namespace:
@@ -138,7 +135,8 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         'workflow',
         metavar='WORKFLOW',
         type='workflow',
-        help='Path to the directory containing the workflow to run',
+        help='Path to the directory containing the workflow to run '
+        '(expects workflow.toml, falls back to config.toml)',
     )
 
     # Target argument group - specify how to target repositories

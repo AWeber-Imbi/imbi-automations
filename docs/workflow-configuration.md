@@ -1,6 +1,6 @@
 # Workflow Configuration Reference
 
-Complete field reference for workflow `config.toml` files with detailed descriptions, types, defaults, and examples.
+Complete field reference for workflow configuration files (`workflow.toml`) with detailed descriptions, types, defaults, and examples.
 
 **Tip:** Workflow configuration syntax is validated on startup
 

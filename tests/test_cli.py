@@ -122,7 +122,7 @@ class WorkflowTypeTestCase(unittest.TestCase):
 
     def test_workflow_valid_path(self) -> None:
         """Test workflow parser with valid workflow directory."""
-        config_file = self.workflow_dir / 'config.toml'
+        config_file = self.workflow_dir / 'workflow.toml'
         config_file.write_text("""
 name = "Test Workflow"
 actions = []
@@ -133,6 +133,37 @@ actions = []
         self.assertIsInstance(result, models.Workflow)
         self.assertEqual(result.path, self.workflow_dir)
         self.assertEqual(result.configuration.name, 'Test Workflow')
+
+    def test_workflow_config_toml_fallback(self) -> None:
+        """Test workflow parser falls back to config.toml."""
+        config_file = self.workflow_dir / 'config.toml'
+        config_file.write_text("""
+name = "Test Workflow Fallback"
+actions = []
+""")
+
+        result = cli.workflow(str(self.workflow_dir))
+
+        self.assertIsInstance(result, models.Workflow)
+        self.assertEqual(result.path, self.workflow_dir)
+        self.assertEqual(result.configuration.name, 'Test Workflow Fallback')
+
+    def test_workflow_prefers_workflow_toml(self) -> None:
+        """Test workflow parser prefers workflow.toml over config.toml."""
+        # Create both files
+        (self.workflow_dir / 'workflow.toml').write_text("""
+name = "Workflow TOML"
+actions = []
+""")
+        (self.workflow_dir / 'config.toml').write_text("""
+name = "Config TOML"
+actions = []
+""")
+
+        result = cli.workflow(str(self.workflow_dir))
+
+        # Should use workflow.toml
+        self.assertEqual(result.configuration.name, 'Workflow TOML')
 
     def test_workflow_not_a_directory(self) -> None:
         """Test workflow parser with non-directory path."""
@@ -145,17 +176,17 @@ actions = []
         self.assertIn('not a directory', str(ctx.exception))
 
     def test_workflow_missing_config_file(self) -> None:
-        """Test workflow parser with missing config.toml."""
-        # Workflow dir exists but no config.toml
+        """Test workflow parser with missing workflow config file."""
+        # Workflow dir exists but no workflow.toml or config.toml
 
         with self.assertRaises(argparse.ArgumentTypeError) as ctx:
             cli.workflow(str(self.workflow_dir))
 
-        self.assertIn('Missing config.toml', str(ctx.exception))
+        self.assertIn('Missing workflow configuration', str(ctx.exception))
 
     def test_workflow_invalid_config_toml(self) -> None:
         """Test workflow parser with invalid TOML syntax."""
-        config_file = self.workflow_dir / 'config.toml'
+        config_file = self.workflow_dir / 'workflow.toml'
         config_file.write_text('[invalid')
 
         with self.assertRaises(argparse.ArgumentTypeError) as ctx:
@@ -165,7 +196,7 @@ actions = []
 
     def test_workflow_invalid_config_validation(self) -> None:
         """Test workflow parser with config validation errors."""
-        config_file = self.workflow_dir / 'config.toml'
+        config_file = self.workflow_dir / 'workflow.toml'
         # Missing required 'name' field
         config_file.write_text('actions = []')
 
@@ -193,7 +224,7 @@ token = "github-token"
 
         self.workflow_dir = pathlib.Path(self.temp_dir.name) / 'workflow'
         self.workflow_dir.mkdir()
-        (self.workflow_dir / 'config.toml').write_text("""
+        (self.workflow_dir / 'workflow.toml').write_text("""
 name = "Test Workflow"
 actions = []
 """)
@@ -359,7 +390,7 @@ token = "github-token"
 
         self.workflow_dir = pathlib.Path(self.temp_dir.name) / 'workflow'
         self.workflow_dir.mkdir()
-        (self.workflow_dir / 'config.toml').write_text("""
+        (self.workflow_dir / 'workflow.toml').write_text("""
 name = "Test Workflow"
 actions = []
 """)
