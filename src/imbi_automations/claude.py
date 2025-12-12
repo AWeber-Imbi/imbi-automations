@@ -5,6 +5,7 @@ analysis and transformations using Claude AI, supporting both agent-based
 workflows and direct Anthropic API queries.
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -197,9 +198,72 @@ class Claude(mixins.WorkflowLoggerMixin):
         return agent_def.prompt
 
     async def agent_query(
-        self, prompt: str, response_model: type[AgentResult] | None = None
+        self,
+        prompt: str,
+        response_model: type[AgentResult] | None = None,
+        timeout: str = '1h',
     ) -> AgentResult | None:
         """Execute an agent query and return structured output.
+
+        Args:
+            prompt: The prompt to send to the agent
+            response_model: Pydantic model for structured output validation
+            timeout: Maximum execution time in Go duration format (e.g., "30m",
+                "1h", "90s")
+
+        Returns:
+            Validated response model instance, or None if no response
+
+        Raises:
+            RuntimeError: If no response received or structured output missing
+            TimeoutError: If execution exceeds the specified timeout
+
+        """
+        # Parse timeout to seconds
+        import pytimeparse2
+
+        timeout_seconds = pytimeparse2.parse(timeout)
+        if timeout_seconds is None:
+            raise ValueError(f'Invalid timeout format: {timeout}')
+
+        # Execute SDK interaction with timeout wrapper
+        try:
+            result = await asyncio.wait_for(
+                self._execute_sdk_query(prompt, response_model),
+                timeout=timeout_seconds,
+            )
+            return result
+        except TimeoutError:
+            # Attempt graceful shutdown
+            LOGGER.warning(
+                'Claude Code execution timed out after %s (%ds), '
+                'attempting graceful shutdown',
+                timeout,
+                timeout_seconds,
+            )
+            try:
+                await asyncio.wait_for(self.client.disconnect(), timeout=5)
+            except TimeoutError:
+                LOGGER.warning(
+                    'Claude SDK disconnect failed due to timeout '
+                    '(process may need forceful termination)'
+                )
+            except Exception as exc:  # noqa: BLE001
+                LOGGER.warning(
+                    'Claude SDK disconnect failed: %s '
+                    '(process may need forceful termination)',
+                    exc,
+                )
+
+            raise TimeoutError(
+                f'Claude Code execution timed out after {timeout} '
+                f'({timeout_seconds}s)'
+            ) from None
+
+    async def _execute_sdk_query(
+        self, prompt: str, response_model: type[AgentResult] | None = None
+    ) -> AgentResult | None:
+        """Execute SDK query without timeout wrapper.
 
         Args:
             prompt: The prompt to send to the agent

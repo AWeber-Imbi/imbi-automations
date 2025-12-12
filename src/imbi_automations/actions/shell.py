@@ -104,7 +104,38 @@ class ShellAction(mixins.WorkflowLoggerMixin):
                 cwd=cwd,
             )
 
-            stdout, stderr = await process.communicate()
+            # Parse timeout to seconds
+            import pytimeparse2
+
+            timeout_seconds = pytimeparse2.parse(action.timeout)
+            if timeout_seconds is None:
+                raise ValueError(f'Invalid timeout format: {action.timeout}')
+
+            # Execute with timeout
+            try:
+                stdout, stderr = await asyncio.wait_for(
+                    process.communicate(), timeout=timeout_seconds
+                )
+            except TimeoutError:
+                # Graceful termination
+                self.logger.warning(
+                    '%s %s shell command timed out after %s, '
+                    'terminating process',
+                    self.context.imbi_project.slug,
+                    action.name,
+                    action.timeout,
+                )
+                try:
+                    process.terminate()
+                    await asyncio.wait_for(process.wait(), timeout=5)
+                except TimeoutError:
+                    process.kill()
+                    await process.wait()
+
+                raise TimeoutError(
+                    f'Shell command timed out after {action.timeout}: '
+                    f'{command_str}'
+                ) from None
 
             # Decode output
             stdout_str = stdout.decode('utf-8') if stdout else ''

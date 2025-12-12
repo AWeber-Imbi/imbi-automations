@@ -410,6 +410,7 @@ Not recommended - commands block until completion. For long-running operations, 
 - Working directory resolved before command execution via `utils.resolve_path()`
 - Template rendering occurs before command execution
 - Commands are parsed as shell-like arguments (respecting quotes and escapes)
-- No timeout configured (commands run until completion)
+- Default timeout of 1 hour (configurable via `timeout` field, see [Action Timeouts](../workflow-configuration.md#timeout-optional))
+- On timeout: Process terminated gracefully (SIGTERM → SIGKILL)
 - stdout and stderr captured and logged at DEBUG level
 - Non-zero exit codes raise `subprocess.CalledProcessError` (unless `ignore_errors=true`)

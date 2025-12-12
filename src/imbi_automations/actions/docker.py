@@ -263,7 +263,46 @@ class DockerActions(mixins.WorkflowLoggerMixin):
                 stderr=asyncio.subprocess.PIPE,
             )
 
-            stdout, stderr = await process.communicate()
+            # Parse timeout to seconds (use action timeout or default)
+            import pytimeparse2
+
+            timeout_str = action.timeout if action else '1h'
+            timeout_seconds = pytimeparse2.parse(timeout_str)
+            if timeout_seconds is None:
+                raise ValueError(f'Invalid timeout format: {timeout_str}')
+
+            # Execute with timeout
+            try:
+                stdout, stderr = await asyncio.wait_for(
+                    process.communicate(), timeout=timeout_seconds
+                )
+            except TimeoutError:
+                # Graceful termination
+                if action:
+                    self.logger.warning(
+                        '%s %s docker command timed out after %s, '
+                        'terminating process',
+                        self.context.imbi_project.slug,
+                        action.name,
+                        timeout_str,
+                    )
+                else:
+                    self.logger.warning(
+                        'Docker command timed out after %s, '
+                        'terminating process',
+                        timeout_str,
+                    )
+                try:
+                    process.terminate()
+                    await asyncio.wait_for(process.wait(), timeout=5)
+                except TimeoutError:
+                    process.kill()
+                    await process.wait()
+
+                raise TimeoutError(
+                    f'Docker command timed out after {timeout_str}: '
+                    f'{" ".join(command)}'
+                ) from None
 
             stdout_str = stdout.decode('utf-8') if stdout else ''
             stderr_str = stderr.decode('utf-8') if stderr else ''
