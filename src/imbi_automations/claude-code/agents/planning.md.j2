@@ -11,7 +11,16 @@ Analyze the codebase and create an execution plan. Use Read, Glob, Grep, Bash to
 
 ## OUTPUT FORMAT
 
-Your response will be structured as JSON with these fields:
+After completing your analysis, you MUST end your response with raw JSON (not wrapped in code blocks, not in XML/tool format):
+```
+{
+  "plan": ["task 1", "task 2"],
+  "analysis": "your findings",
+  "skip_task": false
+}
+```
+
+Fields:
 - `plan`: list of strings (tasks for the task agent)
 - `analysis`: string (your findings)
 - `skip_task`: boolean (default False) - set to True if no work is needed

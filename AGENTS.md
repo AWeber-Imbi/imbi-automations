@@ -193,6 +193,11 @@ ai_commit = true
 
 Planning agent can set `skip_task=True` to skip task/validation when no work needed.
 
+**Structured Output:**
+- Agents must return raw JSON matching their schema (not wrapped in code blocks or XML)
+- Fallback parser extracts JSON/XML if SDK doesn't populate `structured_output`
+- Supports both native API structured output and text-based extraction
+
 ### MCP Servers
 
 ```toml

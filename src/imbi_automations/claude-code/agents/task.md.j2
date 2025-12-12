@@ -11,8 +11,17 @@ Execute the assigned tasks. Make all required changes without asking for confirm
 
 ## OUTPUT FORMAT
 
-Your response will be structured as JSON with this field:
-- `message`: string (brief summary of changes made)
+After completing all work, you MUST end your response with raw JSON (not wrapped in code blocks, not in XML/tool format):
+```
+{"message": "brief summary of changes made"}
+```
+
+Example of correct output:
+```
+I've updated the files as requested.
+
+{"message": "Updated configuration files with new settings"}
+```
 
 ## KEY DIRECTIVES
 

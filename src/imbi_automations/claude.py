@@ -295,14 +295,24 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         await self.client.connect()
         await self.client.query(prompt)
+        last_result_content = None
         async for message in self.client.receive_response():
             self._parse_message(message)
+            # Capture last result for debugging
+            if isinstance(message, claude_agent_sdk.ResultMessage):
+                last_result_content = message.result
         await self.client.disconnect()
 
         if self._structured_output is None:
-            raise RuntimeError(
-                'No structured output received from Claude Code'
-            )
+            error_msg = 'No structured output received from Claude Code'
+            if last_result_content:
+                LOGGER.debug(
+                    'Last result content: %r', last_result_content[:500]
+                )
+                error_msg += (
+                    f'. Last result preview: {last_result_content[:200]}'
+                )
+            raise RuntimeError(error_msg)
 
         if response_model is not None:
             return response_model.model_validate(self._structured_output)
@@ -597,6 +607,65 @@ class Claude(mixins.WorkflowLoggerMixin):
             model=frontmatter.get('model', 'inherit'),  # type: ignore
         )
 
+    def _try_extract_json_from_text(self, text: str) -> None:
+        """Attempt to extract JSON object from result text as fallback.
+
+        This handles cases where the SDK doesn't populate structured_output
+        but Claude has included JSON or XML-formatted output in the response.
+        """
+        import json
+        import re
+
+        # First, try to extract from <StructuredOutput> XML tags if present
+        xml_match = re.search(
+            r'<StructuredOutput>(.*?)</StructuredOutput>', text, re.DOTALL
+        )
+        if xml_match:
+            xml_content = xml_match.group(1)
+            # Extract parameter values from XML
+            result = {}
+            param_matches = re.finditer(
+                r'<parameter name="([^"]+)">([^<]*)</parameter>',
+                xml_content,
+                re.DOTALL,
+            )
+            for match in param_matches:
+                param_name = match.group(1)
+                param_value = match.group(2).strip()
+                result[param_name] = param_value
+
+            if result:
+                self._structured_output = result
+                LOGGER.debug(
+                    'Extracted structured output from XML tags: %r', result
+                )
+                return
+
+        # Fallback: Try to find JSON object in the text
+        # Look for the last occurrence of {...} which is most likely the output
+        json_pattern = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
+        matches = list(re.finditer(json_pattern, text, re.DOTALL))
+
+        if not matches:
+            LOGGER.debug('No JSON found in result text')
+            return
+
+        # Try parsing from the last match backwards
+        for match in reversed(matches):
+            try:
+                json_str = match.group(0)
+                parsed = json.loads(json_str)
+                if isinstance(parsed, dict):
+                    self._structured_output = parsed
+                    LOGGER.debug(
+                        'Extracted structured output from text: %r', parsed
+                    )
+                    return
+            except json.JSONDecodeError:
+                continue
+
+        LOGGER.debug('Found JSON-like patterns but none were valid JSON')
+
     def _parse_message(self, message: claude_agent_sdk.Message) -> None:
         """Parse the response from Claude Code."""
         if isinstance(message, claude_agent_sdk.AssistantMessage):
@@ -633,3 +702,10 @@ class Claude(mixins.WorkflowLoggerMixin):
                 LOGGER.debug(
                     'Structured output received: %r', message.structured_output
                 )
+            # Fallback: Parse JSON from result if SDK didn't extract it
+            elif (
+                not message.is_error
+                and message.result
+                and self._structured_output is None
+            ):
+                self._try_extract_json_from_text(message.result)

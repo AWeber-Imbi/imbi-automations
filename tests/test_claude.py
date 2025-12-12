@@ -724,6 +724,88 @@ class ClaudeTestCase(base.AsyncTestCase):
 
         self.assertIsNone(claude_instance._structured_output)
 
+    def test_parse_message_result_with_xml_fallback(self) -> None:
+        """Test _parse_message extracts structured output from XML tags."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # ResultMessage with XML-formatted output in result text
+        result_text = (
+            "I've updated the CHANGELOG.\n\n"
+            '<StructuredOutput>\n'
+            '<parameter name="message">Updated CHANGELOG.md</parameter>\n'
+            '</StructuredOutput>'
+        )
+        message = claude_agent_sdk.ResultMessage(
+            subtype='success',
+            duration_ms=100,
+            duration_api_ms=90,
+            is_error=False,
+            num_turns=1,
+            session_id='test-session',
+            total_cost_usd=0.01,
+            usage=_create_mock_result_message_usage(),
+            result=result_text,
+            structured_output=None,  # SDK didn't extract it
+        )
+
+        claude_instance._parse_message(message)
+
+        # Should extract from XML tags
+        self.assertEqual(
+            claude_instance._structured_output,
+            {'message': 'Updated CHANGELOG.md'},
+        )
+
+    def test_parse_message_result_with_json_fallback(self) -> None:
+        """Test _parse_message extracts structured output from JSON in text."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # ResultMessage with JSON in result text
+        result_text = (
+            'I completed the task.\n\n'
+            '{"message": "Task completed successfully"}'
+        )
+        message = claude_agent_sdk.ResultMessage(
+            subtype='success',
+            duration_ms=100,
+            duration_api_ms=90,
+            is_error=False,
+            num_turns=1,
+            session_id='test-session',
+            total_cost_usd=0.01,
+            usage=_create_mock_result_message_usage(),
+            result=result_text,
+            structured_output=None,
+        )
+
+        claude_instance._parse_message(message)
+
+        # Should extract JSON
+        self.assertEqual(
+            claude_instance._structured_output,
+            {'message': 'Task completed successfully'},
+        )
+
     def test_get_agent_prompt_returns_prompt(self) -> None:
         """Test get_agent_prompt returns the agent's prompt content."""
         with (
