@@ -10,4 +10,8 @@ The work you will be performing will primarily be in the `repository` directory.
 
 ## Output Format
 
-Your response MUST be structured JSON output matching the schema provided via output_format. The agent instructions specify the expected fields. Do not wrap the JSON in markdown code blocks - output the raw JSON directly as your final response.
+Your response MUST be structured JSON output matching the schema provided via output_format. The agent instructions specify the expected fields.
+
+**CRITICAL: Do NOT use the StructuredOutput tool.** Output the raw JSON directly as your final message content. Do not wrap the JSON in markdown code blocks.
+
+The StructuredOutput tool is disabled for this workflow. You must output JSON directly in your message, not via a tool call.
