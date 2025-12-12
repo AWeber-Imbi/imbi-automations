@@ -427,6 +427,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             'hooks': {},
             'outputStyle': 'json',
             'settingSources': ['project', 'local'],
+            'permissions': {'deny': ['StructuredOutput']},
         }
 
         # Add merged plugin configuration
