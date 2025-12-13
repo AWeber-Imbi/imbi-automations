@@ -159,11 +159,11 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         mock_agent_query: mock.AsyncMock,
     ) -> None:
         """Test successful execution cycle."""
-        # Mock successful agent responses - task returns TaskResult,
-        # validation returns ValidationResult
+        # Mock successful agent responses - task returns response,
+        # validation returns response
         mock_agent_query.side_effect = [
-            models.ClaudeAgentTaskResult(message='Success'),
-            models.ClaudeAgentValidationResult(validated=True, errors=[]),
+            models.ClaudeAgentResponse(message='Success'),
+            models.ClaudeAgentResponse(validated=True, errors=[]),
         ]
         mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
@@ -209,10 +209,8 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         """Test execution cycle with validation failure."""
         # Mock task agent completing, then validation failing
         mock_agent_query.side_effect = [
-            models.ClaudeAgentTaskResult(message='Task completed'),
-            models.ClaudeAgentValidationResult(
-                validated=False, errors=['Error 1']
-            ),
+            models.ClaudeAgentResponse(message='Task completed'),
+            models.ClaudeAgentResponse(validated=False, errors=['Error 1']),
         ]
         mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
@@ -256,7 +254,7 @@ class ClaudeActionTestCase(base.AsyncTestCase):
     ) -> None:
         """Test execute with successful first cycle."""
         # Task agent without validation returns True (success)
-        mock_agent_query.return_value = models.ClaudeAgentTaskResult(
+        mock_agent_query.return_value = models.ClaudeAgentResponse(
             message='Success'
         )
         mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
@@ -297,19 +295,15 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         mock_agent_query: mock.AsyncMock,
     ) -> None:
         """Test execute with all cycles failing."""
-        # Task agent returns TaskResult (always succeeds at execution level).
+        # Task agent returns response (always succeeds at execution level).
         # Without validation, cycles succeed, so test needs validation
         mock_agent_query.side_effect = [
             # Cycle 1: task + validation fail
-            models.ClaudeAgentTaskResult(message='Task completed'),
-            models.ClaudeAgentValidationResult(
-                validated=False, errors=['Error']
-            ),
+            models.ClaudeAgentResponse(message='Task completed'),
+            models.ClaudeAgentResponse(validated=False, errors=['Error']),
             # Cycle 2: task + validation fail again
-            models.ClaudeAgentTaskResult(message='Task completed'),
-            models.ClaudeAgentValidationResult(
-                validated=False, errors=['Error']
-            ),
+            models.ClaudeAgentResponse(message='Task completed'),
+            models.ClaudeAgentResponse(validated=False, errors=['Error']),
         ]
         mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
@@ -360,13 +354,11 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         # Second cycle: task + validation succeeds
         mock_agent_query.side_effect = [
             # Cycle 1
-            models.ClaudeAgentTaskResult(message='Task completed'),
-            models.ClaudeAgentValidationResult(
-                validated=False, errors=['Error']
-            ),
+            models.ClaudeAgentResponse(message='Task completed'),
+            models.ClaudeAgentResponse(validated=False, errors=['Error']),
             # Cycle 2
-            models.ClaudeAgentTaskResult(message='Task completed'),
-            models.ClaudeAgentValidationResult(validated=True, errors=[]),
+            models.ClaudeAgentResponse(message='Task completed'),
+            models.ClaudeAgentResponse(validated=True, errors=[]),
         ]
         mock_get_agent_prompt.return_value = '# AGENT\n\nDo the work.'
 
@@ -404,23 +396,8 @@ class ClaudeActionTestCase(base.AsyncTestCase):
         )  # 2 cycles * (task + validation)
 
 
-class GetResponseModelTestCase(unittest.TestCase):
-    """Test cases for the _get_response_model function."""
-
-    def test_get_response_model_planning(self) -> None:
-        """Test _get_response_model returns correct model for planning."""
-        result = claude._get_response_model(models.ClaudeAgentType.planning)
-        self.assertIs(result, models.ClaudeAgentPlanningResult)
-
-    def test_get_response_model_task(self) -> None:
-        """Test _get_response_model returns correct model for task."""
-        result = claude._get_response_model(models.ClaudeAgentType.task)
-        self.assertIs(result, models.ClaudeAgentTaskResult)
-
-    def test_get_response_model_validation(self) -> None:
-        """Test _get_response_model returns correct model for validation."""
-        result = claude._get_response_model(models.ClaudeAgentType.validation)
-        self.assertIs(result, models.ClaudeAgentValidationResult)
+# GetResponseModelTestCase removed - _get_response_model function no longer
+# exists with unified ClaudeAgentResponse model
 
 
 if __name__ == '__main__':

@@ -72,16 +72,19 @@ class Committer(mixins.WorkflowLoggerMixin):
             **client.prompt_kwargs,
         )
 
-        result = await client.agent_query(prompt, models.ClaudeAgentTaskResult)
+        result = await client.agent_query(prompt)
 
         # Check if agent indicated no changes to commit
-        for phrase in ['no changes to commit', 'working tree is clean']:
-            if phrase in result.message.lower():
-                return False
+        if result.message:
+            for phrase in ['no changes to commit', 'working tree is clean']:
+                if phrase in result.message.lower():
+                    return False
 
-        # Check if commit failed
-        if 'commit failed' in result.message.lower():
-            raise RuntimeError(f'Claude Code commit failed: {result.message}')
+            # Check if commit failed
+            if 'commit failed' in result.message.lower():
+                raise RuntimeError(
+                    f'Claude Code commit failed: {result.message}'
+                )
 
         # Otherwise assume success
         return True

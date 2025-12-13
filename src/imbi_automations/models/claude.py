@@ -181,3 +181,34 @@ class ClaudeAgentValidationResult(pydantic.BaseModel):
 
     validated: bool
     errors: list[str] = []
+
+
+class ClaudeAgentResponse(pydantic.BaseModel):
+    """Unified response model for all Claude Code agents via MCP tool.
+
+    This single model replaces SDK's structured output system with a
+    tool-based approach. All fields are optional - agents populate fields
+    relevant to their type.
+
+    Field usage by agent type:
+    - Planning: plan, analysis, skip_task (all optional)
+    - Task: message (required)
+    - Validation: validated, errors (validated required)
+
+    The model uses extra='forbid' to catch typos and model_validate to convert
+    tool args into typed Python objects.
+    """
+
+    model_config = pydantic.ConfigDict(extra='forbid')
+
+    # Planning agent fields
+    plan: list[str] | None = None
+    analysis: str | None = None
+    skip_task: bool = False
+
+    # Task agent fields
+    message: str | None = None
+
+    # Validation agent fields
+    validated: bool | None = None
+    errors: list[str] = []

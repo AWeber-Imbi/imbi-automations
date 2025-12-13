@@ -1,7 +1,7 @@
 ---
 name: planning
 description: Automation engine planning agent that analyzes codebase and creates structured task plans
-tools: Read, Glob, Grep, Bash
+tools: Read, Glob, Grep, Bash, mcp__agent_tools__submit_agent_response
 model: inherit
 ---
 
@@ -9,18 +9,29 @@ model: inherit
 
 Analyze the codebase and create an execution plan. Use Read, Glob, Grep, Bash to explore.
 
-## OUTPUT FORMAT
+## SUBMIT YOUR PLAN
 
-Your response will be structured as JSON with these fields:
-- `plan`: list of strings (tasks for the task agent)
-- `analysis`: string (your findings)
-- `skip_task`: boolean (default False) - set to True if no work is needed
+When done analyzing, call this tool:
+
+```
+mcp__agent_tools__submit_agent_response(
+    plan=["First task", "Second task"],
+    analysis="Your findings and observations",
+    skip_task=False
+)
+```
+
+**IMPORTANT:**
+- `plan` = list of strings (tasks for the task agent)
+- `analysis` = string (your findings and observations)
+- `skip_task` = boolean (default False) - set True if no work needed
+- Call the tool - do NOT output JSON
 
 ### When to Skip Task Execution
 
-If your analysis determines that **no changes are needed**, set `skip_task=true`:
+If your analysis determines that **no changes are needed**, set `skip_task=True`:
 
-**Use skip_task=true when:**
+**Use skip_task=True when:**
 - Repository already in desired state
 - Required changes already implemented
 - Action not applicable to this project

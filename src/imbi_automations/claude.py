@@ -131,11 +131,7 @@ def _merge_plugin_configs(
     )
 
 
-AgentResult = (
-    models.ClaudeAgentPlanningResult
-    | models.ClaudeAgentTaskResult
-    | models.ClaudeAgentValidationResult
-)
+AgentResult = models.ClaudeAgentResponse
 
 
 class Claude(mixins.WorkflowLoggerMixin):
@@ -175,7 +171,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         }
         self.tracker = tracker.Tracker.get_instance()
         self._set_workflow_logger(self.context.workflow)
-        self._structured_output: dict[str, typing.Any] | None = None
+        self._submitted_response: AgentResult | None = None
         self._merged_local_plugins: list[models.ClaudeLocalPlugin] = []
         self.client = self._create_client()
 
@@ -198,24 +194,20 @@ class Claude(mixins.WorkflowLoggerMixin):
         return agent_def.prompt
 
     async def agent_query(
-        self,
-        prompt: str,
-        response_model: type[AgentResult] | None = None,
-        timeout: str = '1h',
+        self, prompt: str, timeout: str = '1h'
     ) -> AgentResult | None:
-        """Execute an agent query and return structured output.
+        """Execute an agent query and return unified response via MCP tool.
 
         Args:
             prompt: The prompt to send to the agent
-            response_model: Pydantic model for structured output validation
             timeout: Maximum execution time in Go duration format (e.g., "30m",
                 "1h", "90s")
 
         Returns:
-            Validated response model instance, or None if no response
+            ClaudeAgentResponse with fields populated by the agent
 
         Raises:
-            RuntimeError: If no response received or structured output missing
+            RuntimeError: If agent didn't call submit_agent_response tool
             TimeoutError: If execution exceeds the specified timeout
 
         """
@@ -229,8 +221,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         # Execute SDK interaction with timeout wrapper
         try:
             result = await asyncio.wait_for(
-                self._execute_sdk_query(prompt, response_model),
-                timeout=timeout_seconds,
+                self._execute_sdk_query(prompt), timeout=timeout_seconds
             )
             return result
         except TimeoutError:
@@ -260,38 +251,20 @@ class Claude(mixins.WorkflowLoggerMixin):
                 f'({timeout_seconds}s)'
             ) from None
 
-    async def _execute_sdk_query(
-        self, prompt: str, response_model: type[AgentResult] | None = None
-    ) -> AgentResult | None:
-        """Execute SDK query without timeout wrapper.
+    async def _execute_sdk_query(self, prompt: str) -> AgentResult | None:
+        """Execute SDK query and capture tool-based response.
 
         Args:
             prompt: The prompt to send to the agent
-            response_model: Pydantic model for structured output validation
 
         Returns:
-            Validated response model instance, or None if no response
+            ClaudeAgentResponse populated by the agent via MCP tool
 
         Raises:
-            RuntimeError: If no response received or structured output missing
+            RuntimeError: If agent didn't call submit_agent_response tool
 
         """
-        self._structured_output: dict[str, typing.Any] | None = None
-
-        # Set output format BEFORE connecting - SDK reads it at connect time
-        if response_model is not None:
-            output_format = {
-                'type': 'json_schema',
-                'schema': response_model.model_json_schema(),
-            }
-            self.client.options.output_format = output_format
-            LOGGER.debug(
-                'Setting output_format for %s: %r',
-                response_model.__name__,
-                output_format,
-            )
-        else:
-            self.client.options.output_format = None
+        self._submitted_response: AgentResult | None = None
 
         await self.client.connect()
         await self.client.query(prompt)
@@ -299,14 +272,13 @@ class Claude(mixins.WorkflowLoggerMixin):
             self._parse_message(message)
         await self.client.disconnect()
 
-        if self._structured_output is None:
+        if self._submitted_response is None:
             raise RuntimeError(
-                'No structured output received from Claude Code'
+                'No response received from Claude Code - agent must call '
+                'submit_agent_response tool'
             )
 
-        if response_model is not None:
-            return response_model.model_validate(self._structured_output)
-        return None
+        return self._submitted_response
 
     async def anthropic_query(
         self, prompt: str, model: str | None = None
@@ -332,6 +304,41 @@ class Claude(mixins.WorkflowLoggerMixin):
         settings = self._initialize_working_directory()
         LOGGER.debug('Claude Code settings: %s', settings)
 
+        # Create MCP tool for unified agent responses
+        @claude_agent_sdk.tool(
+            'submit_agent_response',
+            'Submit the final agent response (required)',
+            models.ClaudeAgentResponse.model_json_schema(),
+        )
+        async def submit_agent_response(
+            args: dict[str, typing.Any],
+        ) -> dict[str, typing.Any]:
+            """Submit unified agent response via MCP tool."""
+            LOGGER.debug('submit_agent_response tool invoked with: %r', args)
+            try:
+                self._submitted_response = (
+                    models.ClaudeAgentResponse.model_validate(args)
+                )
+            except pydantic.ValidationError as err:
+                return {
+                    'content': [
+                        {
+                            'type': 'text',
+                            'text': f'Error: invalid response - {err}',
+                        }
+                    ],
+                    'is_error': True,
+                }
+            return {
+                'content': [
+                    {'type': 'text', 'text': 'Response submitted successfully'}
+                ]
+            }
+
+        agent_tools = claude_agent_sdk.create_sdk_mcp_server(
+            'agent_tools', '1.0.0', [submit_agent_response]
+        )
+
         system_prompt = (BASE_PATH / 'claude-code' / 'CLAUDE.md').read_text()
         if self.context.workflow.configuration.prompt:
             system_prompt += '\n\n---\n\n'
@@ -347,7 +354,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 raise RuntimeError
 
         # Build MCP servers dict with workflow-defined servers
-        mcp_servers: dict[str, typing.Any] = {}
+        mcp_servers: dict[str, typing.Any] = {'agent_tools': agent_tools}
         for (
             name,
             config,
@@ -378,6 +385,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'WebFetch',
                 'WebSearch',
                 'SlashCommand',
+                'mcp__agent_tools__submit_agent_response',
             ],
             cwd=self.context.working_directory / 'repository',
             mcp_servers=mcp_servers,
@@ -427,6 +435,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             'hooks': {},
             'outputStyle': 'json',
             'settingSources': ['project', 'local'],
+            'permissions': {'deny': ['StructuredOutput']},
         }
 
         # Add merged plugin configuration
@@ -626,10 +635,4 @@ class Claude(mixins.WorkflowLoggerMixin):
             else:
                 LOGGER.debug(
                     'Result (%s): %r', message.session_id, message.result
-                )
-            # Extract structured output if present
-            if message.structured_output is not None:
-                self._structured_output = message.structured_output
-                LOGGER.debug(
-                    'Structured output received: %r', message.structured_output
                 )

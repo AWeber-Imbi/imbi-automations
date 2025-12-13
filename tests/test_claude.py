@@ -657,8 +657,8 @@ class ClaudeTestCase(base.AsyncTestCase):
     # Note: Removed obsolete session_id update tests - _parse_message now
     # returns None
 
-    def test_parse_message_result_with_structured_output(self) -> None:
-        """Test _parse_message extracts structured_output."""
+    def test_parse_message_result_with_success(self) -> None:
+        """Test _parse_message handles successful ResultMessage."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
             mock.patch(
@@ -682,18 +682,17 @@ class ClaudeTestCase(base.AsyncTestCase):
             total_cost_usd=0.01,
             usage=_create_mock_result_message_usage(),
             result='Success',
-            structured_output={'message': 'Task completed successfully'},
+            structured_output=None,
         )
 
+        # Parse message should not raise
         claude_instance._parse_message(message)
 
-        self.assertEqual(
-            claude_instance._structured_output,
-            {'message': 'Task completed successfully'},
-        )
+        # Verify session_id was captured
+        self.assertEqual(claude_instance.session_id, 'test-session')
 
-    def test_parse_message_result_without_structured_output(self) -> None:
-        """Test _parse_message handles ResultMessage without output."""
+    def test_parse_message_result_with_error(self) -> None:
+        """Test _parse_message handles error ResultMessage."""
         with (
             mock.patch('claude_agent_sdk.ClaudeSDKClient'),
             mock.patch(
@@ -706,23 +705,22 @@ class ClaudeTestCase(base.AsyncTestCase):
                 config=self.config, context=self.context
             )
 
-        # Create a proper ResultMessage-like object without structured_output
+        # Create a proper ResultMessage-like object with error
         message = claude_agent_sdk.ResultMessage(
-            subtype='success',
+            subtype='error',
             duration_ms=100,
             duration_api_ms=90,
-            is_error=False,
+            is_error=True,
             num_turns=1,
             session_id='test-session',
             total_cost_usd=0.01,
             usage=_create_mock_result_message_usage(),
-            result='Success',
+            result='Error occurred',
             structured_output=None,
         )
 
+        # Parse message should log error but not raise
         claude_instance._parse_message(message)
-
-        self.assertIsNone(claude_instance._structured_output)
 
     def test_get_agent_prompt_returns_prompt(self) -> None:
         """Test get_agent_prompt returns the agent's prompt content."""

@@ -1,7 +1,7 @@
 ---
 name: validation
 description: Validates generated content and provides feedback
-tools: Read, Bash
+tools: Read, Bash, mcp__agent_tools__submit_agent_response
 model: inherit
 ---
 
@@ -9,11 +9,30 @@ model: inherit
 
 Check if the generated content meets validation rules.
 
-## OUTPUT FORMAT
+## SUBMIT YOUR RESULT
 
-Your response will be structured as JSON with these fields:
-- `validated`: boolean (true if all checks pass)
-- `errors`: list of strings (empty if validated=true, specific error messages if false)
+When done validating, call this tool:
+
+**Success:**
+```
+mcp__agent_tools__submit_agent_response(
+    validated=True,
+    errors=[]
+)
+```
+
+**Failure:**
+```
+mcp__agent_tools__submit_agent_response(
+    validated=False,
+    errors=["Line 5: Expected Python 3.12, found 3.9", "Missing dependency X"]
+)
+```
+
+**IMPORTANT:**
+- `validated` = boolean (true if all checks pass)
+- `errors` = list of strings (empty if validated=True)
+- Call the tool - do NOT output JSON
 
 ## VALIDATION PRINCIPLES
 

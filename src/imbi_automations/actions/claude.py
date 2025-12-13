@@ -10,26 +10,6 @@ import typing
 
 from imbi_automations import claude, mixins, models, prompts
 
-# Type alias for response model types
-ResponseModel = (
-    type[models.ClaudeAgentPlanningResult]
-    | type[models.ClaudeAgentTaskResult]
-    | type[models.ClaudeAgentValidationResult]
-)
-
-
-def _get_response_model(agent: models.ClaudeAgentType) -> ResponseModel:
-    """Return the appropriate response model for the given agent type."""
-    match agent:
-        case models.ClaudeAgentType.planning:
-            return models.ClaudeAgentPlanningResult
-        case models.ClaudeAgentType.task:
-            return models.ClaudeAgentTaskResult
-        case models.ClaudeAgentType.validation:
-            return models.ClaudeAgentValidationResult
-        case _:
-            raise ValueError(f'Unknown agent type: {agent}')
-
 
 class ClaudeAction(mixins.WorkflowLoggerMixin):
     """Executes AI-powered code transformations using Claude Code SDK.
@@ -50,8 +30,8 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self.configuration = configuration
         self.context = context
         self.has_planning_prompt: bool = False
-        self.last_error: models.ClaudeAgentValidationResult | None = None
-        self.task_plan: models.ClaudeAgentPlanningResult | None = None
+        self.last_error: models.ClaudeAgentResponse | None = None
+        self.task_plan: models.ClaudeAgentResponse | None = None
         git = configuration.git
         self.prompt_kwargs = {
             'commit_author': f'{git.user_name} <{git.user_email}>',
@@ -172,11 +152,8 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 prompt,
             )
 
-            # Select response model based on agent type
-            response_model = _get_response_model(agent)
-            run = await self.claude.agent_query(
-                prompt, response_model, timeout=action.timeout
-            )
+            # Execute agent query (unified response via MCP tool)
+            run = await self.claude.agent_query(prompt, timeout=action.timeout)
             self.logger.info(
                 '%s [%s/%s] %s executed Claude Code %s agent in cycle %d',
                 self.context.imbi_project.slug,
@@ -195,7 +172,8 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 run,
             )
 
-            if isinstance(run, models.ClaudeAgentPlanningResult):
+            # Check response type by populated fields
+            if run.plan is not None:  # Planning agent response
                 self.task_plan = run
                 if run.skip_task:
                     self.logger.info(
@@ -211,17 +189,17 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                     '%s %s planning agent created plan with %d tasks',
                     self.context.imbi_project.slug,
                     action.name,
-                    len(self.task_plan.plan),
+                    len(run.plan),
                 )
                 # Continue to task agent - don't return yet
-            elif isinstance(run, models.ClaudeAgentTaskResult):
+            elif run.message is not None:  # Task agent response
                 self.logger.debug(
                     '%s %s task result: %s',
                     self.context.imbi_project.slug,
                     action.name,
                     run.message,
                 )
-            elif isinstance(run, models.ClaudeAgentValidationResult):
+            elif run.validated is not None:  # Validation agent response
                 self.logger.debug(
                     '%s %s validation result: %r',
                     self.context.imbi_project.slug,

@@ -8,6 +8,8 @@ Do not ask for context keywords or session setup. Proceed directly with the task
 
 The work you will be performing will primarily be in the `repository` directory. It is a git clone of the repository you are working on.
 
-## Output Format
+## Response Submission
 
-Your response MUST be structured JSON output matching the schema provided via output_format. The agent instructions specify the expected fields. Do not wrap the JSON in markdown code blocks - output the raw JSON directly as your final response.
+You MUST submit your response using the `mcp__agent_tools__submit_agent_response` tool. The agent instructions specify which fields to populate based on your agent type.
+
+Do NOT output JSON directly - always call the tool to submit your response.
