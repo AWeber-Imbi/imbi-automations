@@ -2,7 +2,6 @@
 
 import pathlib
 import tempfile
-import typing
 import unittest
 from unittest import mock
 
@@ -233,10 +232,8 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
         mock_render.return_value = 'Commit the changes'
 
         # Create a proper async mock for agent_query
-        async def mock_agent_query(
-            prompt: str, response_model: typing.Any
-        ) -> models.ClaudeAgentTaskResult:
-            return models.ClaudeAgentTaskResult(
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            return models.ClaudeAgentResponse(
                 message='Committed changes successfully with SHA abc123'
             )
 
@@ -258,10 +255,8 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
         mock_client.prompt_kwargs = {}
         mock_render.return_value = 'Commit the changes'
 
-        async def mock_agent_query(
-            prompt: str, response_model: typing.Any
-        ) -> models.ClaudeAgentTaskResult:
-            return models.ClaudeAgentTaskResult(
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            return models.ClaudeAgentResponse(
                 message='There are no changes to commit.'
             )
 
@@ -283,10 +278,8 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
         mock_client.prompt_kwargs = {}
         mock_render.return_value = 'Commit the changes'
 
-        async def mock_agent_query(
-            prompt: str, response_model: typing.Any
-        ) -> models.ClaudeAgentTaskResult:
-            return models.ClaudeAgentTaskResult(
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            return models.ClaudeAgentResponse(
                 message='Nothing to commit, working tree is clean.'
             )
 
@@ -308,10 +301,8 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
         mock_client.prompt_kwargs = {}
         mock_render.return_value = 'Commit the changes'
 
-        async def mock_agent_query(
-            prompt: str, response_model: typing.Any
-        ) -> models.ClaudeAgentTaskResult:
-            return models.ClaudeAgentTaskResult(
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            return models.ClaudeAgentResponse(
                 message='Commit failed: pre-commit hook rejected changes'
             )
 
@@ -336,10 +327,8 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
         mock_client.prompt_kwargs = {}
         mock_render.return_value = 'Commit the changes'
 
-        async def mock_agent_query(
-            prompt: str, response_model: typing.Any
-        ) -> models.ClaudeAgentTaskResult:
-            return models.ClaudeAgentTaskResult(
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            return models.ClaudeAgentResponse(
                 message='NO CHANGES TO COMMIT in this repository'
             )
 
@@ -350,32 +339,8 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
 
         self.assertFalse(result)
 
-    @mock.patch('imbi_automations.committer.prompts.render')
-    @mock.patch('imbi_automations.committer.claude.Claude')
-    async def test_passes_correct_response_model(
-        self, mock_claude_class: mock.MagicMock, mock_render: mock.MagicMock
-    ) -> None:
-        """Test _claude_commit passes ClaudeAgentTaskResult to agent_query."""
-        mock_client = mock.MagicMock()
-        mock_claude_class.return_value = mock_client
-        mock_client.prompt_kwargs = {}
-        mock_render.return_value = 'Commit the changes'
-
-        captured_response_model = None
-
-        async def mock_agent_query(
-            prompt: str, response_model: typing.Any
-        ) -> models.ClaudeAgentTaskResult:
-            nonlocal captured_response_model
-            captured_response_model = response_model
-            return models.ClaudeAgentTaskResult(message='Success')
-
-        mock_client.agent_query = mock_agent_query
-
-        c = committer.Committer(self.config, verbose=False)
-        await c._claude_commit(self.context, self.action)
-
-        self.assertIs(captured_response_model, models.ClaudeAgentTaskResult)
+    # test_passes_correct_response_model removed - agent_query no longer
+    # takes response_model parameter with unified ClaudeAgentResponse
 
 
 class ManualCommitTestCase(base.AsyncTestCase):

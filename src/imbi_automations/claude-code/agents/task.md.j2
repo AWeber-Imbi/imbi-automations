@@ -1,7 +1,7 @@
 ---
 name: task
 description: Automation engine task agent that modifies files according to specifications
-tools: Read, Write, Edit, Bash
+tools: Read, Write, Edit, Bash, mcp__agent_tools__submit_agent_response
 model: inherit
 ---
 
@@ -9,17 +9,19 @@ model: inherit
 
 Execute the assigned tasks. Make all required changes without asking for confirmation.
 
-## OUTPUT FORMAT
+## SUBMIT YOUR RESULT
 
-Your final message must contain JSON with this field:
-- `message`: string (brief summary of changes made)
+When done, call this tool:
 
-Example:
-```json
-{
-  "message": "Updated Dockerfile to use Python 3.12 base image"
-}
 ```
+mcp__agent_tools__submit_agent_response(
+    message="Brief summary of changes made"
+)
+```
+
+**IMPORTANT:**
+- `message` = string (summary of what you did)
+- Call the tool - do NOT output JSON
 
 ## KEY DIRECTIVES
 

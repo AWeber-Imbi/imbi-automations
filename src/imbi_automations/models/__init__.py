@@ -7,6 +7,7 @@ workflow definitions, git operations, and Claude Code integration models.
 from . import configuration, imbi, mcp
 from .claude import (
     ClaudeAgentPlanningResult,
+    ClaudeAgentResponse,
     ClaudeAgentTaskResult,
     ClaudeAgentType,
     ClaudeAgentValidationResult,
@@ -90,6 +91,7 @@ __all__ = [
     'AnthropicConfiguration',
     'ClaudeAgentConfiguration',
     'ClaudeAgentPlanningResult',
+    'ClaudeAgentResponse',
     'ClaudeAgentTaskResult',
     'ClaudeAgentType',
     'ClaudeAgentValidationResult',

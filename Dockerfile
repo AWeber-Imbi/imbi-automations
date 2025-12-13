@@ -38,8 +38,6 @@ RUN apt-get update \
 
 USER imbi-automations
 
-RUN curl -fsSL https://claude.ai/install.sh | bash
-
 WORKDIR /opt
 
 VOLUME /opt/config /opt/dry-runs /opt/errors /opt/workflows /docker-entrypoint-init.d
