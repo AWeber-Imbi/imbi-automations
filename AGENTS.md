@@ -155,6 +155,7 @@ exception_types = ["TimeoutError"]
 - `action_names`: Match by action name (`["deploy", "test"]`)
 - `stages`: Match by stage (`["primary", "followup"]`)
 - `exception_types`: Match by exception class name (`["TimeoutError"]`)
+- `exception_message_contains`: Match by text in exception message (`"ruff.....Failed"`)
 - `condition`: Custom Jinja2 expression
 
 **Error context variables:**

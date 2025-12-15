@@ -115,6 +115,7 @@ Filter specification for global error handlers. Defines which failed actions thi
 - `action_names`: List of action names to match (`["deploy", "test"]`)
 - `stages`: List of stages to match (`["primary", "followup"]`)
 - `exception_types`: List of exception class names (`["TimeoutError"]`)
+- `exception_message_contains`: Text that must be present in exception message (e.g., `"ruff.....Failed"`)
 - `condition`: Custom Jinja2 expression (advanced)
 
 ```toml
@@ -298,7 +299,35 @@ sleep 10
 """
 ```
 
-### 3. Type-Specific Global Handlers
+### 3. Pre-commit Hook Auto-fix
+
+Auto-fix lint/format issues caught by pre-commit hooks.
+
+```toml
+[[actions]]
+name = "update-code"
+type = "claude"
+task_prompt = "prompts/update.md.j2"
+committable = true
+
+[[actions]]
+name = "fix-precommit-errors"
+type = "shell"
+stage = "on_error"
+recovery_behavior = "retry"
+max_retry_attempts = 1
+command = """
+cd repository
+ruff check --fix --unsafe-fixes .
+ruff format .
+"""
+
+[actions.error_filter]
+exception_message_contains = "ruff.....Failed"
+stages = ["primary"]
+```
+
+### 4. Type-Specific Global Handlers
 
 Handle all failures of a specific type consistently.
 
@@ -327,7 +356,7 @@ destination = "CLAUDE_ERROR.md"
 action_types = ["claude"]
 ```
 
-### 4. Graceful Cleanup on Failure
+### 5. Graceful Cleanup on Failure
 
 Ensure resources are cleaned up before failing.
 
@@ -349,7 +378,7 @@ aws s3 rm s3://staging-bucket/temp/ --recursive
 """
 ```
 
-### 5. Timeout-Specific Recovery
+### 6. Timeout-Specific Recovery
 
 Handle timeouts differently from other errors.
 

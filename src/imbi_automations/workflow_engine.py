@@ -782,6 +782,12 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             if exc_type not in error_filter.exception_types:
                 return False
 
+        # Check exception message contains text
+        if error_filter.exception_message_contains:
+            exc_message = str(exception)
+            if error_filter.exception_message_contains not in exc_message:
+                return False
+
         # TODO: Implement custom condition (Jinja2) evaluation
         if error_filter.condition:
             # For now, skip condition evaluation

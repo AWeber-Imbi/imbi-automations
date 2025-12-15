@@ -52,6 +52,15 @@ class ErrorHandlerModelTestCase(unittest.TestCase):
             error_filter.exception_types, ['TimeoutError', 'RuntimeError']
         )
 
+    def test_error_filter_exception_message_contains(self) -> None:
+        """Test ErrorFilter with exception_message_contains."""
+        error_filter = models.ErrorFilter(
+            exception_message_contains='ruff.....Failed'
+        )
+        self.assertEqual(
+            error_filter.exception_message_contains, 'ruff.....Failed'
+        )
+
     def test_error_filter_condition(self) -> None:
         """Test ErrorFilter with Jinja2 condition."""
         error_filter = models.ErrorFilter(

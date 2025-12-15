@@ -177,6 +177,7 @@ class ErrorFilter(pydantic.BaseModel):
     action_names: list[str] | None = None
     stages: list[WorkflowActionStage] | None = None
     exception_types: list[str] | None = None
+    exception_message_contains: str | None = None
     condition: str | None = None
 
 
