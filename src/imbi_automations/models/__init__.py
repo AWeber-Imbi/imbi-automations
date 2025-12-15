@@ -52,6 +52,8 @@ from .imbi import (
 from .mcp import McpHttpServer, McpServerConfig, McpSSEServer, McpStdioServer
 from .resume_state import ResumeState
 from .workflow import (
+    ErrorFilter,
+    ErrorRecoveryBehavior,
     ResourceUrl,
     Workflow,
     WorkflowAction,
@@ -90,6 +92,8 @@ __all__ = [
     'mcp',
     'AnthropicConfiguration',
     'ClaudeAgentConfiguration',
+    'ErrorFilter',
+    'ErrorRecoveryBehavior',
     'ClaudeAgentPlanningResult',
     'ClaudeAgentResponse',
     'ClaudeAgentTaskResult',

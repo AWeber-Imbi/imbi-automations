@@ -141,10 +141,43 @@ class WorkflowActionStage(enum.StrEnum):
 
     Primary actions execute first and can create repository changes.
     Followup actions execute after PR creation and can monitor/respond.
+    Error actions execute only when another action fails, providing recovery.
     """
 
     primary = 'primary'
     followup = 'followup'
+    on_error = 'on_error'
+
+
+class ErrorRecoveryBehavior(enum.StrEnum):
+    """Action to take after error recovery succeeds.
+
+    Defines what should happen after an error handler successfully completes:
+    - retry: Re-run the failed action
+    - skip: Continue to the next action
+    - fail: Fail the workflow (for cleanup/validation handlers)
+    """
+
+    retry = 'retry'
+    skip = 'skip'
+    fail = 'fail'
+
+
+class ErrorFilter(pydantic.BaseModel):
+    """Filter for global error handlers to match failed actions.
+
+    All specified filters must match (AND logic) for the handler to trigger.
+    Used by error actions (stage=on_error) to specify which failures they
+    handle when not explicitly attached via on_failure field.
+    """
+
+    model_config = pydantic.ConfigDict(extra='forbid')
+
+    action_types: list[WorkflowActionTypes] | None = None
+    action_names: list[str] | None = None
+    stages: list[WorkflowActionStage] | None = None
+    exception_types: list[str] | None = None
+    condition: str | None = None
 
 
 class WorkflowAction(pydantic.BaseModel):
@@ -170,6 +203,9 @@ class WorkflowAction(pydantic.BaseModel):
     ignore_errors: bool = False
     timeout: str = '1h'
     data: dict[str, typing.Any] = {}
+    recovery_behavior: ErrorRecoveryBehavior = ErrorRecoveryBehavior.skip
+    max_retry_attempts: int = 3
+    error_filter: ErrorFilter | None = None
 
     @pydantic.field_validator('timeout')
     @classmethod
@@ -211,6 +247,38 @@ class WorkflowAction(pydantic.BaseModel):
                 raise ValueError(
                     'commit_message cannot be set when committable is False'
                 )
+        return self
+
+    @pydantic.model_validator(mode='after')
+    def validate_error_config(self) -> 'WorkflowAction':
+        """Validate error handling configuration."""
+        if self.stage == WorkflowActionStage.on_error:
+            # Error actions cannot have error handlers themselves
+            if self.on_failure is not None:
+                raise ValueError(
+                    'Error actions (stage=on_error) cannot have on_failure'
+                )
+            if self.ignore_errors:
+                raise ValueError(
+                    'Error actions (stage=on_error) cannot have ignore_errors'
+                )
+            # Error actions cannot create commits
+            if self.committable:
+                raise ValueError(
+                    'Error actions (stage=on_error) cannot be committable'
+                )
+        else:
+            # Non-error actions cannot have recovery config
+            if self.recovery_behavior != ErrorRecoveryBehavior.skip:
+                raise ValueError(
+                    'recovery_behavior only valid for stage=on_error'
+                )
+            if self.max_retry_attempts != 3:
+                raise ValueError(
+                    'max_retry_attempts only valid for stage=on_error'
+                )
+            if self.error_filter is not None:
+                raise ValueError('error_filter only valid for stage=on_error')
         return self
 
 
@@ -756,6 +824,54 @@ class Workflow(pydantic.BaseModel):
     def _set_slug(self) -> 'Workflow':
         if not self.slug:
             self.slug = self.path.name.lower().replace('_', '-')
+        return self
+
+    @pydantic.model_validator(mode='after')
+    def _validate_error_handlers(self) -> 'Workflow':
+        """Validate error handler references and attachments."""
+        # Build map of action names
+        action_names = {a.name for a in self.configuration.actions}
+
+        # Validate on_failure references
+        for action in self.configuration.actions:
+            if action.on_failure:
+                if action.on_failure not in action_names:
+                    raise ValueError(
+                        f'Action "{action.name}" references non-existent '
+                        f'error handler "{action.on_failure}"'
+                    )
+
+                # Verify the referenced action is an error handler
+                handler = next(
+                    a
+                    for a in self.configuration.actions
+                    if a.name == action.on_failure
+                )
+                if handler.stage != WorkflowActionStage.on_error:
+                    raise ValueError(
+                        f'Action "{action.name}" on_failure references '
+                        f'"{action.on_failure}" which is not stage=on_error'
+                    )
+
+        # Validate error actions have attachment
+        for action in self.configuration.actions:
+            if action.stage == WorkflowActionStage.on_error:
+                # Must be either:
+                # 1. Referenced by another action's on_failure
+                # 2. Have an error_filter (global handler)
+
+                is_referenced = any(
+                    a.on_failure == action.name
+                    for a in self.configuration.actions
+                )
+
+                if not is_referenced and action.error_filter is None:
+                    raise ValueError(
+                        f'Error action "{action.name}" must be either '
+                        f"referenced by another action's on_failure or "
+                        f'have an error_filter'
+                    )
+
         return self
 
 

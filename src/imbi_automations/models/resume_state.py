@@ -57,6 +57,13 @@ class ResumeState(pydantic.BaseModel):
     # Configuration snapshot
     configuration_hash: str  # To detect config changes
 
+    # Error handler tracking
+    retry_counts: dict[str, int] = {}
+    active_error_handler: str | None = None
+    handler_failed: bool = False
+    original_exception_type: str | None = None
+    original_exception_message: str | None = None
+
     def to_msgpack(self) -> bytes:
         """Serialize to MessagePack binary format.
 
