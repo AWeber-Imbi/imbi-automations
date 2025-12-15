@@ -723,6 +723,51 @@ Error: Error action "X" must be either referenced or have error_filter
 → Add on_error reference or error_filter
 ```
 
+## Metrics and Tracking
+
+The workflow engine automatically tracks error handler invocations and includes them in the final run summary. This helps you understand:
+
+- How often error handlers are being triggered
+- Which specific handlers are most active
+- Success vs. failure rates for recovery attempts
+
+### Tracked Metrics
+
+**Global Counters:**
+- `Error Handlers Invoked`: Total number of times any error handler was triggered
+- `Error Handlers Succeeded`: Number of handlers that completed successfully
+- `Error Handlers Failed`: Number of handlers that failed during execution
+
+**Per-Handler Counters:**
+- `Error Handler Invoked {name}`: Number of times a specific handler was triggered
+- `Error Handler Succeeded {name}`: Number of times a specific handler succeeded
+- `Error Handler Failed {name}`: Number of times a specific handler failed
+
+### Example Output
+
+```
+Automation Engine Run Details:
+Actions Executed: 25
+Actions Committed: 18
+Error Handlers Invoked: 3
+Error Handler Invoked Fix Precommit Errors: 3
+Error Handlers Succeeded: 2
+Error Handler Succeeded Fix Precommit Errors: 2
+Error Handlers Failed: 1
+Error Handler Failed Fix Precommit Errors: 1
+```
+
+This shows that the `fix-precommit-errors` handler was triggered 3 times, succeeded twice, and failed once.
+
+### Using Metrics
+
+These metrics help you:
+
+1. **Identify problematic actions**: If a handler runs frequently, the underlying action may need improvement
+2. **Tune retry limits**: Adjust `max_retry_attempts` based on actual success rates
+3. **Validate handlers**: Ensure handlers are working as expected
+4. **Track workflow health**: Monitor error recovery trends across runs
+
 ## See Also
 
 - [Workflow Configuration](workflow-configuration.md) - Complete workflow config reference

@@ -829,6 +829,10 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             failed_action.name,
         )
 
+        # Track error handler invocation
+        self.tracker.incr('error_handlers_invoked')
+        self.tracker.incr(f'error_handler_invoked_{handler.name}')
+
         # Check retry limit
         retry_count = self.retry_counts.get(failed_action.name, 0)
         if (
@@ -864,6 +868,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 handler.name,
             )
             self.tracker.incr('error_handlers_succeeded')
+            self.tracker.incr(f'error_handler_succeeded_{handler.name}')
 
             # Handle recovery behavior
             if handler.recovery_behavior == models.ErrorRecoveryBehavior.retry:
@@ -900,6 +905,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 handler_exc,
             )
             self.tracker.incr('error_handlers_failed')
+            self.tracker.incr(f'error_handler_failed_{handler.name}')
 
             if self.configuration.preserve_on_error:
                 self.last_error_path = self._preserve_working_directory(
