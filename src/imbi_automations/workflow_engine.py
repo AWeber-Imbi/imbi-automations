@@ -684,11 +684,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
 
         # Build map: action_name → error_action
         for action in self.workflow.configuration.actions:
-            if action.on_failure:
+            if action.on_error:
                 handler = next(
-                    a
-                    for a in self.error_actions
-                    if a.name == action.on_failure
+                    a for a in self.error_actions if a.name == action.on_error
                 )
                 self.error_handlers[action.name] = handler
 
@@ -706,7 +704,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         """Find error handler for failed action.
 
         Priority:
-        1. Action-specific handler (on_failure field)
+        1. Action-specific handler (on_error field)
         2. Global handler matching filters
 
         Args:
@@ -718,7 +716,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             Error handler action if found, None otherwise
 
         """
-        # Priority 1: Check action's on_failure
+        # Priority 1: Check action's on_error
         if failed_action.name in self.error_handlers:
             return self.error_handlers[failed_action.name]
 

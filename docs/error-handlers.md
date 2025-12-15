@@ -8,7 +8,7 @@ Error recovery actions provide automated failure handling within workflows. When
 
 Error recovery supports two attachment mechanisms:
 
-1. **Action-specific handlers**: Attached via `on_failure` field to individual actions
+1. **Action-specific handlers**: Attached via `on_error` field to individual actions
 2. **Global handlers**: Attached via `error_filter` to match failed actions by type, stage, or exception
 
 After successful recovery, handlers can:
@@ -24,7 +24,7 @@ After successful recovery, handlers can:
 name = "run-tests"
 type = "shell"
 command = "pytest tests/"
-on_failure = "cleanup-and-retry"
+on_error = "cleanup-and-retry"
 
 [[actions]]
 name = "cleanup-and-retry"
@@ -136,14 +136,14 @@ exception_types = ["TimeoutError", "asyncio.TimeoutError"]
 
 ### Action-Specific Handlers
 
-Attach handlers to specific actions using the `on_failure` field.
+Attach handlers to specific actions using the `on_error` field.
 
 ```toml
 [[actions]]
 name = "deploy-service"
 type = "shell"
 command = "kubectl apply -f deployment.yaml"
-on_failure = "rollback-deployment"
+on_error = "rollback-deployment"
 
 [[actions]]
 name = "rollback-deployment"
@@ -262,7 +262,7 @@ name = "migrate-codebase"
 type = "claude"
 task_prompt = "prompts/migration.md.j2"
 max_cycles = 5
-on_failure = "ai-diagnose-and-fix"
+on_error = "ai-diagnose-and-fix"
 
 [[actions]]
 name = "ai-diagnose-and-fix"
@@ -283,7 +283,7 @@ Reset state before retrying flaky operations.
 name = "integration-tests"
 type = "shell"
 command = "pytest tests/integration/"
-on_failure = "reset-test-environment"
+on_error = "reset-test-environment"
 
 [[actions]]
 name = "reset-test-environment"
@@ -336,7 +336,7 @@ Ensure resources are cleaned up before failing.
 name = "deploy-to-staging"
 type = "shell"
 command = "terraform apply -auto-approve"
-on_failure = "cleanup-partial-deployment"
+on_error = "cleanup-partial-deployment"
 
 [[actions]]
 name = "cleanup-partial-deployment"
@@ -381,7 +381,7 @@ The workflow engine enforces these constraints on error actions:
 
 ### Error Actions Cannot:
 
-- **Have `on_failure` field**: Error handlers cannot have their own error handlers
+- **Have `on_error` field**: Error handlers cannot have their own error handlers
 - **Have `ignore_errors = true`**: Would create ambiguous behavior
 - **Have `committable = true`**: Error recovery should not create commits
 
@@ -391,14 +391,14 @@ The workflow engine enforces these constraints on error actions:
 name = "bad-error-handler"
 type = "shell"
 stage = "on_error"
-on_failure = "another-handler"  # ERROR: not allowed
+on_error = "another-handler"  # ERROR: not allowed
 committable = true               # ERROR: not allowed
 command = "echo 'bad'"
 ```
 
 ### Error Actions Must:
 
-- **Be referenced OR have filter**: Every error action must be attached to the workflow either via another action's `on_failure` field or by having an `error_filter`
+- **Be referenced OR have filter**: Every error action must be attached to the workflow either via another action's `on_error` field or by having an `error_filter`
 
 ```toml
 # INVALID - orphan error handler
@@ -407,7 +407,7 @@ name = "orphan-handler"
 type = "shell"
 stage = "on_error"
 command = "echo 'orphan'"
-# ERROR: Not referenced by on_failure and no error_filter
+# ERROR: Not referenced by on_error and no error_filter
 
 # VALID - has filter
 [[actions]]
@@ -422,7 +422,7 @@ action_types = ["shell"]
 
 ### References Must Be Valid:
 
-- **`on_failure` must reference existing action**: The referenced action name must exist
+- **`on_error` must reference existing action**: The referenced action name must exist
 - **Referenced action must have `stage = "on_error"`**: Cannot reference regular actions
 
 ```toml
@@ -431,14 +431,14 @@ action_types = ["shell"]
 name = "bad-reference"
 type = "shell"
 command = "echo 'test'"
-on_failure = "does-not-exist"  # ERROR: handler not found
+on_error = "does-not-exist"  # ERROR: handler not found
 
 # INVALID - references wrong stage
 [[actions]]
 name = "bad-stage-reference"
 type = "shell"
 command = "echo 'test'"
-on_failure = "not-an-error-handler"
+on_error = "not-an-error-handler"
 
 [[actions]]
 name = "not-an-error-handler"
@@ -453,7 +453,7 @@ command = "echo 'handler'"
 
 When an action fails, the engine searches for handlers in this order:
 
-1. **Action-specific handler**: Check if failed action has `on_failure` field
+1. **Action-specific handler**: Check if failed action has `on_error` field
 2. **First matching global handler**: Check global handlers with `error_filter` in order
 
 **Example with priority:**
@@ -463,7 +463,7 @@ When an action fails, the engine searches for handlers in this order:
 name = "deploy"
 type = "shell"
 command = "kubectl apply -f deployment.yaml"
-on_failure = "specific-rollback"  # This takes priority
+on_error = "specific-rollback"  # This takes priority
 
 [[actions]]
 name = "specific-rollback"
@@ -503,7 +503,7 @@ When `recovery_behavior = "retry"`:
 name = "flaky-test"
 type = "shell"
 command = "pytest tests/integration/test_flaky.py"
-on_failure = "retry-handler"
+on_error = "retry-handler"
 
 [[actions]]
 name = "retry-handler"
@@ -620,12 +620,12 @@ Instead of duplicating error handlers:
 [[actions]]
 name = "update-code"
 type = "claude"
-on_failure = "claude-handler-1"
+on_error = "claude-handler-1"
 
 [[actions]]
 name = "update-tests"
 type = "claude"
-on_failure = "claude-handler-2"
+on_error = "claude-handler-2"
 
 # Good - single global handler
 [[actions]]
@@ -656,7 +656,7 @@ action_types = ["claude"]
 **Check:**
 
 1. Handler has correct `stage = "on_error"`
-2. Handler is referenced by `on_failure` OR has `error_filter`
+2. Handler is referenced by `on_error` OR has `error_filter`
 3. Filter criteria match the failed action
 4. Failed action does not have `ignore_errors = true`
 
@@ -681,8 +681,8 @@ action_types = ["claude"]
 **Common issues:**
 
 ```
-Error: Error action "X" cannot have on_failure
-→ Remove on_failure from error actions
+Error: Error action "X" cannot have on_error
+→ Remove on_error from error actions
 
 Error: Error action "X" cannot be committable
 → Set committable = false or remove field
@@ -691,7 +691,7 @@ Error: Action "Y" references non-existent error handler "X"
 → Ensure handler exists and has stage = "on_error"
 
 Error: Error action "X" must be either referenced or have error_filter
-→ Add on_failure reference or error_filter
+→ Add on_error reference or error_filter
 ```
 
 ## See Also

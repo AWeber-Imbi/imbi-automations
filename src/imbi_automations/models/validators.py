@@ -49,7 +49,7 @@ class CommandRulesMixin:
         'committable',
         'filter',
         'on_success',
-        'on_failure',
+        'on_error',
         'timeout',
         'data',
     }

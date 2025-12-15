@@ -63,15 +63,15 @@ class ErrorHandlerModelTestCase(unittest.TestCase):
 class WorkflowActionErrorConfigTestCase(unittest.TestCase):
     """Test WorkflowAction error configuration validation."""
 
-    def test_action_with_on_failure_reference(self) -> None:
-        """Test action can reference error handler via on_failure."""
+    def test_action_with_on_error_reference(self) -> None:
+        """Test action can reference error handler via on_error."""
         action = models.WorkflowShellAction(
             name='test-action',
             type='shell',
             command='echo "test"',
-            on_failure='error-handler',
+            on_error='error-handler',
         )
-        self.assertEqual(action.on_failure, 'error-handler')
+        self.assertEqual(action.on_error, 'error-handler')
 
     def test_error_action_defaults(self) -> None:
         """Test error action has correct defaults."""
@@ -92,20 +92,20 @@ class WorkflowActionErrorConfigTestCase(unittest.TestCase):
         self.assertEqual(action.max_retry_attempts, 3)
         self.assertFalse(action.committable)
 
-    def test_error_action_cannot_have_on_failure(self) -> None:
-        """Test error action cannot have on_failure field."""
+    def test_error_action_cannot_have_on_error(self) -> None:
+        """Test error action cannot have on_error field."""
         with self.assertRaises(ValueError) as cm:
             models.WorkflowShellAction(
                 name='error-handler',
                 type='shell',
                 stage='on_error',
                 command='echo "error"',
-                on_failure='another-handler',
+                on_error='another-handler',
                 error_filter=models.ErrorFilter(
                     action_types=[models.WorkflowActionTypes.shell]
                 ),
             )
-        self.assertIn('cannot have on_failure', str(cm.exception))
+        self.assertIn('cannot have on_error', str(cm.exception))
 
     def test_error_action_cannot_have_ignore_errors(self) -> None:
         """Test error action cannot have ignore_errors=True."""
@@ -176,8 +176,8 @@ class WorkflowActionErrorConfigTestCase(unittest.TestCase):
 class WorkflowErrorHandlerValidationTestCase(unittest.TestCase):
     """Test workflow-level error handler validation."""
 
-    def test_on_failure_must_reference_existing_action(self) -> None:
-        """Test on_failure must reference existing action."""
+    def test_on_error_must_reference_existing_action(self) -> None:
+        """Test on_error must reference existing action."""
         with self.assertRaises(ValueError) as cm:
             models.Workflow(
                 path=pathlib.Path('/mock/workflow'),
@@ -188,15 +188,15 @@ class WorkflowErrorHandlerValidationTestCase(unittest.TestCase):
                             name='test-action',
                             type='shell',
                             command='echo "test"',
-                            on_failure='nonexistent-handler',
+                            on_error='nonexistent-handler',
                         )
                     ],
                 ),
             )
         self.assertIn('non-existent error handler', str(cm.exception))
 
-    def test_on_failure_must_reference_error_stage_action(self) -> None:
-        """Test on_failure must reference action with stage=on_error."""
+    def test_on_error_must_reference_error_stage_action(self) -> None:
+        """Test on_error must reference action with stage=on_error."""
         with self.assertRaises(ValueError) as cm:
             models.Workflow(
                 path=pathlib.Path('/mock/workflow'),
@@ -207,7 +207,7 @@ class WorkflowErrorHandlerValidationTestCase(unittest.TestCase):
                             name='test-action',
                             type='shell',
                             command='echo "test"',
-                            on_failure='not-an-error-handler',
+                            on_error='not-an-error-handler',
                         ),
                         models.WorkflowShellAction(
                             name='not-an-error-handler',
@@ -251,7 +251,7 @@ class WorkflowErrorHandlerValidationTestCase(unittest.TestCase):
                         name='test-action',
                         type='shell',
                         command='echo "test"',
-                        on_failure='error-handler',
+                        on_error='error-handler',
                     ),
                     models.WorkflowShellAction(
                         name='error-handler',

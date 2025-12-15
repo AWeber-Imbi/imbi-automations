@@ -119,7 +119,7 @@ They can be attached action-specifically or globally with filters.
 name = "deploy"
 type = "shell"
 command = "kubectl apply -f deployment.yaml"
-on_failure = "rollback-deployment"
+on_error = "rollback-deployment"
 
 [[actions]]
 name = "rollback-deployment"
@@ -166,9 +166,9 @@ Available in error handler templates:
 - `{{ max_retries }}`: Maximum retry attempts configured
 
 **Constraints:**
-- Error actions cannot have `on_failure`, `ignore_errors`, or
+- Error actions cannot have `on_error`, `ignore_errors`, or
 `committable=true`
-- Error actions must be referenced by `on_failure` OR have
+- Error actions must be referenced by `on_error` OR have
 `error_filter`
 - If handler fails, workflow fails immediately (fail-fast)
 - Retry counts persist across resume operations

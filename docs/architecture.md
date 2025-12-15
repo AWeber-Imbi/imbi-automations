@@ -293,7 +293,7 @@ Actions support automatic restart on failure:
 ```toml
 [[actions]]
 name = "fragile-operation"
-on_failure = "cleanup-action"  # Restart from this action
+on_error = "cleanup-action"  # Restart from this action
 max_retries = 3
 ```
 
@@ -301,7 +301,7 @@ max_retries = 3
 
 - **Failure Files**: Create specific failure files to signal workflow abortion
 - **Detailed Logging**: Include actionable error information
-- **Recovery Strategies**: Configurable retry mechanisms and `on_failure` action chains
+- **Recovery Strategies**: Configurable retry mechanisms and `on_error` action chains
 
 ### Resource Management
 
