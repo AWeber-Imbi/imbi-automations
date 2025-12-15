@@ -60,7 +60,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         self._set_workflow_logger(workflow)
 
         # Error handler infrastructure
-        self.retry_counts: dict[str, int] = {}
+        self.retry_counts: dict[str, int] = (
+            resume_state.retry_counts if resume_state else {}
+        )
         self.error_actions: list[models.WorkflowActions] = []
         self.error_handlers: dict[str, models.WorkflowActions] = {}
         self.global_handlers: list[models.WorkflowActions] = []
@@ -1001,6 +1003,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     pull_request_number=pr.number if pr else None,
                     pull_request_url=pr.html_url if pr else None,
                     pr_branch=context.pr_branch,
+                    retry_counts=self.retry_counts,
                 )
 
                 state_file = target_path / '.state'

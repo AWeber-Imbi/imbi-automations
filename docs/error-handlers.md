@@ -366,7 +366,7 @@ type = "shell"
 stage = "on_error"
 recovery_behavior = "skip"
 command = """
-echo 'Operation timed out after 1 hour' &gt;&gt; timeout.log
+echo 'Operation timed out after 1 hour' >> timeout.log
 curl -X POST https://monitoring.example.com/alert \
   -d '{"type": "timeout", "action": "slow-operation"}'
 """
