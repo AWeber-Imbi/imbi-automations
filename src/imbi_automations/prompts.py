@@ -87,6 +87,8 @@ def render(
             }
         )
         kwargs.update(context.model_dump())
+        # Flatten context.variables to top-level for template access
+        kwargs.update(context.variables)
 
     if isinstance(source, pathlib.Path) and not template:
         template = source.read_text(encoding='utf-8')
