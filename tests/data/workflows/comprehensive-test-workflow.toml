@@ -220,7 +220,7 @@ type = "template"
 source = "templates/docker/Dockerfile.j2"
 destination = "Dockerfile"
 
-# Cleanup action (referenced by on_failure)
+# Cleanup action (referenced by on_error)
 [[actions]]
 name = "cleanup-action"
 type = "shell"

@@ -731,7 +731,7 @@ name = "skip-slow-method"
 # Execution resumes here
 ```
 
-#### on_failure (optional)
+#### on_error (optional)
 
 Action name to restart from if this action fails after all retry cycles.
 
@@ -752,7 +752,7 @@ destination = "extracted:///src.backup/"
 name = "risky-transformation"
 type = "claude"
 prompt = "prompts/transform.md"
-on_failure = "restore-backup"
+on_error = "restore-backup"
 
 [[actions]]
 name = "restore-backup"
@@ -930,7 +930,7 @@ type = "claude"
 prompt = "prompts/update-python-version.md"
 validation_prompt = "prompts/validate-python-version.md"
 max_cycles = 3
-on_failure = "restore-backup"
+on_error = "restore-backup"
 ai_commit = true
 
 [[actions]]

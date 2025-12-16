@@ -59,6 +59,15 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         )
         self._set_workflow_logger(workflow)
 
+        # Error handler infrastructure
+        self.retry_counts: dict[str, int] = (
+            resume_state.retry_counts if resume_state else {}
+        )
+        self.error_actions: list[models.WorkflowActions] = []
+        self.error_handlers: dict[str, models.WorkflowActions] = {}
+        self.global_handlers: list[models.WorkflowActions] = []
+        self._build_error_handler_maps()
+
         if not self.configuration.claude.enabled and (
             self._needs_claude_code
             or workflow.configuration.github.create_pull_request
@@ -180,8 +189,10 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         else:
             primary_actions_to_run = primary_actions
 
-        # Execute PRIMARY stage actions
-        for idx, action in primary_actions_to_run:
+        # Execute PRIMARY stage actions with error recovery support
+        list_idx = 0
+        while list_idx < len(primary_actions_to_run):
+            idx, action = primary_actions_to_run[list_idx]
             # Update current action index for progress tracking
             context.current_action_index = idx + 1
 
@@ -199,35 +210,84 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                         if committed:
                             context.has_repository_changes = True
                             self.tracker.incr('actions_committed')
+
+                # Success - clear retry count
+                self.retry_counts.pop(action.name, None)
+                list_idx += 1  # Move to next action
+
             except Exception as exc:  # noqa: BLE001 - preserve_on_error must handle all exceptions
-                self.logger.error(
-                    '%s error executing action "%s": %s',
-                    context.imbi_project.slug,
-                    action.name,
-                    exc,
-                )
-                if self.configuration.preserve_on_error:
-                    # Calculate completed indices for this execution
-                    if not self.resume_state:
-                        # First run: all actions before failure
-                        completed_indices = list(range(0, idx))
-                    else:
-                        # Resume: only actions from failed_action_index to idx
-                        # (don't accumulate from previous runs)
-                        completed_indices = list(
-                            range(self.resume_state.failed_action_index, idx)
-                        )
-                    self.last_error_path = self._preserve_working_directory(
-                        context,
-                        working_directory,
-                        self.configuration.error_dir,
-                        failed_action_index=idx,
-                        failed_action_name=action.name,
-                        completed_action_indices=completed_indices,
-                        error_message=str(exc),
+                # Check ignore_errors first
+                if action.ignore_errors:
+                    self.logger.warning(
+                        '%s action "%s" failed but ignore_errors=True',
+                        context.imbi_project.slug,
+                        action.name,
                     )
-                working_directory.cleanup()
-                raise exc
+                    list_idx += 1
+                    continue
+
+                # Try to find error handler
+                handler = self._find_error_handler(action, 'primary', exc)
+
+                if handler:
+                    # Execute error handler
+                    result = await self._execute_error_recovery(
+                        context,
+                        action,
+                        idx,
+                        handler,
+                        exc,
+                        working_directory,
+                        'primary',
+                    )
+
+                    if result == 'retry':
+                        # Don't increment list_idx - retry same action
+                        continue
+                    elif result == 'skip':
+                        # Skip to next action
+                        list_idx += 1
+                        continue
+                    else:  # 'failed'
+                        # Handler failed - fail workflow
+                        raise RuntimeError(
+                            f'Error handler "{handler.name}" failed '
+                            f'for action "{action.name}"'
+                        ) from exc
+                else:
+                    # No handler - use existing error handling
+                    self.logger.error(
+                        '%s error executing action "%s": %s',
+                        context.imbi_project.slug,
+                        action.name,
+                        exc,
+                    )
+                    if self.configuration.preserve_on_error:
+                        # Calculate completed indices for this execution
+                        if not self.resume_state:
+                            # First run: all actions before failure
+                            completed_indices = list(range(0, idx))
+                        else:
+                            # Resume: only actions from failed_action_index
+                            # to idx (don't accumulate from previous runs)
+                            completed_indices = list(
+                                range(
+                                    self.resume_state.failed_action_index, idx
+                                )
+                            )
+                        self.last_error_path = (
+                            self._preserve_working_directory(
+                                context,
+                                working_directory,
+                                self.configuration.error_dir,
+                                failed_action_index=idx,
+                                failed_action_name=action.name,
+                                completed_action_indices=completed_indices,
+                                error_message=str(exc),
+                            )
+                        )
+                    working_directory.cleanup()
+                    raise exc
 
         # Handle dry-run mode: preserve working directory and skip push/PR
         if self.configuration.dry_run:
@@ -404,7 +464,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
 
             cycle_made_commits = False
 
-            for idx, action in followup_actions:
+            list_idx = 0
+            while list_idx < len(followup_actions):
+                idx, action = followup_actions[list_idx]
                 context.current_action_index = idx + 1
 
                 try:
@@ -436,29 +498,74 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                                 cycle_made_commits = True
                                 self.tracker.incr('followup_commits')
 
+                    # Success - clear retry count
+                    self.retry_counts.pop(action.name, None)
+                    list_idx += 1  # Move to next action
+
                 except Exception as exc:  # noqa: BLE001
-                    self.logger.error(
-                        '%s error in followup action "%s": %s',
-                        context.imbi_project.slug,
-                        action.name,
-                        exc,
-                    )
-                    if self.configuration.preserve_on_error:
-                        self.last_error_path = (
-                            self._preserve_working_directory(
-                                context,
-                                working_directory,
-                                self.configuration.error_dir,
-                                failed_action_index=idx,
-                                failed_action_name=action.name,
-                                completed_action_indices=[],
-                                error_message=str(exc),
-                                current_stage='followup',
-                                followup_cycle=cycle,
-                            )
+                    # Check ignore_errors first
+                    if action.ignore_errors:
+                        self.logger.warning(
+                            '%s followup action "%s" failed but '
+                            'ignore_errors=True',
+                            context.imbi_project.slug,
+                            action.name,
                         )
-                    working_directory.cleanup()
-                    raise
+                        list_idx += 1
+                        continue
+
+                    # Try to find error handler
+                    handler = self._find_error_handler(action, 'followup', exc)
+
+                    if handler:
+                        # Execute error handler
+                        result = await self._execute_error_recovery(
+                            context,
+                            action,
+                            idx,
+                            handler,
+                            exc,
+                            working_directory,
+                            'followup',
+                        )
+
+                        if result == 'retry':
+                            # Don't increment list_idx - retry same action
+                            continue
+                        elif result == 'skip':
+                            # Skip to next action
+                            list_idx += 1
+                            continue
+                        else:  # 'failed'
+                            # Handler failed - fail workflow
+                            raise RuntimeError(
+                                f'Error handler "{handler.name}" failed '
+                                f'for action "{action.name}"'
+                            ) from exc
+                    else:
+                        # No handler - use existing error handling
+                        self.logger.error(
+                            '%s error in followup action "%s": %s',
+                            context.imbi_project.slug,
+                            action.name,
+                            exc,
+                        )
+                        if self.configuration.preserve_on_error:
+                            self.last_error_path = (
+                                self._preserve_working_directory(
+                                    context,
+                                    working_directory,
+                                    self.configuration.error_dir,
+                                    failed_action_index=idx,
+                                    failed_action_name=action.name,
+                                    completed_action_indices=[],
+                                    error_message=str(exc),
+                                    current_stage='followup',
+                                    followup_cycle=cycle,
+                                )
+                            )
+                        working_directory.cleanup()
+                        raise
 
             # If no commits were made this cycle, followup is complete
             if not cycle_made_commits:
@@ -566,6 +673,256 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         """
         return self.last_error_path
 
+    def _build_error_handler_maps(self) -> None:
+        """Build lookup structures for error handlers."""
+        # Separate error actions from regular actions
+        self.error_actions = [
+            a
+            for a in self.workflow.configuration.actions
+            if a.stage == models.WorkflowActionStage.on_error
+        ]
+
+        # Build map: action_name → error_action
+        for action in self.workflow.configuration.actions:
+            if action.on_error:
+                handler = next(
+                    a for a in self.error_actions if a.name == action.on_error
+                )
+                self.error_handlers[action.name] = handler
+
+        # Store global handlers separately
+        self.global_handlers = [
+            a for a in self.error_actions if a.error_filter is not None
+        ]
+
+    def _find_error_handler(
+        self,
+        failed_action: models.WorkflowActions,
+        stage_name: str,
+        exception: Exception,
+    ) -> models.WorkflowActions | None:
+        """Find error handler for failed action.
+
+        Priority:
+        1. Action-specific handler (on_error field)
+        2. Global handler matching filters
+
+        Args:
+            failed_action: The action that failed
+            stage_name: Current stage name
+            exception: The exception that was raised
+
+        Returns:
+            Error handler action if found, None otherwise
+
+        """
+        # Priority 1: Check action's on_error
+        if failed_action.name in self.error_handlers:
+            return self.error_handlers[failed_action.name]
+
+        # Priority 2: Check global handlers
+        for handler in self.global_handlers:
+            if self._matches_error_filter(
+                handler.error_filter, failed_action, stage_name, exception
+            ):
+                return handler
+
+        return None
+
+    def _matches_error_filter(
+        self,
+        error_filter: models.ErrorFilter | None,
+        failed_action: models.WorkflowActions,
+        stage_name: str,
+        exception: Exception,
+    ) -> bool:
+        """Check if error filter matches the failed action.
+
+        Args:
+            error_filter: The filter to check
+            failed_action: The action that failed
+            stage_name: Current stage name
+            exception: The exception that was raised
+
+        Returns:
+            True if filter matches, False otherwise
+
+        """
+        if error_filter is None:
+            return False
+
+        # Check action types
+        if (
+            error_filter.action_types
+            and failed_action.type not in error_filter.action_types
+        ):
+            return False
+
+        # Check action names
+        if (
+            error_filter.action_names
+            and failed_action.name not in error_filter.action_names
+        ):
+            return False
+
+        # Check stages
+        if error_filter.stages:
+            # Convert stage_name to WorkflowActionStage
+            try:
+                current_stage = models.WorkflowActionStage(stage_name)
+            except ValueError:
+                return False
+
+            if current_stage not in error_filter.stages:
+                return False
+
+        # Check exception types
+        if error_filter.exception_types:
+            exc_type = type(exception).__name__
+            if exc_type not in error_filter.exception_types:
+                return False
+
+        # Check exception message contains text
+        if error_filter.exception_message_contains:
+            exc_message = str(exception)
+            if error_filter.exception_message_contains not in exc_message:
+                return False
+
+        # TODO: Implement custom condition (Jinja2) evaluation
+        if error_filter.condition:
+            # For now, skip condition evaluation
+            pass
+
+        return True
+
+    async def _execute_error_recovery(
+        self,
+        context: models.WorkflowContext,
+        failed_action: models.WorkflowActions,
+        failed_idx: int,
+        handler: models.WorkflowActions,
+        exception: Exception,
+        working_directory: tempfile.TemporaryDirectory,
+        stage_name: str,
+    ) -> typing.Literal['retry', 'skip', 'failed']:
+        """Execute error recovery action.
+
+        Args:
+            context: Workflow execution context
+            failed_action: The action that failed
+            failed_idx: Index of the failed action
+            handler: The error handler action to execute
+            exception: The exception that was raised
+            working_directory: Temp directory for workflow
+            stage_name: Current stage name
+
+        Returns:
+            'retry': Retry the failed action
+            'skip': Skip to next action
+            'failed': Handler itself failed
+
+        """
+        self.logger.info(
+            '%s executing error handler "%s" for "%s"',
+            context.imbi_project.slug,
+            handler.name,
+            failed_action.name,
+        )
+
+        # Track error handler invocation
+        self.tracker.incr('error_handlers_invoked')
+        self.tracker.incr(f'error_handler_invoked_{handler.name}')
+
+        # Check retry limit
+        retry_count = self.retry_counts.get(failed_action.name, 0)
+        if (
+            handler.recovery_behavior == models.ErrorRecoveryBehavior.retry
+            and retry_count >= handler.max_retry_attempts
+        ):
+            self.logger.error(
+                '%s max retries (%d) exceeded for "%s"',
+                context.imbi_project.slug,
+                handler.max_retry_attempts,
+                failed_action.name,
+            )
+            return 'failed'
+
+        # Add error context to template variables
+        context.variables.update(
+            {
+                'failed_action': failed_action,
+                'exception': str(exception),
+                'exception_type': type(exception).__name__,
+                'retry_attempt': retry_count + 1,
+                'max_retries': handler.max_retry_attempts,
+            }
+        )
+
+        try:
+            # Execute the error handler action
+            await self._execute_action(context, handler)
+
+            self.logger.info(
+                '%s error handler "%s" succeeded',
+                context.imbi_project.slug,
+                handler.name,
+            )
+            self.tracker.incr('error_handlers_succeeded')
+            self.tracker.incr(f'error_handler_succeeded_{handler.name}')
+
+            # Handle recovery behavior
+            if handler.recovery_behavior == models.ErrorRecoveryBehavior.retry:
+                self.retry_counts[failed_action.name] = retry_count + 1
+                self.logger.info(
+                    '%s retrying "%s" (attempt %d/%d)',
+                    context.imbi_project.slug,
+                    failed_action.name,
+                    retry_count + 2,
+                    handler.max_retry_attempts + 1,
+                )
+                return 'retry'
+            elif (
+                handler.recovery_behavior == models.ErrorRecoveryBehavior.skip
+            ):
+                self.retry_counts.pop(failed_action.name, None)
+                self.logger.info(
+                    '%s skipping to next action after recovery',
+                    context.imbi_project.slug,
+                )
+                return 'skip'
+            else:  # fail
+                self.logger.info(
+                    '%s cleanup handler completed, failing workflow',
+                    context.imbi_project.slug,
+                )
+                return 'failed'
+
+        except Exception as handler_exc:  # noqa: BLE001
+            self.logger.error(
+                '%s error handler "%s" failed: %s',
+                context.imbi_project.slug,
+                handler.name,
+                handler_exc,
+            )
+            self.tracker.incr('error_handlers_failed')
+            self.tracker.incr(f'error_handler_failed_{handler.name}')
+
+            if self.configuration.preserve_on_error:
+                self.last_error_path = self._preserve_working_directory(
+                    context,
+                    working_directory,
+                    self.configuration.error_dir,
+                    failed_action_index=failed_idx,
+                    failed_action_name=failed_action.name,
+                    completed_action_indices=list(range(0, failed_idx)),
+                    error_message=(
+                        f'Original: {exception}\nHandler: {handler_exc}'
+                    ),
+                    current_stage=stage_name,
+                )
+
+            return 'failed'
+
     def _preserve_working_directory(
         self,
         context: models.WorkflowContext,
@@ -656,6 +1013,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                     pull_request_number=pr.number if pr else None,
                     pull_request_url=pr.html_url if pr else None,
                     pr_branch=context.pr_branch,
+                    retry_counts=self.retry_counts,
                 )
 
                 state_file = target_path / '.state'

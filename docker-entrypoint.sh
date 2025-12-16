@@ -83,6 +83,11 @@ if [ -d "$INIT_DIR" ] && [ "$(ls -A $INIT_DIR 2>/dev/null)" ]; then
     echo "Initialization complete."
 fi
 
+# Re-source .profile if init scripts modified it (e.g., PATH updates)
+if [ -f ~/.profile ]; then
+    source ~/.profile
+fi
+
 # --- Git Configuration ---
 # Configure git user identity from environment variables
 if [ -n "$GIT_USER_NAME" ]; then

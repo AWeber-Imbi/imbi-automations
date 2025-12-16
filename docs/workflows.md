@@ -238,7 +238,7 @@ name = "migrate-pydantic"
 type = "claude"
 prompt = "workflow:///prompts/pydantic-v2.md"
 max_cycles = 5
-on_failure = "restore-backup"
+on_error = "restore-backup"
 ai_commit = true
 ```
 

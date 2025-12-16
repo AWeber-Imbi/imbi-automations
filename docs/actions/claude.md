@@ -12,7 +12,7 @@ planning_prompt = "prompts/planning.md"         # Optional - enables planning ph
 task_prompt = "prompts/task.md"                 # Required (formerly 'prompt')
 validation_prompt = "prompts/validate.md"       # Optional
 max_cycles = 3                                  # Optional, default: 3
-on_failure = "cleanup-action"                   # Optional
+on_error = "cleanup-action"                   # Optional
 ai_commit = true                                # Optional, default: true
 ```
 
@@ -88,11 +88,11 @@ Maximum number of retry cycles if transformation fails validation.
 
 - Each cycle runs: Planning (if enabled) → Task → Validation (if enabled)
 - Logs warning at 60% of max cycles (e.g., "Cycle 3 of 5, approaching max_cycles limit")
-- If all cycles exhausted, triggers `on_failure` action (if configured)
+- If all cycles exhausted, triggers `on_error` action (if configured)
 - Error context from validation failures passed to subsequent cycles
 
 
-### on_failure (optional)
+### on_error (optional)
 
 Action name to restart from if this action fails after all retry cycles.
 
@@ -300,7 +300,7 @@ name = "refactor-codebase"
 type = "claude"
 task_prompt = "prompts/refactor.md"
 max_cycles = 5
-on_failure = "create-issue"  # Create GitHub issue if fails
+on_error = "create-issue"  # Create GitHub issue if fails
 ```
 
 ### With Validator (No Planning)
@@ -511,7 +511,7 @@ name = "fragile-transformation"
 type = "claude"
 prompt = "prompts/transform.md"
 max_cycles = 5        # Try up to 5 times
-on_failure = "cleanup" # Run cleanup action if all cycles fail
+on_error = "cleanup" # Run cleanup action if all cycles fail
 ```
 
 **Cycle behavior:**  
@@ -519,7 +519,7 @@ on_failure = "cleanup" # Run cleanup action if all cycles fail
 1. Execute transformation
 2. Check for failure files
 3. If failure detected and cycles remaining, retry
-4. If all cycles exhausted, trigger `on_failure` action
+4. If all cycles exhausted, trigger `on_error` action
 5. Pass error context to retry attempts
 
 ### Error Context in Retries
@@ -586,7 +586,7 @@ destination = "repository:///src.backup/"
 name = "ai-refactor"
 type = "claude"
 task_prompt = "prompts/refactor.md"
-on_failure = "restore-backup"
+on_error = "restore-backup"
 
 [[actions]]
 name = "run-tests"

@@ -104,8 +104,75 @@ committable = true
 |-------|------|----------|
 | `primary` | Before PR creation | Standard transformations |
 | `followup` | After PR creation | CI monitoring, review feedback |
+| `on_error` | When another action fails | Error recovery, cleanup |
 
 Followup actions cycle if they commit (up to `max_followup_cycles`). They receive PR context: `{{ pull_request.number }}`, `{{ pull_request.html_url }}`, `{{ pr_branch }}`.
+
+### Error Recovery
+
+Actions with `stage = "on_error"` handle failures from other actions.
+They can be attached action-specifically or globally with filters.
+
+**Action-specific handler:**
+```toml
+[[actions]]
+name = "deploy"
+type = "shell"
+command = "kubectl apply -f deployment.yaml"
+on_error = "rollback-deployment"
+
+[[actions]]
+name = "rollback-deployment"
+type = "shell"
+stage = "on_error"
+recovery_behavior = "retry"  # or "skip", "fail"
+max_retry_attempts = 2
+command = "kubectl rollout undo"
+```
+
+**Global handler with filter:**
+```toml
+[[actions]]
+name = "handle-claude-errors"
+type = "shell"
+stage = "on_error"
+recovery_behavior = "skip"
+command = "echo 'Claude action failed'"
+
+[actions.error_filter]
+action_types = ["claude"]
+stages = ["primary"]
+exception_types = ["TimeoutError"]
+```
+
+**Recovery behaviors:**
+- `retry`: Re-execute the failed action (respects `max_retry_attempts`)
+- `skip`: Continue to next action after recovery
+- `fail`: Fail workflow (for cleanup-only handlers)
+
+**Error filter fields:**
+- `action_types`: Match by action type (`["claude", "shell"]`)
+- `action_names`: Match by action name (`["deploy", "test"]`)
+- `stages`: Match by stage (`["primary", "followup"]`)
+- `exception_types`: Match by exception class name (`["TimeoutError"]`)
+- `exception_message_contains`: Match by text in exception message (`"ruff.....Failed"`)
+- `condition`: Custom Jinja2 expression
+
+**Error context variables:**
+Available in error handler templates:
+- `{{ failed_action }}`: The failed action object
+- `{{ exception }}`: Exception message string
+- `{{ exception_type }}`: Exception class name
+- `{{ retry_attempt }}`: Current retry attempt (1-indexed)
+- `{{ max_retries }}`: Maximum retry attempts configured
+
+**Constraints:**
+- Error actions cannot have `on_error`, `ignore_errors`, or
+`committable=true`
+- Error actions must be referenced by `on_error` OR have
+`error_filter`
+- If handler fails, workflow fails immediately (fail-fast)
+- Retry counts persist across resume operations
 
 ## Action Timeouts
 

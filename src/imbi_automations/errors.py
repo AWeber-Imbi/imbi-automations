@@ -2,7 +2,7 @@
 
 
 class ActionFailureException(Exception):
-    """Exception raised when an action fails with on_failure configuration."""
+    """Exception raised when an action fails with on_error configuration."""
 
     def __init__(
         self, action_name: str, restart_from: str, failure_details: str

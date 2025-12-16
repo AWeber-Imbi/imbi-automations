@@ -233,6 +233,27 @@ class RenderTestCase(PromptsTestBase):
         result = prompts.render(self.context, template=template)
         self.assertEqual(result, 'custom-package')
 
+    def test_render_with_context_variables_flattened(self) -> None:
+        """Test context.variables items are accessible as top-level vars."""
+        # Add some variables to context.variables
+        self.context.variables['failed_action'] = {'name': 'test-action'}
+        self.context.variables['exception'] = 'Test error message'
+        self.context.variables['retry_attempt'] = 1
+
+        # Template should access variables directly, not via 'variables.'
+        result = prompts.render(
+            self.context,
+            template=(
+                'Action: {{ failed_action.name }}\n'
+                'Error: {{ exception }}\n'
+                'Attempt: {{ retry_attempt }}'
+            ),
+        )
+        self.assertEqual(
+            result,
+            'Action: test-action\nError: Test error message\nAttempt: 1',
+        )
+
 
 class RenderFileTestCase(PromptsTestBase):
     """Tests for render_file function."""
