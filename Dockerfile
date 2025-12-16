@@ -20,6 +20,7 @@ RUN apt-get update \
         openssh-client \
         ripgrep \
         sudo \
+        tini \
  && rm -rf /var/lib/apt/lists/* \
  && pip install --root-user-action ignore --break-system-packages --no-cache-dir --upgrade pip \
  && pip install --root-user-action ignore --break-system-packages --no-cache-dir /tmp/imbi_automations*.whl \
@@ -42,6 +43,6 @@ WORKDIR /opt
 
 VOLUME /opt/config /opt/dry-runs /opt/errors /opt/workflows /docker-entrypoint-init.d
 
-ENTRYPOINT ["docker-entrypoint.sh", "imbi-automations"]
+ENTRYPOINT ["/usr/bin/tini", "--", "docker-entrypoint.sh", "imbi-automations"]
 
 CMD ["--help"]
