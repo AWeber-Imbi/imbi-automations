@@ -252,6 +252,9 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
             data: dict[str, typing.Any] = dict(self.prompt_kwargs)
             data.update(self.context.model_dump())
             data.update({'action': action.model_dump()})
+            # Explicitly add context.variables to ensure error handler
+            # context (failed_action, exception, etc.) is available
+            data.update(self.context.variables)
             for key in {'source', 'destination', 'template'}:
                 if key in data:
                     del data[key]
