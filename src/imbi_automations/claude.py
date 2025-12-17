@@ -19,7 +19,7 @@ import pydantic
 from anthropic import types as anthropic_types
 from claude_agent_sdk import types
 
-from imbi_automations import mixins, models, prompts, tracker
+from imbi_automations import git, mixins, models, prompts, tracker
 
 LOGGER = logging.getLogger(__name__)
 BASE_PATH = pathlib.Path(__file__).parent
@@ -80,6 +80,224 @@ def _expand_mcp_config(config: dict[str, typing.Any]) -> dict[str, typing.Any]:
         else:
             result[key] = value
     return result
+
+
+async def _install_marketplace(
+    name: str, marketplace: models.ClaudeMarketplace, claude_home: pathlib.Path
+) -> None:
+    """Install a Claude Code marketplace by cloning its repository.
+
+    Args:
+        name: Marketplace identifier (e.g., 'aweber-marketplace')
+        marketplace: Marketplace configuration with source details
+        claude_home: Path to Claude's home directory (~/.claude)
+
+    Raises:
+        RuntimeError: If git clone fails (including authentication errors)
+
+    """
+    marketplaces_dir = claude_home / 'plugins' / 'marketplaces'
+    marketplaces_dir.mkdir(parents=True, exist_ok=True)
+
+    marketplace_path = marketplaces_dir / name
+
+    # Skip if already cloned
+    if marketplace_path.exists() and (marketplace_path / '.git').exists():
+        LOGGER.debug(
+            'Marketplace %s already installed at %s', name, marketplace_path
+        )
+        return
+
+    LOGGER.info('Installing Claude marketplace: %s', name)
+
+    source = marketplace.source
+    if source.source == models.ClaudeMarketplaceSourceType.git:
+        if not source.url:
+            raise ValueError(f'Marketplace {name} missing git URL')
+
+        # Clone the repository using git module
+        LOGGER.debug(
+            'Cloning marketplace from %s to %s', source.url, marketplace_path
+        )
+        try:
+            await git.clone_to_directory(
+                working_directory=marketplaces_dir.parent.parent,
+                clone_url=source.url,
+                destination=marketplace_path.relative_to(
+                    marketplaces_dir.parent.parent
+                ),
+                depth=None,
+            )
+            LOGGER.info('Successfully installed marketplace: %s', name)
+
+        except RuntimeError as exc:
+            raise RuntimeError(
+                f'Failed to clone marketplace {name} from {source.url}. '
+                f'This may be an authentication error if the repository '
+                f'is private. Error: {exc}'
+            ) from exc
+
+    elif source.source == models.ClaudeMarketplaceSourceType.github:
+        if not source.repo:
+            raise ValueError(f'Marketplace {name} missing GitHub repo')
+
+        # Convert GitHub repo to git URL
+        git_url = f'https://github.com/{source.repo}.git'
+        LOGGER.debug(
+            'Cloning marketplace from %s to %s', git_url, marketplace_path
+        )
+
+        try:
+            await git.clone_to_directory(
+                working_directory=marketplaces_dir.parent.parent,
+                clone_url=git_url,
+                destination=marketplace_path.relative_to(
+                    marketplaces_dir.parent.parent
+                ),
+                depth=None,
+            )
+            LOGGER.info('Successfully installed marketplace: %s', name)
+
+        except RuntimeError as exc:
+            raise RuntimeError(
+                f'Failed to clone marketplace {name} from {git_url}. '
+                f'Error: {exc}'
+            ) from exc
+
+    elif source.source == models.ClaudeMarketplaceSourceType.directory:
+        # For directory sources, just verify the path exists
+        if not source.path:
+            raise ValueError(f'Marketplace {name} missing directory path')
+
+        source_path = pathlib.Path(source.path)
+        if not source_path.exists():
+            raise RuntimeError(
+                f'Marketplace directory does not exist: {source.path}'
+            )
+
+        LOGGER.debug(
+            'Marketplace %s using directory source: %s', name, source.path
+        )
+
+    # Update known_marketplaces.json
+    known_marketplaces_file = (
+        claude_home / 'plugins' / 'known_marketplaces.json'
+    )
+    known_marketplaces: dict[str, typing.Any] = {
+        'version': 2,
+        'marketplaces': {},
+    }
+
+    if known_marketplaces_file.exists():
+        known_marketplaces = json.loads(known_marketplaces_file.read_text())
+
+    # Add marketplace to registry
+    marketplace_entry: dict[str, typing.Any] = {
+        'source': {'type': source.source.value}
+    }
+    if source.repo:
+        marketplace_entry['source']['repo'] = source.repo
+    if source.url:
+        marketplace_entry['source']['url'] = source.url
+    if source.path:
+        marketplace_entry['source']['path'] = source.path
+
+    known_marketplaces['marketplaces'][name] = marketplace_entry
+    known_marketplaces_file.write_text(
+        json.dumps(known_marketplaces, indent=2), encoding='utf-8'
+    )
+
+    LOGGER.debug('Updated known_marketplaces.json with %s', name)
+
+
+async def _install_plugins(
+    enabled_plugins: dict[str, bool], claude_home: pathlib.Path
+) -> None:
+    """Install enabled Claude Code plugins from marketplaces.
+
+    Args:
+        enabled_plugins: Map of "plugin@marketplace" to enabled state
+        claude_home: Path to Claude's home directory (~/.claude)
+
+    Raises:
+        RuntimeError: If plugin installation fails
+
+    """
+    plugins_dir = claude_home / 'plugins'
+    plugins_dir.mkdir(parents=True, exist_ok=True)
+
+    installed_plugins_file = plugins_dir / 'installed_plugins.json'
+    installed_plugins: dict[str, typing.Any] = {'version': 2, 'plugins': {}}
+
+    if installed_plugins_file.exists():
+        installed_plugins = json.loads(installed_plugins_file.read_text())
+
+    marketplaces_dir = plugins_dir / 'marketplaces'
+
+    for plugin_spec, enabled in enabled_plugins.items():
+        if not enabled:
+            continue
+
+        # Parse plugin@marketplace format
+        if '@' not in plugin_spec:
+            LOGGER.warning(
+                'Invalid plugin spec (missing @marketplace): %s', plugin_spec
+            )
+            continue
+
+        plugin_name, marketplace_name = plugin_spec.rsplit('@', 1)
+
+        # Check if already installed
+        if plugin_name in installed_plugins['plugins']:
+            LOGGER.debug('Plugin %s already installed', plugin_name)
+            continue
+
+        # Locate plugin in marketplace
+        marketplace_path = marketplaces_dir / marketplace_name
+        if not marketplace_path.exists():
+            raise RuntimeError(
+                f'Marketplace {marketplace_name} not found for plugin '
+                f'{plugin_name}. Ensure marketplace is installed first.'
+            )
+
+        # Look for plugin directory or manifest
+        plugin_manifest = marketplace_path / plugin_name / 'plugin.json'
+        if not plugin_manifest.exists():
+            raise RuntimeError(
+                f'Plugin {plugin_name} not found in marketplace '
+                f'{marketplace_name}. Expected manifest at: {plugin_manifest}'
+            )
+
+        LOGGER.info(
+            'Installing plugin: %s from %s', plugin_name, marketplace_name
+        )
+
+        # Read plugin manifest
+        try:
+            manifest = json.loads(plugin_manifest.read_text())
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(
+                f'Invalid plugin manifest for {plugin_name}: {exc}'
+            ) from exc
+
+        # Add to installed plugins registry
+        installed_plugins['plugins'][plugin_name] = {
+            'marketplace': marketplace_name,
+            'version': manifest.get('version', '1.0.0'),
+            'enabled': True,
+        }
+
+        LOGGER.info('Successfully installed plugin: %s', plugin_name)
+
+    # Write updated installed_plugins.json
+    installed_plugins_file.write_text(
+        json.dumps(installed_plugins, indent=2), encoding='utf-8'
+    )
+
+    LOGGER.debug(
+        'Updated installed_plugins.json with %d plugins',
+        len(installed_plugins['plugins']),
+    )
 
 
 class Agents(typing.TypedDict):
@@ -401,6 +619,29 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         return claude_agent_sdk.ClaudeSDKClient(options)
 
+    async def _install_marketplaces_and_plugins(
+        self,
+        merged_plugins: models.ClaudePluginConfig,
+        claude_home: pathlib.Path,
+    ) -> None:
+        """Install Claude marketplaces and plugins.
+
+        Args:
+            merged_plugins: Merged plugin configuration
+            claude_home: Path to Claude's home directory (~/.claude)
+
+        Raises:
+            RuntimeError: If installation fails
+
+        """
+        # Install marketplaces first
+        for name, marketplace in merged_plugins.marketplaces.items():
+            await _install_marketplace(name, marketplace, claude_home)
+
+        # Then install plugins from those marketplaces
+        if merged_plugins.enabled_plugins:
+            await _install_plugins(merged_plugins.enabled_plugins, claude_home)
+
     def _initialize_working_directory(self) -> pathlib.Path:
         """Setup dynamic agents and settings for claude-agents action.
 
@@ -443,6 +684,23 @@ class Claude(mixins.WorkflowLoggerMixin):
             self.configuration.claude.plugins,
             self.context.workflow.configuration.plugins,
         )
+
+        # Install marketplaces and plugins to ~/.claude
+        claude_home = pathlib.Path.home() / '.claude'
+        if merged_plugins.marketplaces or merged_plugins.enabled_plugins:
+            LOGGER.debug('Installing Claude marketplaces and plugins')
+            try:
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(
+                    self._install_marketplaces_and_plugins(
+                        merged_plugins, claude_home
+                    )
+                )
+            except RuntimeError as exc:
+                LOGGER.error(
+                    'Failed to install Claude marketplaces/plugins: %s', exc
+                )
+                raise
 
         # Add enabled plugins to settings
         if merged_plugins.enabled_plugins:
