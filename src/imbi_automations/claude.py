@@ -690,7 +690,8 @@ class Claude(mixins.WorkflowLoggerMixin):
         if merged_plugins.marketplaces or merged_plugins.enabled_plugins:
             LOGGER.debug('Installing Claude marketplaces and plugins')
             try:
-                asyncio.run(
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(
                     self._install_marketplaces_and_plugins(
                         merged_plugins, claude_home
                     )
