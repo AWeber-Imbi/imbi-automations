@@ -225,8 +225,8 @@ async def _install_plugins(
 
         plugin_name, marketplace_name = plugin_spec.rsplit('@', 1)
 
-        # Check if plugin already cloned (manifest can be at root or .claude-plugin/)
-        # Plugins are installed to installed_dir, not into the marketplace
+        # Check if plugin already cloned (manifest can be at root or
+        # .claude-plugin/). Plugins installed to installed_dir, not marketplace
         plugin_path = installed_dir / plugin_name
         plugin_manifest = plugin_path / 'plugin.json'
         alt_manifest = plugin_path / '.claude-plugin' / 'plugin.json'
@@ -455,7 +455,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         self._plugins_installed = False
         self._pending_plugin_config: models.ClaudePluginConfig | None = None
         self._client: claude_agent_sdk.ClaudeSDKClient | None = None
-        # Initialize working directory and agents now, but defer client creation
+        # Initialize working directory and agents now, defer client creation
         self._settings_path = self._initialize_working_directory()
 
     def get_agent_prompt(self, agent_type: models.ClaudeAgentType) -> str:
@@ -679,7 +679,8 @@ class Claude(mixins.WorkflowLoggerMixin):
             mcp_servers[name] = _expand_mcp_config(config.model_dump())
             LOGGER.debug('Added workflow MCP server: %s', name)
 
-        # Build local plugins list for SDK (includes config local_plugins + installed marketplace plugins)
+        # Build local plugins list for SDK (includes config local_plugins +
+        # installed marketplace plugins)
         sdk_plugins: list[types.SdkPluginConfig] = [
             types.SdkPluginConfig(type='local', path=plugin.path)
             for plugin in self._merged_local_plugins
@@ -740,7 +741,8 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         Args:
             merged_plugins: Merged plugin configuration
-            plugins_dir: Path to plugins directory (working_dir/.claude/plugins)
+            plugins_dir: Path to plugins directory
+                (working_dir/.claude/plugins)
 
         Returns:
             List of installed plugin paths (for passing to SDK)
@@ -805,7 +807,8 @@ class Claude(mixins.WorkflowLoggerMixin):
             self.context.workflow.configuration.plugins,
         )
 
-        # Store plugin config for async installation later (in _ensure_plugins_installed)
+        # Store plugin config for async installation later
+        # (in _ensure_plugins_installed)
         if merged_plugins.marketplaces or merged_plugins.enabled_plugins:
             self._pending_plugin_config = merged_plugins
 
