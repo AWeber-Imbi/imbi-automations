@@ -598,6 +598,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'KillShell',
                 'MultiEdit',
                 'Read',
+                'Skill',
                 'Task',
                 'Write',
                 'WebFetch',
