@@ -173,7 +173,7 @@ async def _install_marketplace(
 
         # Create symlink so plugins can be found
         if not marketplace_path.exists():
-            marketplace_path.symlink_to(source_path)
+            marketplace_path.symlink_to(source_path.resolve())
             LOGGER.debug(
                 'Created symlink for marketplace %s: %s -> %s',
                 name,
