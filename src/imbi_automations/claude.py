@@ -83,20 +83,20 @@ def _expand_mcp_config(config: dict[str, typing.Any]) -> dict[str, typing.Any]:
 
 
 async def _install_marketplace(
-    name: str, marketplace: models.ClaudeMarketplace, claude_home: pathlib.Path
+    name: str, marketplace: models.ClaudeMarketplace, plugins_dir: pathlib.Path
 ) -> None:
     """Install a Claude Code marketplace by cloning its repository.
 
     Args:
         name: Marketplace identifier (e.g., 'aweber-marketplace')
         marketplace: Marketplace configuration with source details
-        claude_home: Path to Claude's home directory (~/.claude)
+        plugins_dir: Path to plugins directory (working_dir/.claude/plugins)
 
     Raises:
         RuntimeError: If git clone fails (including authentication errors)
 
     """
-    marketplaces_dir = claude_home / 'plugins' / 'marketplaces'
+    marketplaces_dir = plugins_dir / 'marketplaces'
     marketplaces_dir.mkdir(parents=True, exist_ok=True)
 
     marketplace_path = marketplaces_dir / name
@@ -121,11 +121,9 @@ async def _install_marketplace(
         )
         try:
             await git.clone_to_directory(
-                working_directory=marketplaces_dir.parent.parent,
+                working_directory=plugins_dir,
                 clone_url=source.url,
-                destination=marketplace_path.relative_to(
-                    marketplaces_dir.parent.parent
-                ),
+                destination=pathlib.Path('marketplaces') / name,
                 depth=None,
             )
             LOGGER.info('Successfully installed marketplace: %s', name)
@@ -149,11 +147,9 @@ async def _install_marketplace(
 
         try:
             await git.clone_to_directory(
-                working_directory=marketplaces_dir.parent.parent,
+                working_directory=plugins_dir,
                 clone_url=git_url,
-                destination=marketplace_path.relative_to(
-                    marketplaces_dir.parent.parent
-                ),
+                destination=pathlib.Path('marketplaces') / name,
                 depth=None,
             )
             LOGGER.info('Successfully installed marketplace: %s', name)
@@ -165,7 +161,7 @@ async def _install_marketplace(
             ) from exc
 
     elif source.source == models.ClaudeMarketplaceSourceType.directory:
-        # For directory sources, just verify the path exists
+        # For directory sources, verify path exists and symlink it
         if not source.path:
             raise ValueError(f'Marketplace {name} missing directory path')
 
@@ -175,64 +171,46 @@ async def _install_marketplace(
                 f'Marketplace directory does not exist: {source.path}'
             )
 
-        LOGGER.debug(
-            'Marketplace %s using directory source: %s', name, source.path
-        )
-
-    # Update known_marketplaces.json
-    known_marketplaces_file = (
-        claude_home / 'plugins' / 'known_marketplaces.json'
-    )
-    known_marketplaces: dict[str, typing.Any] = {
-        'version': 2,
-        'marketplaces': {},
-    }
-
-    if known_marketplaces_file.exists():
-        known_marketplaces = json.loads(known_marketplaces_file.read_text())
-
-    # Add marketplace to registry
-    marketplace_entry: dict[str, typing.Any] = {
-        'source': {'type': source.source.value}
-    }
-    if source.repo:
-        marketplace_entry['source']['repo'] = source.repo
-    if source.url:
-        marketplace_entry['source']['url'] = source.url
-    if source.path:
-        marketplace_entry['source']['path'] = source.path
-
-    known_marketplaces['marketplaces'][name] = marketplace_entry
-    known_marketplaces_file.write_text(
-        json.dumps(known_marketplaces, indent=2), encoding='utf-8'
-    )
-
-    LOGGER.debug('Updated known_marketplaces.json with %s', name)
+        # Create symlink so plugins can be found
+        if not marketplace_path.exists():
+            marketplace_path.symlink_to(source_path.resolve())
+            LOGGER.debug(
+                'Created symlink for marketplace %s: %s -> %s',
+                name,
+                marketplace_path,
+                source_path,
+            )
+        else:
+            LOGGER.debug(
+                'Marketplace %s already linked at %s', name, marketplace_path
+            )
 
 
 async def _install_plugins(
-    enabled_plugins: dict[str, bool], claude_home: pathlib.Path
-) -> None:
+    enabled_plugins: dict[str, bool], plugins_dir: pathlib.Path
+) -> list[str]:
     """Install enabled Claude Code plugins from marketplaces.
+
+    Reads the marketplace manifest at .claude-plugin/marketplace.json to find
+    plugin sources, then clones plugins to plugins_dir/installed/. Checks for
+    existing plugin.json (at root or .claude-plugin/) to skip already-installed
+    plugins.
 
     Args:
         enabled_plugins: Map of "plugin@marketplace" to enabled state
-        claude_home: Path to Claude's home directory (~/.claude)
+        plugins_dir: Path to plugins directory (working_dir/.claude/plugins)
+
+    Returns:
+        List of installed plugin paths (for passing to SDK)
 
     Raises:
         RuntimeError: If plugin installation fails
 
     """
-    plugins_dir = claude_home / 'plugins'
-    plugins_dir.mkdir(parents=True, exist_ok=True)
-
-    installed_plugins_file = plugins_dir / 'installed_plugins.json'
-    installed_plugins: dict[str, typing.Any] = {'version': 2, 'plugins': {}}
-
-    if installed_plugins_file.exists():
-        installed_plugins = json.loads(installed_plugins_file.read_text())
-
+    installed_paths: list[str] = []
     marketplaces_dir = plugins_dir / 'marketplaces'
+    installed_dir = plugins_dir / 'installed'
+    installed_dir.mkdir(parents=True, exist_ok=True)
 
     for plugin_spec, enabled in enabled_plugins.items():
         if not enabled:
@@ -247,12 +225,21 @@ async def _install_plugins(
 
         plugin_name, marketplace_name = plugin_spec.rsplit('@', 1)
 
-        # Check if already installed
-        if plugin_name in installed_plugins['plugins']:
-            LOGGER.debug('Plugin %s already installed', plugin_name)
+        # Check if plugin already cloned (manifest can be at root or
+        # .claude-plugin/). Plugins installed to installed_dir, not marketplace
+        plugin_path = installed_dir / plugin_name
+        plugin_manifest = plugin_path / 'plugin.json'
+        alt_manifest = plugin_path / '.claude-plugin' / 'plugin.json'
+        if plugin_path.exists() and (
+            plugin_manifest.exists() or alt_manifest.exists()
+        ):
+            LOGGER.debug(
+                'Plugin %s already installed at %s', plugin_name, plugin_path
+            )
+            installed_paths.append(str(plugin_path))
             continue
 
-        # Locate plugin in marketplace
+        # Locate marketplace
         marketplace_path = marketplaces_dir / marketplace_name
         if not marketplace_path.exists():
             raise RuntimeError(
@@ -260,44 +247,117 @@ async def _install_plugins(
                 f'{plugin_name}. Ensure marketplace is installed first.'
             )
 
-        # Look for plugin directory or manifest
-        plugin_manifest = marketplace_path / plugin_name / 'plugin.json'
-        if not plugin_manifest.exists():
+        # Read marketplace manifest
+        manifest_path = (
+            marketplace_path / '.claude-plugin' / 'marketplace.json'
+        )
+        if not manifest_path.exists():
             raise RuntimeError(
-                f'Plugin {plugin_name} not found in marketplace '
-                f'{marketplace_name}. Expected manifest at: {plugin_manifest}'
+                f'Marketplace manifest not found at {manifest_path}'
             )
+
+        try:
+            manifest = json.loads(manifest_path.read_text())
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(
+                f'Invalid marketplace manifest at {manifest_path}: {exc}'
+            ) from exc
+
+        # Find plugin in manifest
+        plugin_entry = None
+        for plugin in manifest.get('plugins', []):
+            if plugin.get('name') == plugin_name:
+                plugin_entry = plugin
+                break
+
+        if not plugin_entry:
+            raise RuntimeError(
+                f'Plugin {plugin_name} not found in marketplace manifest '
+                f'{marketplace_name}'
+            )
+
+        # Get plugin source (can be string path or object)
+        source = plugin_entry.get('source', {})
 
         LOGGER.info(
             'Installing plugin: %s from %s', plugin_name, marketplace_name
         )
 
-        # Read plugin manifest
-        try:
-            manifest = json.loads(plugin_manifest.read_text())
-        except json.JSONDecodeError as exc:
+        # String source = relative directory path from marketplace
+        if isinstance(source, str):
+            local_path = marketplace_path / source
+            if not local_path.exists():
+                raise RuntimeError(
+                    f'Plugin directory does not exist: {local_path}'
+                )
+            plugin_path.symlink_to(local_path.resolve())
+            installed_paths.append(str(plugin_path))
+            LOGGER.info('Linked local plugin: %s', plugin_name)
+            continue
+
+        # Object source - check type
+        source_type = source.get('source')
+
+        if source_type == 'url':
+            # Clone from git URL
+            clone_url = source.get('url')
+            if not clone_url:
+                raise RuntimeError(
+                    f'Plugin {plugin_name} has url source but no url specified'
+                )
+
+            LOGGER.debug(
+                'Cloning plugin from %s to %s', clone_url, plugin_path
+            )
+            try:
+                await git.clone_to_directory(
+                    working_directory=installed_dir,
+                    clone_url=clone_url,
+                    destination=pathlib.Path(plugin_name),
+                    depth=None,
+                )
+                LOGGER.info('Successfully installed plugin: %s', plugin_name)
+                installed_paths.append(str(plugin_path))
+            except RuntimeError as exc:
+                raise RuntimeError(
+                    f'Failed to clone plugin {plugin_name} from '
+                    f'{clone_url}: {exc}'
+                ) from exc
+
+        elif source_type == 'github':
+            # Clone from GitHub repo
+            repo = source.get('repo')
+            if not repo:
+                raise RuntimeError(
+                    f'Plugin {plugin_name} has github source but no repo'
+                )
+            clone_url = f'https://github.com/{repo}.git'
+
+            LOGGER.debug(
+                'Cloning plugin from %s to %s', clone_url, plugin_path
+            )
+            try:
+                await git.clone_to_directory(
+                    working_directory=installed_dir,
+                    clone_url=clone_url,
+                    destination=pathlib.Path(plugin_name),
+                    depth=None,
+                )
+                LOGGER.info('Successfully installed plugin: %s', plugin_name)
+                installed_paths.append(str(plugin_path))
+            except RuntimeError as exc:
+                raise RuntimeError(
+                    f'Failed to clone plugin {plugin_name} from '
+                    f'{clone_url}: {exc}'
+                ) from exc
+
+        else:
             raise RuntimeError(
-                f'Invalid plugin manifest for {plugin_name}: {exc}'
-            ) from exc
+                f'Unsupported plugin source type: {source_type} '
+                f'for {plugin_name}'
+            )
 
-        # Add to installed plugins registry
-        installed_plugins['plugins'][plugin_name] = {
-            'marketplace': marketplace_name,
-            'version': manifest.get('version', '1.0.0'),
-            'enabled': True,
-        }
-
-        LOGGER.info('Successfully installed plugin: %s', plugin_name)
-
-    # Write updated installed_plugins.json
-    installed_plugins_file.write_text(
-        json.dumps(installed_plugins, indent=2), encoding='utf-8'
-    )
-
-    LOGGER.debug(
-        'Updated installed_plugins.json with %d plugins',
-        len(installed_plugins['plugins']),
-    )
+    return installed_paths
 
 
 class Agents(typing.TypedDict):
@@ -391,7 +451,12 @@ class Claude(mixins.WorkflowLoggerMixin):
         self._set_workflow_logger(self.context.workflow)
         self._submitted_response: AgentResult | None = None
         self._merged_local_plugins: list[models.ClaudeLocalPlugin] = []
-        self.client = self._create_client()
+        self._installed_plugin_paths: list[str] = []
+        self._plugins_installed = False
+        self._pending_plugin_config: models.ClaudePluginConfig | None = None
+        self._client: claude_agent_sdk.ClaudeSDKClient | None = None
+        # Initialize working directory and agents now, defer client creation
+        self._settings_path = self._initialize_working_directory()
 
     def get_agent_prompt(self, agent_type: models.ClaudeAgentType) -> str:
         """Get the prompt content for a specific agent type.
@@ -451,7 +516,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 timeout_seconds,
             )
             try:
-                await asyncio.wait_for(self.client.disconnect(), timeout=5)
+                await asyncio.wait_for(self._client.disconnect(), timeout=5)
             except TimeoutError:
                 LOGGER.warning(
                     'Claude SDK disconnect failed due to timeout '
@@ -469,6 +534,34 @@ class Claude(mixins.WorkflowLoggerMixin):
                 f'({timeout_seconds}s)'
             ) from None
 
+    async def _ensure_plugins_installed(self) -> None:
+        """Install Claude marketplaces and plugins if not already done.
+
+        Installs to the working directory (.claude/plugins/) to avoid
+        polluting the user's ~/.claude directory.
+
+        This is called lazily before the first agent query to avoid
+        running async code from __init__ which may be called from
+        an already-running event loop.
+        """
+        if self._plugins_installed or self._pending_plugin_config is None:
+            return
+
+        LOGGER.debug('Installing Claude marketplaces and plugins')
+        plugins_dir = self.context.working_directory / '.claude' / 'plugins'
+        try:
+            self._installed_plugin_paths = (
+                await self._install_marketplaces_and_plugins(
+                    self._pending_plugin_config, plugins_dir
+                )
+            )
+            self._plugins_installed = True
+        except RuntimeError as exc:
+            LOGGER.error(
+                'Failed to install Claude marketplaces/plugins: %s', exc
+            )
+            raise
+
     async def _execute_sdk_query(self, prompt: str) -> AgentResult | None:
         """Execute SDK query and capture tool-based response.
 
@@ -484,11 +577,18 @@ class Claude(mixins.WorkflowLoggerMixin):
         """
         self._submitted_response: AgentResult | None = None
 
-        await self.client.connect()
-        await self.client.query(prompt)
-        async for message in self.client.receive_response():
+        # Install plugins before creating client so we know the paths
+        await self._ensure_plugins_installed()
+
+        # Create client lazily after plugins are installed
+        if self._client is None:
+            self._client = self._create_client()
+
+        await self._client.connect()
+        await self._client.query(prompt)
+        async for message in self._client.receive_response():
             self._parse_message(message)
-        await self.client.disconnect()
+        await self._client.disconnect()
 
         if self._submitted_response is None:
             raise RuntimeError(
@@ -518,9 +618,8 @@ class Claude(mixins.WorkflowLoggerMixin):
         return ''
 
     def _create_client(self) -> claude_agent_sdk.ClaudeSDKClient:
-        """Create the Claude SDK client, initializing the environment."""
-        settings = self._initialize_working_directory()
-        LOGGER.debug('Claude Code settings: %s', settings)
+        """Create the Claude SDK client using pre-initialized settings."""
+        LOGGER.debug('Claude Code settings: %s', self._settings_path)
 
         # Create MCP tool for unified agent responses
         @claude_agent_sdk.tool(
@@ -580,11 +679,24 @@ class Claude(mixins.WorkflowLoggerMixin):
             mcp_servers[name] = _expand_mcp_config(config.model_dump())
             LOGGER.debug('Added workflow MCP server: %s', name)
 
-        # Build local plugins list for SDK
+        # Build local plugins list for SDK (includes config local_plugins +
+        # installed marketplace plugins)
         sdk_plugins: list[types.SdkPluginConfig] = [
             types.SdkPluginConfig(type='local', path=plugin.path)
             for plugin in self._merged_local_plugins
         ]
+        # Add installed marketplace plugins
+        for plugin_path in self._installed_plugin_paths:
+            sdk_plugins.append(
+                types.SdkPluginConfig(type='local', path=plugin_path)
+            )
+
+        if sdk_plugins:
+            LOGGER.debug(
+                'Passing %d plugins to Claude SDK: %s',
+                len(sdk_plugins),
+                [p['path'] for p in sdk_plugins],
+            )
 
         options = claude_agent_sdk.ClaudeAgentOptions(
             agents=dict(self.agents),
@@ -598,6 +710,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'KillShell',
                 'MultiEdit',
                 'Read',
+                'Skill',
                 'Task',
                 'Write',
                 'WebFetch',
@@ -609,7 +722,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             mcp_servers=mcp_servers,
             model=self.configuration.claude.model,
             plugins=sdk_plugins,
-            settings=str(settings),
+            settings=str(self._settings_path),
             setting_sources=['local'],
             system_prompt=types.SystemPromptPreset(
                 type='preset', preset='claude_code', append=system_prompt
@@ -622,25 +735,34 @@ class Claude(mixins.WorkflowLoggerMixin):
     async def _install_marketplaces_and_plugins(
         self,
         merged_plugins: models.ClaudePluginConfig,
-        claude_home: pathlib.Path,
-    ) -> None:
-        """Install Claude marketplaces and plugins.
+        plugins_dir: pathlib.Path,
+    ) -> list[str]:
+        """Install Claude marketplaces and plugins to the working directory.
 
         Args:
             merged_plugins: Merged plugin configuration
-            claude_home: Path to Claude's home directory (~/.claude)
+            plugins_dir: Path to plugins directory
+                (working_dir/.claude/plugins)
+
+        Returns:
+            List of installed plugin paths (for passing to SDK)
 
         Raises:
             RuntimeError: If installation fails
 
         """
+        plugins_dir.mkdir(parents=True, exist_ok=True)
+
         # Install marketplaces first
         for name, marketplace in merged_plugins.marketplaces.items():
-            await _install_marketplace(name, marketplace, claude_home)
+            await _install_marketplace(name, marketplace, plugins_dir)
 
         # Then install plugins from those marketplaces
         if merged_plugins.enabled_plugins:
-            await _install_plugins(merged_plugins.enabled_plugins, claude_home)
+            return await _install_plugins(
+                merged_plugins.enabled_plugins, plugins_dir
+            )
+        return []
 
     def _initialize_working_directory(self) -> pathlib.Path:
         """Setup dynamic agents and settings for claude-agents action.
@@ -685,22 +807,10 @@ class Claude(mixins.WorkflowLoggerMixin):
             self.context.workflow.configuration.plugins,
         )
 
-        # Install marketplaces and plugins to ~/.claude
-        claude_home = pathlib.Path.home() / '.claude'
+        # Store plugin config for async installation later
+        # (in _ensure_plugins_installed)
         if merged_plugins.marketplaces or merged_plugins.enabled_plugins:
-            LOGGER.debug('Installing Claude marketplaces and plugins')
-            try:
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(
-                    self._install_marketplaces_and_plugins(
-                        merged_plugins, claude_home
-                    )
-                )
-            except RuntimeError as exc:
-                LOGGER.error(
-                    'Failed to install Claude marketplaces/plugins: %s', exc
-                )
-                raise
+            self._pending_plugin_config = merged_plugins
 
         # Add enabled plugins to settings
         if merged_plugins.enabled_plugins:

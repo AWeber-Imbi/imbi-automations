@@ -493,8 +493,9 @@ class ClaudeTestCase(base.AsyncTestCase):
         self.assertTrue(claude_instance.verbose)
         self.assertIsNone(claude_instance.session_id)
 
-        # Verify client creation was called
-        mock_client_class.assert_called_once()
+        # Client is created lazily on first query, not during init
+        self.assertIsNone(claude_instance._client)
+        mock_client_class.assert_not_called()
 
     # Note: Removed obsolete _parse_message tests that tested return values.
     # The _parse_message method was refactored to return None and work via
@@ -771,6 +772,166 @@ class ClaudeTestCase(base.AsyncTestCase):
             claude_instance.get_agent_prompt(models.ClaudeAgentType.planning)
 
         self.assertIn('No agent definition', str(exc_context.exception))
+
+
+class InstallPluginsTestCase(base.AsyncTestCase):
+    """Test cases for _install_plugins function."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.plugins_dir = pathlib.Path(self.temp_dir.name)
+        self.marketplaces_dir = self.plugins_dir / 'marketplaces'
+        self.installed_dir = self.plugins_dir / 'installed'
+
+    def tearDown(self) -> None:
+        self.temp_dir.cleanup()
+        super().tearDown()
+
+    def _create_marketplace_with_manifest(
+        self, name: str, plugins: list[dict]
+    ) -> pathlib.Path:
+        """Create a mock marketplace directory with manifest."""
+        marketplace_path = self.marketplaces_dir / name
+        manifest_dir = marketplace_path / '.claude-plugin'
+        manifest_dir.mkdir(parents=True, exist_ok=True)
+
+        manifest = {'plugins': plugins}
+        manifest_path = manifest_dir / 'marketplace.json'
+        manifest_path.write_text(json.dumps(manifest))
+
+        return marketplace_path
+
+    async def test_install_plugins_directory_source(self) -> None:
+        """Test installing plugin from directory string source."""
+        # Create marketplace with a local plugin subdirectory
+        marketplace_path = self._create_marketplace_with_manifest(
+            'test-marketplace',
+            [{'name': 'local-plugin', 'source': './plugins/local-plugin'}],
+        )
+
+        # Create the plugin directory inside marketplace
+        plugin_source = marketplace_path / 'plugins' / 'local-plugin'
+        plugin_source.mkdir(parents=True)
+        (plugin_source / 'plugin.json').write_text('{}')
+
+        result = await claude._install_plugins(
+            {'local-plugin@test-marketplace': True}, self.plugins_dir
+        )
+
+        # Verify symlink was created
+        expected_path = self.installed_dir / 'local-plugin'
+        self.assertTrue(expected_path.is_symlink())
+        self.assertEqual(
+            expected_path.resolve(), plugin_source.resolve()
+        )
+        self.assertEqual(result, [str(expected_path)])
+
+    async def test_install_plugins_directory_source_not_found(self) -> None:
+        """Test error when directory source path doesn't exist."""
+        self._create_marketplace_with_manifest(
+            'test-marketplace',
+            [{'name': 'missing-plugin', 'source': './nonexistent'}],
+        )
+
+        with self.assertRaises(RuntimeError) as exc:
+            await claude._install_plugins(
+                {'missing-plugin@test-marketplace': True}, self.plugins_dir
+            )
+
+        self.assertIn('does not exist', str(exc.exception))
+
+    async def test_install_plugins_github_source(self) -> None:
+        """Test installing plugin from github object source."""
+        self._create_marketplace_with_manifest(
+            'test-marketplace',
+            [
+                {
+                    'name': 'github-plugin',
+                    'source': {'source': 'github', 'repo': 'org/plugin'},
+                }
+            ],
+        )
+
+        with mock.patch(
+            'imbi_automations.claude.git.clone_to_directory'
+        ) as mock_clone:
+            mock_clone.return_value = 'abc123'
+
+            result = await claude._install_plugins(
+                {'github-plugin@test-marketplace': True}, self.plugins_dir
+            )
+
+        # Verify clone was called with GitHub URL
+        mock_clone.assert_called_once_with(
+            working_directory=self.installed_dir,
+            clone_url='https://github.com/org/plugin.git',
+            destination=pathlib.Path('github-plugin'),
+            depth=None,
+        )
+        expected_path = self.installed_dir / 'github-plugin'
+        self.assertEqual(result, [str(expected_path)])
+
+    async def test_install_plugins_github_source_missing_repo(self) -> None:
+        """Test error when github source missing repo field."""
+        self._create_marketplace_with_manifest(
+            'test-marketplace',
+            [{'name': 'bad-plugin', 'source': {'source': 'github'}}],
+        )
+
+        with self.assertRaises(RuntimeError) as exc:
+            await claude._install_plugins(
+                {'bad-plugin@test-marketplace': True}, self.plugins_dir
+            )
+
+        self.assertIn('has github source but no repo', str(exc.exception))
+
+    async def test_install_plugins_url_source(self) -> None:
+        """Test installing plugin from url object source."""
+        self._create_marketplace_with_manifest(
+            'test-marketplace',
+            [
+                {
+                    'name': 'url-plugin',
+                    'source': {
+                        'source': 'url',
+                        'url': 'https://git.example.com/plugin.git',
+                    },
+                }
+            ],
+        )
+
+        with mock.patch(
+            'imbi_automations.claude.git.clone_to_directory'
+        ) as mock_clone:
+            mock_clone.return_value = 'abc123'
+
+            result = await claude._install_plugins(
+                {'url-plugin@test-marketplace': True}, self.plugins_dir
+            )
+
+        mock_clone.assert_called_once_with(
+            working_directory=self.installed_dir,
+            clone_url='https://git.example.com/plugin.git',
+            destination=pathlib.Path('url-plugin'),
+            depth=None,
+        )
+        expected_path = self.installed_dir / 'url-plugin'
+        self.assertEqual(result, [str(expected_path)])
+
+    async def test_install_plugins_unsupported_source_type(self) -> None:
+        """Test error for unsupported source type."""
+        self._create_marketplace_with_manifest(
+            'test-marketplace',
+            [{'name': 'bad-plugin', 'source': {'source': 'unknown'}}],
+        )
+
+        with self.assertRaises(RuntimeError) as exc:
+            await claude._install_plugins(
+                {'bad-plugin@test-marketplace': True}, self.plugins_dir
+            )
+
+        self.assertIn('Unsupported plugin source type', str(exc.exception))
 
 
 if __name__ == '__main__':
