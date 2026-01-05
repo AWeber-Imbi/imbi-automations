@@ -76,8 +76,8 @@ Create a `config.toml` file with your API credentials:
 
 ```toml
 [github]
-api_key = "ghp_your_github_token"
-hostname = "github.com"  # Optional, defaults to github.com
+token = "ghp_your_github_token"
+host = "github.com"  # Optional, defaults to github.com
 
 [imbi]
 api_key = "your-imbi-api-key"

@@ -140,13 +140,8 @@ Host *
 EOF
 
     # Add GitHub hosts to known_hosts
-	ssh-keyscan -t ed25519,rsa "github.com" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
-
-    # Scan GHE host if GITHUB_HOSTNAME is set (strip api. prefix if present)
-    if [ -n "$GITHUB_HOSTNAME" ]; then
-        GHE_HOST=$(echo "$GITHUB_HOSTNAME" | sed 's/^api\.//')
-        ssh-keyscan -t ed25519,rsa "$GHE_HOST" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
-    fi
+    # GH_HOST contains the base domain (e.g., github.com or github.enterprise.com)
+    ssh-keyscan -t ed25519,rsa "${GH_HOST:-github.com}" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
 
     # Point SSH to our runtime config
     export GIT_SSH_COMMAND="ssh -F $SSH_DIR/config"

@@ -111,6 +111,10 @@ class GitHubConfiguration(pydantic_settings.BaseSettings):
 
     Supports both GitHub.com and GitHub Enterprise with API token
     authentication.
+
+    The host field should be set to the base domain (e.g., 'github.com' or
+    'github.enterprise.com'). The api_base_url property automatically
+    prepends 'api.' to form the API endpoint.
     """
 
     model_config = pydantic_settings.SettingsConfigDict(
@@ -119,6 +123,14 @@ class GitHubConfiguration(pydantic_settings.BaseSettings):
 
     host: str = pydantic.Field(default='github.com')
     token: pydantic.SecretStr
+
+    @property
+    def api_base_url(self) -> str:
+        """Compute the GitHub API base URL from the host.
+
+        Prepends 'api.' to the host to form the API endpoint.
+        """
+        return f'https://api.{self.host}'
 
 
 class ImbiConfiguration(pydantic_settings.BaseSettings):

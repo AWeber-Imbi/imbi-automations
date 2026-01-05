@@ -482,7 +482,8 @@ token = "ghp_your_github_personal_access_token"
 
 ### [github].host
 
-GitHub hostname for Enterprise installations.
+GitHub hostname (base domain). The `api.` prefix is automatically prepended
+for API requests.
 
 **Type:** `string`
 **Default:** `github.com`
@@ -492,6 +493,8 @@ For GitHub Enterprise:
 [github]
 host = "github.enterprise.com"
 ```
+
+This will automatically use `api.github.enterprise.com` for API requests.
 
 ## Imbi Configuration
 

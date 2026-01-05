@@ -179,7 +179,7 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
         super().setUp()
         self.config = models.Configuration(
             github=models.GitHubConfiguration(
-                token='test-token', host='api.github.com'
+                token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key',
@@ -255,7 +255,7 @@ class GitHubEnvironmentsTestCase(base.AsyncTestCase):
         super().setUp()
         self.config = models.Configuration(
             github=models.GitHubConfiguration(
-                token='test-token', host='api.github.com'
+                token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key', hostname='imbi.example.com'
@@ -320,7 +320,7 @@ class GitHubPullRequestTestCase(base.AsyncTestCase):
         super().setUp()
         self.config = models.Configuration(
             github=models.GitHubConfiguration(
-                token='test-token', host='api.github.com'
+                token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key', hostname='imbi.example.com'
@@ -476,7 +476,7 @@ class GitHubFileOperationsTestCase(base.AsyncTestCase):
         super().setUp()
         self.config = models.Configuration(
             github=models.GitHubConfiguration(
-                token='test-token', host='api.github.com'
+                token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key', hostname='imbi.example.com'
@@ -587,7 +587,7 @@ class GitHubWorkflowTestCase(base.AsyncTestCase):
         super().setUp()
         self.config = models.Configuration(
             github=models.GitHubConfiguration(
-                token='test-token', host='api.github.com'
+                token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key', hostname='imbi.example.com'
@@ -630,7 +630,7 @@ class GitHubRepositoryUpdateTestCase(base.AsyncTestCase):
         super().setUp()
         self.config = models.Configuration(
             github=models.GitHubConfiguration(
-                token='test-token', host='api.github.com'
+                token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key', hostname='imbi.example.com'
@@ -665,7 +665,7 @@ class GitHubJobLogsTestCase(base.AsyncTestCase):
         super().setUp()
         self.config = models.Configuration(
             github=models.GitHubConfiguration(
-                token='test-token', host='api.github.com'
+                token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
                 api_key='test-key', hostname='imbi.example.com'
