@@ -66,11 +66,10 @@ git commit -F /tmp/commit_msg.txt {{ configuration.git.commit_args }} \
 rm {{ working_directory }}/commit_msg.txt
 ```
 
-Step 2: Make the script executable and run it:
+Step 2: Run the script:
 
 ```bash
-chmod +x {{ working_directory }}/do-commit.sh
-{{ working_directory }}/do-commit.sh
+bash {{ working_directory }}/do-commit.sh
 rm {{ working_directory }}/do-commit.sh
 ```
 
