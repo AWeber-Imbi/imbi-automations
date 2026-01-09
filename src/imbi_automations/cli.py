@@ -8,9 +8,7 @@ orchestrating workflow execution through the controller.
 import argparse
 import asyncio
 import logging
-import os
 import pathlib
-import signal
 import sys
 import tomllib
 import typing
@@ -21,34 +19,6 @@ import pydantic
 from imbi_automations import controller, models, tracker, utils, version
 
 LOGGER = logging.getLogger(__name__)
-
-
-def _reap_zombies(signum: int, frame: typing.Any) -> None:
-    """Signal handler to reap zombie child processes.
-
-    This handler is installed for SIGCHLD to ensure that any child processes
-    that exit are properly reaped, preventing zombie process accumulation.
-    This is especially important when running as PID 1 in containers.
-
-    Args:
-        signum: Signal number (SIGCHLD)
-        frame: Current stack frame (unused)
-
-    """
-    while True:
-        try:
-            # Non-blocking wait for any child process
-            # Returns (0, 0) when no more child processes to reap
-            pid, _ = os.waitpid(-1, os.WNOHANG)
-            if pid == 0:
-                break
-            LOGGER.debug('Reaped zombie process with PID %d', pid)
-        except ChildProcessError:
-            # No child processes left to reap
-            break
-        except OSError as exc:
-            LOGGER.debug('Error reaping zombie process: %s', exc)
-            break
 
 
 def configure_logging(debug: bool) -> None:
@@ -281,10 +251,6 @@ def main() -> None:
     """
     args = parse_args()
     configure_logging(args.debug)
-
-    # Install SIGCHLD handler to reap zombie processes
-    # This is defense-in-depth for containers running as PID 1
-    signal.signal(signal.SIGCHLD, _reap_zombies)
 
     config = load_configuration(args.config[0])
     args.config[0].close()
