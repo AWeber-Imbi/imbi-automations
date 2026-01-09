@@ -1,0 +1,3428 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../workflows/">
+      
+      
+        <link rel="next" href="../workflow-filters/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Configuration - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#workflow-configuration-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Metadata
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompt (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#depth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        depth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ref" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ref
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starting_branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        starting_branch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ci_skip_checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ci_skip_checks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clone_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clone_type
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#github-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GitHub Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create_pull_request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_pull_request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace_branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        replace_branch
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#followup-stage-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Followup Stage Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Followup Stage Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#max_followup_cycles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_followup_cycles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-server-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP Server Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#supported-transport-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Transport Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supported Transport Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stdio-standard-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stdio (Standard I/O)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        http (HTTP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sse-server-sent-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sse (Server-Sent Events)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variable-expansion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variable Expansion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claude-code-plugin-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Code Plugin Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Claude Code Plugin Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#merge-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merge Behavior
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginsenabled_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [plugins].enabled_plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginsmarketplaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [plugins.marketplaces]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginslocal_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[plugins.local_plugins]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-workflow-plugin-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Workflow Plugin Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-level-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow-Level Conditions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow-Level Conditions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#condition_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[conditions]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-action-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Action Fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Action Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-required_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stage (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai_commit-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ai_commit (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commit_message-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        commit_message (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#committable-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        committable (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on_success-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_success (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on_error-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_error (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeout (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condition_type-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_type (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actionsconditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[actions.conditions]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        data (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-specific-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action-Specific Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Metadata
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prompt (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#depth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        depth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ref" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ref
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starting_branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        starting_branch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ci_skip_checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ci_skip_checks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clone_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clone_type
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#github-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GitHub Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create_pull_request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_pull_request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replace_branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        replace_branch
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#followup-stage-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Followup Stage Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Followup Stage Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#max_followup_cycles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_followup_cycles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-server-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP Server Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#supported-transport-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Transport Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supported Transport Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stdio-standard-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stdio (Standard I/O)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        http (HTTP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sse-server-sent-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sse (Server-Sent Events)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variable-expansion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variable Expansion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claude-code-plugin-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Code Plugin Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Claude Code Plugin Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#merge-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merge Behavior
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginsenabled_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [plugins].enabled_plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginsmarketplaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [plugins.marketplaces]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginslocal_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[plugins.local_plugins]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-workflow-plugin-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Workflow Plugin Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-level-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow-Level Conditions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow-Level Conditions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#condition_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[conditions]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-action-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Action Fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Action Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-required_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stage-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stage (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai_commit-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ai_commit (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commit_message-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        commit_message (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#committable-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        committable (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on_success-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_success (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on_error-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_error (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeout (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condition_type-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_type (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actionsconditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[actions.conditions]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        data (optional)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-specific-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action-Specific Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="workflow-configuration-reference">Workflow Configuration Reference<a class="headerlink" href="#workflow-configuration-reference" title="Permanent link">&para;</a></h1>
+<p>Complete field reference for workflow configuration files (<code>workflow.toml</code>) with detailed descriptions, types, defaults, and examples.</p>
+<p><strong>Tip:</strong> Workflow configuration syntax is validated on startup</p>
+<h2 id="configuration-structure">Configuration Structure<a class="headerlink" href="#configuration-structure" title="Permanent link">&para;</a></h2>
+<p>A complete workflow configuration includes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Workflow Metadata</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow-name&quot;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Optional description&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///prompts/base.md&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Project Filtering</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">[filter]</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">project_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="mi">456</span><span class="p">]</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># Git Configuration</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="k">[git]</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">clone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;main&quot;</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">starting_branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;main&quot;</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="n">ci_skip_checks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">clone_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ssh&quot;</span><span class="w">  </span><span class="c1"># or &quot;http&quot;</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="c1"># GitHub Configuration</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="k">[github]</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="n">create_pull_request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="n">replace_branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="c1"># Workflow-Level Conditions</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span><span class="w">  </span><span class="c1"># or &quot;any&quot;</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file.txt&quot;</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="c1"># Actions</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;action-name&quot;</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="c1"># ... action-specific fields</span>
+</code></pre></div>
+<h2 id="workflow-metadata">Workflow Metadata<a class="headerlink" href="#workflow-metadata" title="Permanent link">&para;</a></h2>
+<h3 id="name-required">name (required)<a class="headerlink" href="#name-required" title="Permanent link">&para;</a></h3>
+<p>Workflow display name shown in logs, reports, and pull requests.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Update Python Dependencies&quot;</span>
+</code></pre></div>
+<h3 id="description-optional">description (optional)<a class="headerlink" href="#description-optional" title="Permanent link">&para;</a></h3>
+<p>Human-readable description of workflow purpose and goals.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Default:</strong> None  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Updates Python dependencies to latest compatible versions while maintaining compatibility&quot;</span>
+</code></pre></div>
+<h3 id="prompt-optional">prompt (optional)<a class="headerlink" href="#prompt-optional" title="Permanent link">&para;</a></h3>
+<p>Base prompt file for Claude Code actions. This prompt is prepended to all Claude actions in the workflow unless they specify their own prompt.</p>
+<p><strong>Type:</strong> <a href="../actions/#resourceurl-path-system"><code>ResourceUrl</code></a> (path to prompt template file)</p>
+<p><strong>Default:</strong> None  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///prompts/base-context.md&quot;</span>
+</code></pre></div>
+<p><strong>Usage:</strong> Provides shared context across all Claude actions in the workflow.</p>
+<h2 id="git-configuration">Git Configuration<a class="headerlink" href="#git-configuration" title="Permanent link">&para;</a></h2>
+<p>The <code>[git]</code> section controls repository cloning and commit behavior.</p>
+<h3 id="clone">clone<a class="headerlink" href="#clone" title="Permanent link">&para;</a></h3>
+<p>Whether to clone the repository from the remote.</p>
+<p><strong>Type:</strong> <code>boolean</code>  </p>
+<p><strong>Default:</strong> <code>true</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">[git]</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">clone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<p><strong>When to use <code>false</code>:</strong> API-only workflows that don't need repository access.</p>
+<h3 id="depth">depth<a class="headerlink" href="#depth" title="Permanent link">&para;</a></h3>
+<p>Shallow clone depth (number of commits to fetch).</p>
+<p><strong>Type:</strong> <code>integer</code>  </p>
+<p><strong>Default:</strong> <code>1</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">[git]</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="c1"># Shallow clone (fastest)</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># OR</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">[git]</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w">  </span><span class="c1"># More history available for git operations</span>
+</code></pre></div>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li><code>depth = 1</code>: Fastest, use for most workflows</li>
+<li><code>depth = 100+</code>: When extracting files from commit history</li>
+</ul>
+<h3 id="ref">ref<a class="headerlink" href="#ref" title="Permanent link">&para;</a></h3>
+<p>Git reference (branch, tag, or commit SHA) to clone.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Default:</strong> Repository's default branch  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[git]</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;main&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># OR</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">[git]</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;v1.2.3&quot;</span><span class="w">  </span><span class="c1"># Clone specific tag</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1"># OR</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">[git]</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="n">ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;abc123&quot;</span><span class="w">  </span><span class="c1"># Clone specific commit</span>
+</code></pre></div>
+<h3 id="starting_branch">starting_branch<a class="headerlink" href="#starting_branch" title="Permanent link">&para;</a></h3>
+<p>Branch name to use as starting point for workflow branch.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Default:</strong> Repository's default branch  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">[git]</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">starting_branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;develop&quot;</span><span class="w">  </span><span class="c1"># Branch from develop instead of main</span>
+</code></pre></div>
+<h3 id="ci_skip_checks">ci_skip_checks<a class="headerlink" href="#ci_skip_checks" title="Permanent link">&para;</a></h3>
+<p>Whether to skip CI/CD checks in commit messages.</p>
+<p><strong>Type:</strong> <code>boolean</code>  </p>
+<p><strong>Default:</strong> <code>false</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">[git]</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">ci_skip_checks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c1"># Adds [skip ci] to commit messages</span>
+</code></pre></div>
+<h3 id="clone_type">clone_type<a class="headerlink" href="#clone_type" title="Permanent link">&para;</a></h3>
+<p>Protocol to use for cloning repositories.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Values:</strong> <code>"ssh"</code> (default), <code>"http"</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">[git]</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">clone_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ssh&quot;</span><span class="w">  </span><span class="c1"># Use SSH keys (default)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># OR</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="k">[git]</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">clone_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;http&quot;</span><span class="w">  </span><span class="c1"># Use HTTPS (requires token)</span>
+</code></pre></div>
+<h2 id="github-configuration">GitHub Configuration<a class="headerlink" href="#github-configuration" title="Permanent link">&para;</a></h2>
+<p>The <code>[github]</code> section controls GitHub pull request creation and branch management.</p>
+<h3 id="create_pull_request">create_pull_request<a class="headerlink" href="#create_pull_request" title="Permanent link">&para;</a></h3>
+<p>Whether to create a pull request after committing changes.</p>
+<p><strong>Type:</strong> <code>boolean</code>  </p>
+<p><strong>Default:</strong> <code>true</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">[github]</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">create_pull_request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<p><strong>When to use <code>false</code>:</strong> Direct commits to main (not recommended), testing workflows.</p>
+<h3 id="replace_branch">replace_branch<a class="headerlink" href="#replace_branch" title="Permanent link">&para;</a></h3>
+<p>Delete and recreate remote branch if it already exists.</p>
+<p><strong>Type:</strong> <code>boolean</code>  </p>
+<p><strong>Default:</strong> <code>false</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">[github]</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">create_pull_request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">replace_branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c1"># Force-replace existing PR branch</span>
+</code></pre></div>
+<p><strong>Requirements:</strong> <code>create_pull_request</code> must be <code>true</code>.</p>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Updating failed workflow runs</li>
+<li>Re-running workflows with fixes</li>
+<li>Forcing clean state</li>
+</ul>
+<p><strong>Warning:</strong> Destroys existing PR branch and its history.</p>
+<h2 id="followup-stage-configuration">Followup Stage Configuration<a class="headerlink" href="#followup-stage-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="max_followup_cycles">max_followup_cycles<a class="headerlink" href="#max_followup_cycles" title="Permanent link">&para;</a></h3>
+<p>Maximum number of cycles for followup stage execution.</p>
+<p><strong>Type:</strong> <code>integer</code>  </p>
+<p><strong>Default:</strong> <code>5</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">max_followup_cycles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+</code></pre></div>
+<p><strong>Behavior:</strong>  </p>
+<ul>
+<li>Followup actions execute after PR creation</li>
+<li>If any followup action commits, the stage cycles again</li>
+<li>If no commits made during a cycle, followup is complete</li>
+<li>If max cycles reached without completion, workflow fails</li>
+</ul>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Limit iterations when monitoring CI</li>
+<li>Control retry behavior for feedback loops</li>
+<li>Prevent infinite loops in automated fixes</li>
+</ul>
+<p>See <a href="../actions/stages/">Action Stages</a> for complete followup stage documentation.</p>
+<h2 id="mcp-server-configuration">MCP Server Configuration<a class="headerlink" href="#mcp-server-configuration" title="Permanent link">&para;</a></h2>
+<p>The <code>[mcp_servers]</code> section allows configuring Model Context Protocol (MCP) servers that will be available to Claude actions during workflow execution. MCP servers provide Claude with access to external tools and data sources.</p>
+<h3 id="supported-transport-types">Supported Transport Types<a class="headerlink" href="#supported-transport-types" title="Permanent link">&para;</a></h3>
+<p>Three MCP transport types are supported, matching the Claude Agent SDK:</p>
+<h4 id="stdio-standard-io">stdio (Standard I/O)<a class="headerlink" href="#stdio-standard-io" title="Permanent link">&para;</a></h4>
+<p>Launch a local MCP server process:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">[mcp_servers.my-postgres]</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;stdio&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;uvx&quot;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;mcp-server-postgres&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;${DATABASE_URL}&quot;</span><span class="p">]</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">DATABASE_URL</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;${DATABASE_URL}&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><strong>Fields:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td><code>"stdio"</code></td>
+<td>Yes</td>
+<td>Transport type</td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td><code>string</code></td>
+<td>Yes</td>
+<td>Executable to run</td>
+</tr>
+<tr>
+<td><code>args</code></td>
+<td><code>list[string]</code></td>
+<td>No</td>
+<td>Command arguments (default: <code>[]</code>)</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td><code>dict[string, string]</code></td>
+<td>No</td>
+<td>Environment variables (default: <code>{}</code>)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="http-http">http (HTTP)<a class="headerlink" href="#http-http" title="Permanent link">&para;</a></h4>
+<p>Connect to an HTTP-based MCP server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">[mcp_servers.my-api]</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;http&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://api.example.com/mcp&quot;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Authorization</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Bearer ${API_TOKEN}&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><strong>Fields:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td><code>"http"</code></td>
+<td>Yes</td>
+<td>Transport type</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td><code>string</code></td>
+<td>Yes</td>
+<td>Server endpoint URL</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td><code>dict[string, string]</code></td>
+<td>No</td>
+<td>HTTP headers (default: <code>{}</code>)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sse-server-sent-events">sse (Server-Sent Events)<a class="headerlink" href="#sse-server-sent-events" title="Permanent link">&para;</a></h4>
+<p>Connect to an SSE-based MCP server:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">[mcp_servers.my-events]</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sse&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://api.example.com/mcp/sse&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Authorization</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Bearer ${API_TOKEN}&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><strong>Fields:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td><code>"sse"</code></td>
+<td>Yes</td>
+<td>Transport type</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td><code>string</code></td>
+<td>Yes</td>
+<td>SSE endpoint URL</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td><code>dict[string, string]</code></td>
+<td>No</td>
+<td>HTTP headers (default: <code>{}</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="environment-variable-expansion">Environment Variable Expansion<a class="headerlink" href="#environment-variable-expansion" title="Permanent link">&para;</a></h3>
+<p>MCP server configurations support shell-style environment variable expansion for secure credential injection:</p>
+<ul>
+<li><strong><code>$VAR</code></strong> - Basic expansion</li>
+<li><strong><code>${VAR}</code></strong> - Braced expansion (recommended)</li>
+</ul>
+<p>Environment variables are expanded at runtime when the Claude client is created, not at configuration parse time.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">[mcp_servers.production-db]</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;stdio&quot;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;uvx&quot;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;mcp-server-postgres&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;${PROD_DATABASE_URL}&quot;</span><span class="p">]</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="k">[mcp_servers.internal-api]</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;http&quot;</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://api.internal.example.com/mcp&quot;</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="n">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Authorization</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Bearer ${INTERNAL_API_TOKEN}&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><strong>Supported Locations:</strong></p>
+<ul>
+<li><code>args</code> list values</li>
+<li><code>env</code> dict values</li>
+<li><code>url</code> string</li>
+<li><code>headers</code> dict values</li>
+</ul>
+<p><strong>Error Handling:</strong></p>
+<p>If a referenced environment variable is not set, a clear error is raised:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>ValueError: Environment variable PROD_DATABASE_URL not set
+</code></pre></div>
+<h3 id="complete-example">Complete Example<a class="headerlink" href="#complete-example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Data Analysis Workflow&quot;</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Analyze project data using MCP-connected databases&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="k">[mcp_servers.postgres]</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;stdio&quot;</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;uvx&quot;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;mcp-server-postgres&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;${DATABASE_URL}&quot;</span><span class="p">]</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="k">[mcp_servers.clickhouse]</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;http&quot;</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://clickhouse.example.com/mcp&quot;</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="n">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Authorization</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Bearer ${CLICKHOUSE_TOKEN}&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="k">[mcp_servers.neo4j]</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;stdio&quot;</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;uvx&quot;</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;mcp-server-neo4j&quot;</span><span class="p">]</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">NEO4J_URL</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;${NEO4J_URL}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">NEO4J_PASSWORD</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;${NEO4J_PASSWORD}&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;analyze-data&quot;</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="n">task_prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/analyze.md&quot;</span>
+</code></pre></div>
+<p>In Claude actions, these MCP servers are available alongside the built-in <code>agent_tools</code> server that provides workflow submission functions.</p>
+<h2 id="claude-code-plugin-configuration">Claude Code Plugin Configuration<a class="headerlink" href="#claude-code-plugin-configuration" title="Permanent link">&para;</a></h2>
+<p>The <code>[plugins]</code> section allows configuring Claude Code plugins and marketplaces at the workflow level. These settings are merged with the main configuration's <code>[claude_code.plugins]</code> settings.</p>
+<h3 id="merge-behavior">Merge Behavior<a class="headerlink" href="#merge-behavior" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Merge Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled_plugins</code></td>
+<td>Workflow values override main config</td>
+</tr>
+<tr>
+<td><code>marketplaces</code></td>
+<td>Workflow values override main config for same keys</td>
+</tr>
+<tr>
+<td><code>local_plugins</code></td>
+<td>Concatenated (duplicates removed by path)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pluginsenabled_plugins">[plugins].enabled_plugins<a class="headerlink" href="#pluginsenabled_plugins" title="Permanent link">&para;</a></h3>
+<p>Enable or disable specific plugins for this workflow.</p>
+<p><strong>Type:</strong> <code>dict[string, boolean]</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">[plugins.enabled_plugins]</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="s2">&quot;workflow-specific-plugin@marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="s2">&quot;grafana-mcp@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c1"># Override main config</span>
+</code></pre></div>
+<h3 id="pluginsmarketplaces">[plugins.marketplaces]<a class="headerlink" href="#pluginsmarketplaces" title="Permanent link">&para;</a></h3>
+<p>Add workflow-specific marketplace sources.</p>
+<p><strong>Type:</strong> <code>dict[string, ClaudeMarketplace]</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">[plugins.marketplaces.workflow-marketplace]</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github&quot;</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;org/workflow-specific-plugins&quot;</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="k">[plugins.marketplaces.local-dev]</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;directory&quot;</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/path/to/dev/marketplace&quot;</span>
+</code></pre></div>
+<h3 id="pluginslocal_plugins">[[plugins.local_plugins]]<a class="headerlink" href="#pluginslocal_plugins" title="Permanent link">&para;</a></h3>
+<p>Add workflow-specific local plugins.</p>
+<p><strong>Type:</strong> <code>list[ClaudeLocalPlugin]</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">[[plugins.local_plugins]]</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/path/to/workflow/plugin&quot;</span>
+</code></pre></div>
+<h3 id="complete-workflow-plugin-example">Complete Workflow Plugin Example<a class="headerlink" href="#complete-workflow-plugin-example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Data Analysis Workflow&quot;</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Analyze data using specialized plugins&quot;</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Enable workflow-specific plugins</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="k">[plugins.enabled_plugins]</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="s2">&quot;data-analyzer@analytics-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="s2">&quot;grafana-mcp@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c1"># Enable for this workflow</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="c1"># Add workflow-specific marketplace</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="k">[plugins.marketplaces.analytics-marketplace]</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github&quot;</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="n">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;company/analytics-plugins&quot;</span>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="c1"># Add local development plugin</span>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="k">[[plugins.local_plugins]]</span>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/home/user/data-analysis-plugin&quot;</span>
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;analyze-data&quot;</span>
+<a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="n">task_prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/analyze.md&quot;</span>
+</code></pre></div>
+<h2 id="workflow-level-conditions">Workflow-Level Conditions<a class="headerlink" href="#workflow-level-conditions" title="Permanent link">&para;</a></h2>
+<p>Workflow conditions determine if the entire workflow should execute for a project. See <a href="../workflow-conditions/">Workflow Conditions</a> for detailed documentation.</p>
+<h3 id="condition_type">condition_type<a class="headerlink" href="#condition_type" title="Permanent link">&para;</a></h3>
+<p>How to evaluate multiple conditions.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Values:</strong> <code>"all"</code> (AND logic), <code>"any"</code> (OR logic)</p>
+<p><strong>Default:</strong> <code>"all"</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span><span class="w">  </span><span class="c1"># All conditions must pass</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;package.json&quot;</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;node.*18&quot;</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.nvmrc&quot;</span>
+</code></pre></div>
+<p>With <code>condition_type = "all"</code>, workflow executes only if BOTH conditions pass.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;any&quot;</span><span class="w">  </span><span class="c1"># Any one condition passing is sufficient</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements.txt&quot;</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p>With <code>condition_type = "any"</code>, workflow executes if EITHER file exists.</p>
+<h3 id="conditions">[[conditions]]<a class="headerlink" href="#conditions" title="Permanent link">&para;</a></h3>
+<p>Array of condition objects. See <a href="../workflow-conditions/">Workflow Conditions</a> for complete condition types and examples.</p>
+<p><strong>Condition Types:</strong></p>
+<ul>
+<li><strong>Remote conditions</strong> (checked via API before cloning)</li>
+<li><code>remote_file_exists</code> / <code>remote_file_not_exists</code></li>
+<li>
+<p><code>remote_file_contains</code> / <code>remote_file_doesnt_contain</code> + <code>remote_file</code></p>
+</li>
+<li>
+<p><strong>Local conditions</strong> (checked after cloning)</p>
+</li>
+<li><code>file_exists</code> / <code>file_not_exists</code></li>
+<li>
+<p><code>file_contains</code> / <code>file_doesnt_contain</code> + <code>file</code></p>
+</li>
+<li>
+<p><strong>Template conditions</strong> (checked after cloning)</p>
+</li>
+<li><code>when</code> - Jinja2 expression for complex logic</li>
+</ul>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FROM python:3&quot;</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ compare_semver(get_component_version(&#39;repository:///package.json&#39;, &#39;react&#39;), &#39;19.0.0&#39;).is_older }}&quot;</span>
+</code></pre></div></p>
+<h2 id="actions">Actions<a class="headerlink" href="#actions" title="Permanent link">&para;</a></h2>
+<p>Actions define the operations to perform during workflow execution. Each action has common fields plus type-specific configuration.</p>
+<h3 id="common-action-fields">Common Action Fields<a class="headerlink" href="#common-action-fields" title="Permanent link">&para;</a></h3>
+<p>All actions support these fields:</p>
+<h4 id="name-required_1">name (required)<a class="headerlink" href="#name-required_1" title="Permanent link">&para;</a></h4>
+<p>Action identifier for logging and error messages.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;copy-gitignore&quot;</span>
+</code></pre></div>
+<h4 id="type-required">type (required)<a class="headerlink" href="#type-required" title="Permanent link">&para;</a></h4>
+<p>Action type determines which operation to perform.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Values:</strong> <code>callable</code>, <code>claude</code>, <code>docker</code>, <code>file</code>, <code>git</code>, <code>github</code>, <code>imbi</code>, <code>shell</code>, <code>template</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+</code></pre></div>
+<p>See <a href="../actions/">Actions Reference</a> for complete documentation of each action type.</p>
+<h4 id="stage-optional">stage (optional)<a class="headerlink" href="#stage-optional" title="Permanent link">&para;</a></h4>
+<p>Execution stage for this action.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Values:</strong> <code>"primary"</code> (default), <code>"followup"</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;monitor-ci&quot;</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="n">stage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;followup&quot;</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="n">task_prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/monitor.md.j2&quot;</span>
+</code></pre></div>
+<p><strong>Stage behaviors:</strong></p>
+<ul>
+<li><strong><code>primary</code></strong>: Executes before PR creation (default behavior)</li>
+<li><strong><code>followup</code></strong>: Executes after PR is created, with access to PR context</li>
+</ul>
+<p><strong>Followup stage features:</strong></p>
+<ul>
+<li>Receives <code>pull_request</code> and <code>pr_branch</code> in template context</li>
+<li>Can commit changes that push to PR branch</li>
+<li>Cycles if commits are made (up to <code>max_followup_cycles</code>)</li>
+</ul>
+<p>See <a href="../actions/stages/">Action Stages</a> for detailed stage documentation.</p>
+<h4 id="ai_commit-optional">ai_commit (optional)<a class="headerlink" href="#ai_commit-optional" title="Permanent link">&para;</a></h4>
+<p>Use AI to generate commit message for this action's changes.</p>
+<p><strong>Type:</strong> <code>boolean</code>  </p>
+<p><strong>Default:</strong> <code>false</code>  </p>
+<p><strong>Requires:</strong> Anthropic API key configured</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;complex-refactor&quot;</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="n">ai_commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c1"># AI-generated commit message</span>
+</code></pre></div>
+<h4 id="commit_message-optional">commit_message (optional)<a class="headerlink" href="#commit_message-optional" title="Permanent link">&para;</a></h4>
+<p>Specify a custom commit message for this action's changes. Only valid when <code>ai_commit</code> is <code>false</code> (or unset) and <code>committable</code> is <code>true</code>.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Default:</strong> <code>null</code> (uses auto-generated message)  </p>
+<p><strong>Validation:</strong></p>
+<ul>
+<li>Cannot be set when <code>ai_commit = true</code></li>
+<li>Cannot be set when <code>committable = false</code></li>
+</ul>
+<p><strong>Auto-generated format when not specified:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>imbi-automations: workflow-name - action-name
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>🤖 Generated with [Imbi Automations](https://github.com/AWeber-Imbi/).
+</code></pre></div>
+<p><strong>Custom message example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-dependencies&quot;</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;copy&quot;</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///requirements.txt&quot;</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///requirements.txt&quot;</span>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="n">commit_message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Update Python dependencies to latest versions&quot;</span>
+</code></pre></div>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Semantic commit messages for specific changes</li>
+<li>Conventional commit format enforcement</li>
+<li>Custom formatting for automated changelogs</li>
+<li>Descriptive messages for significant updates</li>
+</ul>
+<h4 id="committable-optional">committable (optional)<a class="headerlink" href="#committable-optional" title="Permanent link">&para;</a></h4>
+<p>Whether this action's changes should be included in git commits.</p>
+<p><strong>Type:</strong> <code>boolean</code>  </p>
+<p><strong>Default:</strong> <code>true</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;temporary-analysis&quot;</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;write&quot;</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="n">committable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w">  </span><span class="c1"># Don&#39;t commit this file</span>
+</code></pre></div>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Temporary files for other actions</li>
+<li>Diagnostic output files</li>
+<li>Intermediate processing artifacts</li>
+</ul>
+<h4 id="on_success-optional">on_success (optional)<a class="headerlink" href="#on_success-optional" title="Permanent link">&para;</a></h4>
+<p>Action name to jump to if this action succeeds.</p>
+<p><strong>Type:</strong> <code>string</code> (action name)  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;try-fast-method&quot;</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fast-operation&quot;</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="n">on_success</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;skip-slow-method&quot;</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;slow-fallback&quot;</span>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="c1"># This will be skipped if fast method succeeds</span>
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a>
+<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;skip-slow-method&quot;</span>
+<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="c1"># Execution resumes here</span>
+</code></pre></div>
+<h4 id="on_error-optional">on_error (optional)<a class="headerlink" href="#on_error-optional" title="Permanent link">&para;</a></h4>
+<p>Action name to restart from if this action fails after all retry cycles.</p>
+<p><strong>Type:</strong> <code>string</code> (action name)  </p>
+<p><strong>Max Retries:</strong> 3 per action</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;backup-files&quot;</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;copy&quot;</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///src/&quot;</span>
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///src.backup/&quot;</span>
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;risky-transformation&quot;</span>
+<a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/transform.md&quot;</span>
+<a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a><span class="n">on_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;restore-backup&quot;</span>
+<a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a>
+<a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;restore-backup&quot;</span>
+<a id="__codelineno-34-16" name="__codelineno-34-16" href="#__codelineno-34-16"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-34-17" name="__codelineno-34-17" href="#__codelineno-34-17"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;move&quot;</span>
+<a id="__codelineno-34-18" name="__codelineno-34-18" href="#__codelineno-34-18"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///src.backup/&quot;</span>
+<a id="__codelineno-34-19" name="__codelineno-34-19" href="#__codelineno-34-19"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///src/&quot;</span>
+</code></pre></div>
+<h4 id="timeout-optional">timeout (optional)<a class="headerlink" href="#timeout-optional" title="Permanent link">&para;</a></h4>
+<p>Maximum execution time for action in Go time.Duration format.</p>
+<p><strong>Type:</strong> <code>string</code></p>
+<p><strong>Default:</strong> <code>"1h"</code> (1 hour)</p>
+<p><strong>Supported formats:</strong>
+- Minutes: <code>"5m"</code>, <code>"30m"</code>
+- Hours: <code>"1h"</code>, <code>"2h30m"</code>
+- Seconds: <code>"90s"</code>
+- Combined: <code>"1h30m45s"</code></p>
+<p><strong>Behavior:</strong>
+- <strong>Claude actions</strong>: Timeout applies per-cycle (each planning/task/validation gets the full duration)
+- <strong>Shell/Docker actions</strong>: Timeout applies to single execution
+- On timeout: Process terminated gracefully (SIGTERM → SIGKILL), workflow fails with error</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;long-running-build&quot;</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;make build&quot;</span>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="n">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;2h&quot;</span><span class="w">  </span><span class="c1"># 2 hours</span>
+</code></pre></div>
+<h4 id="filter-optional">filter (optional)<a class="headerlink" href="#filter-optional" title="Permanent link">&para;</a></h4>
+<p>Project filter to apply for this specific action. Uses same filter format as workflow-level <code>[filter]</code>.</p>
+<p><strong>Type:</strong> <code>WorkflowFilter</code> object</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;api-specific-update&quot;</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="c1"># Only execute this action for API projects</span>
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="k">[actions.filter]</span>
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">]</span>
+</code></pre></div>
+<h4 id="condition_type-optional">condition_type (optional)<a class="headerlink" href="#condition_type-optional" title="Permanent link">&para;</a></h4>
+<p>How to evaluate multiple action conditions.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Values:</strong> <code>"all"</code> (default), <code>"any"</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-python-config&quot;</span>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;any&quot;</span><span class="w">  </span><span class="c1"># Execute if ANY config file exists</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.py&quot;</span>
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+<a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a>
+<a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-37-13" name="__codelineno-37-13" href="#__codelineno-37-13"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements.txt&quot;</span>
+</code></pre></div>
+<h4 id="actionsconditions">[[actions.conditions]]<a class="headerlink" href="#actionsconditions" title="Permanent link">&para;</a></h4>
+<p>Array of conditions that must pass for this action to execute. Same condition types as workflow-level conditions.</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-dockerfile&quot;</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a>
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="n">file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FROM python:3</span><span class="se">\\</span><span class="s2">.11&quot;</span>
+<a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div></p>
+<p>See <a href="../workflow-conditions/">Workflow Conditions</a> for detailed condition documentation.</p>
+<h4 id="data-optional">data (optional)<a class="headerlink" href="#data-optional" title="Permanent link">&para;</a></h4>
+<p>Custom data dictionary for action-specific use.</p>
+<p><strong>Type:</strong> <code>dict[string, any]</code>  </p>
+<p><strong>Default:</strong> <code>{}</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;custom-action&quot;</span>
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;callable&quot;</span>
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>
+<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a><span class="k">[actions.data]</span>
+<a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a><span class="n">custom_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;value&quot;</span>
+<a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a><span class="n">nested</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="action-specific-fields">Action-Specific Fields<a class="headerlink" href="#action-specific-fields" title="Permanent link">&para;</a></h3>
+<p>Each action type has additional required and optional fields. See the <a href="../actions/">Actions Reference</a> for complete documentation:</p>
+<ul>
+<li><a href="../actions/callable/">Callable Actions</a> - <code>import</code>, <code>callable</code>, <code>args</code>, <code>kwargs</code></li>
+<li><a href="../actions/claude/">Claude Actions</a> - <code>prompt</code>, <code>validation_prompt</code>, <code>max_cycles</code></li>
+<li><a href="../actions/docker/">Docker Actions</a> - <code>command</code>, <code>image</code>, <code>tag</code>, <code>source</code>, <code>destination</code></li>
+<li><a href="../actions/file/">File Actions</a> - <code>command</code>, <code>path</code>, <code>source</code>, <code>destination</code>, <code>content</code>, <code>pattern</code></li>
+<li><a href="../actions/git/">Git Actions</a> - <code>command</code>, <code>source</code>, <code>destination</code>, <code>url</code>, <code>commit_keyword</code></li>
+<li><a href="../actions/github/">GitHub Actions</a> - <code>command</code></li>
+<li><a href="../actions/imbi/">Imbi Actions</a> - <code>command</code></li>
+<li><a href="../actions/shell/">Shell Actions</a> - <code>command</code>, <code>working_directory</code>, <code>ignore_errors</code></li>
+<li><a href="../actions/template/">Template Actions</a> - <code>source_path</code>, <code>destination_path</code></li>
+</ul>
+<h2 id="complete-example_1">Complete Example<a class="headerlink" href="#complete-example_1" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12 Migration&quot;</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Migrate Python projects from 3.11 to 3.12&quot;</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///prompts/base-python.md&quot;</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="k">[filter]</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumer&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;daemon&quot;</span><span class="p">]</span>
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.11&quot;</span><span class="p">}</span>
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a>
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="k">[git]</span>
+<a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a><span class="n">clone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a><span class="n">depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w">  </span><span class="c1"># Need history for git extract actions</span>
+<a id="__codelineno-40-14" name="__codelineno-40-14" href="#__codelineno-40-14"></a><span class="n">starting_branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;main&quot;</span>
+<a id="__codelineno-40-15" name="__codelineno-40-15" href="#__codelineno-40-15"></a><span class="n">clone_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ssh&quot;</span>
+<a id="__codelineno-40-16" name="__codelineno-40-16" href="#__codelineno-40-16"></a>
+<a id="__codelineno-40-17" name="__codelineno-40-17" href="#__codelineno-40-17"></a><span class="k">[github]</span>
+<a id="__codelineno-40-18" name="__codelineno-40-18" href="#__codelineno-40-18"></a><span class="n">create_pull_request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-40-19" name="__codelineno-40-19" href="#__codelineno-40-19"></a><span class="n">replace_branch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-40-20" name="__codelineno-40-20" href="#__codelineno-40-20"></a>
+<a id="__codelineno-40-21" name="__codelineno-40-21" href="#__codelineno-40-21"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span>
+<a id="__codelineno-40-22" name="__codelineno-40-22" href="#__codelineno-40-22"></a>
+<a id="__codelineno-40-23" name="__codelineno-40-23" href="#__codelineno-40-23"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-40-24" name="__codelineno-40-24" href="#__codelineno-40-24"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+<a id="__codelineno-40-25" name="__codelineno-40-25" href="#__codelineno-40-25"></a>
+<a id="__codelineno-40-26" name="__codelineno-40-26" href="#__codelineno-40-26"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-40-27" name="__codelineno-40-27" href="#__codelineno-40-27"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*3</span><span class="se">\\</span><span class="s2">.11&quot;</span>
+<a id="__codelineno-40-28" name="__codelineno-40-28" href="#__codelineno-40-28"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+<a id="__codelineno-40-29" name="__codelineno-40-29" href="#__codelineno-40-29"></a>
+<a id="__codelineno-40-30" name="__codelineno-40-30" href="#__codelineno-40-30"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-40-31" name="__codelineno-40-31" href="#__codelineno-40-31"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;backup-pyproject&quot;</span>
+<a id="__codelineno-40-32" name="__codelineno-40-32" href="#__codelineno-40-32"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-40-33" name="__codelineno-40-33" href="#__codelineno-40-33"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;copy&quot;</span>
+<a id="__codelineno-40-34" name="__codelineno-40-34" href="#__codelineno-40-34"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///pyproject.toml&quot;</span>
+<a id="__codelineno-40-35" name="__codelineno-40-35" href="#__codelineno-40-35"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///pyproject.toml.backup&quot;</span>
+<a id="__codelineno-40-36" name="__codelineno-40-36" href="#__codelineno-40-36"></a><span class="n">committable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-40-37" name="__codelineno-40-37" href="#__codelineno-40-37"></a>
+<a id="__codelineno-40-38" name="__codelineno-40-38" href="#__codelineno-40-38"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-40-39" name="__codelineno-40-39" href="#__codelineno-40-39"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-python-version&quot;</span>
+<a id="__codelineno-40-40" name="__codelineno-40-40" href="#__codelineno-40-40"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-40-41" name="__codelineno-40-41" href="#__codelineno-40-41"></a><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/update-python-version.md&quot;</span>
+<a id="__codelineno-40-42" name="__codelineno-40-42" href="#__codelineno-40-42"></a><span class="n">validation_prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/validate-python-version.md&quot;</span>
+<a id="__codelineno-40-43" name="__codelineno-40-43" href="#__codelineno-40-43"></a><span class="n">max_cycles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+<a id="__codelineno-40-44" name="__codelineno-40-44" href="#__codelineno-40-44"></a><span class="n">on_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;restore-backup&quot;</span>
+<a id="__codelineno-40-45" name="__codelineno-40-45" href="#__codelineno-40-45"></a><span class="n">ai_commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-40-46" name="__codelineno-40-46" href="#__codelineno-40-46"></a>
+<a id="__codelineno-40-47" name="__codelineno-40-47" href="#__codelineno-40-47"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-40-48" name="__codelineno-40-48" href="#__codelineno-40-48"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;run-tests&quot;</span>
+<a id="__codelineno-40-49" name="__codelineno-40-49" href="#__codelineno-40-49"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span>
+<a id="__codelineno-40-50" name="__codelineno-40-50" href="#__codelineno-40-50"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pytest tests/ -v&quot;</span>
+<a id="__codelineno-40-51" name="__codelineno-40-51" href="#__codelineno-40-51"></a><span class="n">working_directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///&quot;</span>
+<a id="__codelineno-40-52" name="__codelineno-40-52" href="#__codelineno-40-52"></a><span class="n">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;10m&quot;</span>
+<a id="__codelineno-40-53" name="__codelineno-40-53" href="#__codelineno-40-53"></a>
+<a id="__codelineno-40-54" name="__codelineno-40-54" href="#__codelineno-40-54"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-40-55" name="__codelineno-40-55" href="#__codelineno-40-55"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;tests/&quot;</span>
+<a id="__codelineno-40-56" name="__codelineno-40-56" href="#__codelineno-40-56"></a>
+<a id="__codelineno-40-57" name="__codelineno-40-57" href="#__codelineno-40-57"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-40-58" name="__codelineno-40-58" href="#__codelineno-40-58"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;restore-backup&quot;</span>
+<a id="__codelineno-40-59" name="__codelineno-40-59" href="#__codelineno-40-59"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-40-60" name="__codelineno-40-60" href="#__codelineno-40-60"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;move&quot;</span>
+<a id="__codelineno-40-61" name="__codelineno-40-61" href="#__codelineno-40-61"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///pyproject.toml.backup&quot;</span>
+<a id="__codelineno-40-62" name="__codelineno-40-62" href="#__codelineno-40-62"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///pyproject.toml&quot;</span>
+</code></pre></div>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../workflow-filters/">Workflow Filters</a> - Detailed filter documentation with examples</li>
+<li><a href="../workflow-conditions/">Workflow Conditions</a> - Comprehensive condition types and patterns</li>
+<li><a href="../actions/">Actions Reference</a> - Complete action types documentation</li>
+<li><a href="../workflows/">Workflows Overview</a> - High-level workflow concepts and best practices</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
