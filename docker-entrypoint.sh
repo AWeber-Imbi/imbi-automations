@@ -143,8 +143,8 @@ EOF
 	ssh-keyscan -t ed25519,rsa "github.com" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
 
     # Scan GHE host if GITHUB_HOSTNAME is set (strip api. prefix if present)
-    if [ -n "$GITHUB_HOSTNAME" ]; then
-        GHE_HOST=$(echo "$GITHUB_HOSTNAME" | sed 's/^api\.//')
+    if [ -n "$GH_HOST" ]; then
+        GHE_HOST=$(echo "$GH_HOST" | sed 's/^api\.//')
         ssh-keyscan -t ed25519,rsa "$GHE_HOST" >> "$SSH_DIR/known_hosts" 2>/dev/null || true
     fi
 
