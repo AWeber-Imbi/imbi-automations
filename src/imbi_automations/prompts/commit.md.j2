@@ -1,6 +1,6 @@
 Your task is to analyze pending changes and create logical commits.
 
-You are working in the `repository` directory.
+Your current working directory is already set to the repository directory. Run git commands directly without changing directories.
 
 If there are no pending changes, exit immediately without performing any actions.
 
@@ -44,7 +44,8 @@ set -e
 git add {file1} {file2} ...
 
 # Create commit message file
-cat > {{ working_directory }}/commit_msg.txt << 'EOF'
+COMMIT_MSG_FILE="{{ working_directory }}/commit_msg.txt"
+cat > "${COMMIT_MSG_FILE}" << 'EOF'
 imbi-automations: {{ workflow_name }} - {{ action_name }}
 
 {Detailed description of what changed}
@@ -58,12 +59,12 @@ GIT_AUTHOR_NAME="{{ commit_author_name }}" \
 GIT_AUTHOR_EMAIL="{{ commit_author_address }}" \
 GIT_COMMITTER_NAME="{{ commit_author_name }}" \
 GIT_COMMITTER_EMAIL="{{ commit_author_address }}" \
-git commit -F /tmp/commit_msg.txt {{ configuration.git.commit_args }} \
+git commit -F "${COMMIT_MSG_FILE}" {{ configuration.git.commit_args }} \
   --trailer "Authored-By: {{ commit_author }}" \
   --trailer "Co-Authored-By: Claude <noreply@anthropic.com>"
 
 # Cleanup
-rm {{ working_directory }}/commit_msg.txt
+rm "${COMMIT_MSG_FILE}"
 ```
 
 Step 2: Make the script executable and run it:
