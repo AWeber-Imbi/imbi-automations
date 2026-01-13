@@ -22,4 +22,4 @@ jobs:
         python-version: '3.12'
     - name: Install uv
       uses: astral-sh/setup-uv@v5
-    - run: uv run mkdocs gh-deploy --force
+    - run: uv run --group docs mkdocs gh-deploy --force
