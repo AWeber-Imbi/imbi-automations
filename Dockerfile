@@ -1,13 +1,27 @@
-FROM python:3.12-trixie
+FROM python:3.12-trixie AS builder
+
+COPY pyproject.toml uv.lock dist/imbi_automations*.whl /tmp
+
+WORKDIR /tmp
+ENV PATH="/root/.local/bin:$PATH"
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+ && uv venv --system-site-packages --link-mode symlink --no-project /app \
+ && . /app/bin/activate \
+ && uv sync --active --no-install-project --frozen --no-dev \
+ && uv pip install imbi_automations*.whl
+
+FROM python:3.12-trixie AS runtime
 
 ENV CLAUDE_CODE_USE_ANTHROPIC_API=1 \
     GH_HOST=github.com \
     GIT_USER_NAME="Imbi Automations" \
     GIT_USER_EMAIL="imbi-automations@aweber.com" \
-    IMBI_AUTOMATIONS_CONFIG=/opt/config/config.toml
+    IMBI_AUTOMATIONS_CONFIG=/opt/config/config.toml \
+    PATH="/app/bin:$PATH"
 
-COPY dist/imbi_automations*.whl /tmp/
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY --from=builder /app /app
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -22,9 +36,6 @@ RUN apt-get update \
         sudo \
         tini \
  && rm -rf /var/lib/apt/lists/* \
- && pip install --root-user-action ignore --break-system-packages --no-cache-dir --upgrade pip \
- && pip install --root-user-action ignore --break-system-packages --no-cache-dir /tmp/imbi_automations*.whl \
- && rm /tmp/*.whl \
  && mkdir -p /opt/config /opt/dry-runs /opt/errors /opt/logs /opt/workflows /docker-entrypoint-init.d \
  && groupadd --gid 1000 imbi-automations \
  && useradd --uid 1000 --gid 1000 --shell /bin/bash \
