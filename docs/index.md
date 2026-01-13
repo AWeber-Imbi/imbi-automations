@@ -64,8 +64,8 @@ pip install imbi-automations
 ```bash
 git clone <repository-url>
 cd imbi-automations-cli
-pip install -e .[dev]
-pre-commit install
+uv sync --all-groups --all-extras --frozen
+uv run pre-commit install --install-hooks
 ```
 
 ## Getting Started

@@ -59,10 +59,18 @@ docker run --rm \
 
 ## Installation
 
+### Using uv
+
+```bash
+uv tool install imbi-automations
+uv tool run imbi-automations config.toml workflows/my-workflow --all-projects
+```
+
 ### From PyPI
 
 ```bash
 pip install imbi-automations
+imbi-automations config.toml workflows/my-workflow --all-projects
 ```
 
 ### Docker Installation
@@ -124,6 +132,6 @@ docker build -t imbi-automations:latest .
 ```bash
 git clone https://github.com/AWeber-Imbi/imbi-automations.git
 cd imbi-automations
-pip install -e .[dev]
-pre-commit install
+uv sync --all-groups --all-extras --frozen
+uv run pre-commit install --install-hooks
 ```
