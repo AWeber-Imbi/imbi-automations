@@ -36,7 +36,7 @@ classifiers = [
 ]
 dependencies = [
   "anthropic[bedrock]",
-  "async_lru",
+  "async-lru",
   "claude-agent-sdk>=0.1.13",
   "colorlog",
   "httpx",
@@ -48,26 +48,7 @@ dependencies = [
   "rich",
   "semver",
   "truststore",
-  "yarl"
-]
-
-[project.optional-dependencies]
-dev = [
-  "build",
-  "coverage[toml]",
-  "pre-commit",
-  "pytest",
-  "pytest-cov",
-  "ruff",
-]
-docs = [
-  "black",  # used by mkdocs for signature formatting
-  "griffe-pydantic",  # document pydantic models
-  "mkdocs>=1.5,<2",
-  "mkdocs-material>9.5,<10",
-  "mkdocs-autorefs",
-  "mkdocstrings[python]>=0.26,<1.1",
-  "mkdocstrings-python-xref>=1.6,<2"
+  "yarl",
 ]
 
 [project.scripts]
@@ -143,4 +124,23 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "raise AssertionError",
     "raise NotImplementedError",
+]
+
+[dependency-groups]
+dev = [
+  "build",
+  "coverage[toml]",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "ruff",
+]
+docs = [
+  "black",
+  "griffe-pydantic",
+  "mkdocs>=1.5,<2",
+  "mkdocs-autorefs",
+  "mkdocs-material>9.5,<10",
+  "mkdocstrings-python-xref>=1.6,<2",
+  "mkdocstrings[python]>=0.26,<1.1",
 ]
