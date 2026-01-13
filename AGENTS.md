@@ -10,19 +10,19 @@ CLI framework for executing workflows across repositories with Imbi project mana
 
 ```bash
 # Setup
-pip install -e .[dev] && pre-commit install
+uv sync --all-groups --all-extras --frozen && uv run pre-commit install
 
 # Run CLI
 # Note: Workflow directories should contain workflow.toml (config.toml supported as fallback)
-imbi-automations config.toml workflows/workflow-name --all-projects
-imbi-automations config.toml workflows/workflow-name --project-id 123
-imbi-automations config.toml workflows/workflow-name --resume ./errors/workflow/project-timestamp
+uv run imbi-automations config.toml workflows/workflow-name --all-projects
+uv run imbi-automations config.toml workflows/workflow-name --project-id 123
+uv run imbi-automations config.toml workflows/workflow-name --resume ./errors/workflow/project-timestamp
 
 # Testing & Quality
-pytest                          # Run tests
-pytest --cov=src/imbi_automations  # With coverage
-ruff format && ruff check --fix # Format and lint
-pre-commit run --all-files      # All hooks
+uv run pytest                          # Run tests
+uv run pytest --cov=src/imbi_automations  # With coverage
+uv run ruff format && uv run ruff check --fix # Format and lint
+uv run pre-commit run --all-files      # All hooks
 ```
 
 ## Architecture
