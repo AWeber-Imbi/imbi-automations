@@ -1,6 +1,6 @@
 FROM python:3.12-trixie AS builder
 
-COPY pyproject.toml uv.lock dist/imbi_automations*.whl /tmp
+COPY pyproject.toml uv.lock dist/imbi_automations*.whl /tmp/
 
 WORKDIR /tmp
 ENV PATH="/root/.local/bin:$PATH"
