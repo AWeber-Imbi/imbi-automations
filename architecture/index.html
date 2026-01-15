@@ -1,0 +1,3125 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../configuration/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Architecture - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-architecture-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Architecture Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Component Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primary-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Primary Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli-interface-clipy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Interface (cli.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controller-controllerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Controller (controller.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-engine-workflow_enginepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Engine (workflow_engine.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Client Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#http-client-clientshttppy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP Client (clients/http.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbi-client-clientsimbipy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Client (clients/imbi.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-client-clientsgithubpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Client (clients/github.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Models
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-models-modelsconfigurationpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Models (models/configuration.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-models-modelsworkflowpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Models (models/workflow.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Models
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supporting-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supporting Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supporting Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imbi-metadata-cache-imcpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Metadata Cache (imc.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-dispatcher-actions__init__py" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions Dispatcher (actions/__init__.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-operations-gitpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git Operations (git.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#committer-committerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Committer (committer.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condition-checker-condition_checkerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Checker (condition_checker.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-layer-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions Layer (actions/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Action Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-callable-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Callable Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-claude-code-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Claude Code Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-file-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. File Operations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-shell-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Shell Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condition-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remote-conditions-pre-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote Conditions (Pre-Clone)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-conditions-post-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local Conditions (Post-Clone)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling-and-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling and Recovery
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling and Recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-restart-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Restart Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failure-indication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure Indication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Optimizations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Optimizations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concurrent-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concurrent Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caching-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#early-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Early Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock-data-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock Data Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credential-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credential Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repository-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extensibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extensibility
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extensibility">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-action-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Action Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Providers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="System Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-architecture-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Architecture Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Component Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primary-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Primary Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli-interface-clipy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Interface (cli.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controller-controllerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Controller (controller.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-engine-workflow_enginepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Engine (workflow_engine.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Client Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#http-client-clientshttppy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP Client (clients/http.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbi-client-clientsimbipy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Client (clients/imbi.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-client-clientsgithubpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Client (clients/github.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Models
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-models-modelsconfigurationpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Models (models/configuration.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-models-modelsworkflowpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Models (models/workflow.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Models
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supporting-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supporting Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supporting Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imbi-metadata-cache-imcpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Metadata Cache (imc.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-dispatcher-actions__init__py" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions Dispatcher (actions/__init__.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-operations-gitpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git Operations (git.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#committer-committerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Committer (committer.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condition-checker-condition_checkerpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Checker (condition_checker.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-layer-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions Layer (actions/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Action Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-callable-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Callable Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-claude-code-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Claude Code Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-file-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. File Operations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-shell-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Shell Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#condition-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remote-conditions-pre-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote Conditions (Pre-Clone)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-conditions-post-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local Conditions (Post-Clone)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling-and-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling and Recovery
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling and Recovery">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-restart-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Restart Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failure-indication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure Indication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Optimizations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Optimizations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concurrent-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concurrent Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caching-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#early-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Early Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock-data-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock Data Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credential-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credential Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repository-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extensibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extensibility
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extensibility">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-action-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Action Types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding New Providers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="architecture-guide">Architecture Guide<a class="headerlink" href="#architecture-guide" title="Permanent link">&para;</a></h1>
+<p>This guide provides a comprehensive overview of the Imbi Automations CLI architecture, components, and implementation patterns.</p>
+<h2 id="system-overview">System Overview<a class="headerlink" href="#system-overview" title="Permanent link">&para;</a></h2>
+<p>Imbi Automations is built on a modern async Python architecture designed for scalability, maintainability, and extensibility. The system follows a modular design with clear separation of concerns between different layers.</p>
+<h3 id="core-architecture-principles">Core Architecture Principles<a class="headerlink" href="#core-architecture-principles" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Async-First</strong>: Full async/await implementation with concurrent processing</li>
+<li><strong>Modular Design</strong>: Clean separation between clients, models, and business logic</li>
+<li><strong>Type Safety</strong>: Comprehensive type hints throughout the codebase</li>
+<li><strong>Configuration-Driven</strong>: TOML-based workflows with Pydantic validation</li>
+<li><strong>Extensible</strong>: Plugin-ready architecture for new action types and providers</li>
+</ul>
+<h2 id="component-architecture">Component Architecture<a class="headerlink" href="#component-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="primary-components">Primary Components<a class="headerlink" href="#primary-components" title="Permanent link">&para;</a></h3>
+<h4 id="cli-interface-clipy">CLI Interface (<code>cli.py</code>)<a class="headerlink" href="#cli-interface-clipy" title="Permanent link">&para;</a></h4>
+<p>The entry point for the application, responsible for:
+- Command-line argument parsing and validation
+- Colored logging configuration with different levels
+- Workflow validation and loading
+- Error handling and user feedback</p>
+<h4 id="controller-controllerpy">Controller (<code>controller.py</code>)<a class="headerlink" href="#controller-controllerpy" title="Permanent link">&para;</a></h4>
+<p>Main automation controller implementing the iterator pattern:
+- Project iteration and filtering
+- Workflow orchestration across multiple targets
+- Concurrent processing with proper resource management
+- Progress tracking and resumption capabilities</p>
+<h4 id="workflow-engine-workflow_enginepy">Workflow Engine (<code>workflow_engine.py</code>)<a class="headerlink" href="#workflow-engine-workflow_enginepy" title="Permanent link">&para;</a></h4>
+<p>Core execution engine that handles:
+- Action execution with context management
+- Temporary directory handling for repository operations
+- Error recovery and action restart mechanisms
+- Template variable resolution with Jinja2
+- Comprehensive logging and status reporting</p>
+<h3 id="client-layer">Client Layer<a class="headerlink" href="#client-layer" title="Permanent link">&para;</a></h3>
+<p>The client layer provides abstraction for external service interactions:</p>
+<h4 id="http-client-clientshttppy">HTTP Client (<code>clients/http.py</code>)<a class="headerlink" href="#http-client-clientshttppy" title="Permanent link">&para;</a></h4>
+<p>Base async HTTP client with:
+- Authentication handling for various providers
+- Automatic retry logic with exponential backoff
+- Request/response logging with credential sanitization
+- Error handling and timeout management</p>
+<h4 id="imbi-client-clientsimbipy">Imbi Client (<code>clients/imbi.py</code>)<a class="headerlink" href="#imbi-client-clientsimbipy" title="Permanent link">&para;</a></h4>
+<p>Integration with Imbi project management system:
+- Project data retrieval and filtering
+- Environment and metadata synchronization
+- Fact validation and updates via ImbiMetadataCache
+- Pagination handling for large datasets</p>
+<h4 id="github-client-clientsgithubpy">GitHub Client (<code>clients/github.py</code>)<a class="headerlink" href="#github-client-clientsgithubpy" title="Permanent link">&para;</a></h4>
+<p>GitHub API integration featuring:
+- Repository and organization operations
+- Pattern-aware workflow file detection
+- Environment management
+- Pull request creation and management
+- Rate limiting and API quota management</p>
+<h3 id="data-models">Data Models<a class="headerlink" href="#data-models" title="Permanent link">&para;</a></h3>
+<p>All models use Pydantic for validation and type safety:</p>
+<h4 id="configuration-models-modelsconfigurationpy">Configuration Models (<code>models/configuration.py</code>)<a class="headerlink" href="#configuration-models-modelsconfigurationpy" title="Permanent link">&para;</a></h4>
+<ul>
+<li>TOML-based configuration with secret handling</li>
+<li>Provider-specific settings (GitHub, Imbi)</li>
+<li>Claude Code SDK integration settings</li>
+<li>Validation rules and default values</li>
+</ul>
+<h4 id="workflow-models-modelsworkflowpy">Workflow Models (<code>models/workflow.py</code>)<a class="headerlink" href="#workflow-models-modelsworkflowpy" title="Permanent link">&para;</a></h4>
+<p>Comprehensive workflow definition including:</p>
+<ul>
+<li><strong>Actions</strong>: Sequence of operations with type validation</li>
+<li><strong>Conditions</strong>: Repository state requirements (local and remote)</li>
+<li><strong>Filters</strong>: Project targeting and selection criteria</li>
+<li><strong>Templates</strong>: Jinja2 template configurations</li>
+</ul>
+<h4 id="provider-models">Provider Models<a class="headerlink" href="#provider-models" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>GitHub Models</strong> (<code>models/github.py</code>): Repository, organization, and API response models</li>
+<li><strong>Imbi Models</strong> (<code>models/imbi.py</code>): Project management system models</li>
+</ul>
+<h3 id="supporting-components">Supporting Components<a class="headerlink" href="#supporting-components" title="Permanent link">&para;</a></h3>
+<h4 id="imbi-metadata-cache-imcpy">Imbi Metadata Cache (<code>imc.py</code>)<a class="headerlink" href="#imbi-metadata-cache-imcpy" title="Permanent link">&para;</a></h4>
+<p>Cache (<code>ImbiMetadataCache</code>) for Imbi metadata with 15-minute TTL and safe-by-default design:</p>
+<ul>
+<li>Caches environments, project types, fact types</li>
+<li>Always initialized with empty collections (no <code>None</code> state)</li>
+<li>Enables parse-time validation of workflow filters</li>
+<li>Stored in <code>~/.cache/imbi-automations/metadata.json</code> (configurable)</li>
+<li>Auto-refreshes when expired via <code>refresh_from_cache()</code></li>
+<li>Provides fuzzy-matched suggestions for typos</li>
+<li>Graceful degradation: returns empty sets when unpopulated</li>
+</ul>
+<h4 id="actions-dispatcher-actions__init__py">Actions Dispatcher (<code>actions/__init__.py</code>)<a class="headerlink" href="#actions-dispatcher-actions__init__py" title="Permanent link">&para;</a></h4>
+<p>Centralized action execution using Python 3.12 match/case:</p>
+<ul>
+<li>Type-safe action routing to specialized handlers</li>
+<li>Callable, Claude, Docker, File, Git, GitHub, Imbi, Shell, Template actions</li>
+<li>Consistent error handling across action types</li>
+</ul>
+<h4 id="git-operations-gitpy">Git Operations (<code>git.py</code>)<a class="headerlink" href="#git-operations-gitpy" title="Permanent link">&para;</a></h4>
+<p>Comprehensive Git integration:</p>
+<ul>
+<li>Repository cloning with authentication</li>
+<li>Branch management and switching</li>
+<li>Commit creation via Committer class</li>
+<li>Uses <code>git add --all</code> for staging</li>
+<li>Tag and version handling</li>
+</ul>
+<h4 id="committer-committerpy">Committer (<code>committer.py</code>)<a class="headerlink" href="#committer-committerpy" title="Permanent link">&para;</a></h4>
+<p>Handles git commit operations:</p>
+<ul>
+<li>AI-powered commit message generation</li>
+<li>Manual commit messages with templates</li>
+<li>Proper author attribution</li>
+<li>Commit message formatting standards</li>
+</ul>
+<h4 id="condition-checker-condition_checkerpy">Condition Checker (<code>condition_checker.py</code>)<a class="headerlink" href="#condition-checker-condition_checkerpy" title="Permanent link">&para;</a></h4>
+<p>Workflow condition evaluation:</p>
+<ul>
+<li>Local file system checks (post-clone)</li>
+<li>Remote repository checks via GitHub API (pre-clone)</li>
+<li>Regex pattern matching with string fallback</li>
+<li>Performance optimization with early filtering</li>
+</ul>
+<h4 id="actions-layer-actions">Actions Layer (<code>actions/</code>)<a class="headerlink" href="#actions-layer-actions" title="Permanent link">&para;</a></h4>
+<p>Specialized action handlers:</p>
+<ul>
+<li><strong>Callable</strong> (<code>actions/callablea.py</code>): Direct Python function/method invocation with async support and template rendering</li>
+<li><strong>Claude</strong> (<code>actions/claude.py</code>): AI-powered transformations via Claude Code SDK</li>
+<li><strong>Docker</strong> (<code>actions/docker.py</code>): Container operations and file extraction</li>
+<li><strong>File</strong> (<code>actions/filea.py</code>): Copy (with globs), move, delete, regex replacement</li>
+<li><strong>Git</strong> (<code>actions/git.py</code>): Revert, extract, branch management</li>
+<li><strong>GitHub</strong> (<code>actions/github.py</code>): GitHub-specific operations</li>
+<li><strong>Imbi</strong> (<code>actions/imbi.py</code>): Project fact management with validation</li>
+<li><strong>Shell</strong> (<code>actions/shell.py</code>): Command execution via <code>subprocess_shell</code> (supports globs)</li>
+<li><strong>Template</strong> (<code>actions/template.py</code>): Jinja2 rendering with workflow context</li>
+</ul>
+<h2 id="workflow-system">Workflow System<a class="headerlink" href="#workflow-system" title="Permanent link">&para;</a></h2>
+<h3 id="workflow-structure">Workflow Structure<a class="headerlink" href="#workflow-structure" title="Permanent link">&para;</a></h3>
+<p>Workflows are defined in TOML configuration files with three main sections:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Project filtering</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">project_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="mi">456</span><span class="p">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;apis&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumers&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Execution conditions</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;package.json&quot;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*3</span><span class="se">\\</span><span class="s2">.12&quot;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1"># Action sequence</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-dependencies&quot;</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="c1"># ... action configuration</span>
+</code></pre></div>
+<h3 id="action-types">Action Types<a class="headerlink" href="#action-types" title="Permanent link">&para;</a></h3>
+<h4 id="1-callable-actions">1. Callable Actions<a class="headerlink" href="#1-callable-actions" title="Permanent link">&para;</a></h4>
+<p>Direct Python function/method invocation with async support:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-fact&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;callable&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">callable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi_automations.clients.imbi:Imbi.set_fact&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;deployment_status&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">]</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">kwargs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">notes</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;{{ workflow.name }} finished&quot;</span><span class="p">}</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">ai_commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div></p>
+<h4 id="2-claude-code-integration">2. Claude Code Integration<a class="headerlink" href="#2-claude-code-integration" title="Permanent link">&para;</a></h4>
+<p>AI-powered transformations:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">task_prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/update-readme.md&quot;</span>
+</code></pre></div></p>
+<h4 id="3-file-operations">3. File Operations<a class="headerlink" href="#3-file-operations" title="Permanent link">&para;</a></h4>
+<p>Direct file manipulation:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;copy&quot;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;templates/config.yml&quot;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///config/production.yml&quot;</span>
+</code></pre></div></p>
+<h4 id="4-shell-commands">4. Shell Commands<a class="headerlink" href="#4-shell-commands" title="Permanent link">&para;</a></h4>
+<p>Arbitrary command execution:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python -m pytest tests/&quot;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">working_directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///&quot;</span>
+</code></pre></div></p>
+<h3 id="condition-system">Condition System<a class="headerlink" href="#condition-system" title="Permanent link">&para;</a></h3>
+<h4 id="remote-conditions-pre-clone">Remote Conditions (Pre-Clone)<a class="headerlink" href="#remote-conditions-pre-clone" title="Permanent link">&para;</a></h4>
+<p>Evaluated using provider APIs before repository cloning:</p>
+<ul>
+<li><strong>Performance Benefit</strong>: Skip cloning for non-matching repositories</li>
+<li><strong>Bandwidth Efficient</strong>: Reduce network usage for large batch operations</li>
+<li><strong>Early Filtering</strong>: Fail fast before expensive operations</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.github/workflows/ci.yml&quot;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*3</span><span class="se">\\</span><span class="s2">.[0-9]+&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<h4 id="local-conditions-post-clone">Local Conditions (Post-Clone)<a class="headerlink" href="#local-conditions-post-clone" title="Permanent link">&para;</a></h4>
+<p>Evaluated after repository cloning for complex analysis:</p>
+<ul>
+<li><strong>Full Access</strong>: Complete repository content available</li>
+<li><strong>Complex Patterns</strong>: Multi-file analysis and cross-references</li>
+<li><strong>File Content Analysis</strong>: Deep inspection of file contents</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docker-compose.yml&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FROM python:3</span><span class="se">\\</span><span class="s2">.[0-9]+&quot;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div>
+<h3 id="template-system">Template System<a class="headerlink" href="#template-system" title="Permanent link">&para;</a></h3>
+<p>Jinja2-based template engine with full project context:</p>
+<h4 id="available-variables">Available Variables<a class="headerlink" href="#available-variables" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>{{ imbi_project }}</code>: Complete Imbi project data</li>
+<li><code>{{ github_repository }}</code>: GitHub repository information</li>
+<li><code>{{ workflow_name }}</code>: Current workflow identifier</li>
+<li><code>{{ repository_path }}</code>: Local repository path</li>
+<li><code>{{ timestamp }}</code>: Execution timestamp</li>
+</ul>
+<h4 id="template-files">Template Files<a class="headerlink" href="#template-files" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a># Pull Request Template
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>## Summary
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Updating {{ imbi_project.name }} to use Python {{ target_version }}
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>## Changes
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>- Updated pyproject.toml Python version requirement
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>- Modified GitHub Actions workflow
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>- Updated Dockerfile base image
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>Generated by: {{ workflow_name }}
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>Date: {{ timestamp }}
+</code></pre></div>
+<h2 id="error-handling-and-recovery">Error Handling and Recovery<a class="headerlink" href="#error-handling-and-recovery" title="Permanent link">&para;</a></h2>
+<h3 id="action-restart-mechanism">Action Restart Mechanism<a class="headerlink" href="#action-restart-mechanism" title="Permanent link">&para;</a></h3>
+<p>Actions support automatic restart on failure:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fragile-operation&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">on_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;cleanup-action&quot;</span><span class="w">  </span><span class="c1"># Restart from this action</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">max_retries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+</code></pre></div></p>
+<h3 id="failure-indication">Failure Indication<a class="headerlink" href="#failure-indication" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Failure Files</strong>: Create specific failure files to signal workflow abortion</li>
+<li><strong>Detailed Logging</strong>: Include actionable error information</li>
+<li><strong>Recovery Strategies</strong>: Configurable retry mechanisms and <code>on_error</code> action chains</li>
+</ul>
+<h3 id="resource-management">Resource Management<a class="headerlink" href="#resource-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Temporary Directory Cleanup</strong>: Automatic cleanup on success or failure</li>
+<li><strong>Connection Pooling</strong>: Efficient HTTP connection reuse</li>
+<li><strong>Memory Management</strong>: LRU caching for expensive operations</li>
+</ul>
+<h2 id="performance-optimizations">Performance Optimizations<a class="headerlink" href="#performance-optimizations" title="Permanent link">&para;</a></h2>
+<h3 id="concurrent-processing">Concurrent Processing<a class="headerlink" href="#concurrent-processing" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Batch Operations</strong>: Process multiple projects concurrently</li>
+<li><strong>Connection Pooling</strong>: Reuse HTTP connections across requests</li>
+<li><strong>Async Operations</strong>: Non-blocking I/O throughout the system</li>
+</ul>
+<h3 id="caching-strategy">Caching Strategy<a class="headerlink" href="#caching-strategy" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>LRU Caching</strong>: Cache expensive API calls and computations</li>
+<li><strong>Repository State</strong>: Cache repository metadata between operations</li>
+<li><strong>Template Compilation</strong>: Pre-compile Jinja2 templates</li>
+</ul>
+<h3 id="early-filtering">Early Filtering<a class="headerlink" href="#early-filtering" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Remote Conditions</strong>: Filter projects before cloning</li>
+<li><strong>Project Filtering</strong>: Apply filters before workflow execution</li>
+<li><strong>Resumption</strong>: Skip already processed projects</li>
+</ul>
+<h2 id="testing-architecture">Testing Architecture<a class="headerlink" href="#testing-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="test-infrastructure">Test Infrastructure<a class="headerlink" href="#test-infrastructure" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Base Class</strong>: <code>AsyncTestCase</code> for async test support</li>
+<li><strong>HTTP Mocking</strong>: <code>httpx.MockTransport</code> with JSON fixtures</li>
+<li><strong>Test Isolation</strong>: Clean state between test runs</li>
+<li><strong>Coverage Requirements</strong>: Comprehensive test coverage with exclusions</li>
+</ul>
+<h3 id="mock-data-strategy">Mock Data Strategy<a class="headerlink" href="#mock-data-strategy" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Path-Based Fixtures</strong>: JSON files matching URL patterns</li>
+<li><strong>Realistic Data</strong>: Production-like test data</li>
+<li><strong>Edge Cases</strong>: Comprehensive error condition testing</li>
+</ul>
+<h3 id="integration-testing">Integration Testing<a class="headerlink" href="#integration-testing" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>End-to-End Workflows</strong>: Complete workflow execution tests</li>
+<li><strong>Provider Integration</strong>: Real API integration tests (optional)</li>
+<li><strong>Performance Testing</strong>: Load and concurrency testing</li>
+</ul>
+<h2 id="security-considerations">Security Considerations<a class="headerlink" href="#security-considerations" title="Permanent link">&para;</a></h2>
+<h3 id="credential-management">Credential Management<a class="headerlink" href="#credential-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Secret Strings</strong>: Automatic credential masking in logs</li>
+<li><strong>Configuration Validation</strong>: Secure handling of API keys</li>
+<li><strong>Environment Variables</strong>: Support for environment-based configuration</li>
+</ul>
+<h3 id="api-security">API Security<a class="headerlink" href="#api-security" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Authentication</strong>: Proper token and key management</li>
+<li><strong>Rate Limiting</strong>: Respect provider API limits</li>
+<li><strong>SSL/TLS</strong>: Secure communication with all external services</li>
+</ul>
+<h3 id="repository-security">Repository Security<a class="headerlink" href="#repository-security" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Temporary Directories</strong>: Secure cleanup of cloned repositories</li>
+<li><strong>File Permissions</strong>: Proper permission handling</li>
+<li><strong>Branch Protection</strong>: Safe branch and tag operations</li>
+</ul>
+<h2 id="extensibility">Extensibility<a class="headerlink" href="#extensibility" title="Permanent link">&para;</a></h2>
+<h3 id="adding-new-action-types">Adding New Action Types<a class="headerlink" href="#adding-new-action-types" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Create action handler in appropriate module</li>
+<li>Add action type to workflow model validation</li>
+<li>Implement action execution logic</li>
+<li>Add comprehensive tests</li>
+</ol>
+<h3 id="adding-new-providers">Adding New Providers<a class="headerlink" href="#adding-new-providers" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Implement client interface in <code>clients/</code></li>
+<li>Create provider-specific models</li>
+<li>Add configuration support</li>
+<li>Implement authentication and API integration</li>
+</ol>
+<h3 id="custom-workflows">Custom Workflows<a class="headerlink" href="#custom-workflows" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Create workflow directory structure</li>
+<li>Define <code>config.toml</code> with actions and conditions</li>
+<li>Add template files if needed</li>
+<li>Test with target projects</li>
+</ol>
+<p>This architecture provides a solid foundation for scalable automation across software projects while maintaining flexibility for future enhancements and integrations.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
