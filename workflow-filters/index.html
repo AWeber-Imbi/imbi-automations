@@ -1,0 +1,2688 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../workflow-configuration/">
+      
+      
+        <link rel="next" href="../workflow-conditions/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Filters - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#workflow-filters" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Filters
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Filters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project_ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_ids
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project_types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project_facts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_facts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project_environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_environments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github_identifier_required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        github_identifier_required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github_workflow_status_exclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        github_workflow_status_exclude
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exclude_open_workflow_prs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exclude_open_workflow_prs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-real-world-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Real-World Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-evaluation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Evaluation Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-filter-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Filter Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Filter Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#target-specific-technology-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Target Specific Technology Stack
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-projects-with-failing-builds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Projects with Failing Builds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specific-project-type-without-github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specific Project Type Without GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-filter-small-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Filter (Small Subset)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-python-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Python Projects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projects-needing-github-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Projects Needing GitHub Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-vs-condition-vs-cli-argument" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter vs Condition vs CLI Argument
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter vs Condition vs CLI Argument">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combining-filters-with-other-mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining Filters with Other Mechanisms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Combining Filters with Other Mechanisms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filter-workflow-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter + Workflow Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-cli-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter + CLI Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-action-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter + Action Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Filters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project_ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_ids
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project_types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project_facts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_facts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project_environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project_environments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github_identifier_required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        github_identifier_required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github_workflow_status_exclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        github_workflow_status_exclude
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exclude_open_workflow_prs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exclude_open_workflow_prs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-real-world-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Real-World Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-evaluation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Evaluation Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-filter-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Filter Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Filter Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#target-specific-technology-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Target Specific Technology Stack
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#python-projects-with-failing-builds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Projects with Failing Builds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specific-project-type-without-github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specific Project Type Without GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-filter-small-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Filter (Small Subset)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-python-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Python Projects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projects-needing-github-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Projects Needing GitHub Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-vs-condition-vs-cli-argument" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter vs Condition vs CLI Argument
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter vs Condition vs CLI Argument">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cli-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combining-filters-with-other-mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining Filters with Other Mechanisms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Combining Filters with Other Mechanisms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filter-workflow-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter + Workflow Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-cli-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter + CLI Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-action-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter + Action Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="workflow-filters">Workflow Filters<a class="headerlink" href="#workflow-filters" title="Permanent link">&para;</a></h1>
+<p>Project filters reduce the scope of workflow execution by pre-filtering projects based on Imbi metadata before any workflow processing begins. This is the first and most efficient level of project selection.</p>
+<h2 id="when-to-use-filters">When to Use Filters<a class="headerlink" href="#when-to-use-filters" title="Permanent link">&para;</a></h2>
+<p><strong>Use filters when you want to:</strong></p>
+<ul>
+<li>Target specific project types (APIs, consumers, libraries, etc.)</li>
+<li>Select projects with specific technology stacks</li>
+<li>Require GitHub integration</li>
+<li>Exclude projects with passing builds (target only failing ones)</li>
+<li>Process only a specific subset of projects</li>
+</ul>
+<p><strong>Performance benefit:</strong> Filtered-out projects are never processed, saving API calls, cloning, and condition evaluation.</p>
+<h2 id="filter-configuration">Filter Configuration<a class="headerlink" href="#filter-configuration" title="Permanent link">&para;</a></h2>
+<p>Filters are defined in the <code>[filter]</code> section of <code>config.toml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">project_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w"> </span><span class="mi">789</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumer&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">project_environments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;production&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;staging&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># New: Flexible field filtering</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="k">[filter.project.description]</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">is_empty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="k">[filter.project.name]</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">regex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;^api-.*&quot;</span>
+</code></pre></div>
+<p><strong>Filter Logic:</strong> ALL filter criteria must match (AND logic). A project must satisfy every filter to be included.</p>
+<h2 id="filter-fields">Filter Fields<a class="headerlink" href="#filter-fields" title="Permanent link">&para;</a></h2>
+<h3 id="project_ids">project_ids<a class="headerlink" href="#project_ids" title="Permanent link">&para;</a></h3>
+<p>Target specific projects by their Imbi project ID.</p>
+<p><strong>Type:</strong> <code>list[int]</code>  </p>
+<p><strong>Default:</strong> <code>[]</code> (no ID filtering)  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">project_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">108</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">]</span>
+</code></pre></div>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Testing workflows on specific projects</li>
+<li>Fixing issues in known problem projects</li>
+<li>Updating projects that failed in a previous run</li>
+</ul>
+<p><strong>Example from real workflow:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Test workflow on three projects before full rollout</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">project_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w"> </span><span class="mi">789</span><span class="p">]</span>
+</code></pre></div></p>
+<h3 id="project_types">project_types<a class="headerlink" href="#project_types" title="Permanent link">&para;</a></h3>
+<p>Filter by project type slugs from Imbi.</p>
+<p><strong>Type:</strong> <code>list[string]</code>  </p>
+<p><strong>Default:</strong> <code>[]</code> (no type filtering)  </p>
+<p><strong>Common project types:</strong></p>
+<ul>
+<li><code>api</code> / <code>apis</code> - REST APIs and web services</li>
+<li><code>backend-libraries</code> - Shared backend libraries</li>
+<li><code>bots</code> - Chat and automation bots</li>
+<li><code>cli</code> / <code>clis</code> - Command-line tools</li>
+<li><code>consumer</code> / <code>consumers</code> - Message queue consumers</li>
+<li><code>daemon</code> / <code>daemons</code> - Background services</li>
+<li><code>frontend</code> - Web frontends</li>
+<li><code>plugin</code> / <code>plugins</code> - Extension plugins</li>
+<li><code>scheduled-job</code> / <code>scheduled-jobs</code> - Cron-like tasks</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumer&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;daemon&quot;</span><span class="p">]</span>
+</code></pre></div>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="s2">&quot;apis&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="s2">&quot;backend-libraries&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="s2">&quot;bots&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="s2">&quot;clis&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="s2">&quot;consumers&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="s2">&quot;daemons&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="s2">&quot;plugin&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="s2">&quot;scheduled-jobs&quot;</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">]</span>
+</code></pre></div></p>
+<p><strong>Why this filter?</strong> Excludes frontend projects that don't use Python setup.cfg files.</p>
+<h3 id="project_facts">project_facts<a class="headerlink" href="#project_facts" title="Permanent link">&para;</a></h3>
+<p>Filter by exact Imbi project fact values.</p>
+<p><strong>Type:</strong> <code>dict[string, string]</code>  </p>
+<p><strong>Default:</strong> <code>{}</code> (no fact filtering)  </p>
+<p><strong>Fact matching:</strong></p>
+<ul>
+<li>Keys are fact names (case-sensitive)</li>
+<li>Values must match exactly</li>
+<li>ALL specified facts must match (AND logic)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="err">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="s2">&quot;Framework&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FastAPI&quot;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="err">}</span>
+</code></pre></div>
+<p>Only projects with BOTH <code>Programming Language = "Python 3.12"</code> AND <code>Framework = "FastAPI"</code> will be included.</p>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;programming_language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.9&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Why this filter?</strong> Targets only Python 3.9 projects that need updating.</p>
+<p><strong>Common fact names:</strong></p>
+<ul>
+<li><code>Programming Language</code> - e.g., "Python 3.12", "TypeScript", "Go"</li>
+<li><code>Framework</code> - e.g., "FastAPI", "Flask", "Express"</li>
+<li><code>Database</code> - e.g., "PostgreSQL", "MongoDB"</li>
+<li><code>Message Queue</code> - e.g., "RabbitMQ", "SQS"</li>
+<li><code>Deployment Platform</code> - e.g., "Kubernetes", "ECS"</li>
+</ul>
+<h3 id="project_environments">project_environments<a class="headerlink" href="#project_environments" title="Permanent link">&para;</a></h3>
+<p>Filter by Imbi project environments.</p>
+<p><strong>Type:</strong> <code>list[string]</code>  </p>
+<p><strong>Default:</strong> <code>[]</code> (no environment filtering)  </p>
+<p><strong>Environment matching:</strong></p>
+<ul>
+<li>Supports both environment names ("Production") and slugs ("production")</li>
+<li>ALL specified environments must be present in project (AND logic)</li>
+<li>Matches against both <code>name</code> and <code>slug</code> fields of <code>ImbiEnvironment</code> objects</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">project_environments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;production&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;staging&quot;</span><span class="p">]</span>
+</code></pre></div>
+<p>Only projects with BOTH production AND staging environments will be included.</p>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">project_environments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Production&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Staging&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Development&quot;</span><span class="p">]</span>
+</code></pre></div></p>
+<p><strong>Why this filter?</strong> Target only projects with complete environment configurations for deployment workflows.</p>
+<p><strong>Flexible matching:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># These are all equivalent:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">project_environments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Production&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">project_environments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;production&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">project_environments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;PRODUCTION&quot;</span><span class="p">]</span>
+</code></pre></div></p>
+<p>The filter checks against both the original environment name and the auto-generated slug.</p>
+<h3 id="github_identifier_required">github_identifier_required<a class="headerlink" href="#github_identifier_required" title="Permanent link">&para;</a></h3>
+<p>Require projects to have a GitHub repository identifier.</p>
+<p><strong>Type:</strong> <code>boolean</code>  </p>
+<p><strong>Default:</strong> <code>false</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>GitHub-specific workflows (workflow fixes, PR automation)</li>
+<li>Projects that must have CI/CD</li>
+<li>Excluding archived projects without GitHub integration</li>
+</ul>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div></p>
+<p><strong>Why this filter?</strong> Workflow creates pull requests, so GitHub integration is required.</p>
+<h3 id="project">project<a class="headerlink" href="#project" title="Permanent link">&para;</a></h3>
+<p>Filter projects based on arbitrary field conditions with flexible operators.</p>
+<p><strong>Type:</strong> <code>dict[string, ProjectFieldFilter]</code>  </p>
+<p><strong>Default:</strong> <code>{}</code> (no field filtering)  </p>
+<p><strong>Available operators:</strong></p>
+<ul>
+<li><code>is_null</code> - Check if field is None</li>
+<li><code>is_not_null</code> - Check if field is not None</li>
+<li><code>is_empty</code> - Check if field is None OR empty string</li>
+<li><code>equals</code> - Exact value match</li>
+<li><code>not_equals</code> - Value must not match</li>
+<li><code>contains</code> - Substring search (strings only)</li>
+<li><code>regex</code> - Pattern matching (strings only)</li>
+</ul>
+<p><strong>Key constraint:</strong> Only ONE operator per field filter.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Filter projects without descriptions</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">[filter.project.description]</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">is_empty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># Filter projects by name pattern</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="k">[filter.project.name]</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="n">regex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;^api-.*&quot;</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c1"># Filter projects with specific archived status</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="k">[filter.project.archived]</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</code></pre></div>
+<p><strong>Common use cases:</strong></p>
+<p><strong>Find projects missing metadata:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">[filter.project.description]</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">is_empty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div></p>
+<p><strong>Target projects by name pattern:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">[filter.project.name]</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">regex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;^(api|service)-&quot;</span>
+</code></pre></div></p>
+<p><strong>Exclude archived projects:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">[filter.project.archived]</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">equals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</code></pre></div></p>
+<p><strong>Find projects with specific text:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">[filter.project.description]</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;legacy&quot;</span>
+</code></pre></div></p>
+<p><strong>Available project fields:</strong></p>
+<ul>
+<li><code>name</code> - Project name</li>
+<li><code>slug</code> - Project slug</li>
+<li><code>description</code> - Project description</li>
+<li><code>archived</code> - Whether project is archived</li>
+<li><code>project_type_name</code> - Project type name</li>
+<li><code>project_type_slug</code> - Project type slug</li>
+<li><code>namespace_slug</code> - Namespace slug</li>
+<li>Any custom fields on <code>ImbiProject</code> model</li>
+</ul>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Find Python projects without descriptions</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="k">[filter.project.description]</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">is_empty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div></p>
+<p><strong>Performance:</strong> Field filters evaluate against cached Imbi data, making them very fast.</p>
+<p><strong>Validation:</strong> Fields are checked for existence at runtime. Non-existent fields cause projects to be filtered out with a warning.</p>
+<h3 id="github_workflow_status_exclude">github_workflow_status_exclude<a class="headerlink" href="#github_workflow_status_exclude" title="Permanent link">&para;</a></h3>
+<p>Exclude projects with specific GitHub Actions workflow statuses.</p>
+<p><strong>Type:</strong> <code>list[string]</code></p>
+<p><strong>Default:</strong> <code>[]</code> (no status filtering)</p>
+<p><strong>Valid statuses:</strong></p>
+<ul>
+<li><code>"success"</code> - All workflows passing</li>
+<li><code>"failure"</code> - At least one workflow failing</li>
+<li><code>"pending"</code> - Workflows currently running</li>
+<li><code>"skipped"</code> - Workflows skipped</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+</code></pre></div>
+<p>Only projects with failing, pending, or no workflows will be processed.</p>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+</code></pre></div></p>
+<p><strong>Why this filter?</strong> No need to process projects with passing builds - they don't need fixes.</p>
+<p><strong>Common patterns:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Only process failing builds</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;skipped&quot;</span><span class="p">]</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="c1"># Exclude projects with active/passing workflows</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="k">[filter]</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">]</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="c1"># Only process completely broken projects</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="k">[filter]</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">]</span>
+</code></pre></div></p>
+<h3 id="exclude_open_workflow_prs">exclude_open_workflow_prs<a class="headerlink" href="#exclude_open_workflow_prs" title="Permanent link">&para;</a></h3>
+<p>Exclude projects that already have open pull requests for a specific workflow.</p>
+<p><strong>Type:</strong> <code>bool | string</code></p>
+<p><strong>Default:</strong> <code>false</code> (no PR filtering)</p>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li><code>false</code> - Filter disabled (default)</li>
+<li><code>true</code> - Exclude projects with open PRs for the <strong>current workflow</strong></li>
+<li><code>"workflow-slug"</code> - Exclude projects with open PRs for the <strong>specified workflow</strong></li>
+</ul>
+<p><strong>PR states that cause exclusion:</strong></p>
+<ul>
+<li><strong>Open PRs</strong> (including drafts) - Work still in progress</li>
+<li><strong>Closed unmerged PRs</strong> - Failed or abandoned changes</li>
+</ul>
+<p><strong>Why exclude closed-unmerged PRs?</strong> They indicate issues or rejected changes that should be resolved before re-running the workflow.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">exclude_open_workflow_prs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<p>Projects with open PRs for this workflow will be skipped.</p>
+<p><strong>Real-world examples:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Prevent duplicate PRs for same workflow</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumer&quot;</span><span class="p">]</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="n">exclude_open_workflow_prs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c1"># Skip if PR already exists</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Cross-workflow dependency</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Secondary Workflow&quot;</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="k">[filter]</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="c1"># Only run after primary workflow PR is merged</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="n">exclude_open_workflow_prs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;primary-workflow&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Combined with other filters</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">]</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="n">exclude_open_workflow_prs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c1"># Skip projects with pending PRs</span>
+</code></pre></div>
+<p><strong>Why this filter?</strong> Prevents creating duplicate PRs when:
+- Projects haven't updated their Imbi facts yet
+- PRs haven't been reviewed or merged yet
+- Workflow re-runs before previous execution completes</p>
+<p><strong>How it works:</strong></p>
+<p>The filter checks for PRs with head branch matching <code>imbi-automations/{workflow-slug}</code>:</p>
+<ol>
+<li><strong>Branch identification:</strong> Each workflow creates PRs on branch <code>imbi-automations/{slug}</code></li>
+<li><strong>PR state check:</strong> Looks for open, draft, or closed-unmerged PRs</li>
+<li><strong>Exclusion logic:</strong> If blocking PR found, skip the project</li>
+</ol>
+<p><strong>Error handling:</strong></p>
+<p>Uses fail-open approach: API failures or errors log warnings but allow the project through. This prevents transient GitHub API issues from blocking valid workflow executions.</p>
+<p><strong>Performance note:</strong></p>
+<p>This filter requires a GitHub API call per project, so it's placed after cheap filters (IDs, types, facts) but before repository cloning. Projects filtered out here avoid the expensive git clone operation.</p>
+<p><strong>Use cases:</strong></p>
+<ol>
+<li><strong>Prevent duplicate work:</strong></li>
+<li>Don't re-run if PR already exists</li>
+<li>
+<p>Wait for facts to update before next run</p>
+</li>
+<li>
+<p><strong>Sequential workflows:</strong></p>
+</li>
+<li>Workflow B waits for Workflow A's PR to merge</li>
+<li>
+<p>Cross-workflow orchestration</p>
+</li>
+<li>
+<p><strong>Manual review workflows:</strong></p>
+</li>
+<li>Create PR, wait for approval</li>
+<li>Don't create new PR until previous is handled</li>
+</ol>
+<p><strong>Example workflow sequence:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>Day 1: Workflow runs → Creates PR #42 → Left open for review
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>Day 2: Workflow runs → Sees open PR #42 → Skips project
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>Day 3: PR #42 merged → Facts updated → Workflow runs → Allowed
+</code></pre></div>
+<h2 id="complete-real-world-example">Complete Real-World Example<a class="headerlink" href="#complete-real-world-example" title="Permanent link">&para;</a></h2>
+<p>This is the actual filter from the example-workflow workflow:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;programming_language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.9&quot;</span><span class="p">}</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">    </span><span class="s2">&quot;apis&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">    </span><span class="s2">&quot;backend-libraries&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">    </span><span class="s2">&quot;bots&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">    </span><span class="s2">&quot;clis&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">    </span><span class="s2">&quot;consumers&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">    </span><span class="s2">&quot;daemons&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">    </span><span class="s2">&quot;plugin&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">    </span><span class="s2">&quot;scheduled-jobs&quot;</span>
+<a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="p">]</span>
+</code></pre></div>
+<p><strong>What this filter does:</strong></p>
+<ol>
+<li>✅ <strong>Must have GitHub</strong> (<code>github_identifier_required = true</code>)</li>
+<li>Excludes projects without GitHub integration</li>
+<li>
+<p>Ensures PR creation will work</p>
+</li>
+<li>
+<p>✅ <strong>Exclude passing builds</strong> (<code>github_workflow_status_exclude = ["success"]</code>)</p>
+</li>
+<li>Only processes projects with failing or missing workflows</li>
+<li>
+<p>Avoids unnecessary work on healthy projects</p>
+</li>
+<li>
+<p>✅ <strong>Python 3.9 only</strong> (<code>project_facts = {"programming_language" = "Python 3.9"}</code>)</p>
+</li>
+<li>Targets exactly Python 3.9 projects</li>
+<li>
+<p>Excludes Python 3.10, 3.11, 3.12, etc.</p>
+</li>
+<li>
+<p>✅ <strong>Backend projects only</strong> (<code>project_types = [...]</code>)</p>
+</li>
+<li>Includes APIs, libraries, CLIs, consumers, etc.</li>
+<li>Excludes frontend projects that don't have setup.cfg</li>
+</ol>
+<p><strong>Result:</strong> From 1000 total projects → ~50 projects that need fixing</p>
+<h2 id="filter-evaluation-flow">Filter Evaluation Flow<a class="headerlink" href="#filter-evaluation-flow" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>All Projects (1000)
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    ↓
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>github_identifier_required = true
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>    ↓ (excludes 200 projects without GitHub)
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>800 projects remain
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>    ↓
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>github_workflow_status_exclude = [&quot;success&quot;]
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>    ↓ (excludes 600 projects with passing builds)
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>200 projects remain
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>    ↓
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>project_facts = {&quot;programming_language&quot; = &quot;Python 3.9&quot;}
+<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a>    ↓ (excludes 120 non-Python-3.9 projects)
+<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a>80 projects remain
+<a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a>    ↓
+<a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a>project_types = [&quot;apis&quot;, &quot;consumers&quot;, ...]
+<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>    ↓ (excludes 30 frontend projects)
+<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>50 projects match all filters
+</code></pre></div>
+<p>These 50 projects then proceed to workflow condition evaluation.</p>
+<h2 id="common-filter-patterns">Common Filter Patterns<a class="headerlink" href="#common-filter-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="target-specific-technology-stack">Target Specific Technology Stack<a class="headerlink" href="#target-specific-technology-stack" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="err">,</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">    </span><span class="s2">&quot;Framework&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FastAPI&quot;</span><span class="err">,</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">    </span><span class="s2">&quot;Database&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;PostgreSQL&quot;</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="err">}</span>
+</code></pre></div>
+<h3 id="python-projects-with-failing-builds">Python Projects with Failing Builds<a class="headerlink" href="#python-projects-with-failing-builds" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumer&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;daemon&quot;</span><span class="p">]</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+</code></pre></div>
+<h3 id="specific-project-type-without-github">Specific Project Type Without GitHub<a class="headerlink" href="#specific-project-type-without-github" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;backend-libraries&quot;</span><span class="p">]</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="c1"># No github_identifier_required - includes non-GitHub projects</span>
+</code></pre></div>
+<h3 id="testing-filter-small-subset">Testing Filter (Small Subset)<a class="headerlink" href="#testing-filter-small-subset" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">project_ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">108</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">]</span><span class="w">  </span><span class="c1"># Test on 3 projects first</span>
+</code></pre></div>
+<h3 id="all-python-projects">All Python Projects<a class="headerlink" href="#all-python-projects" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="c1"># Use facts to match any Python version</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python&quot;</span><span class="p">}</span><span class="w">  </span><span class="c1"># Won&#39;t work - needs exact match</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="c1"># Better: Use multiple workflows or no filter + conditions</span>
+</code></pre></div>
+<p><strong>Note:</strong> Fact filtering requires exact matches. For partial matching, use workflow conditions with regex.  </p>
+<h3 id="projects-needing-github-actions">Projects Needing GitHub Actions<a class="headerlink" href="#projects-needing-github-actions" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="c1"># Then use conditions to check for specific workflow files</span>
+</code></pre></div>
+<h2 id="filter-performance">Filter Performance<a class="headerlink" href="#filter-performance" title="Permanent link">&para;</a></h2>
+<p><strong>Filters are the most efficient project selection mechanism:</strong></p>
+<ul>
+<li>✅ <strong>No API calls</strong> - Uses cached Imbi data</li>
+<li>✅ <strong>No git operations</strong> - No cloning or remote checks</li>
+<li>✅ <strong>Fast evaluation</strong> - Simple equality checks</li>
+<li>✅ <strong>Early elimination</strong> - Reduces downstream processing</li>
+</ul>
+<p><strong>Performance comparison for 1000 projects:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Projects Processed</th>
+<th>API Calls</th>
+<th>Git Clones</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No filters</td>
+<td>1000</td>
+<td>1000+</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>With filters</td>
+<td>50</td>
+<td>50+</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best practice:</strong> Use filters to get close to your target set, then use workflow conditions for fine-grained selection.</p>
+<h2 id="filter-vs-condition-vs-cli-argument">Filter vs Condition vs CLI Argument<a class="headerlink" href="#filter-vs-condition-vs-cli-argument" title="Permanent link">&para;</a></h2>
+<h3 id="cli-arguments">CLI Arguments<a class="headerlink" href="#cli-arguments" title="Permanent link">&para;</a></h3>
+<p><strong>Scope:</strong> Initial project selection
+<strong>Speed:</strong> ⚡⚡⚡ Fastest
+<strong>Use for:</strong> One-off targeting, testing</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>--project-id<span class="w"> </span><span class="m">123</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>--project-type<span class="w"> </span>api
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>--all-projects
+</code></pre></div>
+<h3 id="filters">Filters<a class="headerlink" href="#filters" title="Permanent link">&para;</a></h3>
+<p><strong>Scope:</strong> Workflow-level pre-filtering
+<strong>Speed:</strong> ⚡⚡ Very fast
+<strong>Use for:</strong> Broad targeting, technology stack selection</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">]</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+</code></pre></div>
+<h3 id="workflow-conditions">Workflow Conditions<a class="headerlink" href="#workflow-conditions" title="Permanent link">&para;</a></h3>
+<p><strong>Scope:</strong> Repository state checks
+<strong>Speed:</strong> ⚡ Fast (remote) or 🐌 Slow (local)
+<strong>Use for:</strong> File existence, content checking</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;package.json&quot;</span>
+</code></pre></div>
+<h3 id="action-conditions">Action Conditions<a class="headerlink" href="#action-conditions" title="Permanent link">&para;</a></h3>
+<p><strong>Scope:</strong> Per-action execution control
+<strong>Speed:</strong> ⚡ Fast (already cloned)
+<strong>Use for:</strong> Conditional behavior within workflow</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.py&quot;</span>
+</code></pre></div>
+<h2 id="combining-filters-with-other-mechanisms">Combining Filters with Other Mechanisms<a class="headerlink" href="#combining-filters-with-other-mechanisms" title="Permanent link">&para;</a></h2>
+<h3 id="filter-workflow-conditions">Filter + Workflow Conditions<a class="headerlink" href="#filter-workflow-conditions" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="c1"># Filter: Broad technology targeting</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">]</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="c1"># Conditions: Specific repository requirements</span>
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a>
+<a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fastapi&quot;</span>
+<a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p><strong>Result:</strong> FastAPI projects using Python 3.12 with pyproject.toml</p>
+<h3 id="filter-cli-arguments">Filter + CLI Arguments<a class="headerlink" href="#filter-cli-arguments" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="c1"># CLI: Specific project type</span>
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-python<span class="w"> </span>--project-type<span class="w"> </span>api
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="c1"># Workflow filter: Further refinement</span>
+<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a><span class="o">[</span>filter<span class="o">]</span>
+<a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a><span class="nv">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="o">}</span>
+<a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a><span class="nv">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+<p><strong>Result:</strong> Python 3.12 APIs with GitHub integration</p>
+<h3 id="filter-action-conditions">Filter + Action Conditions<a class="headerlink" href="#filter-action-conditions" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="c1"># Filter: Python projects</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;Programming Language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.12&quot;</span><span class="p">}</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-setup-py&quot;</span>
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="c1"># Action condition: Only if setup.py exists</span>
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.py&quot;</span>
+<a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a>
+<a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-40-14" name="__codelineno-40-14" href="#__codelineno-40-14"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-pyproject&quot;</span>
+<a id="__codelineno-40-15" name="__codelineno-40-15" href="#__codelineno-40-15"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-40-16" name="__codelineno-40-16" href="#__codelineno-40-16"></a>
+<a id="__codelineno-40-17" name="__codelineno-40-17" href="#__codelineno-40-17"></a><span class="c1"># Action condition: Only if pyproject.toml exists</span>
+<a id="__codelineno-40-18" name="__codelineno-40-18" href="#__codelineno-40-18"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-40-19" name="__codelineno-40-19" href="#__codelineno-40-19"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p><strong>Result:</strong> Python 3.12 projects, with different actions for setup.py vs pyproject.toml</p>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../workflow-conditions/">Workflow Conditions</a> - File existence and content checking</li>
+<li><a href="../workflow-configuration/">Workflow Configuration</a> - Complete configuration reference</li>
+<li><a href="../workflows/">Workflows Overview</a> - High-level concepts and best practices</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

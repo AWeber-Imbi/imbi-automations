@@ -1,0 +1,2601 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../shell/">
+      
+      
+        <link rel="next" href="../../templating/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Template - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#template-actions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Template
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflow-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflow-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflow-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source_path-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        source_path (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#destination_path-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        destination_path (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-file-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single File Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-actions-workflow-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Actions Workflow Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dockerfile Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jinja2-template-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jinja2 Template Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Jinja2 Template Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditionals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditionals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loops
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comments
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-file-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration File Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-file-template-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-File Template Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contributing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#template-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Inheritance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Macros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path Resolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handling-undefined-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handling Undefined Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../templating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source_path-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        source_path (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#destination_path-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        destination_path (required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-file-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single File Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-actions-workflow-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Actions Workflow Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dockerfile Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jinja2-template-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jinja2 Template Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Jinja2 Template Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditionals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditionals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loops
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comments
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-file-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration File Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-file-template-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-File Template Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contributing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#template-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Inheritance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Macros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Filters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path Resolution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handling-undefined-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handling Undefined Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="template-actions">Template Actions<a class="headerlink" href="#template-actions" title="Permanent link">&para;</a></h1>
+<p>Template actions render Jinja2 templates with full workflow context, enabling dynamic file generation for configurations, documentation, and code files.</p>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;action-name&quot;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template-file-or-directory&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;output-location&quot;</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Path Schemes</p>
+<p>Template actions use <a href="../../path-schemes/">path schemes</a> for <code>source_path</code> and <code>destination_path</code>. See the <a href="../../path-schemes/">Path Schemes guide</a> for details on all available schemes.</p>
+</div>
+<h2 id="fields">Fields<a class="headerlink" href="#fields" title="Permanent link">&para;</a></h2>
+<h3 id="source_path-required">source_path (required)<a class="headerlink" href="#source_path-required" title="Permanent link">&para;</a></h3>
+<p>Path to template file or directory. Can be:</p>
+<ul>
+<li>Single <code>.j2</code> template file</li>
+<li>Directory containing <code>.j2</code> files (recursively rendered)</li>
+</ul>
+<p><strong>Type:</strong> <a href="../#resourceurl-path-system"><code>ResourceUrl</code></a> (string path)</p>
+<p><strong>Conventions:</strong>  </p>
+<ul>
+<li>Template files should use <code>.j2</code> extension</li>
+<li>Directory paths should NOT include wildcards</li>
+<li>Relative to working directory by default</li>
+<li>Usually prefixed with <code>workflow:///</code> for workflow resources</li>
+</ul>
+<h3 id="destination_path-required">destination_path (required)<a class="headerlink" href="#destination_path-required" title="Permanent link">&para;</a></h3>
+<p>Output location for rendered templates.</p>
+<p><strong>Type:</strong> <a href="../#resourceurl-path-system"><code>ResourceUrl</code></a> (string path)</p>
+<p><strong>Behavior:</strong>  </p>
+<ul>
+<li>For single file: Output file path</li>
+<li>For directory: Output directory (structure mirrored)</li>
+<li>Parent directories created automatically</li>
+<li>Existing files overwritten</li>
+</ul>
+<h2 id="template-context">Template Context<a class="headerlink" href="#template-context" title="Permanent link">&para;</a></h2>
+<p>Templates have access to all workflow context variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workflow</code></td>
+<td><code>Workflow</code></td>
+<td>Current workflow configuration</td>
+</tr>
+<tr>
+<td><code>imbi_project</code></td>
+<td><code>ImbiProject</code></td>
+<td>Complete Imbi project data</td>
+</tr>
+<tr>
+<td><code>github_repository</code></td>
+<td><code>GitHubRepository</code></td>
+<td>GitHub repo data (if applicable)</td>
+</tr>
+<tr>
+<td><code>working_directory</code></td>
+<td><code>Path</code></td>
+<td>Workflow execution directory</td>
+</tr>
+<tr>
+<td><code>starting_commit</code></td>
+<td><code>str</code></td>
+<td>Initial Git commit SHA</td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<h3 id="single-file-template">Single File Template<a class="headerlink" href="#single-file-template" title="Permanent link">&para;</a></h3>
+<p><strong>Workflow config:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-readme&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///templates/README.md.j2&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///README.md&quot;</span>
+</code></pre></div></p>
+<p><strong>Template (<code>templates/README.md.j2</code>):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a># {{ imbi_project.name }}
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>{{ imbi_project.description }}
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>## Project Information
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>- **Type**: {{ imbi_project.project_type }}
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>- **Namespace**: {{ imbi_project.namespace }}
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>- **Imbi URL**: {{ imbi_project.imbi_url }}
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>{% if github_repository %}
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>## Repository
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>- **GitHub**: {{ github_repository.html_url }}
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>- **Default Branch**: {{ github_repository.default_branch }}
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>{% endif %}
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>## Installation
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>```bash
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>pip install {{ imbi_project.slug }}
+</code></pre></div></p>
+<p>Generated by {{ workflow.configuration.name }} on {{ now() }}
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>### Directory Template
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>**Workflow config:**
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>```toml
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>[[actions]]
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>name = &quot;render-configs&quot;
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>type = &quot;template&quot;
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>source_path = &quot;workflow:///templates/configs&quot;
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>destination_path = &quot;repository:///config/&quot;
+</code></pre></div></p>
+<p><strong>Directory structure:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>workflow/templates/configs/
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>├── app.yaml.j2
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>├── database.yaml.j2
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>└── logging.yaml.j2
+</code></pre></div></p>
+<p><strong>Result:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>repository/config/
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── app.yaml
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>├── database.yaml
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>└── logging.yaml
+</code></pre></div></p>
+<h3 id="github-actions-workflow-template">GitHub Actions Workflow Template<a class="headerlink" href="#github-actions-workflow-template" title="Permanent link">&para;</a></h3>
+<p><strong>Workflow config:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-ci-workflow&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///ci-template.yml.j2&quot;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///.github/workflows/ci.yml&quot;</span>
+</code></pre></div></p>
+<p><strong>Template:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>name: CI
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>on:
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  push:
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    branches: [ {{ github_repository.default_branch }} ]
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>  pull_request:
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    branches: [ {{ github_repository.default_branch }} ]
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>jobs:
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>  test:
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    runs-on: ubuntu-latest
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    steps:
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>      - uses: actions/checkout@v4
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>      {% if imbi_project.facts.get(&#39;Programming Language&#39;, &#39;&#39;).startswith(&#39;Python&#39;) %}
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>      - name: Set up Python
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>        uses: actions/setup-python@v5
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>        with:
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>          python-version: &#39;{{ imbi_project.facts[&#39;Programming Language&#39;].split()[-1] }}&#39;
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>      - name: Install dependencies
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>        run: |
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>          python -m pip install --upgrade pip
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>          pip install -e .[dev]
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>      - name: Run tests
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>        run: pytest tests/ -v
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>      {% elif imbi_project.facts.get(&#39;Programming Language&#39;) == &#39;JavaScript&#39; %}
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>      - name: Setup Node.js
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>        uses: actions/setup-node@v4
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a>        with:
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a>          node-version: &#39;18&#39;
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a>
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a>      - name: Install dependencies
+<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a>        run: npm ci
+<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>
+<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a>      - name: Run tests
+<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a>        run: npm test
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a>      {% endif %}
+</code></pre></div></p>
+<h3 id="dockerfile-template">Dockerfile Template<a class="headerlink" href="#dockerfile-template" title="Permanent link">&para;</a></h3>
+<p><strong>Workflow config:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-dockerfile&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///Dockerfile.j2&quot;</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///Dockerfile&quot;</span>
+</code></pre></div></p>
+<p><strong>Template:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>{% set python_version = imbi_project.facts.get(&#39;Programming Language&#39;, &#39;Python 3.12&#39;).split()[-1] %}
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>FROM python:{{ python_version }}-slim
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>LABEL maintainer=&quot;{{ imbi_project.namespace }}&quot;
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>LABEL project=&quot;{{ imbi_project.slug }}&quot;
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>WORKDIR /app
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>COPY requirements.txt .
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>RUN pip install --no-cache-dir -r requirements.txt
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>COPY . .
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>{% if imbi_project.project_type == &#39;api&#39; %}
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>CMD [&quot;uvicorn&quot;, &quot;{{ imbi_project.slug }}.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>{% elif imbi_project.project_type == &#39;consumer&#39; %}
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>CMD [&quot;python&quot;, &quot;-m&quot;, &quot;{{ imbi_project.slug }}.consumer&quot;]
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>{% else %}
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>CMD [&quot;python&quot;, &quot;-m&quot;, &quot;{{ imbi_project.slug }}&quot;]
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>{% endif %}
+</code></pre></div></p>
+<h2 id="jinja2-template-features">Jinja2 Template Features<a class="headerlink" href="#jinja2-template-features" title="Permanent link">&para;</a></h2>
+<h3 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>{{ imbi_project.name }}
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>{{ imbi_project.slug }}
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>{{ workflow.configuration.name }}
+</code></pre></div>
+<h3 id="conditionals">Conditionals<a class="headerlink" href="#conditionals" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>{% if imbi_project.project_type == &#39;api&#39; %}
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  API-specific content
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>{% elif imbi_project.project_type == &#39;consumer&#39; %}
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>  Consumer-specific content
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>{% else %}
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>  Default content
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>{% endif %}
+</code></pre></div>
+<h3 id="loops">Loops<a class="headerlink" href="#loops" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>{% for env in imbi_project.environments %}
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>- {{ env.name }}: {{ env.url }}
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>{% endfor %}
+</code></pre></div>
+<h3 id="filters">Filters<a class="headerlink" href="#filters" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>{{ imbi_project.name | upper }}
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>{{ imbi_project.slug | replace(&#39;-&#39;, &#39;_&#39;) }}
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>{{ imbi_project.description | truncate(100) }}
+</code></pre></div>
+<h3 id="tests">Tests<a class="headerlink" href="#tests" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>{% if github_repository is defined %}
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>  Has GitHub repository
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>{% endif %}
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>{% if imbi_project.facts %}
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>  Has facts defined
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>{% endif %}
+</code></pre></div>
+<h3 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>{# This is a comment - won&#39;t appear in output #}
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>{{ imbi_project.name }}  {# inline comment #}
+</code></pre></div>
+<h2 id="common-patterns">Common Patterns<a class="headerlink" href="#common-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="configuration-file-generation">Configuration File Generation<a class="headerlink" href="#configuration-file-generation" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-app-config&quot;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///app.yaml.j2&quot;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///config/app.yaml&quot;</span>
+</code></pre></div>
+<p><strong>Template:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>application:
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>  name: {{ imbi_project.slug }}
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>  type: {{ imbi_project.project_type }}
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>{% if imbi_project.environments %}
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>environments:
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>{% for env in imbi_project.environments %}
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>  {{ env.name }}:
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    url: {{ env.url }}
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>    enabled: true
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>{% endfor %}
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>{% endif %}
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>database:
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>  host: ${DB_HOST}
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>  port: ${DB_PORT}
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>  name: {{ imbi_project.slug | replace(&#39;-&#39;, &#39;_&#39;) }}
+</code></pre></div></p>
+<h3 id="multi-file-template-directory">Multi-File Template Directory<a class="headerlink" href="#multi-file-template-directory" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-all-configs&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///templates&quot;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///config/&quot;</span>
+</code></pre></div>
+<p><strong>Template directory:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>workflow/templates/
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>├── app.yaml.j2
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>├── database.yaml.j2
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>├── logging.yaml.j2
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>└── monitoring.yaml.j2
+</code></pre></div></p>
+<h3 id="documentation-generation">Documentation Generation<a class="headerlink" href="#documentation-generation" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-docs&quot;</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///docs&quot;</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///docs/&quot;</span>
+</code></pre></div>
+<p><strong>Template:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a># {{ imbi_project.name }} Documentation
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>## Overview
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>{{ imbi_project.description }}
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>## Quick Start
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>### Installation
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>```bash
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>pip install {{ imbi_project.slug }}
+</code></pre></div></p>
+<h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kn">from</span><span class="w"> </span><span class="p">{{</span> <span class="n">imbi_project</span><span class="o">.</span><span class="n">slug</span> <span class="o">|</span> <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="p">}}</span> <span class="kn">import</span><span class="w"> </span><span class="nn">main</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h2>
+<p>{% if imbi_project.project_type == 'api' %}
+The API is available at: <code>https://{{ imbi_project.slug }}.example.com/api</code>
+{% endif %}</p>
+<h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
+<p>Contributions welcome! See CONTRIBUTING.md in the repository for details.</p>
+<hr />
+<p><em>Generated from template by {{ workflow.configuration.name }}</em>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>## Advanced Templates
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>### Accessing Nested Data
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>```jinja2
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>{# Access project facts #}
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>{% if &#39;Programming Language&#39; in imbi_project.facts %}
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>Language: {{ imbi_project.facts[&#39;Programming Language&#39;] }}
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>{% endif %}
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a>{# Access GitHub repository details #}
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a>{% if github_repository %}
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a>Stars: {{ github_repository.stargazers_count }}
+<a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a>Forks: {{ github_repository.forks_count }}
+<a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a>{% endif %}
+</code></pre></div></p>
+<h3 id="template-inheritance">Template Inheritance<a class="headerlink" href="#template-inheritance" title="Permanent link">&para;</a></h3>
+<p><strong>Base template (<code>base.j2</code>):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a># {{ imbi_project.name }}
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>{% block content %}
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>Default content
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>{% endblock %}
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>---
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>Generated by {{ workflow.configuration.name }}
+</code></pre></div></p>
+<p><strong>Child template (<code>readme.j2</code>):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>{% extends &quot;base.j2&quot; %}
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>{% block content %}
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>## Description
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>{{ imbi_project.description }}
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>## Installation
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>pip install {{ imbi_project.slug }}
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>{% endblock %}
+</code></pre></div></p>
+<h3 id="macros">Macros<a class="headerlink" href="#macros" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>{% macro render_environment(env) %}
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>## {{ env.name | title }}
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>- URL: {{ env.url }}
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>- Active: {{ env.active | default(true) }}
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>{% endmacro %}
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a># Environments
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>{% for env in imbi_project.environments %}
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>{{ render_environment(env) }}
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a>{% endfor %}
+</code></pre></div>
+<h3 id="custom-filters">Custom Filters<a class="headerlink" href="#custom-filters" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>{# Convert kebab-case to snake_case #}
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>{{ imbi_project.slug | replace(&#39;-&#39;, &#39;_&#39;) }}
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>{# Convert to SCREAMING_SNAKE_CASE #}
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>{{ imbi_project.slug | replace(&#39;-&#39;, &#39;_&#39;) | upper }}
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>{# Truncate long descriptions #}
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>{{ imbi_project.description | truncate(100, True, &#39;...&#39;) }}
+</code></pre></div>
+<h2 id="path-resolution">Path Resolution<a class="headerlink" href="#path-resolution" title="Permanent link">&para;</a></h2>
+<p>Both source and destination support ResourceUrl schemes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># Workflow templates to repository</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///templates/&quot;</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///config/&quot;</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="c1"># Specific file paths</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///README.md.j2&quot;</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///README.md&quot;</span>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="c1"># Extracted data with templates</span>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;template&quot;</span>
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a><span class="n">source_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow:///process-extracted.j2&quot;</span>
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a><span class="n">destination_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///processed/output.txt&quot;</span>
+</code></pre></div>
+<h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<p>Template actions raise errors for:</p>
+<ul>
+<li><strong>Missing source</strong>: Source file/directory doesn't exist</li>
+<li><strong>Template syntax errors</strong>: Invalid Jinja2 syntax</li>
+<li><strong>Undefined variables</strong>: Referenced variables not in context</li>
+<li><strong>I/O errors</strong>: Permission denied, disk full, etc.</li>
+</ul>
+<h3 id="handling-undefined-variables">Handling Undefined Variables<a class="headerlink" href="#handling-undefined-variables" title="Permanent link">&para;</a></h3>
+<p><strong>Strict mode (default - raises error):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>{{ undefined_variable }}  {# Raises error #}
+</code></pre></div></p>
+<p><strong>Graceful fallback:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>{{ undefined_variable | default(&#39;fallback value&#39;) }}
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>{{ undefined_variable | default(&#39;&#39;) }}
+</code></pre></div></p>
+<p><strong>Check before use:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>{% if undefined_variable is defined %}
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>  {{ undefined_variable }}
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>{% endif %}
+</code></pre></div></p>
+<h2 id="implementation-notes">Implementation Notes<a class="headerlink" href="#implementation-notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Templates rendered using Jinja2 with StrictUndefined by default</li>
+<li>Context variables automatically passed via <code>context.model_dump()</code> in <code>prompts.render()</code></li>
+<li><code>.j2</code> extension NOT automatically removed from output filenames</li>
+<li>Directory rendering is recursive via <code>source_path.rglob('*')</code></li>
+<li>Existing files overwritten without warning</li>
+<li>Parent directories created automatically with <code>mkdir(parents=True, exist_ok=True)</code></li>
+<li>File permissions NOT explicitly preserved (uses default umask)</li>
+<li>Template context is immutable during rendering</li>
+<li>All Jinja2 built-in filters and tests available</li>
+<li>Custom template functions: <code>extract_image_from_dockerfile</code>, <code>extract_package_name_from_pyproject</code>, <code>get_component_version</code>, <code>python_init_file_path</code>, <code>read_file</code>, <code>compare_semver</code></li>
+</ul>
+<p><strong>Implementation Location</strong>: <code>src/imbi_automations/actions/template.py:24-101</code></p>
+<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Use <code>.j2</code> extension</strong>: Makes templates easily identifiable</li>
+<li><strong>Provide defaults</strong>: Use <code>| default()</code> for optional values</li>
+<li><strong>Check existence</strong>: Test <code>is defined</code> before accessing optional data</li>
+<li><strong>Document templates</strong>: Add comments explaining template logic</li>
+<li><strong>Test templates</strong>: Verify output with sample data before production</li>
+<li><strong>Version control</strong>: Keep templates in workflow resources</li>
+<li><strong>Validate output</strong>: Use shell actions to validate generated configs</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
