@@ -88,13 +88,18 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
 
             # Copy preserved state to new temp location, ignoring workflow
             # symlink (may be broken if path differs between environments)
+            source_root = self.resume_state.preserved_directory_path.resolve()
+
             def ignore_workflow_symlink(
                 directory: str, contents: list[str]
             ) -> list[str]:
-                return ['workflow'] if 'workflow' in contents else []
+                # Only ignore workflow symlink at root level, not nested dirs
+                if pathlib.Path(directory) == source_root:
+                    return ['workflow'] if 'workflow' in contents else []
+                return []
 
             shutil.copytree(
-                self.resume_state.preserved_directory_path.resolve(),
+                source_root,
                 working_directory.name,
                 dirs_exist_ok=True,
                 symlinks=True,
