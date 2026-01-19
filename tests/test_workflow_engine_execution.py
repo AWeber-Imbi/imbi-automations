@@ -1421,6 +1421,7 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
         super().setUp()
         self.temp_dir = tempfile.TemporaryDirectory()
         self.preserved_dir = tempfile.TemporaryDirectory()
+        self.workflow_dir = tempfile.TemporaryDirectory()
         self.working_directory = pathlib.Path(self.temp_dir.name)
         self.preserved_path = pathlib.Path(self.preserved_dir.name)
 
@@ -1434,7 +1435,8 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
             ),
         )
 
-        self.workflow_path = pathlib.Path('/mock/workflow')
+        # Use a real directory for workflow path (needed for symlink creation)
+        self.workflow_path = pathlib.Path(self.workflow_dir.name)
         self.workflow = models.Workflow(
             path=self.workflow_path,
             configuration=models.WorkflowConfiguration(
@@ -1485,6 +1487,7 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
         super().tearDown()
         self.temp_dir.cleanup()
         self.preserved_dir.cleanup()
+        self.workflow_dir.cleanup()
 
     async def test_execute_resumes_from_failed_action(self) -> None:
         """Test that execute resumes from the correct action index."""

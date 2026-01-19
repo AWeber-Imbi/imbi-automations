@@ -86,13 +86,31 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             # Resume mode: reuse preserved directory (don't auto-cleanup)
             working_directory = tempfile.TemporaryDirectory(delete=False)
 
-            # Copy preserved state to new temp location
+            # Copy preserved state to new temp location, ignoring workflow
+            # symlink (may be broken if path differs between environments)
+            source_root = self.resume_state.preserved_directory_path.resolve()
+
+            def ignore_workflow_symlink(
+                directory: str, contents: list[str]
+            ) -> list[str]:
+                # Only ignore workflow symlink at root level, not nested dirs
+                if pathlib.Path(directory) == source_root:
+                    return ['workflow'] if 'workflow' in contents else []
+                return []
+
             shutil.copytree(
-                self.resume_state.preserved_directory_path,
+                source_root,
                 working_directory.name,
                 dirs_exist_ok=True,
                 symlinks=True,
+                ignore=ignore_workflow_symlink,
             )
+
+            # Recreate workflow symlink using current workflow path
+            workflow_symlink = (
+                pathlib.Path(working_directory.name) / 'workflow'
+            )
+            workflow_symlink.symlink_to(self.workflow.path.resolve())
 
             # Restore context from saved state
             context = self._restore_workflow_context(
@@ -964,8 +982,11 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         project_slug = context.imbi_project.slug
 
         # Create target directory: <base>/<workflow>/<project>-<timestamp>
+        # Resolve to absolute path to ensure resume works across environments
         target_path = (
-            target_base_dir / workflow_slug / f'{project_slug}-{timestamp}'
+            target_base_dir.resolve()
+            / workflow_slug
+            / f'{project_slug}-{timestamp}'
         )
 
         try:

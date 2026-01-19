@@ -166,6 +166,10 @@ class Automation(mixins.WorkflowLoggerMixin):
                 f'Failed to load resume state from {state_file}: {exc}'
             ) from exc
 
+        # Update preserved_directory_path to use the actual path provided
+        # by user (state file may contain relative or outdated path)
+        state.preserved_directory_path = self.args.resume.resolve()
+
         self.logger.info(
             'Resuming workflow "%s" for project %s from action "%s" '
             '(index %d)',
