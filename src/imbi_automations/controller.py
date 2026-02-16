@@ -296,8 +296,11 @@ class Automation(mixins.WorkflowLoggerMixin):
 
         first_followup_idx, first_followup_action = followup_actions[0]
 
-        # Determine PR branch name
-        pr_branch = f'imbi-automations/{self.workflow.slug}'
+        # Fetch actual PR branch name from GitHub API
+        org, repo_name = github_repository.full_name.split('/', 1)
+        gh_client = clients.GitHub.get_instance(config=self.configuration)
+        pr = await gh_client.get_pull_request(org, repo_name, pr_number)
+        pr_branch = pr.head['ref']
 
         self.logger.info(
             'Re-running followup stage for project %s (PR #%d on branch %s)',
