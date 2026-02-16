@@ -310,51 +310,53 @@ class Automation(mixins.WorkflowLoggerMixin):
         temp_dir = tempfile.mkdtemp(prefix=f'imbi-rerun-{project.slug}-')
         temp_path = pathlib.Path(temp_dir)
 
-        # Create workflow symlink and extracted directory
-        (temp_path / 'workflow').symlink_to(self.workflow.path.resolve())
-        (temp_path / 'extracted').mkdir(exist_ok=True)
-
-        # Determine clone URL based on workflow clone type
-        if (
-            self.workflow.configuration.git.clone_type
-            == models.WorkflowGitCloneType.ssh
-        ):
-            clone_url = github_repository.ssh_url
-        else:
-            clone_url = github_repository.clone_url
-
-        # Clone repository on the PR branch
-        starting_commit = await git.clone_repository(
-            temp_path,
-            clone_url,
-            branch=pr_branch,
-            depth=self.workflow.configuration.git.depth,
-        )
-
-        # Construct synthetic ResumeState
-        state = models.ResumeState(
-            workflow_slug=self.workflow.slug,
-            workflow_path=self.workflow.path,
-            project_id=project.id,
-            project_slug=project.slug,
-            failed_action_index=first_followup_idx,
-            failed_action_name=first_followup_action.name,
-            completed_action_indices=primary_indices,
-            current_stage='followup',
-            starting_commit=starting_commit,
-            has_repository_changes=True,
-            github_repository=github_repository,
-            pull_request_number=pr_number,
-            pull_request_url=None,
-            pr_branch=pr_branch,
-            error_message='Synthetic state for --rerun-followup',
-            error_timestamp=datetime.datetime.now(tz=datetime.UTC),
-            preserved_directory_path=temp_path,
-            configuration_hash=utils.hash_configuration(self.configuration),
-        )
-
-        # Initialize workflow engine with synthetic resume state
         try:
+            # Create workflow symlink and extracted directory
+            (temp_path / 'workflow').symlink_to(self.workflow.path.resolve())
+            (temp_path / 'extracted').mkdir(exist_ok=True)
+
+            # Determine clone URL based on workflow clone type
+            if (
+                self.workflow.configuration.git.clone_type
+                == models.WorkflowGitCloneType.ssh
+            ):
+                clone_url = github_repository.ssh_url
+            else:
+                clone_url = github_repository.clone_url
+
+            # Clone repository on the PR branch
+            starting_commit = await git.clone_repository(
+                temp_path,
+                clone_url,
+                branch=pr_branch,
+                depth=self.workflow.configuration.git.depth,
+            )
+
+            # Construct synthetic ResumeState
+            state = models.ResumeState(
+                workflow_slug=self.workflow.slug,
+                workflow_path=self.workflow.path,
+                project_id=project.id,
+                project_slug=project.slug,
+                failed_action_index=first_followup_idx,
+                failed_action_name=first_followup_action.name,
+                completed_action_indices=primary_indices,
+                current_stage='followup',
+                starting_commit=starting_commit,
+                has_repository_changes=True,
+                github_repository=github_repository,
+                pull_request_number=pr_number,
+                pull_request_url=None,
+                pr_branch=pr_branch,
+                error_message='Synthetic state for --rerun-followup',
+                error_timestamp=datetime.datetime.now(tz=datetime.UTC),
+                preserved_directory_path=temp_path,
+                configuration_hash=utils.hash_configuration(
+                    self.configuration
+                ),
+            )
+
+            # Initialize workflow engine with synthetic resume state
             self._workflow_engine = workflow_engine.WorkflowEngine(
                 config=self.configuration,
                 workflow=self.workflow,
