@@ -177,6 +177,20 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         help='Resume from previous error state directory '
         '(looks for .state file inside)',
     )
+    target_group.add_argument(
+        '--rerun-followup',
+        type=int,
+        metavar='PROJECT_ID',
+        help='Re-run followup stage for a project with an existing PR '
+        '(requires --pr-number)',
+    )
+
+    parser.add_argument(
+        '--pr-number',
+        type=int,
+        metavar='NUMBER',
+        help='Pull request number (required with --rerun-followup)',
+    )
 
     parser.add_argument(
         '--start-from-project',

@@ -8,13 +8,17 @@ concurrency control, and comprehensive error handling.
 import argparse
 import asyncio
 import collections
+import datetime
 import enum
 import logging
+import pathlib
+import tempfile
 
 import async_lru
 
 from imbi_automations import (
     clients,
+    git,
     imc,
     mixins,
     models,
@@ -94,7 +98,7 @@ class Automation(mixins.WorkflowLoggerMixin):
             AutomationIterator enum value corresponding to the target type
 
         """
-        if self.args.resume:
+        if self.args.resume or self.args.rerun_followup:
             return None
         elif self.args.project_id:
             return AutomationIterator.imbi_project
@@ -120,6 +124,8 @@ class Automation(mixins.WorkflowLoggerMixin):
 
         if self.args.resume:
             return await self._resume_from_state()
+        if self.args.rerun_followup:
+            return await self._rerun_followup_stage()
 
         self._validate_workflow_filters()
 
@@ -234,6 +240,138 @@ class Automation(mixins.WorkflowLoggerMixin):
             self.logger.error(
                 'Workflow resume failed for %s', state.project_slug
             )
+
+        return success
+
+    async def _rerun_followup_stage(self) -> bool:
+        """Re-run the followup stage for a project with an existing PR.
+
+        Creates a synthetic resume state targeting the first followup
+        action, clones the repository on the PR branch, and executes
+        the workflow engine in resume mode.
+
+        Returns:
+            True if workflow completed successfully, False otherwise
+
+        Raises:
+            RuntimeError: If --pr-number not provided, no followup
+                actions exist, or project/repository lookup fails
+
+        """
+        if not self.args.pr_number:
+            raise RuntimeError('--pr-number is required with --rerun-followup')
+
+        project_id = self.args.rerun_followup
+        pr_number = self.args.pr_number
+
+        # Fetch project and GitHub repository
+        client = clients.Imbi.get_instance(config=self.configuration.imbi)
+        project = await client.get_project(project_id)
+        github_repository = await self._get_github_repository(project)
+
+        if not github_repository:
+            raise RuntimeError(
+                f'No GitHub repository found for project {project.slug}'
+            )
+
+        # Find followup actions and primary action indices
+        all_actions = list(enumerate(self.workflow.configuration.actions))
+        primary_indices = [
+            i
+            for i, a in all_actions
+            if a.stage == models.WorkflowActionStage.primary
+        ]
+        followup_actions = [
+            (i, a)
+            for i, a in all_actions
+            if a.stage == models.WorkflowActionStage.followup
+        ]
+
+        if not followup_actions:
+            raise RuntimeError(
+                f'Workflow "{self.workflow.configuration.name}" has no '
+                f'followup actions to re-run'
+            )
+
+        first_followup_idx, first_followup_action = followup_actions[0]
+
+        # Determine PR branch name
+        pr_branch = f'imbi-automations/{self.workflow.slug}'
+
+        self.logger.info(
+            'Re-running followup stage for project %s (PR #%d on branch %s)',
+            project.slug,
+            pr_number,
+            pr_branch,
+        )
+
+        # Create temp directory with standard structure
+        temp_dir = tempfile.mkdtemp(prefix=f'imbi-rerun-{project.slug}-')
+        temp_path = pathlib.Path(temp_dir)
+
+        # Create workflow symlink and extracted directory
+        (temp_path / 'workflow').symlink_to(self.workflow.path.resolve())
+        (temp_path / 'extracted').mkdir(exist_ok=True)
+
+        # Determine clone URL based on workflow clone type
+        if (
+            self.workflow.configuration.git.clone_type
+            == models.WorkflowGitCloneType.ssh
+        ):
+            clone_url = github_repository.ssh_url
+        else:
+            clone_url = github_repository.clone_url
+
+        # Clone repository on the PR branch
+        starting_commit = await git.clone_repository(
+            temp_path,
+            clone_url,
+            branch=pr_branch,
+            depth=self.workflow.configuration.git.depth,
+        )
+
+        # Construct synthetic ResumeState
+        state = models.ResumeState(
+            workflow_slug=self.workflow.slug,
+            workflow_path=self.workflow.path,
+            project_id=project.id,
+            project_slug=project.slug,
+            failed_action_index=first_followup_idx,
+            failed_action_name=first_followup_action.name,
+            completed_action_indices=primary_indices,
+            current_stage='followup',
+            starting_commit=starting_commit,
+            has_repository_changes=True,
+            github_repository=github_repository,
+            pull_request_number=pr_number,
+            pull_request_url=None,
+            pr_branch=pr_branch,
+            error_message='Synthetic state for --rerun-followup',
+            error_timestamp=datetime.datetime.now(tz=datetime.UTC),
+            preserved_directory_path=temp_path,
+            configuration_hash=utils.hash_configuration(self.configuration),
+        )
+
+        # Initialize workflow engine with synthetic resume state
+        self._workflow_engine = workflow_engine.WorkflowEngine(
+            config=self.configuration,
+            workflow=self.workflow,
+            verbose=self.args.verbose,
+            resume_state=state,
+            registry=self.registry,
+        )
+
+        # Execute workflow in resume mode
+        success = await self.workflow_engine.execute(
+            project, github_repository
+        )
+
+        if success:
+            self.logger.info(
+                'Successfully completed followup re-run for %s', project.slug
+            )
+        else:
+            self.logger.error('Followup re-run failed for %s', project.slug)
 
         return success
 
