@@ -12,6 +12,7 @@ import datetime
 import enum
 import logging
 import pathlib
+import shutil
 import tempfile
 
 import async_lru
@@ -353,18 +354,22 @@ class Automation(mixins.WorkflowLoggerMixin):
         )
 
         # Initialize workflow engine with synthetic resume state
-        self._workflow_engine = workflow_engine.WorkflowEngine(
-            config=self.configuration,
-            workflow=self.workflow,
-            verbose=self.args.verbose,
-            resume_state=state,
-            registry=self.registry,
-        )
+        try:
+            self._workflow_engine = workflow_engine.WorkflowEngine(
+                config=self.configuration,
+                workflow=self.workflow,
+                verbose=self.args.verbose,
+                resume_state=state,
+                registry=self.registry,
+            )
 
-        # Execute workflow in resume mode
-        success = await self.workflow_engine.execute(
-            project, github_repository
-        )
+            # Execute workflow in resume mode
+            success = await self.workflow_engine.execute(
+                project, github_repository
+            )
+        except Exception:
+            shutil.rmtree(temp_path, ignore_errors=True)
+            raise
 
         if success:
             self.logger.info(
