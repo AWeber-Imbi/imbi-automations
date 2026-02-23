@@ -883,6 +883,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         content: str
         | list[
             claude_agent_sdk.TextBlock
+            | claude_agent_sdk.ThinkingBlock
             | claude_agent_sdk.ContentBlock
             | claude_agent_sdk.ToolUseBlock
             | claude_agent_sdk.ToolResultBlock
@@ -903,6 +904,15 @@ class Claude(mixins.WorkflowLoggerMixin):
                         self.context.imbi_project.slug,
                         message_type,
                         entry.text.rstrip(':'),
+                    )
+                elif isinstance(entry, claude_agent_sdk.ThinkingBlock):
+                    self.logger.debug(
+                        '[%s] %s: [thinking] %s',
+                        self.context.imbi_project.slug,
+                        message_type,
+                        entry.thinking[:100] + '...'
+                        if len(entry.thinking) > 100
+                        else entry.thinking,
                     )
                 elif isinstance(
                     entry,

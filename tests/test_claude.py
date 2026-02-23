@@ -630,6 +630,69 @@ class ClaudeTestCase(base.AsyncTestCase):
             '[%s] %s: %s', 'test-project', 'Test Type', 'Simple string message'
         )
 
+    def test_log_message_with_thinking_block(self) -> None:
+        """Test _log_message method with ThinkingBlock."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # Create a mock ThinkingBlock
+        thinking_block = claude_agent_sdk.ThinkingBlock(
+            thinking='This is some thinking content',
+            signature='test-signature',
+        )
+        content = [thinking_block]
+
+        with mock.patch.object(claude_instance.logger, 'debug') as mock_debug:
+            claude_instance._log_message('Test Type', content)
+
+        mock_debug.assert_called_once_with(
+            '[%s] %s: [thinking] %s',
+            'test-project',
+            'Test Type',
+            'This is some thinking content',
+        )
+
+    def test_log_message_with_long_thinking_block(self) -> None:
+        """Test _log_message method with long ThinkingBlock content."""
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+
+        # Create a mock ThinkingBlock with long content
+        long_thinking = 'a' * 150  # More than 100 characters
+        thinking_block = claude_agent_sdk.ThinkingBlock(
+            thinking=long_thinking, signature='test-signature'
+        )
+        content = [thinking_block]
+
+        with mock.patch.object(claude_instance.logger, 'debug') as mock_debug:
+            claude_instance._log_message('Test Type', content)
+
+        # Should be truncated to 100 chars + '...'
+        mock_debug.assert_called_once_with(
+            '[%s] %s: [thinking] %s',
+            'test-project',
+            'Test Type',
+            'a' * 100 + '...',
+        )
+
     def test_log_message_with_unknown_block_type(self) -> None:
         """Test _log_message method with unknown block type."""
         with (
@@ -822,9 +885,7 @@ class InstallPluginsTestCase(base.AsyncTestCase):
         # Verify symlink was created
         expected_path = self.installed_dir / 'local-plugin'
         self.assertTrue(expected_path.is_symlink())
-        self.assertEqual(
-            expected_path.resolve(), plugin_source.resolve()
-        )
+        self.assertEqual(expected_path.resolve(), plugin_source.resolve())
         self.assertEqual(result, [str(expected_path)])
 
     async def test_install_plugins_directory_source_not_found(self) -> None:
