@@ -145,6 +145,6 @@ docs = [
   "mkdocs>=1.5,<2",
   "mkdocs-autorefs",
   "mkdocs-material>9.5,<10",
-  "mkdocstrings-python-xref>=1.6,<2",
+  "mkdocstrings-python-xref>=1.6,<3",
   "mkdocstrings[python]>=0.26,<1.1",
 ]
