@@ -1,0 +1,3007 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../workflow-filters/">
+      
+      
+        <link rel="next" href="../path-schemes/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Conditions - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#workflow-conditions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Conditions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#condition-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Levels
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition Levels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-level-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow-Level Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-level-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action-Level Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#condition-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remote-conditions-pre-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote Conditions (Pre-Clone)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remote Conditions (Pre-Clone)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_not_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_not_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_contains-remote_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_contains + remote_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_doesnt_contain-remote_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_doesnt_contain + remote_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_client
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-conditions-post-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local Conditions (Post-Clone)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Local Conditions (Post-Clone)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_not_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_not_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_contains-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_contains + file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_doesnt_contain-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_doesnt_contain + file
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-conditions-post-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Conditions (Post-Clone)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template Conditions (Post-Clone)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        when
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="when">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compare_semvercurrent-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compare_semver(current, target)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_component_versionpath-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_component_version(path, component)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combined-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combined examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#condition-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Evaluation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition Evaluation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#condition_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_type
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="condition_type">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#and-logic-condition_type-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AND Logic (condition_type = "all")
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#or-logic-condition_type-any" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OR Logic (condition_type = "any")
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#real-world-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real-World Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Real-World Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-workflow-level-conditions-example-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Workflow-Level Conditions (example-workflow)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-action-level-conditions-conditional-docker-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Action-Level Conditions (Conditional Docker Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-multiple-action-conditions-compose-file-variations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: Multiple Action Conditions (Compose File Variations)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-conditional-dockerfile-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: Conditional Dockerfile Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-5-multiple-condition-fallbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 5: Multiple Condition Fallbacks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-use-remote-conditions-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Use Remote Conditions First
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-combine-and-logic-for-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Combine AND Logic for Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-use-or-logic-for-flexibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Use OR Logic for Flexibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-action-conditions-for-optional-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Action Conditions for Optional Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-avoid-over-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Avoid Over-Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#condition-vs-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition vs Filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#condition-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Levels
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition Levels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-level-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow-Level Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-level-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action-Level Conditions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#condition-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remote-conditions-pre-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote Conditions (Pre-Clone)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Remote Conditions (Pre-Clone)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_not_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_not_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_contains-remote_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_contains + remote_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_file_doesnt_contain-remote_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_file_doesnt_contain + remote_file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remote_client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remote_client
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-conditions-post-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local Conditions (Post-Clone)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Local Conditions (Post-Clone)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_not_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_not_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_contains-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_contains + file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file_doesnt_contain-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        file_doesnt_contain + file
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-conditions-post-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Conditions (Post-Clone)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template Conditions (Post-Clone)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        when
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="when">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compare_semvercurrent-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compare_semver(current, target)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_component_versionpath-component" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_component_version(path, component)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combined-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combined examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#condition-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition Evaluation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Condition Evaluation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#condition_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_type
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="condition_type">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#and-logic-condition_type-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AND Logic (condition_type = "all")
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#or-logic-condition_type-any" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OR Logic (condition_type = "any")
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#real-world-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real-World Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Real-World Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-workflow-level-conditions-example-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: Workflow-Level Conditions (example-workflow)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-action-level-conditions-conditional-docker-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: Action-Level Conditions (Conditional Docker Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-multiple-action-conditions-compose-file-variations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: Multiple Action Conditions (Compose File Variations)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-conditional-dockerfile-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: Conditional Dockerfile Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-5-multiple-condition-fallbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 5: Multiple Condition Fallbacks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-use-remote-conditions-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Use Remote Conditions First
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-combine-and-logic-for-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Combine AND Logic for Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-use-or-logic-for-flexibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Use OR Logic for Flexibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-action-conditions-for-optional-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Action Conditions for Optional Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-avoid-over-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Avoid Over-Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#condition-vs-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition vs Filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="workflow-conditions">Workflow Conditions<a class="headerlink" href="#workflow-conditions" title="Permanent link">&para;</a></h1>
+<p>Conditions check repository state to determine if workflows or individual actions should execute. They provide fine-grained control over workflow execution based on file existence, file contents, and repository structure.</p>
+<h2 id="condition-levels">Condition Levels<a class="headerlink" href="#condition-levels" title="Permanent link">&para;</a></h2>
+<p>Conditions can be applied at two levels:</p>
+<h3 id="workflow-level-conditions">Workflow-Level Conditions<a class="headerlink" href="#workflow-level-conditions" title="Permanent link">&para;</a></h3>
+<p>Evaluated once per project before any actions execute. If conditions fail, the entire workflow is skipped.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+</code></pre></div>
+<h3 id="action-level-conditions">Action-Level Conditions<a class="headerlink" href="#action-level-conditions" title="Permanent link">&para;</a></h3>
+<p>Evaluated before each action executes. If conditions fail, only that specific action is skipped.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-dockerfile&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div>
+<h2 id="condition-types">Condition Types<a class="headerlink" href="#condition-types" title="Permanent link">&para;</a></h2>
+<h3 id="remote-conditions-pre-clone">Remote Conditions (Pre-Clone)<a class="headerlink" href="#remote-conditions-pre-clone" title="Permanent link">&para;</a></h3>
+<p>Remote conditions are checked via API before cloning the repository. They are <strong>faster</strong> and more <strong>efficient</strong> than local conditions.</p>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>⚡ No repository cloning required</li>
+<li>💾 Saves bandwidth and disk space</li>
+<li>🚀 Faster workflow evaluation</li>
+<li>✅ Early filtering (fail fast)</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li>Limited to single file content checks</li>
+<li>No glob pattern support for content matching</li>
+<li>API rate limits may apply</li>
+</ul>
+<h4 id="remote_file_exists">remote_file_exists<a class="headerlink" href="#remote_file_exists" title="Permanent link">&para;</a></h4>
+<p>Check if a file exists using the GitHub API.</p>
+<p><strong>Type:</strong> <code>string</code> (file path or glob pattern)  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+</code></pre></div>
+<p><strong>Glob pattern support:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;**/*.tf&quot;</span><span class="w">  </span><span class="c1"># Any Terraform file recursively</span>
+</code></pre></div></p>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+</code></pre></div></p>
+<p><strong>Why?</strong> Workflow migrates projects from setup.cfg to pyproject.toml, so it only runs on projects that still have setup.cfg.</p>
+<h4 id="remote_file_not_exists">remote_file_not_exists<a class="headerlink" href="#remote_file_not_exists" title="Permanent link">&para;</a></h4>
+<p>Check if a file does NOT exist using the GitHub API.</p>
+<p><strong>Type:</strong> <code>string</code> (file path or glob pattern)  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">remote_file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">remote_file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div></p>
+<p><strong>Why?</strong> Combined with <code>remote_file_exists = "setup.cfg"</code>, this targets projects that haven't been migrated yet (have setup.cfg but no pyproject.toml).</p>
+<h4 id="remote_file_contains-remote_file">remote_file_contains + remote_file<a class="headerlink" href="#remote_file_contains-remote_file" title="Permanent link">&para;</a></h4>
+<p>Check if a file contains specific text or matches a regex pattern.</p>
+<p><strong>Type:</strong> <code>string</code> (pattern to search for)  </p>
+<p><strong>Requires:</strong> <code>remote_file</code> field with target file path</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*3</span><span class="se">\\</span><span class="s2">.9&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+</code></pre></div>
+<p><strong>Pattern matching:</strong></p>
+<ol>
+<li>String search first (fast)</li>
+<li>Falls back to regex if string not found</li>
+<li>Use regex escaping: <code>\\.</code> for literal <code>.</code>, <code>\\d</code> for digits</li>
+</ol>
+<p><strong>Example - exact string:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FROM python:3.9&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div></p>
+<p><strong>Example - regex pattern:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python_requires.*=[</span><span class="se">\&quot;</span><span class="s2">&#39;]&gt;=3</span><span class="se">\\</span><span class="s2">.(9|10)&quot;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+</code></pre></div></p>
+<h4 id="remote_file_doesnt_contain-remote_file">remote_file_doesnt_contain + remote_file<a class="headerlink" href="#remote_file_doesnt_contain-remote_file" title="Permanent link">&para;</a></h4>
+<p>Check if a file does NOT contain a pattern.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">remote_file_doesnt_contain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*3</span><span class="se">\\</span><span class="s2">.12&quot;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<h4 id="remote_client">remote_client<a class="headerlink" href="#remote_client" title="Permanent link">&para;</a></h4>
+<p>Specify which API client to use for remote checks.</p>
+<p><strong>Type:</strong> <code>string</code></p>
+<p><strong>Values:</strong> <code>"github"</code> (default)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">remote_client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github&quot;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.github/workflows/ci.yml&quot;</span>
+</code></pre></div>
+<h3 id="local-conditions-post-clone">Local Conditions (Post-Clone)<a class="headerlink" href="#local-conditions-post-clone" title="Permanent link">&para;</a></h3>
+<p>Local conditions are checked after cloning the repository. They have <strong>full filesystem access</strong> and support <strong>glob patterns</strong>.</p>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>✅ Full glob pattern support</li>
+<li>✅ Access to all files, even .gitignored</li>
+<li>✅ Complex pattern matching</li>
+<li>✅ Directory checks</li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul>
+<li>🐌 Requires git clone first</li>
+<li>💾 Uses bandwidth and disk space</li>
+<li>⏱️ Slower than remote conditions</li>
+</ul>
+<h4 id="file_exists">file_exists<a class="headerlink" href="#file_exists" title="Permanent link">&para;</a></h4>
+<p>Check if a file or directory exists locally.</p>
+<p><strong>Type:</strong> <a href="../actions/#resourceurl-path-system"><code>ResourceUrl</code></a> (path relative to repository)</p>
+<p><strong>Supports:</strong> Glob patterns</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div>
+<p><strong>Glob patterns:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;**/*.py&quot;</span><span class="w">  </span><span class="c1"># Any Python file recursively</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;src/**/__init__.py&quot;</span><span class="w">  </span><span class="c1"># __init__.py in any src subdirectory</span>
+</code></pre></div></p>
+<p><strong>Real-world example from example-workflow (action-level):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-constraints&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docker&quot;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ extract_image_from_dockerfile(&#39;repository/Dockerfile&#39;) }}&quot;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/tmp/constraints.txt&quot;</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///constraints.txt&quot;</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div></p>
+<p><strong>Why?</strong> Only extract Docker constraints if project has a Dockerfile.</p>
+<h4 id="file_not_exists">file_not_exists<a class="headerlink" href="#file_not_exists" title="Permanent link">&para;</a></h4>
+<p>Check if a file or directory does NOT exist locally.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.travis.yml&quot;</span><span class="w">  </span><span class="c1"># No legacy CI</span>
+</code></pre></div>
+<p><strong>Real-world example from example-workflow (action-level):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-original-compose-yml&quot;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">commit_keyword</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;migration&quot;</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;compose.yml&quot;</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="n">file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+</code></pre></div></p>
+<p><strong>Why?</strong> Only attempt to extract compose.yml from git history if we haven't already extracted it from a previous attempt (compose.yaml).</p>
+<h4 id="file_contains-file">file_contains + file<a class="headerlink" href="#file_contains-file" title="Permanent link">&para;</a></h4>
+<p>Check if a file contains specific text or matches a regex pattern.</p>
+<p><strong>Type:</strong> <code>string</code> (pattern to search for)  </p>
+<p><strong>Requires:</strong> <code>file</code> field with target file path</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FROM python:3</span><span class="se">\\</span><span class="s2">.9&quot;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div>
+<p><strong>Pattern matching:</strong></p>
+<ol>
+<li>String search first (fast)</li>
+<li>Falls back to regex if string not found</li>
+<li>Use regex escaping: <code>\\.</code> for literal <code>.</code>, <code>\\d</code> for digits</li>
+</ol>
+<p><strong>Example - Check Python version:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*3</span><span class="se">\\</span><span class="s2">.(9|10|11)&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div></p>
+<p><strong>Example - Check dependencies:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;fastapi.*==.*0</span><span class="se">\\</span><span class="s2">.&quot;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements.txt&quot;</span>
+</code></pre></div></p>
+<h4 id="file_doesnt_contain-file">file_doesnt_contain + file<a class="headerlink" href="#file_doesnt_contain-file" title="Permanent link">&para;</a></h4>
+<p>Check if a file does NOT contain a pattern.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">file_doesnt_contain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*2</span><span class="se">\\</span><span class="s2">.&quot;</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.py&quot;</span>
+</code></pre></div>
+<h3 id="template-conditions-post-clone">Template Conditions (Post-Clone)<a class="headerlink" href="#template-conditions-post-clone" title="Permanent link">&para;</a></h3>
+<p>Template conditions use Jinja2 expressions for complex logic. They have access to template functions like <code>compare_semver()</code> and <code>get_component_version()</code>.</p>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>✅ Complex conditional logic</li>
+<li>✅ Version comparison support</li>
+<li>✅ Access to workflow context</li>
+<li>✅ Dependency version extraction</li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul>
+<li>🐌 Requires git clone first</li>
+<li>⏱️ Template evaluation overhead</li>
+</ul>
+<h4 id="when">when<a class="headerlink" href="#when" title="Permanent link">&para;</a></h4>
+<p>Evaluate a Jinja2 template expression. If the result is truthy, the condition passes.</p>
+<p><strong>Type:</strong> <code>string</code> (Jinja2 template)  </p>
+<p><strong>Truthiness evaluation:</strong></p>
+<ul>
+<li><strong>Truthy:</strong> <code>True</code>, <code>true</code>, <code>1</code>, <code>yes</code>, any non-empty string</li>
+<li><strong>Falsy:</strong> <code>False</code>, <code>false</code>, <code>0</code>, <code>no</code>, <code>none</code>, empty string</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ compare_semver(get_component_version(&#39;repository:///package.json&#39;, &#39;react&#39;), &#39;19.0.0&#39;).is_older }}&quot;</span>
+</code></pre></div>
+<p><strong>Template functions available:</strong></p>
+<ul>
+<li><code>compare_semver(current, target)</code> - Compare two semantic versions</li>
+<li><code>get_component_version(path, component)</code> - Extract dependency version from package.json or pyproject.toml</li>
+</ul>
+<h5 id="compare_semvercurrent-target">compare_semver(current, target)<a class="headerlink" href="#compare_semvercurrent-target" title="Permanent link">&para;</a></h5>
+<p>Compares two semantic versions and returns a dict with comparison results.</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>current</code>: Current version string (e.g., "18.2.0", "3.9.18-4")</li>
+<li><code>target</code>: Target version string to compare against</li>
+</ul>
+<p><strong>Returns:</strong> Dict with:</p>
+<ul>
+<li><code>is_older</code>: True if current &lt; target</li>
+<li><code>is_equal</code>: True if current == target</li>
+<li><code>is_newer</code>: True if current &gt; target</li>
+<li><code>comparison</code>: -1 (older), 0 (equal), or 1 (newer)</li>
+<li><code>current_major</code>, <code>current_minor</code>, <code>current_patch</code>, <code>current_build</code></li>
+<li><code>target_major</code>, <code>target_minor</code>, <code>target_patch</code>, <code>target_build</code></li>
+</ul>
+<p><strong>Version handling:</strong></p>
+<ul>
+<li>Strips prefixes like <code>v</code>, <code>^</code>, <code>~</code>, <code>&gt;=</code></li>
+<li>Handles partial versions (e.g., "3.9" → "3.9.0")</li>
+<li>Supports build numbers (e.g., "3.9.18-4")</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Check if React is older than 19.0.0</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ compare_semver(&#39;18.2.0&#39;, &#39;19.0.0&#39;).is_older }}&quot;</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="c1"># Check major version</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ compare_semver(get_component_version(&#39;repository:///package.json&#39;, &#39;react&#39;), &#39;18.0.0&#39;).current_major &gt;= 17 }}&quot;</span>
+</code></pre></div>
+<h5 id="get_component_versionpath-component">get_component_version(path, component)<a class="headerlink" href="#get_component_versionpath-component" title="Permanent link">&para;</a></h5>
+<p>Extracts a dependency version from a manifest file.</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>path</code>: ResourceUrl path to manifest file (e.g., "repository:///package.json")</li>
+<li><code>component</code>: Name of the dependency to extract</li>
+</ul>
+<p><strong>Supported file types:</strong></p>
+<ul>
+<li><code>package.json</code>: Searches dependencies, devDependencies, peerDependencies</li>
+<li><code>pyproject.toml</code>: Searches project.dependencies, optional-dependencies, Poetry dependencies</li>
+</ul>
+<p><strong>Returns:</strong> Clean version string without prefixes</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Check React version in package.json</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ compare_semver(get_component_version(&#39;repository:///package.json&#39;, &#39;react&#39;), &#39;19.0.0&#39;).is_older }}&quot;</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="c1"># Check Pydantic version in pyproject.toml</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ compare_semver(get_component_version(&#39;repository:///pyproject.toml&#39;, &#39;pydantic&#39;), &#39;2.0.0&#39;).is_older }}&quot;</span>
+</code></pre></div>
+<h5 id="combined-examples">Combined examples<a class="headerlink" href="#combined-examples" title="Permanent link">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Skip upgrade workflow if already on target version</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ compare_semver(get_component_version(&#39;repository:///package.json&#39;, &#39;react&#39;), &#39;19.0.0&#39;).is_older }}&quot;</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="c1"># Complex negation</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ not compare_semver(get_component_version(&#39;repository:///pyproject.toml&#39;, &#39;pydantic&#39;), &#39;2.0.0&#39;).is_newer }}&quot;</span>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="c1"># String checks on version</span>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ get_component_version(&#39;repository:///pyproject.toml&#39;, &#39;python&#39;).startswith(&#39;3.9&#39;) }}&quot;</span>
+<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a>
+<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="c1"># Access workflow context</span>
+<a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a><span class="n">when</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ workflow.configuration.name == &#39;upgrade-react&#39; }}&quot;</span>
+</code></pre></div>
+<p><strong>Note:</strong> Template conditions are skipped during remote checks (pre-clone) since they require filesystem access. Use remote conditions for pre-clone filtering.  </p>
+<h2 id="condition-evaluation">Condition Evaluation<a class="headerlink" href="#condition-evaluation" title="Permanent link">&para;</a></h2>
+<h3 id="condition_type">condition_type<a class="headerlink" href="#condition_type" title="Permanent link">&para;</a></h3>
+<p>Controls how multiple conditions are evaluated.</p>
+<p><strong>Type:</strong> <code>string</code>  </p>
+<p><strong>Values:</strong> <code>"all"</code> (AND logic), <code>"any"</code> (OR logic)</p>
+<p><strong>Default:</strong> <code>"all"</code>  </p>
+<h4 id="and-logic-condition_type-all">AND Logic (condition_type = "all")<a class="headerlink" href="#and-logic-condition_type-all" title="Permanent link">&para;</a></h4>
+<p>ALL conditions must pass for execution to proceed.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span><span class="w">  </span><span class="c1"># All conditions must pass (default)</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="n">remote_file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p><strong>Real-world example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># Workflow level - targets un-migrated projects</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="n">remote_file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div></p>
+<p><strong>Result:</strong> Only processes projects that have setup.cfg AND don't have pyproject.toml (haven't been migrated yet).</p>
+<h4 id="or-logic-condition_type-any">OR Logic (condition_type = "any")<a class="headerlink" href="#or-logic-condition_type-any" title="Permanent link">&para;</a></h4>
+<p>ANY ONE condition passing is sufficient for execution.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;any&quot;</span><span class="w">  </span><span class="c1"># Any condition passing is sufficient</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements.txt&quot;</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.py&quot;</span>
+</code></pre></div>
+<p><strong>Result:</strong> Executes if project has ANY Python configuration file.</p>
+<h2 id="real-world-examples">Real-World Examples<a class="headerlink" href="#real-world-examples" title="Permanent link">&para;</a></h2>
+<h3 id="example-1-workflow-level-conditions-example-workflow">Example 1: Workflow-Level Conditions (example-workflow)<a class="headerlink" href="#example-1-workflow-level-conditions-example-workflow" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># Only target Python projects that still use setup.cfg</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="n">remote_file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>✅ Project must have <code>setup.cfg</code> (old configuration)</li>
+<li>✅ Project must NOT have <code>pyproject.toml</code> (not yet migrated)</li>
+</ol>
+<p><strong>Why remote conditions?</strong> These checks happen before cloning, so we avoid cloning projects that don't need migration. For 1000 projects, this might only clone 50 that need fixing.</p>
+<h3 id="example-2-action-level-conditions-conditional-docker-extraction">Example 2: Action-Level Conditions (Conditional Docker Extraction)<a class="headerlink" href="#example-2-action-level-conditions-conditional-docker-extraction" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-constraints&quot;</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docker&quot;</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;{{ extract_image_from_dockerfile(&#39;repository/Dockerfile&#39;) }}&quot;</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/tmp/constraints.txt&quot;</span>
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///constraints.txt&quot;</span>
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>
+<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+</code></pre></div>
+<p><strong>What it does:</strong></p>
+<ul>
+<li>Only extracts Docker constraints if project has a Dockerfile</li>
+<li>If no Dockerfile, action is skipped (not a failure)</li>
+</ul>
+<p><strong>Why action-level?</strong> Not all Python projects use Docker, so this action should only run when applicable.</p>
+<h3 id="example-3-multiple-action-conditions-compose-file-variations">Example 3: Multiple Action Conditions (Compose File Variations)<a class="headerlink" href="#example-3-multiple-action-conditions-compose-file-variations" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-original-docker-compose-yml&quot;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="n">commit_keyword</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;migration&quot;</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docker-compose.yml&quot;</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="n">ignore_errors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="n">file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///compose.yaml&quot;</span>
+</code></pre></div>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>✅ Only extract if we haven't already extracted a compose file</li>
+<li>✅ Only extract if project currently has compose.yaml</li>
+</ol>
+<p><strong>Why both conditions?</strong> Projects might have compose.yaml, compose.yml, docker-compose.yaml, or docker-compose.yml. The workflow tries each variant in sequence, but stops once one succeeds.</p>
+<h3 id="example-4-conditional-dockerfile-update">Example 4: Conditional Dockerfile Update<a class="headerlink" href="#example-4-conditional-dockerfile-update" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-dockerfile&quot;</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="n">prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/dockerfile.md.j2&quot;</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="n">validation_prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;prompts/validate-dockerfile.md.j2&quot;</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///Dockerfile&quot;</span>
+</code></pre></div>
+<p><strong>What it does:</strong></p>
+<ul>
+<li>Only runs Claude to update Dockerfile if project has one</li>
+<li>Projects without Docker are skipped gracefully</li>
+</ul>
+<p><strong>Why ResourceUrl?</strong> The <code>repository:///</code> prefix ensures we're checking the cloned repository, not extracted files.</p>
+<h3 id="example-5-multiple-condition-fallbacks">Example 5: Multiple Condition Fallbacks<a class="headerlink" href="#example-5-multiple-condition-fallbacks" title="Permanent link">&para;</a></h3>
+<p>This pattern from example-workflow tries multiple compose file names:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Try compose.yaml first</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-original-compose-yaml&quot;</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;compose.yaml&quot;</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>
+<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="c1"># Try compose.yml if compose.yaml wasn&#39;t found</span>
+<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-original-compose-yml&quot;</span>
+<a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;compose.yml&quot;</span>
+<a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a>
+<a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a><span class="n">file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span><span class="w">  </span><span class="c1"># Only if previous failed</span>
+<a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a>
+<a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a><span class="c1"># Try docker-compose.yaml</span>
+<a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-original-docker-compose-yaml&quot;</span>
+<a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-32-25" name="__codelineno-32-25" href="#__codelineno-32-25"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docker-compose.yaml&quot;</span>
+<a id="__codelineno-32-26" name="__codelineno-32-26" href="#__codelineno-32-26"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-32-27" name="__codelineno-32-27" href="#__codelineno-32-27"></a>
+<a id="__codelineno-32-28" name="__codelineno-32-28" href="#__codelineno-32-28"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-32-29" name="__codelineno-32-29" href="#__codelineno-32-29"></a><span class="n">file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-32-30" name="__codelineno-32-30" href="#__codelineno-32-30"></a>
+<a id="__codelineno-32-31" name="__codelineno-32-31" href="#__codelineno-32-31"></a><span class="c1"># Try docker-compose.yml</span>
+<a id="__codelineno-32-32" name="__codelineno-32-32" href="#__codelineno-32-32"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-32-33" name="__codelineno-32-33" href="#__codelineno-32-33"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-original-docker-compose-yml&quot;</span>
+<a id="__codelineno-32-34" name="__codelineno-32-34" href="#__codelineno-32-34"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-32-35" name="__codelineno-32-35" href="#__codelineno-32-35"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract&quot;</span>
+<a id="__codelineno-32-36" name="__codelineno-32-36" href="#__codelineno-32-36"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docker-compose.yml&quot;</span>
+<a id="__codelineno-32-37" name="__codelineno-32-37" href="#__codelineno-32-37"></a><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+<a id="__codelineno-32-38" name="__codelineno-32-38" href="#__codelineno-32-38"></a>
+<a id="__codelineno-32-39" name="__codelineno-32-39" href="#__codelineno-32-39"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-32-40" name="__codelineno-32-40" href="#__codelineno-32-40"></a><span class="n">file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extracted:///compose.original.yaml&quot;</span>
+</code></pre></div>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Try <code>compose.yaml</code> (modern name)</li>
+<li>If that fails, try <code>compose.yml</code></li>
+<li>If that fails, try <code>docker-compose.yaml</code></li>
+<li>If that fails, try <code>docker-compose.yml</code></li>
+<li>Stop at first success</li>
+</ol>
+<p><strong>Why this pattern?</strong> Docker Compose supports multiple filenames, and different projects use different conventions. This ensures we find the file regardless of naming.</p>
+<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="1-use-remote-conditions-first">1. Use Remote Conditions First<a class="headerlink" href="#1-use-remote-conditions-first" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1"># ✅ Good - check remotely before cloning</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;package.json&quot;</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;node.*18&quot;</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.nvmrc&quot;</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="c1"># ❌ Slower - clones every repository</span>
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;package.json&quot;</span>
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a>
+<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a><span class="n">file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;node.*18&quot;</span>
+<a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.nvmrc&quot;</span>
+</code></pre></div>
+<p><strong>Performance impact:</strong> For 1000 projects, remote conditions might process 50, while local conditions require cloning all 1000 first.</p>
+<h3 id="2-combine-and-logic-for-precision">2. Combine AND Logic for Precision<a class="headerlink" href="#2-combine-and-logic-for-precision" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;all&quot;</span><span class="w">  </span><span class="c1"># All must pass (default)</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a>
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FROM python:3</span><span class="se">\\</span><span class="s2">.9&quot;</span>
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span>
+<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a>
+<a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="n">remote_file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p><strong>Result:</strong> Only Python 3.9 Docker projects without pyproject.toml.</p>
+<h3 id="3-use-or-logic-for-flexibility">3. Use OR Logic for Flexibility<a class="headerlink" href="#3-use-or-logic-for-flexibility" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">condition_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;any&quot;</span><span class="w">  </span><span class="c1"># Any one passing is sufficient</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.py&quot;</span>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a>
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a>
+<a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+</code></pre></div>
+<p><strong>Result:</strong> Any Python project with configuration.</p>
+<h3 id="4-action-conditions-for-optional-steps">4. Action Conditions for Optional Steps<a class="headerlink" href="#4-action-conditions-for-optional-steps" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;update-dockerfile&quot;</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;file&quot;</span>
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span><span class="w">  </span><span class="c1"># Skip if no Docker</span>
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;run-tests&quot;</span>
+<a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span>
+<a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pytest tests/&quot;</span>
+<a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a>
+<a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;tests/&quot;</span><span class="w">  </span><span class="c1"># Skip if no tests</span>
+</code></pre></div>
+<p><strong>Why?</strong> Not all projects need all actions. Conditions allow graceful degradation.</p>
+<h3 id="5-avoid-over-filtering">5. Avoid Over-Filtering<a class="headerlink" href="#5-avoid-over-filtering" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="c1"># ❌ Too restrictive - might miss valid projects</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python_requires.*=.*[&#39;</span><span class="se">\&quot;</span><span class="s2">]3</span><span class="se">\\</span><span class="s2">.9[&#39;</span><span class="se">\&quot;</span><span class="s2">]&quot;</span>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="c1"># ✅ Better - allows variations</span>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="n">remote_file_contains</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python.*3</span><span class="se">\\</span><span class="s2">.9&quot;</span>
+<a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="n">remote_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+</code></pre></div>
+<p><strong>Why?</strong> The second pattern matches more variations in how version might be specified.</p>
+<h2 id="condition-vs-filter">Condition vs Filter<a class="headerlink" href="#condition-vs-filter" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Filters</th>
+<th>Remote Conditions</th>
+<th>Local Conditions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>When evaluated</strong></td>
+<td>Before processing</td>
+<td>Before cloning</td>
+<td>After cloning</td>
+</tr>
+<tr>
+<td><strong>Data source</strong></td>
+<td>Imbi metadata</td>
+<td>GitHub API</td>
+<td>Local filesystem</td>
+</tr>
+<tr>
+<td><strong>Speed</strong></td>
+<td>⚡⚡⚡ Fastest</td>
+<td>⚡⚡ Fast</td>
+<td>⚡ Slower</td>
+</tr>
+<tr>
+<td><strong>Use for</strong></td>
+<td>Project metadata</td>
+<td>File existence/content</td>
+<td>Complex patterns</td>
+</tr>
+<tr>
+<td><strong>Glob support</strong></td>
+<td>No</td>
+<td>Limited</td>
+<td>Full</td>
+</tr>
+<tr>
+<td><strong>Bandwidth</strong></td>
+<td>None</td>
+<td>Minimal</td>
+<td>High</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best practice:</strong> Use all three in combination:</p>
+<ol>
+<li><strong>Filters</strong> for broad technology targeting</li>
+<li><strong>Remote conditions</strong> for file-based applicability</li>
+<li><strong>Local conditions</strong> for complex repository checks</li>
+</ol>
+<h2 id="complete-example">Complete Example<a class="headerlink" href="#complete-example" title="Permanent link">&para;</a></h2>
+<p>This is the actual condition strategy from example-workflow:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="c1"># Filter: Broad targeting</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="k">[filter]</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;apis&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumers&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...]</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="n">project_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;programming_language&quot;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Python 3.9&quot;</span><span class="p">}</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="n">github_workflow_status_exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span>
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a>
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="c1"># Workflow conditions: Migration applicability</span>
+<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="n">remote_file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setup.cfg&quot;</span>
+<a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a>
+<a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="k">[[conditions]]</span>
+<a id="__codelineno-38-13" name="__codelineno-38-13" href="#__codelineno-38-13"></a><span class="n">remote_file_not_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyproject.toml&quot;</span>
+<a id="__codelineno-38-14" name="__codelineno-38-14" href="#__codelineno-38-14"></a>
+<a id="__codelineno-38-15" name="__codelineno-38-15" href="#__codelineno-38-15"></a><span class="c1"># Action conditions: Optional steps</span>
+<a id="__codelineno-38-16" name="__codelineno-38-16" href="#__codelineno-38-16"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-38-17" name="__codelineno-38-17" href="#__codelineno-38-17"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;extract-constraints&quot;</span>
+<a id="__codelineno-38-18" name="__codelineno-38-18" href="#__codelineno-38-18"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;docker&quot;</span>
+<a id="__codelineno-38-19" name="__codelineno-38-19" href="#__codelineno-38-19"></a>
+<a id="__codelineno-38-20" name="__codelineno-38-20" href="#__codelineno-38-20"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-38-21" name="__codelineno-38-21" href="#__codelineno-38-21"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span><span class="w">  </span><span class="c1"># Only if Docker is used</span>
+<a id="__codelineno-38-22" name="__codelineno-38-22" href="#__codelineno-38-22"></a>
+<a id="__codelineno-38-23" name="__codelineno-38-23" href="#__codelineno-38-23"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-38-24" name="__codelineno-38-24" href="#__codelineno-38-24"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ensure-correct-pins&quot;</span>
+<a id="__codelineno-38-25" name="__codelineno-38-25" href="#__codelineno-38-25"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-38-26" name="__codelineno-38-26" href="#__codelineno-38-26"></a>
+<a id="__codelineno-38-27" name="__codelineno-38-27" href="#__codelineno-38-27"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-38-28" name="__codelineno-38-28" href="#__codelineno-38-28"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Dockerfile&quot;</span><span class="w">  </span><span class="c1"># Only if Docker is used</span>
+<a id="__codelineno-38-29" name="__codelineno-38-29" href="#__codelineno-38-29"></a>
+<a id="__codelineno-38-30" name="__codelineno-38-30" href="#__codelineno-38-30"></a><span class="k">[[actions]]</span>
+<a id="__codelineno-38-31" name="__codelineno-38-31" href="#__codelineno-38-31"></a><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generate-dockerfile&quot;</span>
+<a id="__codelineno-38-32" name="__codelineno-38-32" href="#__codelineno-38-32"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-38-33" name="__codelineno-38-33" href="#__codelineno-38-33"></a>
+<a id="__codelineno-38-34" name="__codelineno-38-34" href="#__codelineno-38-34"></a><span class="k">[[actions.conditions]]</span>
+<a id="__codelineno-38-35" name="__codelineno-38-35" href="#__codelineno-38-35"></a><span class="n">file_exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;repository:///Dockerfile&quot;</span><span class="w">  </span><span class="c1"># Only if Dockerfile exists</span>
+</code></pre></div>
+<p><strong>Result:</strong></p>
+<ol>
+<li>Filter reduces 1000 projects → 50 Python 3.9 projects with failing builds</li>
+<li>Remote conditions reduce 50 projects → 30 projects needing migration (have setup.cfg, no pyproject.toml)</li>
+<li>Action conditions skip Docker-related actions for non-Docker projects</li>
+</ol>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../workflow-filters/">Workflow Filters</a> - Pre-filtering projects by metadata</li>
+<li><a href="../workflow-configuration/">Workflow Configuration</a> - Complete configuration reference</li>
+<li><a href="../workflows/">Workflows Overview</a> - High-level concepts and best practices</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

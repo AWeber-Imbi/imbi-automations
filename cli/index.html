@@ -1,0 +1,3375 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../debugging/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>CLI Reference - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#command-line-interface" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CLI Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Syntax
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#positional-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positional Arguments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Positional Arguments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CONFIG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WORKFLOW
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#targeting-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Targeting Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Targeting Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-project-id-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --project-id ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-project-type-slug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --project-type SLUG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-all-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --all-projects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-github-repository-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --github-repository URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-github-organization-org" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --github-organization ORG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-all-github-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --all-github-repositories
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execution-control-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution Control Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Execution Control Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-start-from-project-id_or_slug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --start-from-project ID_OR_SLUG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-max-concurrency-n" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --max-concurrency N
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-exit-on-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --exit-on-error
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debugging Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-preserve-on-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --preserve-on-error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-error-dir-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --error-dir DIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dry-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dry-run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dry-run-dir-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dry-run-dir DIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-cache-dir-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --cache-dir DIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --debug
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-verbose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -v, --verbose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-h-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -h, --help
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -V, --version
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-usage-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Usage Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Usage Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-on-single-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test on Single Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry-run-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dry Run Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-update-with-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Update with Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume-interrupted-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resume Interrupted Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-organization-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Organization Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critical-production-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critical Production Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-specific-failure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging Specific Failure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-type-targeted-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Type Targeted Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit Codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optimize-concurrency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimize Concurrency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-smartly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Smartly
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-module-named-imbi_automations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No module named imbi_automations"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-path-is-not-a-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Workflow path is not a directory"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exactly-one-targeting-option-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Exactly one targeting option required"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-validation-failed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Configuration validation failed"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parallel-processing-with-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parallel Processing with Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-batch-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditional Batch Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-analysis-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Analysis Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Syntax
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#positional-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positional Arguments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Positional Arguments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CONFIG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WORKFLOW
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#targeting-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Targeting Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Targeting Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-project-id-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --project-id ID
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-project-type-slug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --project-type SLUG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-all-projects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --all-projects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-github-repository-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --github-repository URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-github-organization-org" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --github-organization ORG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-all-github-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --all-github-repositories
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execution-control-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution Control Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Execution Control Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-start-from-project-id_or_slug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --start-from-project ID_OR_SLUG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-max-concurrency-n" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --max-concurrency N
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-exit-on-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --exit-on-error
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Debugging Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-preserve-on-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --preserve-on-error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-error-dir-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --error-dir DIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dry-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dry-run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-dry-run-dir-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --dry-run-dir DIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-cache-dir-dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --cache-dir DIR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --debug
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-verbose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -v, --verbose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-h-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -h, --help
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-v-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        -V, --version
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-usage-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Usage Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Usage Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-on-single-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test on Single Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry-run-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dry Run Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-update-with-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Update with Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume-interrupted-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resume Interrupted Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-organization-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Organization Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#critical-production-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critical Production Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging-specific-failure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debugging Specific Failure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-type-targeted-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Type Targeted Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit Codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optimize-concurrency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimize Concurrency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-smartly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Smartly
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-module-named-imbi_automations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No module named imbi_automations"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-path-is-not-a-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Workflow path is not a directory"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exactly-one-targeting-option-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Exactly one targeting option required"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-validation-failed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Configuration validation failed"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parallel-processing-with-error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parallel Processing with Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-batch-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conditional Batch Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-analysis-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Analysis Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="command-line-interface">Command-Line Interface<a class="headerlink" href="#command-line-interface" title="Permanent link">&para;</a></h1>
+<p>Imbi Automations provides a comprehensive CLI for executing workflows across projects with flexible targeting, concurrency control, and debugging capabilities.</p>
+<h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>imbi-automations<span class="w"> </span>CONFIG<span class="w"> </span>WORKFLOW<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>CONFIG</code>: Path to configuration TOML file</li>
+<li><code>WORKFLOW</code>: Path to workflow directory containing config.toml</li>
+</ul>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-python<span class="w"> </span>--all-projects
+</code></pre></div></p>
+<h2 id="complete-syntax">Complete Syntax<a class="headerlink" href="#complete-syntax" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>imbi-automations<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>-V<span class="o">]</span><span class="w"> </span><span class="o">[</span>--debug<span class="o">]</span><span class="w"> </span><span class="o">[</span>-v<span class="o">]</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">                 </span><span class="o">[</span>--max-concurrency<span class="w"> </span>N<span class="o">]</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">                 </span><span class="o">[</span>--exit-on-error<span class="o">]</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">                 </span><span class="o">[</span>--preserve-on-error<span class="o">]</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">                 </span><span class="o">[</span>--error-dir<span class="w"> </span>DIR<span class="o">]</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">                 </span><span class="o">[</span>--dry-run<span class="o">]</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">                 </span><span class="o">[</span>--dry-run-dir<span class="w"> </span>DIR<span class="o">]</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">                 </span><span class="o">[</span>--cache-dir<span class="w"> </span>DIR<span class="o">]</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">                 </span><span class="o">[</span>--start-from-project<span class="w"> </span>ID_OR_SLUG<span class="o">]</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">                 </span><span class="o">(</span>--project-id<span class="w"> </span>ID<span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">                  </span>--project-type<span class="w"> </span>SLUG<span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">                  </span>--all-projects<span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">                  </span>--github-repository<span class="w"> </span>URL<span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">                  </span>--github-organization<span class="w"> </span>ORG<span class="w"> </span><span class="p">|</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">                  </span>--all-github-repositories<span class="o">)</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">                 </span>CONFIG<span class="w"> </span>WORKFLOW
+</code></pre></div>
+<h2 id="positional-arguments">Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permanent link">&para;</a></h2>
+<h3 id="config">CONFIG<a class="headerlink" href="#config" title="Permanent link">&para;</a></h3>
+<p>Path to configuration file containing API credentials and settings.</p>
+<p><strong>Type:</strong> File path
+<strong>Format:</strong> TOML file  </p>
+<p><strong>Required:</strong> Yes  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/my-workflow<span class="w"> </span>--all-projects
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>imbi-automations<span class="w"> </span>/etc/imbi/prod.toml<span class="w"> </span>workflows/deploy<span class="w"> </span>--all-projects
+</code></pre></div></p>
+<p><strong>See Also:</strong> <a href="../configuration/">Configuration Documentation</a></p>
+<h3 id="workflow">WORKFLOW<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h3>
+<p>Path to workflow directory containing workflow configuration file.</p>
+<p><strong>Type:</strong> Directory path
+<strong>Required:</strong> Yes
+<strong>Must Contain:</strong> <code>workflow.toml</code></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-python<span class="w"> </span>--all-projects
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>./my-workflow<span class="w"> </span>--project-id<span class="w"> </span><span class="m">123</span>
+</code></pre></div></p>
+<p><strong>Structure:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>workflows/my-workflow/
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── workflow.toml        # Required
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>├── prompts/             # Optional
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│   └── prompt.md
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>└── templates/           # Optional
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    └── template.j2
+</code></pre></div></p>
+<h2 id="targeting-options">Targeting Options<a class="headerlink" href="#targeting-options" title="Permanent link">&para;</a></h2>
+<p><strong>Exactly one</strong> targeting option is required to specify which projects/repositories to process.</p>
+<h3 id="-project-id-id">--project-id ID<a class="headerlink" href="#-project-id-id" title="Permanent link">&para;</a></h3>
+<p>Process a single Imbi project by ID.</p>
+<p><strong>Type:</strong> Integer
+<strong>Use Case:</strong> Testing workflows on specific project</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/fix-config<span class="w"> </span>--project-id<span class="w"> </span><span class="m">123</span>
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Processing: my-project (123)
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>✓ Completed: my-project
+</code></pre></div></p>
+<h3 id="-project-type-slug">--project-type SLUG<a class="headerlink" href="#-project-type-slug" title="Permanent link">&para;</a></h3>
+<p>Process all Imbi projects of a specific type.</p>
+<p><strong>Type:</strong> String (project type slug)
+<strong>Use Case:</strong> Target specific project categories</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-apis<span class="w"> </span>--project-type<span class="w"> </span>api
+</code></pre></div></p>
+<p><strong>Common Project Types:</strong></p>
+<ul>
+<li><code>api</code> - API services</li>
+<li><code>consumer</code> - Message consumers</li>
+<li><code>scheduled-job</code> - Scheduled tasks</li>
+<li><code>frontend</code> - Frontend applications</li>
+<li><code>library</code> - Shared libraries</li>
+</ul>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Found 47 projects of type &#39;api&#39;
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Processing: api-service-1 (123)
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Processing: api-service-2 (124)
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>...
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>Completed: 45/47 projects successful
+</code></pre></div></p>
+<h3 id="-all-projects">--all-projects<a class="headerlink" href="#-all-projects" title="Permanent link">&para;</a></h3>
+<p>Process all projects in Imbi.</p>
+<p><strong>Type:</strong> Flag (boolean)
+<strong>Use Case:</strong> Batch updates across entire organization</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-deps<span class="w"> </span>--all-projects
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Found 664 total projects
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Processing 664 projects...
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>✓ Completed: 650/664 successful
+</code></pre></div></p>
+<p><strong>Warning:</strong> This processes ALL projects. Use with caution and test workflow first with <code>--project-id</code>.</p>
+<h3 id="-github-repository-url">--github-repository URL<a class="headerlink" href="#-github-repository-url" title="Permanent link">&para;</a></h3>
+<p>Process a single GitHub repository by URL.</p>
+<p><strong>Type:</strong> URL string
+<strong>Format:</strong> <code>https://github.com/org/repo</code> or <code>org/repo</code>  </p>
+<p><strong>Use Case:</strong> Target specific GitHub repository</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/fix-actions<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>--github-repository<span class="w"> </span>https://github.com/myorg/myrepo
+</code></pre></div></p>
+<p><strong>Accepted Formats:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>--github-repository<span class="w"> </span>https://github.com/org/repo
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>--github-repository<span class="w"> </span>github.com/org/repo
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>--github-repository<span class="w"> </span>org/repo
+</code></pre></div></p>
+<h3 id="-github-organization-org">--github-organization ORG<a class="headerlink" href="#-github-organization-org" title="Permanent link">&para;</a></h3>
+<p>Process all repositories in a GitHub organization.</p>
+<p><strong>Type:</strong> String (organization name)
+<strong>Use Case:</strong> Update all repos in an organization</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-workflows<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>--github-organization<span class="w"> </span>myorg
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Found 32 repositories in organization &#39;myorg&#39;
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Processing: myorg/repo1
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Processing: myorg/repo2
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>...
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>Completed: 30/32 successful
+</code></pre></div></p>
+<h3 id="-all-github-repositories">--all-github-repositories<a class="headerlink" href="#-all-github-repositories" title="Permanent link">&para;</a></h3>
+<p>Process all GitHub repositories across all organizations.</p>
+<p><strong>Type:</strong> Flag (boolean)
+<strong>Use Case:</strong> Organization-wide GitHub updates</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/security-update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span>--all-github-repositories
+</code></pre></div></p>
+<p><strong>Note:</strong> Discovers repositories from all organizations the API key has access to.  </p>
+<h2 id="execution-control-options">Execution Control Options<a class="headerlink" href="#execution-control-options" title="Permanent link">&para;</a></h2>
+<h3 id="-start-from-project-id_or_slug">--start-from-project ID_OR_SLUG<a class="headerlink" href="#-start-from-project-id_or_slug" title="Permanent link">&para;</a></h3>
+<p>Resume batch processing from a specific project.</p>
+<p><strong>Type:</strong> Integer (ID) or String (slug)
+<strong>Use Case:</strong> Resume interrupted batch runs</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># By project ID</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-all<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span>--start-from-project<span class="w"> </span><span class="m">456</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="c1"># By project slug</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-all<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">  </span>--start-from-project<span class="w"> </span>my-project-slug
+</code></pre></div></p>
+<p><strong>Behavior:</strong>  </p>
+<ul>
+<li>Skips all projects up to and including the specified project</li>
+<li>Starts processing from the next project</li>
+<li>Useful for resuming after interruption or failure</li>
+</ul>
+<p><strong>Example Scenario:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Initial run interrupted at project ID 456</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/big-update<span class="w"> </span>--all-projects
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1"># ... processes projects 1-456, then interrupted</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Resume from where it left off</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/big-update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span>--start-from-project<span class="w"> </span><span class="m">456</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="c1"># ... starts from project 457</span>
+</code></pre></div></p>
+<h3 id="-max-concurrency-n">--max-concurrency N<a class="headerlink" href="#-max-concurrency-n" title="Permanent link">&para;</a></h3>
+<p>Set maximum number of concurrent workflow executions.</p>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>1</code> (sequential)<br />
+<strong>Range:</strong> 1-100 (practical limit depends on system resources)</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Process 5 projects simultaneously</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-deps<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">5</span>
+</code></pre></div></p>
+<p><strong>Performance Considerations:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Concurrency</th>
+<th>Use Case</th>
+<th>Memory</th>
+<th>Risk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Debugging, testing</td>
+<td>Low</td>
+<td>None</td>
+</tr>
+<tr>
+<td>2-5</td>
+<td>Normal batch processing</td>
+<td>Medium</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>10+</td>
+<td>Large-scale updates</td>
+<td>High</td>
+<td>Higher</td>
+</tr>
+<tr>
+<td>20+</td>
+<td>Maximum throughput</td>
+<td>Very High</td>
+<td>Monitor carefully</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example Performance:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Sequential (slower, safer)</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>--max-concurrency<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="c1"># ~1 project/minute = 664 projects in 11 hours</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="c1"># Parallel (faster, more resources)</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>--max-concurrency<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="c1"># ~10 projects/minute = 664 projects in 1.1 hours</span>
+</code></pre></div></p>
+<p><strong>Warning:</strong> Higher concurrency increases:</p>
+<ul>
+<li>Memory usage (each workflow uses ~100-500MB)</li>
+<li>API rate limit pressure</li>
+<li>Disk I/O (simultaneous git clones)</li>
+<li>Debugging complexity</li>
+</ul>
+<h3 id="-exit-on-error">--exit-on-error<a class="headerlink" href="#-exit-on-error" title="Permanent link">&para;</a></h3>
+<p>Stop immediately when any project fails.</p>
+<p><strong>Type:</strong> Flag (boolean)
+<strong>Default:</strong> <code>false</code> (continue with other projects)  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/critical-update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span>--exit-on-error
+</code></pre></div></p>
+<p><strong>Behavior:</strong>  </p>
+<ul>
+<li><strong>Without flag:</strong> Logs error, continues to next project</li>
+<li><strong>With flag:</strong> Exits immediately with error code</li>
+</ul>
+<p><strong>Use Cases:</strong>  </p>
+<ul>
+<li>CI/CD pipelines requiring atomic success</li>
+<li>Testing workflows before batch runs</li>
+<li>Critical updates that must succeed for all projects</li>
+<li>Debugging specific failure</li>
+</ul>
+<p><strong>Example Comparison:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Default: continues on error</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span>--all-projects
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="c1"># Processes all 664 projects even if some fail</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Exit code: 0 if any succeeded</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="c1"># Exits on first error</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span>--all-projects<span class="w"> </span>--exit-on-error
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="c1"># Stops at first failure</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="c1"># Exit code: 5 on failure</span>
+</code></pre></div></p>
+<h2 id="debugging-options">Debugging Options<a class="headerlink" href="#debugging-options" title="Permanent link">&para;</a></h2>
+<h3 id="-preserve-on-error">--preserve-on-error<a class="headerlink" href="#-preserve-on-error" title="Permanent link">&para;</a></h3>
+<p>Save working directory state when workflows fail.</p>
+<p><strong>Type:</strong> Flag (boolean)
+<strong>Default:</strong> <code>false</code>  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/failing-workflow<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span>--preserve-on-error
+</code></pre></div></p>
+<p><strong>What Gets Saved:</strong></p>
+<ul>
+<li>Complete Git repository state</li>
+<li>Workflow resource files</li>
+<li>Docker extracted files</li>
+<li>All temporary files</li>
+<li><code>debug.log</code> with complete execution trace</li>
+</ul>
+<p><strong>Storage Location:</strong> <code>./errors/workflow-name/project-slug-timestamp/</code></p>
+<p><strong>See Also:</strong> <a href="../debugging/">Debugging Documentation</a></p>
+<h3 id="-error-dir-dir">--error-dir DIR<a class="headerlink" href="#-error-dir-dir" title="Permanent link">&para;</a></h3>
+<p>Specify directory for saving error states.</p>
+<p><strong>Type:</strong> Directory path
+<strong>Default:</strong> <code>./errors</code>  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/test<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>--preserve-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span>--error-dir<span class="w"> </span>/tmp/workflow-errors
+</code></pre></div></p>
+<p><strong>Directory Structure:</strong><br />
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>/tmp/workflow-errors/
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>└── workflow-name/
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    └── project-slug-20250103-143052/
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>        ├── repository/
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>        ├── workflow/
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>        └── debug.log
+</code></pre></div></p>
+<h3 id="-dry-run">--dry-run<a class="headerlink" href="#-dry-run" title="Permanent link">&para;</a></h3>
+<p>Execute workflows without pushing changes or creating pull requests.</p>
+<p><strong>Type:</strong> Flag (boolean)
+<strong>Default:</strong> <code>false</code>  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-deps<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span>--dry-run
+</code></pre></div></p>
+<p><strong>Behavior:</strong>  </p>
+<p>When enabled, the workflow executes normally including:
+- Cloning repositories
+- Running all actions
+- Making file changes
+- Creating commits locally</p>
+<p><strong>But skips:</strong></p>
+<ul>
+<li>Pushing commits to remote</li>
+<li>Creating pull requests</li>
+</ul>
+<p><strong>Working directory is preserved to:</strong> <code>./dry-runs/workflow-name/project-slug-timestamp/</code></p>
+<p><strong>Use Cases:</strong>  </p>
+<ul>
+<li>Testing workflows before production runs</li>
+<li>Validating changes without affecting remote repositories</li>
+<li>Reviewing commit messages and file changes</li>
+<li>Debugging workflow logic safely</li>
+<li>Training and demonstration</li>
+</ul>
+<p><strong>Example Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>Processing:<span class="w"> </span>my-project<span class="w"> </span><span class="o">(</span><span class="m">123</span><span class="o">)</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>✓<span class="w"> </span>Cloned<span class="w"> </span>repository
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>✓<span class="w"> </span>Executed<span class="w"> </span><span class="m">5</span><span class="w"> </span>actions
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>✓<span class="w"> </span>Created<span class="w"> </span>commit:<span class="w"> </span><span class="s2">&quot;Update dependencies&quot;</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>🔍<span class="w"> </span>dry-run<span class="w"> </span>mode:<span class="w"> </span>saving<span class="w"> </span>repository<span class="w"> </span>state<span class="w"> </span>to<span class="w"> </span>./dry-runs
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>✓<span class="w"> </span>Completed:<span class="w"> </span>my-project<span class="w"> </span><span class="o">(</span>dry-run<span class="o">)</span>
+</code></pre></div></p>
+<p><strong>Inspection:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># View the commit that would have been pushed</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nb">cd</span><span class="w"> </span>dry-runs/update-deps/my-project-20250103-143052/repository
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>git<span class="w"> </span>log<span class="w"> </span>-1
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>git<span class="w"> </span>show<span class="w"> </span>HEAD
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="c1"># View all changes</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>git<span class="w"> </span>diff<span class="w"> </span>HEAD~1
+</code></pre></div></p>
+<p><strong>See Also:</strong> <a href="../debugging/#dry-run-mode">Debugging - Dry Run Mode</a></p>
+<h3 id="-dry-run-dir-dir">--dry-run-dir DIR<a class="headerlink" href="#-dry-run-dir-dir" title="Permanent link">&para;</a></h3>
+<p>Specify directory for saving dry-run repository states.</p>
+<p><strong>Type:</strong> Directory path
+<strong>Default:</strong> <code>./dry-runs</code></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span>--dry-run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">  </span>--dry-run-dir<span class="w"> </span>/tmp/review-changes
+</code></pre></div></p>
+<p><strong>Docker:</strong> When running in Docker, use <code>--dry-run-dir /opt/dry-runs</code> and mount a host directory to <code>/opt/dry-runs</code> to persist dry-run artifacts outside the container.</p>
+<p><strong>Directory Structure:</strong><br />
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>/tmp/review-changes/
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>└── workflow-name/
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    └── project-slug-20250103-143052/
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>        ├── repository/        # Full git repository with commits
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>        ├── workflow/          # Workflow files and templates
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>        └── extracted/         # Docker extracted files (if any)
+</code></pre></div></p>
+<p><strong>Use Cases:</strong>  </p>
+<ul>
+<li>Organize dry runs by date or workflow</li>
+<li>Review changes across multiple projects</li>
+<li>Share results with team for review</li>
+<li>Temporary storage for CI/CD validation</li>
+<li>Custom inspection pipelines</li>
+</ul>
+<p><strong>Example with Batch Review:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># Run dry-run on all projects</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/security-patch<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span>--dry-run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">  </span>--dry-run-dir<span class="w"> </span>./review/<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="c1"># Review all changes</span>
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="k">for</span><span class="w"> </span>dir<span class="w"> </span><span class="k">in</span><span class="w"> </span>./review/*/workflow-name/*/repository<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;=== </span><span class="k">$(</span>basename<span class="w"> </span><span class="k">$(</span>dirname<span class="w"> </span><span class="nv">$dir</span><span class="k">))</span><span class="s2"> ===&quot;</span>
+<a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="w">    </span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$dir</span><span class="s2">&quot;</span>
+<a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="w">    </span>git<span class="w"> </span>log<span class="w"> </span>-1<span class="w"> </span>--oneline
+<a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a><span class="w">    </span>git<span class="w"> </span>diff<span class="w"> </span>HEAD~1<span class="w"> </span>--stat
+<a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a><span class="k">done</span>
+</code></pre></div></p>
+<h3 id="-cache-dir-dir">--cache-dir DIR<a class="headerlink" href="#-cache-dir-dir" title="Permanent link">&para;</a></h3>
+<p>Specify directory for Imbi metadata cache storage.</p>
+<p><strong>Type:</strong> Directory path
+<strong>Default:</strong> <code>~/.cache/imbi-automations</code>  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">  </span>--cache-dir<span class="w"> </span>/tmp/imbi-cache
+</code></pre></div></p>
+<p><strong>Use Cases:</strong>  </p>
+<ul>
+<li>Custom cache location for multi-user systems</li>
+<li>Temporary cache for testing</li>
+<li>Network-mounted cache for shared environments</li>
+<li>CI/CD pipeline isolation</li>
+</ul>
+<p><strong>Cache Contents:</strong></p>
+<p>The cache directory will contain <code>metadata.json</code> with Imbi metadata including environments, project types, and fact type definitions. This cache is automatically refreshed every 15 minutes.</p>
+<p><strong>See Also:</strong> <a href="../configuration/#imbi-metadata-cache">Configuration - Imbi Metadata Cache</a></p>
+<h3 id="-debug">--debug<a class="headerlink" href="#-debug" title="Permanent link">&para;</a></h3>
+<p>Enable DEBUG level logging for all components.</p>
+<p><strong>Type:</strong> Flag (boolean)
+<strong>Default:</strong> <code>false</code> (INFO level)  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/test<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">  </span>--debug
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>2025-01-03 14:30:52 - imbi_automations.workflow_engine - DEBUG - Executing action: copy-files
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>2025-01-03 14:30:52 - imbi_automations.actions.filea - DEBUG - Copying workflow:///template to repository:///config
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>2025-01-03 14:30:52 - imbi_automations.utils - DEBUG - Resolved path: /tmp/workflow123/workflow/template
+</code></pre></div></p>
+<p><strong>Log Categories:</strong></p>
+<ul>
+<li>Action execution details</li>
+<li>HTTP requests/responses (API calls)</li>
+<li>Git operations</li>
+<li>File operations</li>
+<li>Template rendering</li>
+<li>Condition evaluation</li>
+</ul>
+<p><strong>See Also:</strong> <a href="../debugging/">Debugging Documentation</a></p>
+<h3 id="-v-verbose">-v, --verbose<a class="headerlink" href="#-v-verbose" title="Permanent link">&para;</a></h3>
+<p>Show action start/end INFO messages.</p>
+<p><strong>Type:</strong> Flag (boolean)
+<strong>Default:</strong> <code>false</code>  </p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="w">  </span>--verbose
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>2025-01-03 14:30:50 - INFO - Starting action: backup-files
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>2025-01-03 14:30:52 - INFO - Completed action: backup-files
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>2025-01-03 14:30:52 - INFO - Starting action: update-configs
+</code></pre></div></p>
+<p><strong>Difference from --debug:</strong></p>
+<ul>
+<li><code>--verbose</code>: Action-level progress (cleaner output)</li>
+<li><code>--debug</code>: Everything (very detailed)</li>
+</ul>
+<h2 id="general-options">General Options<a class="headerlink" href="#general-options" title="Permanent link">&para;</a></h2>
+<h3 id="-h-help">-h, --help<a class="headerlink" href="#-h-help" title="Permanent link">&para;</a></h3>
+<p>Show help message and exit.</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>imbi-automations<span class="w"> </span>--help
+</code></pre></div></p>
+<h3 id="-v-version">-V, --version<a class="headerlink" href="#-v-version" title="Permanent link">&para;</a></h3>
+<p>Show version number and exit.</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>imbi-automations<span class="w"> </span>--version
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>0.1.0
+</code></pre></div></p>
+<h2 id="common-usage-patterns">Common Usage Patterns<a class="headerlink" href="#common-usage-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="test-on-single-project">Test on Single Project<a class="headerlink" href="#test-on-single-project" title="Permanent link">&para;</a></h3>
+<p>Test workflow before batch execution:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/new-workflow<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">  </span>--preserve-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">  </span>--debug
+</code></pre></div>
+<h3 id="dry-run-testing">Dry Run Testing<a class="headerlink" href="#dry-run-testing" title="Permanent link">&para;</a></h3>
+<p>Test workflow without making remote changes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="c1"># Single project dry run</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/new-feature<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="w">  </span>--dry-run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">  </span>--debug
+<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>
+<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="c1"># Batch dry run for review</span>
+<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-all<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-41-10" name="__codelineno-41-10" href="#__codelineno-41-10"></a><span class="w">  </span>--dry-run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-41-11" name="__codelineno-41-11" href="#__codelineno-41-11"></a><span class="w">  </span>--dry-run-dir<span class="w"> </span>./review<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-41-12" name="__codelineno-41-12" href="#__codelineno-41-12"></a><span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">5</span>
+</code></pre></div>
+<h3 id="batch-update-with-debugging">Batch Update with Debugging<a class="headerlink" href="#batch-update-with-debugging" title="Permanent link">&para;</a></h3>
+<p>Process all projects with error preservation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-deps<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="w">  </span>--preserve-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="w">  </span>--error-dir<span class="w"> </span>./errors<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a><span class="w">  </span>--verbose
+</code></pre></div>
+<h3 id="resume-interrupted-run">Resume Interrupted Run<a class="headerlink" href="#resume-interrupted-run" title="Permanent link">&para;</a></h3>
+<p>Continue from where you left off:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/large-update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="w">  </span>--start-from-project<span class="w"> </span><span class="m">456</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">5</span>
+</code></pre></div>
+<h3 id="github-organization-update">GitHub Organization Update<a class="headerlink" href="#github-organization-update" title="Permanent link">&para;</a></h3>
+<p>Update all repos in an organization:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-actions<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="w">  </span>--github-organization<span class="w"> </span>myorg<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="w">  </span>--verbose
+</code></pre></div>
+<h3 id="critical-production-update">Critical Production Update<a class="headerlink" href="#critical-production-update" title="Permanent link">&para;</a></h3>
+<p>Ensure all or nothing success:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/security-patch<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="w">  </span>--exit-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="w">  </span>--preserve-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a><span class="w">  </span>--verbose
+</code></pre></div>
+<h3 id="debugging-specific-failure">Debugging Specific Failure<a class="headerlink" href="#debugging-specific-failure" title="Permanent link">&para;</a></h3>
+<p>Deep dive into a failing project:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/failing<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="w">  </span>--project-id<span class="w"> </span><span class="m">123</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="w">  </span>--preserve-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="w">  </span>--error-dir<span class="w"> </span>./debug<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a><span class="w">  </span>--debug<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a><span class="w">  </span>--verbose<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a><span class="w">  </span>--exit-on-error
+</code></pre></div>
+<h3 id="project-type-targeted-update">Project Type Targeted Update<a class="headerlink" href="#project-type-targeted-update" title="Permanent link">&para;</a></h3>
+<p>Update only APIs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update-api-configs<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="w">  </span>--project-type<span class="w"> </span>api<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a><span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a><span class="w">  </span>--verbose
+</code></pre></div>
+<h2 id="exit-codes">Exit Codes<a class="headerlink" href="#exit-codes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Success - all workflows completed successfully</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Configuration error (invalid config, missing workflow)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Interrupted (Ctrl+C)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Runtime error (unexpected exception)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Workflow failure (one or more projects failed)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example Usage in Scripts:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span>--all-projects
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a>
+<a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;All projects updated successfully&quot;</span>
+<a id="__codelineno-48-6" name="__codelineno-48-6" href="#__codelineno-48-6"></a><span class="k">elif</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-48-7" name="__codelineno-48-7" href="#__codelineno-48-7"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Some projects failed - check logs&quot;</span>
+<a id="__codelineno-48-8" name="__codelineno-48-8" href="#__codelineno-48-8"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-48-9" name="__codelineno-48-9" href="#__codelineno-48-9"></a><span class="k">else</span>
+<a id="__codelineno-48-10" name="__codelineno-48-10" href="#__codelineno-48-10"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Fatal error - check configuration&quot;</span>
+<a id="__codelineno-48-11" name="__codelineno-48-11" href="#__codelineno-48-11"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-48-12" name="__codelineno-48-12" href="#__codelineno-48-12"></a><span class="k">fi</span>
+</code></pre></div></p>
+<h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
+<p>While not CLI switches, these environment variables affect behavior:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ANTHROPIC_API_KEY</code></td>
+<td>Claude API key</td>
+<td><code>sk-ant-api03-...</code></td>
+</tr>
+<tr>
+<td><code>GITHUB_TOKEN</code></td>
+<td>GitHub API token (if not in config)</td>
+<td><code>ghp_...</code></td>
+</tr>
+<tr>
+<td><code>IMBI_API_KEY</code></td>
+<td>Imbi API key (if not in config)</td>
+<td><code>uuid-here</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-api03-...&quot;</span>
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GITHUB_TOKEN</span><span class="o">=</span><span class="s2">&quot;ghp_...&quot;</span>
+<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a>
+<a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/ai-workflow<span class="w"> </span>--all-projects
+</code></pre></div></p>
+<h2 id="performance-tips">Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
+<h3 id="optimize-concurrency">Optimize Concurrency<a class="headerlink" href="#optimize-concurrency" title="Permanent link">&para;</a></h3>
+<p>Start conservative, increase gradually:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="c1"># Test with 1</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>--max-concurrency<span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="c1"># Increase to 5</span>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a>--max-concurrency<span class="w"> </span><span class="m">5</span>
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="c1"># Monitor system resources, adjust</span>
+<a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a>--max-concurrency<span class="w"> </span><span class="m">10</span>
+</code></pre></div>
+<h3 id="use-filtering">Use Filtering<a class="headerlink" href="#use-filtering" title="Permanent link">&para;</a></h3>
+<p>Reduce scope with workflow filters in <code>config.toml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="k">[filter]</span>
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="n">project_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;consumer&quot;</span><span class="p">]</span>
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a><span class="n">github_identifier_required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<h3 id="batch-smartly">Batch Smartly<a class="headerlink" href="#batch-smartly" title="Permanent link">&para;</a></h3>
+<p>Split large runs into chunks:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="c1"># Process 100 at a time</span>
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>--all-projects<span class="w"> </span>--max-concurrency<span class="w"> </span><span class="m">5</span><span class="w"> </span>--start-from-project<span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a><span class="c1"># ... after completion</span>
+<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>--all-projects<span class="w"> </span>--max-concurrency<span class="w"> </span><span class="m">5</span><span class="w"> </span>--start-from-project<span class="w"> </span><span class="m">100</span>
+</code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="no-module-named-imbi_automations">"No module named imbi_automations"<a class="headerlink" href="#no-module-named-imbi_automations" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> CLI not installed or not in PATH</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a><span class="c1"># or</span>
+<a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>pip<span class="w"> </span>install<span class="w"> </span>imbi-automations
+</code></pre></div></p>
+<h3 id="workflow-path-is-not-a-directory">"Workflow path is not a directory"<a class="headerlink" href="#workflow-path-is-not-a-directory" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Incorrect workflow path</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="c1"># Correct - path to directory</span>
+<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/my-workflow<span class="w"> </span>--all-projects
+<a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a>
+<a id="__codelineno-54-4" name="__codelineno-54-4" href="#__codelineno-54-4"></a><span class="c1"># Incorrect - don&#39;t include config.toml</span>
+<a id="__codelineno-54-5" name="__codelineno-54-5" href="#__codelineno-54-5"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/my-workflow/config.toml<span class="w"> </span>--all-projects
+</code></pre></div></p>
+<h3 id="exactly-one-targeting-option-required">"Exactly one targeting option required"<a class="headerlink" href="#exactly-one-targeting-option-required" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> No targeting flag specified</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="c1"># Must include one of:</span>
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>--project-id<span class="w"> </span><span class="m">123</span>
+<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>--project-type<span class="w"> </span>api
+<a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a>--all-projects
+<a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a>--github-repository<span class="w"> </span>org/repo
+<a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a><span class="c1"># etc.</span>
+</code></pre></div></p>
+<h3 id="configuration-validation-failed">"Configuration validation failed"<a class="headerlink" href="#configuration-validation-failed" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Invalid or missing config values</p>
+<p><strong>Solution:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="c1"># Validate config separately</span>
+<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from imbi_automations.cli import load_configuration; load_configuration(open(&#39;config.toml&#39;))&quot;</span>
+</code></pre></div></p>
+<h2 id="advanced-examples">Advanced Examples<a class="headerlink" href="#advanced-examples" title="Permanent link">&para;</a></h2>
+<h3 id="parallel-processing-with-error-handling">Parallel Processing with Error Handling<a class="headerlink" href="#parallel-processing-with-error-handling" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/complex-update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a><span class="w">  </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-57-3" name="__codelineno-57-3" href="#__codelineno-57-3"></a><span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-57-4" name="__codelineno-57-4" href="#__codelineno-57-4"></a><span class="w">  </span>--preserve-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-57-5" name="__codelineno-57-5" href="#__codelineno-57-5"></a><span class="w">  </span>--error-dir<span class="w"> </span>/var/log/imbi-errors<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-57-6" name="__codelineno-57-6" href="#__codelineno-57-6"></a><span class="w">  </span>--verbose<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-57-7" name="__codelineno-57-7" href="#__codelineno-57-7"></a><span class="w">  </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>workflow.log
+</code></pre></div>
+<h3 id="conditional-batch-processing">Conditional Batch Processing<a class="headerlink" href="#conditional-batch-processing" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="c1"># Process projects by type with different concurrency</span>
+<a id="__codelineno-58-3" name="__codelineno-58-3" href="#__codelineno-58-3"></a><span class="k">for</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="k">in</span><span class="w"> </span>api<span class="w"> </span>consumer<span class="w"> </span>scheduled-job<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-58-4" name="__codelineno-58-4" href="#__codelineno-58-4"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processing </span><span class="nv">$type</span><span class="s2"> projects...&quot;</span>
+<a id="__codelineno-58-5" name="__codelineno-58-5" href="#__codelineno-58-5"></a><span class="w">    </span>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-58-6" name="__codelineno-58-6" href="#__codelineno-58-6"></a><span class="w">        </span>--project-type<span class="w"> </span><span class="nv">$type</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-58-7" name="__codelineno-58-7" href="#__codelineno-58-7"></a><span class="w">        </span>--max-concurrency<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-58-8" name="__codelineno-58-8" href="#__codelineno-58-8"></a><span class="w">        </span>--verbose
+<a id="__codelineno-58-9" name="__codelineno-58-9" href="#__codelineno-58-9"></a><span class="k">done</span>
+</code></pre></div>
+<h3 id="error-analysis-pipeline">Error Analysis Pipeline<a class="headerlink" href="#error-analysis-pipeline" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a><span class="c1"># Run workflow with error preservation</span>
+<a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/update<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-59-4" name="__codelineno-59-4" href="#__codelineno-59-4"></a><span class="w">    </span>--all-projects<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-59-5" name="__codelineno-59-5" href="#__codelineno-59-5"></a><span class="w">    </span>--preserve-on-error<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-59-6" name="__codelineno-59-6" href="#__codelineno-59-6"></a><span class="w">    </span>--error-dir<span class="w"> </span>./errors
+<a id="__codelineno-59-7" name="__codelineno-59-7" href="#__codelineno-59-7"></a>
+<a id="__codelineno-59-8" name="__codelineno-59-8" href="#__codelineno-59-8"></a><span class="c1"># Analyze errors</span>
+<a id="__codelineno-59-9" name="__codelineno-59-9" href="#__codelineno-59-9"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Failed projects:&quot;</span>
+<a id="__codelineno-59-10" name="__codelineno-59-10" href="#__codelineno-59-10"></a>find<span class="w"> </span>./errors<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;debug.log&quot;</span><span class="w"> </span>-exec<span class="w"> </span>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">&quot;ERROR&quot;</span><span class="w"> </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-59-11" name="__codelineno-59-11" href="#__codelineno-59-11"></a><span class="w">    </span>sed<span class="w"> </span><span class="s1">&#39;s|.*/\(.*\)-[0-9]*-[0-9]*/debug.log|\1|&#39;</span>
+<a id="__codelineno-59-12" name="__codelineno-59-12" href="#__codelineno-59-12"></a>
+<a id="__codelineno-59-13" name="__codelineno-59-13" href="#__codelineno-59-13"></a><span class="c1"># Count by error type</span>
+<a id="__codelineno-59-14" name="__codelineno-59-14" href="#__codelineno-59-14"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;\nError types:&quot;</span>
+<a id="__codelineno-59-15" name="__codelineno-59-15" href="#__codelineno-59-15"></a>find<span class="w"> </span>./errors<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;debug.log&quot;</span><span class="w"> </span>-exec<span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;ERROR&quot;</span><span class="w"> </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-59-16" name="__codelineno-59-16" href="#__codelineno-59-16"></a><span class="w">    </span>cut<span class="w"> </span>-d:<span class="w"> </span>-f4<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span><span class="p">|</span><span class="w"> </span>uniq<span class="w"> </span>-c
+</code></pre></div>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../configuration/">Configuration</a> - Configure API keys and settings</li>
+<li><a href="../debugging/">Debugging</a> - Detailed debugging guide</li>
+<li><a href="../actions/">Actions</a> - Workflow action reference</li>
+<li><a href="../architecture/">Architecture</a> - System design and components</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

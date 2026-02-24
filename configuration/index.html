@@ -1,0 +1,3792 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../environment-variables/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Configuration File - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration-file" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration File
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration File Location
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Configuration Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Global Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ai_commits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ai_commits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        error_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preserve_on_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        preserve_on_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry_run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dry_run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry_run_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dry_run_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anthropic-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anthropic Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anthropic Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#anthropicapi_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [anthropic].api_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anthropicbedrock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [anthropic].bedrock
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anthropicmodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [anthropic].model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claude-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Claude Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claudeexecutable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].executable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudeenabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].enabled
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudebase_prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].base_prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudeplugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].plugins
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[claude].plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claudepluginsenabled_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude.plugins].enabled_plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudepluginsmarketplaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude.plugins.marketplaces]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudepluginslocal_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[claude.plugins.local_plugins]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-plugin-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Plugin Configuration Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gituser_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].user_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gituser_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].user_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitgpg_sign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].gpg_sign
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitgpg_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].gpg_format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitsigning_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].signing_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitssh_program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].ssh_program
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitgpg_program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].gpg_program
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitcommit_args" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].commit_args
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#github-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GitHub Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubtoken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [github].token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubhost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [github].host
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#imbi-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Imbi Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imbiapi_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].api_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbihostname" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].hostname
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbi_identifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].*_identifier
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbi_link" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].*_link
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#imbi-metadata-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Metadata Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Imbi Metadata Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cache-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cache-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache Behavior
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuring-cache-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring Cache Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-cache-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Cache Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimal-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#missing-required-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Missing Required Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-token-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid Token Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-hostname" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid Hostname
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api-key-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Key Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#separate-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Separate Configurations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#github-only-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Only Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-enterprise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Enterprise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-ai-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With AI Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-dry-run-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With Dry Run Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Not Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Failures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-toml-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid TOML Syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-error-directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Error Directory Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-git-author-per-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Git Author Per Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration File Location
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Configuration Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Global Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ai_commits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ai_commits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        error_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preserve_on_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        preserve_on_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry_run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dry_run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dry_run_dir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dry_run_dir
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anthropic-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anthropic Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anthropic Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#anthropicapi_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [anthropic].api_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anthropicbedrock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [anthropic].bedrock
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anthropicmodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [anthropic].model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claude-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Claude Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claudeexecutable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].executable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudeenabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].enabled
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudebase_prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].base_prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudeplugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude].plugins
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[claude].plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claudepluginsenabled_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude.plugins].enabled_plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudepluginsmarketplaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [claude.plugins.marketplaces]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claudepluginslocal_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [[claude.plugins.local_plugins]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-plugin-configuration-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Plugin Configuration Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gituser_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].user_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gituser_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].user_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitgpg_sign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].gpg_sign
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitgpg_format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].gpg_format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitsigning_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].signing_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitssh_program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].ssh_program
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitgpg_program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].gpg_program
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitcommit_args" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [git].commit_args
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#github-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GitHub Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubtoken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [github].token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubhost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [github].host
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#imbi-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Imbi Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imbiapi_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].api_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbihostname" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].hostname
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbi_identifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].*_identifier
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imbi_link" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [imbi].*_link
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#imbi-metadata-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Imbi Metadata Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Imbi Metadata Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cache-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cache-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache Behavior
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuring-cache-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring Cache Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-cache-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Cache Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimal-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#missing-required-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Missing Required Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-token-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid Token Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-hostname" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid Hostname
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api-key-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Key Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Permissions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#separate-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Separate Configurations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#github-only-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Only Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github-enterprise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Enterprise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-ai-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With AI Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With Debugging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-dry-run-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With Dry Run Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Not Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Failures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-toml-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid TOML Syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-error-directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Error Directory Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-git-author-per-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Git Author Per Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="configuration-file">Configuration File<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h1>
+<p>Imbi Automations uses TOML-based configuration files with Pydantic validation for all settings. This document describes all available configuration options.</p>
+<h2 id="configuration-file-location">Configuration File Location<a class="headerlink" href="#configuration-file-location" title="Permanent link">&para;</a></h2>
+<p>By default, the CLI expects a <code>config.toml</code> file as the first argument:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/workflow-name<span class="w"> </span>--all-projects
+</code></pre></div>
+<h2 id="complete-configuration-example">Complete Configuration Example<a class="headerlink" href="#complete-configuration-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Global Settings</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">ai_commits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">dry_run</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">dry_run_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;./dry-runs&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">error_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;./errors&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">preserve_on_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># Anthropic API Configuration</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">[anthropic]</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${ANTHROPIC_API_KEY}&quot;</span><span class="w">  </span><span class="c1"># Or set directly</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">bedrock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-haiku-4-5-20251001&quot;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="c1"># Claude Agent SDK Configuration</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="k">[claude]</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">executable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude&quot;</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-haiku-4-5&quot;</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="c1"># Git Configuration</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="k">[git]</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="n">user_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Imbi Automations&quot;</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="n">user_email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;automations@imbi.ai&quot;</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="c1"># GitHub API Configuration</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="k">[github]</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ghp_your_github_token&quot;</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github.com&quot;</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="c1"># Imbi Project Management Configuration</span>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="k">[imbi]</span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your-imbi-api-key&quot;</span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="n">github_identifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github&quot;</span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="n">github_link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;GitHub Repository&quot;</span>
+</code></pre></div>
+<h2 id="global-settings">Global Settings<a class="headerlink" href="#global-settings" title="Permanent link">&para;</a></h2>
+<h3 id="ai_commits">ai_commits<a class="headerlink" href="#ai_commits" title="Permanent link">&para;</a></h3>
+<p>Enable AI-powered commit message generation.</p>
+<p><strong>Type:</strong> <code>boolean</code><br />
+<strong>Default:</strong> <code>false</code>  </p>
+<p>When enabled, uses Anthropic API to generate commit messages based on changes.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">ai_commits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<h3 id="error_dir">error_dir<a class="headerlink" href="#error_dir" title="Permanent link">&para;</a></h3>
+<p>Directory to store error logs and debugging information when workflows fail.</p>
+<p><strong>Type:</strong> <code>path</code><br />
+<strong>Default:</strong> <code>./errors</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">error_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/var/log/imbi-automations/errors&quot;</span>
+</code></pre></div>
+<h3 id="preserve_on_error">preserve_on_error<a class="headerlink" href="#preserve_on_error" title="Permanent link">&para;</a></h3>
+<p>Preserve working directories when errors occur for debugging.</p>
+<p><strong>Type:</strong> <code>boolean</code><br />
+<strong>Default:</strong> <code>false</code>  </p>
+<p>When <code>true</code>, temporary directories are not cleaned up after failures, allowing manual inspection.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">preserve_on_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<h3 id="dry_run">dry_run<a class="headerlink" href="#dry_run" title="Permanent link">&para;</a></h3>
+<p>Execute workflows without pushing changes or creating pull requests.</p>
+<p><strong>Type:</strong> <code>boolean</code><br />
+<strong>Default:</strong> <code>false</code>  </p>
+<p>When enabled, workflows execute completely (clone, actions, commits) but skip remote operations:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dry_run</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<p><strong>Behavior:</strong></p>
+<p>✓ Clones repositories<br />
+✓ Runs all actions<br />
+✓ Makes file changes<br />
+✓ Creates commits locally<br />
+✗ Skips pushing to remote<br />
+✗ Skips creating pull requests  </p>
+<p><strong>Use Cases:</strong></p>
+<ul>
+<li>Testing new workflows safely</li>
+<li>Validating changes before production runs</li>
+<li>Reviewing commit messages and diffs</li>
+<li>Training and demonstration</li>
+<li>CI/CD validation pipelines</li>
+</ul>
+<p>Working directories are preserved to <code>dry_run_dir</code> for inspection.</p>
+<p><strong>Note:</strong> Can be overridden by <code>--dry-run</code> CLI flag.  </p>
+<h3 id="dry_run_dir">dry_run_dir<a class="headerlink" href="#dry_run_dir" title="Permanent link">&para;</a></h3>
+<p>Directory for saving repository state during dry-run executions.</p>
+<p><strong>Type:</strong> <code>path</code><br />
+<strong>Default:</strong> <code>./dry-runs</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">dry_run_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;./review-changes&quot;</span>
+</code></pre></div>
+<p><strong>Directory Structure:</strong><br />
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>./review-changes/
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>└── workflow-name/
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    └── project-slug-timestamp/
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        ├── repository/    # Full git repository with commits
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        ├── workflow/      # Workflow files and templates
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        └── extracted/     # Docker extracted files (if any)
+</code></pre></div></p>
+<p><strong>Example Inspection:</strong><br />
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># View commits that would have been pushed</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">cd</span><span class="w"> </span>./dry-runs/update-deps/my-project-20250103-143052/repository
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>git<span class="w"> </span>log<span class="w"> </span>-1
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>git<span class="w"> </span>show<span class="w"> </span>HEAD
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>git<span class="w"> </span>diff<span class="w"> </span>HEAD~1
+</code></pre></div></p>
+<p><strong>Note:</strong> Can be overridden by <code>--dry-run-dir</code> CLI flag.  </p>
+<h2 id="anthropic-configuration">Anthropic Configuration<a class="headerlink" href="#anthropic-configuration" title="Permanent link">&para;</a></h2>
+<p>Configuration for Anthropic Claude API used in Claude actions and AI commit generation.</p>
+<h3 id="anthropicapi_key">[anthropic].api_key<a class="headerlink" href="#anthropicapi_key" title="Permanent link">&para;</a></h3>
+<p>Anthropic API key for Claude models.</p>
+<p><strong>Type:</strong> <code>string</code> (secret)<br />
+<strong>Default:</strong> <code>$ANTHROPIC_API_KEY</code> environment variable<br />
+<strong>Required:</strong> For Claude actions or <code>ai_commits = true</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">[anthropic]</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;sk-ant-api03-...&quot;</span>
+</code></pre></div>
+<p>Or use environment variable:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-api03-...&quot;</span>
+</code></pre></div></p>
+<h3 id="anthropicbedrock">[anthropic].bedrock<a class="headerlink" href="#anthropicbedrock" title="Permanent link">&para;</a></h3>
+<p>Use AWS Bedrock instead of direct Anthropic API.</p>
+<p><strong>Type:</strong> <code>boolean</code><br />
+<strong>Default:</strong> <code>false</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">[anthropic]</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">bedrock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<p><strong>Note:</strong> Requires AWS credentials configured separately.  </p>
+<h3 id="anthropicmodel">[anthropic].model<a class="headerlink" href="#anthropicmodel" title="Permanent link">&para;</a></h3>
+<p>Claude model to use for API requests.</p>
+<p><strong>Type:</strong> <code>string</code><br />
+<strong>Default:</strong> <code>claude-haiku-4-5-20251001</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">[anthropic]</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-opus-4-5&quot;</span>
+</code></pre></div>
+<h2 id="claude-configuration">Claude Configuration<a class="headerlink" href="#claude-configuration" title="Permanent link">&para;</a></h2>
+<p>Configuration for Claude Agent SDK integration.</p>
+<h3 id="claudeexecutable">[claude].executable<a class="headerlink" href="#claudeexecutable" title="Permanent link">&para;</a></h3>
+<p>Path or command name for Claude Code executable.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>claude</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">[claude]</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">executable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/usr/local/bin/claude&quot;</span>
+</code></pre></div>
+<h3 id="claudeenabled">[claude].enabled<a class="headerlink" href="#claudeenabled" title="Permanent link">&para;</a></h3>
+<p>Enable Claude Code actions in workflows.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>true</code></p>
+<p>Set to <code>false</code> to disable all Claude actions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">[claude]</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</code></pre></div>
+<h3 id="claudemodel">[claude].model<a class="headerlink" href="#claudemodel" title="Permanent link">&para;</a></h3>
+<p>Claude model to use for Claude Code SDK operations.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>claude-haiku-4-5</code>
+<strong>Environment Variable:</strong> <code>CLAUDE_MODEL</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">[claude]</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-sonnet-4-5&quot;</span>
+</code></pre></div>
+<p>Available models include:</p>
+<ul>
+<li><code>claude-haiku-4-5</code> - Fast, cost-effective (default)</li>
+<li><code>claude-sonnet-4-5</code> - Balanced performance</li>
+<li><code>claude-opus-4-5</code> - Most capable</li>
+</ul>
+<h3 id="claudebase_prompt">[claude].base_prompt<a class="headerlink" href="#claudebase_prompt" title="Permanent link">&para;</a></h3>
+<p>Custom base prompt file for Claude Code sessions.</p>
+<p><strong>Type:</strong> <code>path</code>
+<strong>Default:</strong> <code>src/imbi_automations/prompts/claude.md</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">[claude]</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">base_prompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/path/to/custom-prompt.md&quot;</span>
+</code></pre></div>
+<h3 id="claudeplugins">[claude].plugins<a class="headerlink" href="#claudeplugins" title="Permanent link">&para;</a></h3>
+<p>Plugin and marketplace configuration for Claude Code. These settings are merged with workflow-level plugin settings (workflow values take precedence).</p>
+<p><strong>Type:</strong> <code>ClaudePluginConfig</code> object
+<strong>Default:</strong> Empty (no plugins)</p>
+<h4 id="claudepluginsenabled_plugins">[claude.plugins].enabled_plugins<a class="headerlink" href="#claudepluginsenabled_plugins" title="Permanent link">&para;</a></h4>
+<p>Enable or disable specific plugins from marketplaces.</p>
+<p><strong>Type:</strong> <code>dict[string, boolean]</code><br />
+<strong>Format:</strong> <code>plugin-name@marketplace-name" = true/false</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">[claude.plugins.enabled_plugins]</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="s2">&quot;git-repository@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="s2">&quot;python-developer@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="s2">&quot;grafana-mcp@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+</code></pre></div>
+<h4 id="claudepluginsmarketplaces">[claude.plugins.marketplaces]<a class="headerlink" href="#claudepluginsmarketplaces" title="Permanent link">&para;</a></h4>
+<p>Configure additional marketplace sources for plugins.</p>
+<p><strong>Type:</strong> <code>dict[string, ClaudeMarketplace]</code>  </p>
+<p>Each marketplace requires a <code>source</code> type and corresponding field:</p>
+<table>
+<thead>
+<tr>
+<th>Source Type</th>
+<th>Required Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>github</code></td>
+<td><code>repo</code></td>
+<td>GitHub repository (e.g., <code>org/repo</code>)</td>
+</tr>
+<tr>
+<td><code>git</code></td>
+<td><code>url</code></td>
+<td>Any git URL</td>
+</tr>
+<tr>
+<td><code>directory</code></td>
+<td><code>path</code></td>
+<td>Local directory (development only)</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># GitHub marketplace</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">[claude.plugins.marketplaces.company-tools]</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github&quot;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;company-org/claude-plugins&quot;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="c1"># Git URL marketplace (e.g., GitHub Enterprise)</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">[claude.plugins.marketplaces.enterprise-tools]</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://github.enterprise.com/org/claude-plugins.git&quot;</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="c1"># Local directory (development)</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="k">[claude.plugins.marketplaces.dev-plugins]</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;directory&quot;</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/path/to/local/marketplace&quot;</span>
+</code></pre></div>
+<h4 id="claudepluginslocal_plugins">[[claude.plugins.local_plugins]]<a class="headerlink" href="#claudepluginslocal_plugins" title="Permanent link">&para;</a></h4>
+<p>Load local plugin directories directly via the Claude Agent SDK.</p>
+<p><strong>Type:</strong> <code>list[ClaudeLocalPlugin]</code>  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">[[claude.plugins.local_plugins]]</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/path/to/local/plugin&quot;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="k">[[claude.plugins.local_plugins]]</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/another/plugin/directory&quot;</span>
+</code></pre></div>
+<h4 id="complete-plugin-configuration-example">Complete Plugin Configuration Example<a class="headerlink" href="#complete-plugin-configuration-example" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">[claude]</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-sonnet-4-5&quot;</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="k">[claude.plugins.enabled_plugins]</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="s2">&quot;git-repository@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="s2">&quot;python-developer@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="s2">&quot;grafana-mcp@aweber-marketplace&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="k">[claude.plugins.marketplaces.aweber-marketplace]</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;git&quot;</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://github.enterprise.com/claude/marketplace.git&quot;</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="k">[claude.plugins.marketplaces.community]</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github&quot;</span>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="n">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;anthropics/claude-plugins&quot;</span>
+<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a>
+<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a><span class="k">[[claude.plugins.local_plugins]]</span>
+<a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/home/user/my-custom-plugin&quot;</span>
+</code></pre></div>
+<h2 id="git-configuration">Git Configuration<a class="headerlink" href="#git-configuration" title="Permanent link">&para;</a></h2>
+<p>Configuration for git commit operations.</p>
+<h3 id="gituser_name">[git].user_name<a class="headerlink" href="#gituser_name" title="Permanent link">&para;</a></h3>
+<p>Git commit author name.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>Imbi Automations</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">[git]</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">user_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Bot User&quot;</span>
+</code></pre></div>
+<h3 id="gituser_email">[git].user_email<a class="headerlink" href="#gituser_email" title="Permanent link">&para;</a></h3>
+<p>Git commit author email address.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>automations@imbi.ai</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">[git]</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">user_email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bot@example.com&quot;</span>
+</code></pre></div>
+<h3 id="gitgpg_sign">[git].gpg_sign<a class="headerlink" href="#gitgpg_sign" title="Permanent link">&para;</a></h3>
+<p>Enable GPG signing for commits.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>false</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">[git]</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">gpg_sign</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="n">signing_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ABCD1234...&quot;</span>
+</code></pre></div>
+<h3 id="gitgpg_format">[git].gpg_format<a class="headerlink" href="#gitgpg_format" title="Permanent link">&para;</a></h3>
+<p>GPG signing format.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>null</code>
+<strong>Options:</strong> <code>gpg</code>, <code>ssh</code>, <code>x509</code>, <code>openpgp</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">[git]</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">gpg_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ssh&quot;</span>
+</code></pre></div>
+<h3 id="gitsigning_key">[git].signing_key<a class="headerlink" href="#gitsigning_key" title="Permanent link">&para;</a></h3>
+<p>GPG or SSH signing key identifier.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>null</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">[git]</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">signing_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;~/.ssh/id_ed25519.pub&quot;</span>
+</code></pre></div>
+<h3 id="gitssh_program">[git].ssh_program<a class="headerlink" href="#gitssh_program" title="Permanent link">&para;</a></h3>
+<p>SSH program for commit signing (for SSH signing with 1Password, etc.).</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>null</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">[git]</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">gpg_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ssh&quot;</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">ssh_program</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/Applications/1Password.app/Contents/MacOS/op-ssh-sign&quot;</span>
+</code></pre></div>
+<h3 id="gitgpg_program">[git].gpg_program<a class="headerlink" href="#gitgpg_program" title="Permanent link">&para;</a></h3>
+<p>GPG program path for traditional GPG signing.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>null</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">[git]</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">gpg_sign</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="n">gpg_program</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/usr/local/bin/gpg&quot;</span>
+</code></pre></div>
+<h3 id="gitcommit_args">[git].commit_args<a class="headerlink" href="#gitcommit_args" title="Permanent link">&para;</a></h3>
+<p>Additional arguments to pass to git commit commands.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>""</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">[git]</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">commit_args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;--no-verify&quot;</span>
+</code></pre></div>
+<h2 id="github-configuration">GitHub Configuration<a class="headerlink" href="#github-configuration" title="Permanent link">&para;</a></h2>
+<p>Configuration for GitHub API integration.</p>
+<h3 id="githubtoken">[github].token<a class="headerlink" href="#githubtoken" title="Permanent link">&para;</a></h3>
+<p>GitHub personal access token or fine-grained token.</p>
+<p><strong>Type:</strong> <code>string</code> (secret)
+<strong>Required:</strong> For GitHub workflows</p>
+<p><strong>Token Permissions Required:</strong></p>
+<ul>
+<li><code>repo</code> - Full repository access</li>
+<li><code>workflow</code> - Update GitHub Actions workflows</li>
+<li><code>admin:org</code> - Manage organization (for environment sync)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">[github]</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ghp_your_github_personal_access_token&quot;</span>
+</code></pre></div>
+<h3 id="githubhost">[github].host<a class="headerlink" href="#githubhost" title="Permanent link">&para;</a></h3>
+<p>GitHub hostname (base domain). The <code>api.</code> prefix is automatically prepended
+for API requests.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>github.com</code></p>
+<p>For GitHub Enterprise:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">[github]</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github.enterprise.com&quot;</span>
+</code></pre></div></p>
+<p>This will automatically use <code>api.github.enterprise.com</code> for API requests.</p>
+<h2 id="imbi-configuration">Imbi Configuration<a class="headerlink" href="#imbi-configuration" title="Permanent link">&para;</a></h2>
+<p>Configuration for Imbi project management system integration.</p>
+<h3 id="imbiapi_key">[imbi].api_key<a class="headerlink" href="#imbiapi_key" title="Permanent link">&para;</a></h3>
+<p>Imbi API authentication key.</p>
+<p><strong>Type:</strong> <code>string</code> (secret)<br />
+<strong>Required:</strong> Always (core functionality)  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">[imbi]</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your-imbi-api-key-uuid&quot;</span>
+</code></pre></div>
+<h3 id="imbihostname">[imbi].hostname<a class="headerlink" href="#imbihostname" title="Permanent link">&para;</a></h3>
+<p>Imbi instance hostname.</p>
+<p><strong>Type:</strong> <code>string</code><br />
+<strong>Required:</strong> Always  </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">[imbi]</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<h3 id="imbi_identifier">[imbi].*_identifier<a class="headerlink" href="#imbi_identifier" title="Permanent link">&para;</a></h3>
+<p>Project identifier field names in Imbi for external systems.</p>
+<p><strong>Type:</strong> <code>string</code><br />
+<strong>Defaults:</strong>  </p>
+<ul>
+<li><code>github_identifier = "github</code></li>
+<li><code>pagerduty_identifier = "pagerduty</code></li>
+<li><code>sonarqube_identifier = "sonarqube</code></li>
+<li><code>sentry_identifier = "sentry</code></li>
+</ul>
+<p>These specify which Imbi project identifier fields contain external system references:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">[imbi]</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="n">github_identifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github-id&quot;</span>
+</code></pre></div>
+<h3 id="imbi_link">[imbi].*_link<a class="headerlink" href="#imbi_link" title="Permanent link">&para;</a></h3>
+<p>Link type names in Imbi for external system URLs.</p>
+<p><strong>Type:</strong> <code>string</code><br />
+<strong>Defaults:</strong>  </p>
+<ul>
+<li><code>github_link = "GitHub Repository</code></li>
+<li><code>grafana_link = "Grafana Dashboard</code></li>
+<li><code>pagerduty_link = "PagerDuty</code></li>
+<li><code>sentry_link = "Sentry</code></li>
+<li><code>sonarqube_link = "SonarQube</code></li>
+</ul>
+<p>These specify the link type names used in Imbi to store external URLs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">[imbi]</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="n">github_link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;GitHub Repo&quot;</span>
+</code></pre></div>
+<h2 id="imbi-metadata-cache">Imbi Metadata Cache<a class="headerlink" href="#imbi-metadata-cache" title="Permanent link">&para;</a></h2>
+<p>The ImbiMetadataCache system caches Imbi metadata locally for improved performance and parse-time validation.</p>
+<h3 id="cache-location">Cache Location<a class="headerlink" href="#cache-location" title="Permanent link">&para;</a></h3>
+<p><strong>Path:</strong> <code>~/.cache/imbi-automations/metadata.json</code> (configurable via <code>cache_dir</code> setting or <code>--cache-dir</code> CLI option)  </p>
+<p><strong>TTL:</strong> 15 minutes  </p>
+<p><strong>Contents:</strong>  </p>
+<ul>
+<li>Environments</li>
+<li>Project type slugs and IDs</li>
+<li>Fact type definitions with enums and ranges</li>
+<li>Enum values for fact validation</li>
+</ul>
+<h3 id="cache-behavior">Cache Behavior<a class="headerlink" href="#cache-behavior" title="Permanent link">&para;</a></h3>
+<p>The metadata cache is automatically managed and safe by default:</p>
+<ul>
+<li><strong>First run</strong>: Fetches all metadata from Imbi API</li>
+<li><strong>Subsequent runs</strong>: Uses cached data if less than 15 minutes old</li>
+<li><strong>Expired cache</strong>: Auto-refreshes from API</li>
+<li><strong>Validation</strong>: Enables parse-time validation of workflow filters</li>
+<li><strong>Uninitialized</strong>: Returns empty collections (graceful degradation)</li>
+</ul>
+<h3 id="configuring-cache-location">Configuring Cache Location<a class="headerlink" href="#configuring-cache-location" title="Permanent link">&para;</a></h3>
+<p>Override the default cache directory in configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="c1"># Optional: Override cache directory</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="n">cache_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/custom/path/to/cache&quot;</span>
+</code></pre></div>
+<p>Or via CLI option:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/workflow-name<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">  </span>--cache-dir<span class="w"> </span>/tmp/imbi-cache<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">  </span>--all-projects
+</code></pre></div>
+<h3 id="manual-cache-management">Manual Cache Management<a class="headerlink" href="#manual-cache-management" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="c1"># View cache location</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>ls<span class="w"> </span>-lah<span class="w"> </span>~/.cache/imbi-automations/
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="c1"># Clear cache (forces refresh on next run)</span>
+<a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>rm<span class="w"> </span>~/.cache/imbi-automations/metadata.json
+<a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>
+<a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="c1"># View cache contents</span>
+<a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>cat<span class="w"> </span>~/.cache/imbi-automations/metadata.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.
+</code></pre></div>
+<h3 id="benefits">Benefits<a class="headerlink" href="#benefits" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Parse-time validation</strong>: Catches typos in <code>project_types</code> and <code>project_facts</code> before workflow execution</li>
+<li><strong>Fuzzy suggestions</strong>: Provides helpful suggestions for misspelled values</li>
+<li><strong>Reduced API calls</strong>: Avoids repeated metadata fetches</li>
+<li><strong>Fast filter validation</strong>: Instant validation without network calls</li>
+</ul>
+<h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
+<p>All configuration sections support automatic environment variable loading via Pydantic Settings. Each section has a prefix:</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Prefix</th>
+<th>Example Variable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[anthropic]</code></td>
+<td><code>ANTHROPIC_</code></td>
+<td><code>ANTHROPIC_API_KEY</code></td>
+</tr>
+<tr>
+<td><code>[claude]</code></td>
+<td><code>CLAUDE_</code></td>
+<td><code>CLAUDE_MODEL</code></td>
+</tr>
+<tr>
+<td><code>[git]</code></td>
+<td><code>GIT_</code></td>
+<td><code>GIT_USER_NAME</code></td>
+</tr>
+<tr>
+<td><code>[github]</code></td>
+<td><code>GH_</code></td>
+<td><code>GH_TOKEN</code></td>
+</tr>
+<tr>
+<td><code>[imbi]</code></td>
+<td><code>IMBI_</code></td>
+<td><code>IMBI_API_KEY</code></td>
+</tr>
+</tbody>
+</table>
+<p>For a complete reference of all available environment variables, see <a href="../environment-variables/">Environment Variables</a>.</p>
+<h3 id="quick-example">Quick Example<a class="headerlink" href="#quick-example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="c1"># Set required environment variables</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GH_TOKEN</span><span class="o">=</span><span class="s2">&quot;ghp_xxxxxxxxxxxxxxxxxxxx&quot;</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">IMBI_API_KEY</span><span class="o">=</span><span class="s2">&quot;your-api-key-uuid&quot;</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">IMBI_HOSTNAME</span><span class="o">=</span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<p>Then use empty sections in your config to load from environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="k">[github]</span>
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="k">[imbi]</span>
+</code></pre></div>
+<h2 id="minimal-configuration">Minimal Configuration<a class="headerlink" href="#minimal-configuration" title="Permanent link">&para;</a></h2>
+<p>The absolute minimum configuration for basic GitHub workflows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="k">[github]</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ghp_your_token&quot;</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="k">[imbi]</span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;your-imbi-key&quot;</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<h2 id="configuration-validation">Configuration Validation<a class="headerlink" href="#configuration-validation" title="Permanent link">&para;</a></h2>
+<p>Configuration is validated at startup using Pydantic. Common errors:</p>
+<h3 id="missing-required-fields">Missing Required Fields<a class="headerlink" href="#missing-required-fields" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>ValidationError: 1 validation error for Configuration
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>github.token
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>  field required (type=value_error.missing)
+</code></pre></div>
+<p><strong>Solution:</strong> Add the required field to your config.toml</p>
+<h3 id="invalid-token-format">Invalid Token Format<a class="headerlink" href="#invalid-token-format" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>ValidationError: 1 validation error for Configuration
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>github.token
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>  string does not match regex (type=value_error.str.regex)
+</code></pre></div>
+<p><strong>Solution:</strong> Check API key format and validity</p>
+<h3 id="invalid-hostname">Invalid Hostname<a class="headerlink" href="#invalid-hostname" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>ValidationError: 1 validation error for Configuration
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>imbi.hostname
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>  invalid hostname (type=value_error.url.host)
+</code></pre></div>
+<p><strong>Solution:</strong> Use valid hostname without protocol (no <code>https://</code>)</p>
+<h2 id="security-best-practices">Security Best Practices<a class="headerlink" href="#security-best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="api-key-storage">API Key Storage<a class="headerlink" href="#api-key-storage" title="Permanent link">&para;</a></h3>
+<p><strong>DO NOT</strong> commit API keys to version control:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="c1"># ❌ BAD - Keys in config file</span>
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="k">[github]</span>
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ghp_actual_key_here&quot;</span>
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a><span class="c1"># ✅ GOOD - Environment variables</span>
+<a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a><span class="k">[github]</span>
+<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${GITHUB_TOKEN}&quot;</span>
+</code></pre></div>
+<h3 id="file-permissions">File Permissions<a class="headerlink" href="#file-permissions" title="Permanent link">&para;</a></h3>
+<p>Restrict config file permissions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>config.toml
+</code></pre></div>
+<h3 id="environment-variables_1">Environment Variables<a class="headerlink" href="#environment-variables_1" title="Permanent link">&para;</a></h3>
+<p>Set sensitive values via environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GITHUB_TOKEN</span><span class="o">=</span><span class="s2">&quot;ghp_...&quot;</span>
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s2">&quot;sk-ant-...&quot;</span>
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">IMBI_API_KEY</span><span class="o">=</span><span class="s2">&quot;uuid-here&quot;</span>
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a>imbi-automations<span class="w"> </span>config.toml<span class="w"> </span>workflows/workflow-name<span class="w"> </span>--all-projects
+</code></pre></div>
+<h3 id="separate-configurations">Separate Configurations<a class="headerlink" href="#separate-configurations" title="Permanent link">&para;</a></h3>
+<p>Use different config files for different environments:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="c1"># Development</span>
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>imbi-automations<span class="w"> </span>config.dev.toml<span class="w"> </span>workflows/test
+<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>
+<a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a><span class="c1"># Production</span>
+<a id="__codelineno-47-5" name="__codelineno-47-5" href="#__codelineno-47-5"></a>imbi-automations<span class="w"> </span>config.prod.toml<span class="w"> </span>workflows/deploy
+</code></pre></div>
+<h2 id="configuration-examples">Configuration Examples<a class="headerlink" href="#configuration-examples" title="Permanent link">&para;</a></h2>
+<h3 id="github-only-workflows">GitHub Only Workflows<a class="headerlink" href="#github-only-workflows" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="k">[git]</span>
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="n">user_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;GitHub Bot&quot;</span>
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="n">user_email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;bot@example.com&quot;</span>
+<a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a>
+<a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a><span class="k">[github]</span>
+<a id="__codelineno-48-6" name="__codelineno-48-6" href="#__codelineno-48-6"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${GITHUB_TOKEN}&quot;</span>
+<a id="__codelineno-48-7" name="__codelineno-48-7" href="#__codelineno-48-7"></a>
+<a id="__codelineno-48-8" name="__codelineno-48-8" href="#__codelineno-48-8"></a><span class="k">[imbi]</span>
+<a id="__codelineno-48-9" name="__codelineno-48-9" href="#__codelineno-48-9"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${IMBI_API_KEY}&quot;</span>
+<a id="__codelineno-48-10" name="__codelineno-48-10" href="#__codelineno-48-10"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<h3 id="github-enterprise">GitHub Enterprise<a class="headerlink" href="#github-enterprise" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="k">[github]</span>
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${GITHUB_ENTERPRISE_TOKEN}&quot;</span>
+<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;github.enterprise.com&quot;</span>
+<a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a>
+<a id="__codelineno-49-5" name="__codelineno-49-5" href="#__codelineno-49-5"></a><span class="k">[imbi]</span>
+<a id="__codelineno-49-6" name="__codelineno-49-6" href="#__codelineno-49-6"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${IMBI_API_KEY}&quot;</span>
+<a id="__codelineno-49-7" name="__codelineno-49-7" href="#__codelineno-49-7"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<h3 id="with-ai-features">With AI Features<a class="headerlink" href="#with-ai-features" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="n">ai_commits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="k">[anthropic]</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${ANTHROPIC_API_KEY}&quot;</span>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-sonnet-4-5-20250514&quot;</span>
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="k">[claude]</span>
+<a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;claude-sonnet-4-5&quot;</span>
+<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a>
+<a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a><span class="k">[github]</span>
+<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${GITHUB_TOKEN}&quot;</span>
+<a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a>
+<a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a><span class="k">[imbi]</span>
+<a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${IMBI_API_KEY}&quot;</span>
+<a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<h3 id="with-debugging">With Debugging<a class="headerlink" href="#with-debugging" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="n">preserve_on_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="n">error_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/tmp/imbi-errors&quot;</span>
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a><span class="k">[github]</span>
+<a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${GITHUB_TOKEN}&quot;</span>
+<a id="__codelineno-51-6" name="__codelineno-51-6" href="#__codelineno-51-6"></a>
+<a id="__codelineno-51-7" name="__codelineno-51-7" href="#__codelineno-51-7"></a><span class="k">[imbi]</span>
+<a id="__codelineno-51-8" name="__codelineno-51-8" href="#__codelineno-51-8"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${IMBI_API_KEY}&quot;</span>
+<a id="__codelineno-51-9" name="__codelineno-51-9" href="#__codelineno-51-9"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<h3 id="with-dry-run-mode">With Dry Run Mode<a class="headerlink" href="#with-dry-run-mode" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="c1"># Enable dry-run globally for safe testing</span>
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a><span class="n">dry_run</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a><span class="n">dry_run_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;./review-changes&quot;</span>
+<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>
+<a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a><span class="k">[github]</span>
+<a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${GITHUB_TOKEN}&quot;</span>
+<a id="__codelineno-52-7" name="__codelineno-52-7" href="#__codelineno-52-7"></a>
+<a id="__codelineno-52-8" name="__codelineno-52-8" href="#__codelineno-52-8"></a><span class="k">[imbi]</span>
+<a id="__codelineno-52-9" name="__codelineno-52-9" href="#__codelineno-52-9"></a><span class="n">api_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;${IMBI_API_KEY}&quot;</span>
+<a id="__codelineno-52-10" name="__codelineno-52-10" href="#__codelineno-52-10"></a><span class="n">hostname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;imbi.example.com&quot;</span>
+</code></pre></div>
+<p>All workflows will execute but skip pushing and PR creation. Review changes in <code>./review-changes/</code> before disabling dry-run mode.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="configuration-not-loading">Configuration Not Loading<a class="headerlink" href="#configuration-not-loading" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> <code>FileNotFoundError: config.toml not found</code></p>
+<p><strong>Solution:</strong> Provide full path to config file:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>imbi-automations<span class="w"> </span>/path/to/config.toml<span class="w"> </span>workflows/name<span class="w"> </span>--all-projects
+</code></pre></div></p>
+<h3 id="authentication-failures">Authentication Failures<a class="headerlink" href="#authentication-failures" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> <code>401 Unauthorized</code> errors</p>
+<p><strong>Solutions:</strong><br />
+1. Verify API key is valid and not expired
+2. Check API key has required permissions
+3. Ensure environment variables are exported
+4. Test API access manually with curl</p>
+<h3 id="invalid-toml-syntax">Invalid TOML Syntax<a class="headerlink" href="#invalid-toml-syntax" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> <code>toml.decoder.TomlDecodeError</code></p>
+<p><strong>Solutions:</strong><br />
+1. Validate TOML syntax with online validator
+2. Check for missing quotes around strings
+3. Verify section headers use <code>[section]</code> format
+4. Ensure key-value pairs use <code>key = "value</code> format</p>
+<h2 id="advanced-configuration">Advanced Configuration<a class="headerlink" href="#advanced-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="custom-error-directory-structure">Custom Error Directory Structure<a class="headerlink" href="#custom-error-directory-structure" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="n">error_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/var/log/imbi-automations/errors&quot;</span>
+</code></pre></div>
+<p>Creates:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>/var/log/imbi-automations/errors/
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>└── workflow-name/
+<a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>    └── project-slug-timestamp/
+<a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a>        ├── repository/
+<a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a>        ├── workflow/
+<a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a>        └── error.log
+</code></pre></div></p>
+<h3 id="custom-git-author-per-workflow">Custom Git Author Per Workflow<a class="headerlink" href="#custom-git-author-per-workflow" title="Permanent link">&para;</a></h3>
+<p>Set in workflow config.toml instead:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="c1"># workflows/my-workflow/config.toml</span>
+<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a><span class="k">[git]</span>
+<a id="__codelineno-56-3" name="__codelineno-56-3" href="#__codelineno-56-3"></a><span class="n">user_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Workflow Bot&quot;</span>
+<a id="__codelineno-56-4" name="__codelineno-56-4" href="#__codelineno-56-4"></a><span class="n">user_email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;workflow@example.com&quot;</span>
+</code></pre></div>
+<p>Overrides global git author settings for that workflow only.</p>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../environment-variables/">Environment Variables</a> - Complete environment variable reference</li>
+<li><a href="../actions/">Workflow Actions</a> - Complete action configuration reference</li>
+<li><a href="../architecture/">Architecture</a> - System design and components</li>
+<li><a href="../actions/github/">GitHub Actions</a> - GitHub-specific configuration</li>
+<li><a href="../actions/claude/">Claude Actions</a> - AI transformation configuration</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
