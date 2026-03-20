@@ -37,7 +37,7 @@ classifiers = [
 dependencies = [
   "anthropic[bedrock]",
   "async-lru",
-  "claude-agent-sdk>=0.1.13",
+  "claude-agent-sdk>=0.1.39",
   "colorlog",
   "httpx",
   "jinja2",
@@ -104,6 +104,7 @@ select = [
 ignore = [
   "ANN401",   # There is a time and place for typing.Any
   "ASYNC109", # async function with timeout parameter (false positive)
+  "ASYNC240", # Async functions should not use pathlib.Path methods, use trio.Path or anyio.path
   "RSE",      # contradicts Python Style Guide
 ]
 flake8-quotes = { inline-quotes = "single" }
