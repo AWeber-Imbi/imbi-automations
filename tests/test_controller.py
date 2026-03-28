@@ -98,6 +98,7 @@ class ControllerInitializationTestCase(base.AsyncTestCase):
         args = argparse.Namespace(
             verbose=False,
             resume=None,
+            rerun_followup=None,
             project_id=123,
             project_type=None,
             all_projects=False,
@@ -116,6 +117,7 @@ class ControllerInitializationTestCase(base.AsyncTestCase):
         args = argparse.Namespace(
             verbose=False,
             resume=None,
+            rerun_followup=None,
             project_id=None,
             project_type='apis',
             all_projects=False,
@@ -135,6 +137,7 @@ class ControllerInitializationTestCase(base.AsyncTestCase):
         args = argparse.Namespace(
             verbose=False,
             resume=None,
+            rerun_followup=None,
             project_id=None,
             project_type=None,
             all_projects=True,
@@ -153,6 +156,7 @@ class ControllerInitializationTestCase(base.AsyncTestCase):
         args = argparse.Namespace(
             verbose=False,
             resume=pathlib.Path('/tmp/errors/workflow/project-123'),
+            rerun_followup=None,
             project_id=None,
             project_type=None,
             all_projects=False,
