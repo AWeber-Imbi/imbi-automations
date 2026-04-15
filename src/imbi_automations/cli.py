@@ -177,6 +177,20 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         help='Resume from previous error state directory '
         '(looks for .state file inside)',
     )
+    target_group.add_argument(
+        '--rerun-followup',
+        type=int,
+        metavar='PROJECT_ID',
+        help='Re-run followup stage for a project with an existing PR '
+        '(requires --pr-number)',
+    )
+
+    parser.add_argument(
+        '--pr-number',
+        type=int,
+        metavar='NUMBER',
+        help='Pull request number (required with --rerun-followup)',
+    )
 
     parser.add_argument(
         '--start-from-project',
@@ -240,7 +254,16 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         help='Enable debug logging (shows all debug messages)',
     )
     parser.add_argument('-V', '--version', action='version', version=version)
-    return parser.parse_args(args)
+    parsed = parser.parse_args(args)
+
+    # --pr-number is only meaningful with --rerun-followup, and
+    # --rerun-followup requires --pr-number to locate the existing PR.
+    if parsed.rerun_followup is not None and parsed.pr_number is None:
+        parser.error('--pr-number is required when using --rerun-followup')
+    if parsed.pr_number is not None and parsed.rerun_followup is None:
+        parser.error('--pr-number can only be used with --rerun-followup')
+
+    return parsed
 
 
 def main() -> None:

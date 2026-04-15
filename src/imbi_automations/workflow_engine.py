@@ -327,8 +327,26 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             working_directory.cleanup()
             return True
 
-        # Create PR or push changes
-        if context.has_repository_changes:
+        # Create PR or push changes (skip if resuming from followup stage)
+        if (
+            self.resume_state
+            and self.resume_state.current_stage == 'followup'
+            and self.resume_state.pull_request_number
+        ):
+            # Resuming from followup stage: restore PR info from API
+            self.logger.info(
+                '%s resuming followup stage — restoring PR #%d from API',
+                context.imbi_project.slug,
+                self.resume_state.pull_request_number,
+            )
+            org, repo = context.github_repository.full_name.split('/', 1)
+            context.pull_request = await self.github.get_pull_request(
+                org, repo, self.resume_state.pull_request_number
+            )
+            context.pr_branch = (
+                self.resume_state.pr_branch or context.pull_request.head['ref']
+            )
+        elif context.has_repository_changes:
             if (
                 self.workflow.configuration.github.create_pull_request
                 and self.configuration.claude.enabled

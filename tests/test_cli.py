@@ -369,6 +369,49 @@ actions = []
 
         self.assertTrue(args.dry_run)
 
+    def test_parse_args_rerun_followup_requires_pr_number(self) -> None:
+        """--rerun-followup without --pr-number must exit with usage error."""
+        with self.assertRaises(SystemExit) as ctx:
+            cli.parse_args(
+                [
+                    str(self.config_file),
+                    str(self.workflow_dir),
+                    '--rerun-followup',
+                    '42',
+                ]
+            )
+        self.assertEqual(ctx.exception.code, 2)
+
+    def test_parse_args_pr_number_requires_rerun_followup(self) -> None:
+        """--pr-number without --rerun-followup must exit with usage error."""
+        with self.assertRaises(SystemExit) as ctx:
+            cli.parse_args(
+                [
+                    str(self.config_file),
+                    str(self.workflow_dir),
+                    '--project-id',
+                    '42',
+                    '--pr-number',
+                    '99',
+                ]
+            )
+        self.assertEqual(ctx.exception.code, 2)
+
+    def test_parse_args_rerun_followup_with_pr_number(self) -> None:
+        """--rerun-followup + --pr-number parses cleanly."""
+        args = cli.parse_args(
+            [
+                str(self.config_file),
+                str(self.workflow_dir),
+                '--rerun-followup',
+                '42',
+                '--pr-number',
+                '99',
+            ]
+        )
+        self.assertEqual(args.rerun_followup, 42)
+        self.assertEqual(args.pr_number, 99)
+
 
 class MainExecutionTestCase(unittest.TestCase):
     """Test main execution flow."""
