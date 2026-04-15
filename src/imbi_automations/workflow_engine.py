@@ -885,12 +885,9 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             return 'failed'
 
         # Add error context to template variables
-        # Serialize failed_action to dict to avoid pydantic
-        # SchemaSerializer errors when context.model_dump() is
-        # called during prompt rendering
         context.variables.update(
             {
-                'failed_action': failed_action.model_dump(),
+                'failed_action': failed_action,
                 'exception': str(exception),
                 'exception_type': type(exception).__name__,
                 'retry_attempt': retry_count + 1,
