@@ -32,6 +32,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
         self.has_planning_prompt: bool = False
         self.last_error: models.ClaudeAgentResponse | None = None
         self.task_plan: models.ClaudeAgentResponse | None = None
+        self.task_message: str | None = None
         git = configuration.git
         self.prompt_kwargs = {
             'commit_author': f'{git.user_name} <{git.user_email}>',
@@ -82,6 +83,9 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                         action.name,
                         cycle,
                     )
+                    self._record_commit_context(
+                        action, skipped=self.task_message is None
+                    )
                     success = True
                     break
             except TimeoutError as exc:
@@ -117,12 +121,34 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 )
             raise RuntimeError(error_msg)
 
+    def _record_commit_context(
+        self, action: models.WorkflowClaudeAction, *, skipped: bool
+    ) -> None:
+        """Persist implementer reasoning for the committer to consume.
+
+        Writes to ``context.variables['_commit_context']``, which
+        ``commit.md.j2`` renders conditionally. Planning fields are None
+        when the action had no planning_prompt; message is None when
+        planning skipped the task.
+        """
+        plan = self.task_plan.plan if self.task_plan else None
+        analysis = self.task_plan.analysis if self.task_plan else None
+        self.context.variables['_commit_context'] = {
+            'action_name': action.name,
+            'action_type': 'claude',
+            'plan': plan,
+            'analysis': analysis,
+            'message': self.task_message,
+            'skipped': skipped,
+        }
+
     async def _execute_cycle(
         self, action: models.WorkflowClaudeAction, cycle: int
     ) -> bool:
-        # Reset task_plan at the start of each cycle
+        # Reset per-cycle state
         self.has_planning_prompt = False
         self.task_plan = None
+        self.task_message = None
 
         # Build agent execution sequence
         agents = []
@@ -193,6 +219,7 @@ class ClaudeAction(mixins.WorkflowLoggerMixin):
                 )
                 # Continue to task agent - don't return yet
             elif run.message is not None:  # Task agent response
+                self.task_message = run.message
                 self.logger.debug(
                     '%s %s task result: %s',
                     self.context.imbi_project.slug,

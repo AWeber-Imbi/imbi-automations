@@ -342,6 +342,38 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
     # test_passes_correct_response_model removed - agent_query no longer
     # takes response_model parameter with unified ClaudeAgentResponse
 
+    @mock.patch('imbi_automations.committer.prompts.render')
+    @mock.patch('imbi_automations.committer.claude.Claude')
+    async def test_passes_context_to_prompts_render(
+        self, mock_claude_class: mock.MagicMock, mock_render: mock.MagicMock
+    ) -> None:
+        """_claude_commit passes context so _commit_context is templated."""
+        mock_client = mock.MagicMock()
+        mock_claude_class.return_value = mock_client
+        mock_client.prompt_kwargs = {'workflow_name': 'test-workflow'}
+        mock_render.return_value = 'Commit the changes'
+
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            return models.ClaudeAgentResponse(message='Done')
+
+        mock_client.agent_query = mock_agent_query
+
+        self.context.variables['_commit_context'] = {
+            'action_name': 'migrate-code',
+            'action_type': 'claude',
+            'plan': ['step one', 'step two'],
+            'analysis': 'migration needed for new API',
+            'message': 'Updated three files to use new endpoint',
+            'skipped': False,
+        }
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._claude_commit(self.context, self.action)
+
+        _, kwargs = mock_render.call_args
+        self.assertIs(kwargs['context'], self.context)
+        self.assertEqual(kwargs['action_name'], self.action.name)
+
 
 class ManualCommitTestCase(base.AsyncTestCase):
     """Test cases for Committer._manual_commit()."""
