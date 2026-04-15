@@ -67,6 +67,7 @@ class Committer(mixins.WorkflowLoggerMixin):
         # Build the commit prompt from the command template
         commit_template = BASE_PATH / 'prompts' / 'commit.md.j2'
         prompt = prompts.render(
+            context=context,
             source=commit_template,
             action_name=action.name,
             **client.prompt_kwargs,

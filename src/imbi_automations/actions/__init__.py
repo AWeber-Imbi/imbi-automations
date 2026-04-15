@@ -66,6 +66,8 @@ class Actions(mixins.WorkflowLoggerMixin):
         ),
     ) -> None:
         self._set_workflow_logger(context.workflow)
+        # Drop stale implementer context from prior actions
+        context.variables.pop('_commit_context', None)
         match action.type:
             case models.WorkflowActionTypes.callable:
                 obj = callablea.CallableAction(

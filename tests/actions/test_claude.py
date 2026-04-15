@@ -400,5 +400,131 @@ class ClaudeActionTestCase(base.AsyncTestCase):
 # exists with unified ClaudeAgentResponse model
 
 
+class RecordCommitContextTestCase(base.AsyncTestCase):
+    """ClaudeAction._record_commit_context populates context.variables."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.working_directory = pathlib.Path(self.temp_dir.name)
+        (self.working_directory / 'workflow').mkdir()
+        (self.working_directory / 'extracted').mkdir()
+        (self.working_directory / 'repository').mkdir()
+
+        self.config = models.Configuration(
+            claude=models.ClaudeAgentConfiguration(executable='claude'),
+            anthropic=models.AnthropicConfiguration(),
+            git=models.GitConfiguration(
+                user_name='Test Author', user_email='test@example.com'
+            ),
+            imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
+            github=models.GitHubConfiguration(
+                token='test'  # noqa: S106
+            ),
+        )
+
+        self.workflow = models.Workflow(
+            path=pathlib.Path('/mock/workflow'),
+            configuration=models.WorkflowConfiguration(
+                name='test-workflow', actions=[]
+            ),
+        )
+
+        self.context = models.WorkflowContext(
+            workflow=self.workflow,
+            imbi_project=models.ImbiProject(
+                id=123,
+                dependencies=None,
+                description='Test project',
+                environments=None,
+                facts=None,
+                identifiers=None,
+                links=None,
+                name='test-project',
+                namespace='test-namespace',
+                namespace_slug='test-namespace',
+                project_score=None,
+                project_type='API',
+                project_type_slug='api',
+                slug='test-project',
+                urls=None,
+                imbi_url='https://imbi.example.com/projects/123',
+            ),
+            working_directory=self.working_directory,
+        )
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        self.temp_dir.cleanup()
+
+    def _build_action(self) -> claude.ClaudeAction:
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            return claude.ClaudeAction(
+                self.config, self.context, verbose=False
+            )
+
+    def test_records_plan_analysis_and_message_on_success(self) -> None:
+        """_commit_context includes plan, analysis, and message on success."""
+        claude_action = self._build_action()
+        claude_action.task_plan = models.ClaudeAgentResponse(
+            plan=['step one', 'step two'], analysis='analysis text'
+        )
+        claude_action.task_message = 'Updated three files'
+
+        action = models.WorkflowClaudeAction(
+            name='migrate-code', type='claude', task_prompt='t.md'
+        )
+        claude_action._record_commit_context(action, skipped=False)
+
+        recorded = self.context.variables['_commit_context']
+        self.assertEqual(recorded['action_name'], 'migrate-code')
+        self.assertEqual(recorded['action_type'], 'claude')
+        self.assertEqual(recorded['plan'], ['step one', 'step two'])
+        self.assertEqual(recorded['analysis'], 'analysis text')
+        self.assertEqual(recorded['message'], 'Updated three files')
+        self.assertFalse(recorded['skipped'])
+
+    def test_records_skipped_true_when_no_task_message(self) -> None:
+        """skipped=True with message=None when planning skipped the task."""
+        claude_action = self._build_action()
+        claude_action.task_plan = models.ClaudeAgentResponse(
+            plan=['no-op'], analysis='nothing to do', skip_task=True
+        )
+        claude_action.task_message = None
+
+        action = models.WorkflowClaudeAction(
+            name='migrate-code', type='claude', task_prompt='t.md'
+        )
+        claude_action._record_commit_context(action, skipped=True)
+
+        recorded = self.context.variables['_commit_context']
+        self.assertTrue(recorded['skipped'])
+        self.assertIsNone(recorded['message'])
+        self.assertEqual(recorded['plan'], ['no-op'])
+
+    def test_records_none_plan_when_no_planning_prompt(self) -> None:
+        """plan and analysis are None when action had no planning_prompt."""
+        claude_action = self._build_action()
+        claude_action.task_plan = None
+        claude_action.task_message = 'done'
+
+        action = models.WorkflowClaudeAction(
+            name='migrate-code', type='claude', task_prompt='t.md'
+        )
+        claude_action._record_commit_context(action, skipped=False)
+
+        recorded = self.context.variables['_commit_context']
+        self.assertIsNone(recorded['plan'])
+        self.assertIsNone(recorded['analysis'])
+        self.assertEqual(recorded['message'], 'done')
+
+
 if __name__ == '__main__':
     unittest.main()

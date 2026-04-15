@@ -1,3 +1,36 @@
+{% if _commit_context is defined and _commit_context %}
+# Context from the preceding action
+
+The `{{ _commit_context.action_name }}` action ({{ _commit_context.action_type }})
+produced the pending changes. Use the following reasoning to craft the
+commit message body — especially the *why* behind the change. Do NOT
+alter the subject line format.
+
+{% if _commit_context.plan %}
+## Plan the implementer followed
+
+{% for step in _commit_context.plan %}
+{{ loop.index }}. {{ step }}
+{% endfor %}
+{% endif %}
+{% if _commit_context.analysis %}
+## Analysis
+
+{{ _commit_context.analysis }}
+{% endif %}
+{% if _commit_context.message %}
+## Implementer's summary of what was done
+
+{{ _commit_context.message }}
+{% endif %}
+{% if _commit_context.skipped %}
+Note: the implementer determined no work was needed and skipped execution.
+If there are no pending changes, exit without committing.
+{% endif %}
+
+---
+
+{% endif %}
 Your task is to analyze pending changes and create logical commits.
 
 Your current working directory is already set to the repository directory. Run git commands directly without changing directories.
