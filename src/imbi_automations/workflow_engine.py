@@ -344,8 +344,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                 org, repo, self.resume_state.pull_request_number
             )
             context.pr_branch = (
-                self.resume_state.pr_branch
-                or f'imbi-automations/{context.workflow.slug}'
+                self.resume_state.pr_branch or context.pull_request.head['ref']
             )
         elif context.has_repository_changes:
             if (
