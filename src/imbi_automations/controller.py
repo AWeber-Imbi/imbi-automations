@@ -255,13 +255,10 @@ class Automation(mixins.WorkflowLoggerMixin):
             True if workflow completed successfully, False otherwise
 
         Raises:
-            RuntimeError: If --pr-number not provided, no followup
-                actions exist, or project/repository lookup fails
+            RuntimeError: If no followup actions exist or project/
+                repository lookup fails
 
         """
-        if not self.args.pr_number:
-            raise RuntimeError('--pr-number is required with --rerun-followup')
-
         project_id = self.args.rerun_followup
         pr_number = self.args.pr_number
 
