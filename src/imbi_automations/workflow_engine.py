@@ -471,7 +471,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         self,
         context: models.WorkflowContext,
         followup_actions: list[tuple[int, models.WorkflowActions]],
-        working_directory: 'tempfile.TemporaryDirectory',
+        working_directory: tempfile.TemporaryDirectory,
     ) -> None:
         """Execute followup stage actions with commit cycling.
 
