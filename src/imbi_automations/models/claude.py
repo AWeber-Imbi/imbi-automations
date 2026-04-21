@@ -38,7 +38,7 @@ class ClaudeMarketplaceSource(pydantic.BaseModel):
     path: str | None = None  # For 'directory' source type
 
     @pydantic.model_validator(mode='after')
-    def validate_source_fields(self) -> 'ClaudeMarketplaceSource':
+    def validate_source_fields(self) -> ClaudeMarketplaceSource:
         """Validate that the correct field is set for the source type."""
         if self.source == ClaudeMarketplaceSourceType.github and not self.repo:
             raise ValueError("'repo' is required for 'github' source type")

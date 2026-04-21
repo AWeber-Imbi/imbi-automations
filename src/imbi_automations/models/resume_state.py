@@ -74,7 +74,7 @@ class ResumeState(pydantic.BaseModel):
         return msgpack.packb(self.model_dump(mode='json'), use_bin_type=True)
 
     @classmethod
-    def from_msgpack(cls, data: bytes) -> 'ResumeState':
+    def from_msgpack(cls, data: bytes) -> ResumeState:
         """Deserialize from MessagePack binary format.
 
         Args:

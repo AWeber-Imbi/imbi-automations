@@ -324,7 +324,7 @@ class GitHub(http.BaseURLHTTPClient):
 
     async def create_pull_request(
         self,
-        context: 'models.WorkflowContext',
+        context: models.WorkflowContext,
         title: str,
         body: str,
         head_branch: str,
@@ -418,7 +418,7 @@ class GitHub(http.BaseURLHTTPClient):
 
     def _repository_base_path(
         self,
-        context: 'models.WorkflowContext | None' = None,
+        context: models.WorkflowContext | None = None,
         org: str | None = None,
         repo_name: str | None = None,
         repository: models.GitHubRepository | None = None,
@@ -552,7 +552,7 @@ class GitHub(http.BaseURLHTTPClient):
         return job_logs
 
     async def get_file_contents(
-        self, context: 'models.WorkflowContext', file_path: str
+        self, context: models.WorkflowContext, file_path: str
     ) -> str | None:
         """Get file contents from GitHub repository.
 
@@ -689,7 +689,7 @@ class GitHub(http.BaseURLHTTPClient):
                 raise
 
     async def get_repository_tree(
-        self, context: 'models.WorkflowContext', ref: str | None = None
+        self, context: models.WorkflowContext, ref: str | None = None
     ) -> list[str]:
         """Get repository file tree recursively from GitHub.
 

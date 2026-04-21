@@ -327,7 +327,7 @@ State saved in `.state` file (MessagePack format) with:
 ## Code Style
 
 - **Line length**: 79 chars (ruff enforced)
-- **Python**: 3.12+ with type hints
+- **Python**: 3.14+ with type hints
 - **Quotes**: Single preferred, double for docstrings
 - **Imports**: Module imports over direct class imports
 - **Pydantic**: Use `field: list[int] = []` not `Field(default_factory=list)`

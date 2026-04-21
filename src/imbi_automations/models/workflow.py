@@ -57,7 +57,7 @@ class ProjectFieldFilter(pydantic.BaseModel):
     is_empty: bool | None = None
 
     @pydantic.model_validator(mode='after')
-    def validate_single_operator(self) -> 'ProjectFieldFilter':
+    def validate_single_operator(self) -> ProjectFieldFilter:
         """Ensure only one operator is specified."""
         operators = [
             self.is_null,
@@ -195,7 +195,7 @@ class WorkflowAction(pydantic.BaseModel):
     stage: WorkflowActionStage = WorkflowActionStage.primary
     ai_commit: bool = False
     commit_message: str | None = None
-    conditions: list['WorkflowCondition'] = []
+    conditions: list[WorkflowCondition] = []
     condition_type: WorkflowConditionType = WorkflowConditionType.all
     committable: bool = True
     filter: WorkflowFilter | None = None
@@ -234,7 +234,7 @@ class WorkflowAction(pydantic.BaseModel):
         return v
 
     @pydantic.model_validator(mode='after')
-    def validate_commit_message(self) -> 'WorkflowAction':
+    def validate_commit_message(self) -> WorkflowAction:
         """Validate that commit_message is only set when ai_commit=False
         and committable=True.
 
@@ -251,7 +251,7 @@ class WorkflowAction(pydantic.BaseModel):
         return self
 
     @pydantic.model_validator(mode='after')
-    def validate_error_config(self) -> 'WorkflowAction':
+    def validate_error_config(self) -> WorkflowAction:
         """Validate error handling configuration."""
         if self.stage == WorkflowActionStage.on_error:
             # Error actions cannot have error handlers themselves
@@ -379,7 +379,7 @@ class WorkflowFileActionCommand(enum.StrEnum):
     write = 'write'
 
 
-def _file_delete_requires_path_or_pattern(model: 'WorkflowFileAction') -> None:
+def _file_delete_requires_path_or_pattern(model: WorkflowFileAction) -> None:
     if (
         model.command == WorkflowFileActionCommand.delete
         and model.path is None
@@ -469,7 +469,7 @@ class WorkflowGitAction(WorkflowAction):
     committable: bool = False
 
     @pydantic.model_validator(mode='after')
-    def validate_git_action_fields(self) -> 'WorkflowGitAction':
+    def validate_git_action_fields(self) -> WorkflowGitAction:
         """Validate required fields based on command type."""
         if self.command == WorkflowGitActionCommand.extract:
             self.committable = False
@@ -754,7 +754,7 @@ class WorkflowGitHub(pydantic.BaseModel):
     replace_branch: bool = False
 
     @pydantic.model_validator(mode='after')
-    def validate_replace_branch(self) -> 'WorkflowGitHub':
+    def validate_replace_branch(self) -> WorkflowGitHub:
         if self.replace_branch and not self.create_pull_request:
             raise ValueError(
                 'replace_branch requires create_pull_request to be True'
@@ -822,13 +822,13 @@ class Workflow(pydantic.BaseModel):
     slug: str | None = None
 
     @pydantic.model_validator(mode='after')
-    def _set_slug(self) -> 'Workflow':
+    def _set_slug(self) -> Workflow:
         if not self.slug:
             self.slug = self.path.name.lower().replace('_', '-')
         return self
 
     @pydantic.model_validator(mode='after')
-    def _validate_error_handlers(self) -> 'Workflow':
+    def _validate_error_handlers(self) -> Workflow:
         """Validate error handler references and attachments."""
         # Build map of action names
         action_names = {a.name for a in self.configuration.actions}

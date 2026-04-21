@@ -1,4 +1,4 @@
-FROM python:3.12-trixie AS builder
+FROM python:3.14-trixie AS builder
 
 COPY pyproject.toml uv.lock dist/imbi_automations*.whl /tmp/
 
@@ -11,7 +11,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
  && uv sync --active --no-install-project --frozen --no-dev \
  && uv pip install imbi_automations*.whl
 
-FROM python:3.12-trixie AS runtime
+FROM python:3.14-trixie AS runtime
 
 ENV CLAUDE_CODE_USE_ANTHROPIC_API=1 \
     GH_HOST=github.com \
