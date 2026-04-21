@@ -11,7 +11,7 @@ authors = [
 ]
 license = {text = "BSD-3-Clause"}
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 keywords = [
   "imbi",
   "github",
@@ -27,8 +27,6 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Topic :: Database",
   "Topic :: System :: Systems Administration",
@@ -72,7 +70,7 @@ serve-docs = ["mkdocs serve -a localhost:8080"]
 
 [tool.ruff]
 line-length = 79
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.format]
 docstring-code-format = true
