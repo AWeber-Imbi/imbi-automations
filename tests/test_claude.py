@@ -882,8 +882,10 @@ class InstallPluginsTestCase(base.AsyncTestCase):
             {'local-plugin@test-marketplace': True}, self.plugins_dir
         )
 
-        # Verify symlink was created
-        expected_path = self.installed_dir / 'local-plugin'
+        # Verify symlink was created under the marketplace-namespaced path
+        expected_path = (
+            self.installed_dir / 'test-marketplace' / 'local-plugin'
+        )
         self.assertTrue(expected_path.is_symlink())
         self.assertEqual(expected_path.resolve(), plugin_source.resolve())
         self.assertEqual(result, [str(expected_path)])
@@ -923,14 +925,16 @@ class InstallPluginsTestCase(base.AsyncTestCase):
                 {'github-plugin@test-marketplace': True}, self.plugins_dir
             )
 
-        # Verify clone was called with GitHub URL
+        # Verify clone was called with GitHub URL into the
+        # marketplace-namespaced install directory.
+        marketplace_install_dir = self.installed_dir / 'test-marketplace'
         mock_clone.assert_called_once_with(
-            working_directory=self.installed_dir,
+            working_directory=marketplace_install_dir,
             clone_url='https://github.com/org/plugin.git',
             destination=pathlib.Path('github-plugin'),
             depth=None,
         )
-        expected_path = self.installed_dir / 'github-plugin'
+        expected_path = marketplace_install_dir / 'github-plugin'
         self.assertEqual(result, [str(expected_path)])
 
     async def test_install_plugins_github_source_missing_repo(self) -> None:
@@ -971,13 +975,14 @@ class InstallPluginsTestCase(base.AsyncTestCase):
                 {'url-plugin@test-marketplace': True}, self.plugins_dir
             )
 
+        marketplace_install_dir = self.installed_dir / 'test-marketplace'
         mock_clone.assert_called_once_with(
-            working_directory=self.installed_dir,
+            working_directory=marketplace_install_dir,
             clone_url='https://git.example.com/plugin.git',
             destination=pathlib.Path('url-plugin'),
             depth=None,
         )
-        expected_path = self.installed_dir / 'url-plugin'
+        expected_path = marketplace_install_dir / 'url-plugin'
         self.assertEqual(result, [str(expected_path)])
 
     async def test_install_plugins_unsupported_source_type(self) -> None:
@@ -993,6 +998,41 @@ class InstallPluginsTestCase(base.AsyncTestCase):
             )
 
         self.assertIn('Unsupported plugin source type', str(exc.exception))
+
+    async def test_install_plugins_same_name_different_marketplaces(
+        self,
+    ) -> None:
+        """Same-named plugins from different marketplaces do not collide."""
+        # Two marketplaces both expose a plugin named 'shared-plugin' but
+        # pointing at different local directories.
+        marketplace_a = self._create_marketplace_with_manifest(
+            'marketplace-a',
+            [{'name': 'shared-plugin', 'source': './plugins/shared-plugin'}],
+        )
+        marketplace_b = self._create_marketplace_with_manifest(
+            'marketplace-b',
+            [{'name': 'shared-plugin', 'source': './plugins/shared-plugin'}],
+        )
+        source_a = marketplace_a / 'plugins' / 'shared-plugin'
+        source_a.mkdir(parents=True)
+        (source_a / 'plugin.json').write_text('{"variant": "a"}')
+        source_b = marketplace_b / 'plugins' / 'shared-plugin'
+        source_b.mkdir(parents=True)
+        (source_b / 'plugin.json').write_text('{"variant": "b"}')
+
+        result = await claude._install_plugins(
+            {
+                'shared-plugin@marketplace-a': True,
+                'shared-plugin@marketplace-b': True,
+            },
+            self.plugins_dir,
+        )
+
+        path_a = self.installed_dir / 'marketplace-a' / 'shared-plugin'
+        path_b = self.installed_dir / 'marketplace-b' / 'shared-plugin'
+        self.assertEqual(result, [str(path_a), str(path_b)])
+        self.assertEqual(path_a.resolve(), source_a.resolve())
+        self.assertEqual(path_b.resolve(), source_b.resolve())
 
 
 if __name__ == '__main__':
