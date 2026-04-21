@@ -537,8 +537,9 @@ class Claude(mixins.WorkflowLoggerMixin):
     async def _ensure_plugins_installed(self) -> None:
         """Install Claude marketplaces and plugins if not already done.
 
-        Installs to the working directory (.claude/plugins/) to avoid
-        polluting the user's ~/.claude directory.
+        Installs to the shared cache directory so marketplaces and plugins
+        are reused across projects within a single CLI invocation (and
+        across invocations) instead of being re-cloned per project.
 
         This is called lazily before the first agent query to avoid
         running async code from __init__ which may be called from
@@ -548,7 +549,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             return
 
         LOGGER.debug('Installing Claude marketplaces and plugins')
-        plugins_dir = self.context.working_directory / '.claude' / 'plugins'
+        plugins_dir = self.configuration.cache_dir / 'claude-plugins'
         try:
             self._installed_plugin_paths = (
                 await self._install_marketplaces_and_plugins(
