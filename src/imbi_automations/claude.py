@@ -192,9 +192,11 @@ async def _install_plugins(
     """Install enabled Claude Code plugins from marketplaces.
 
     Reads the marketplace manifest at .claude-plugin/marketplace.json to find
-    plugin sources, then clones plugins to plugins_dir/installed/. Checks for
-    existing plugin.json (at root or .claude-plugin/) to skip already-installed
-    plugins.
+    plugin sources, then clones plugins to
+    plugins_dir/installed/<marketplace>/<plugin>. Namespacing by marketplace
+    prevents cache collisions when two marketplaces expose a plugin with the
+    same name. Checks for existing plugin.json (at root or .claude-plugin/)
+    to skip already-installed plugins.
 
     Args:
         enabled_plugins: Map of "plugin@marketplace" to enabled state
@@ -225,9 +227,14 @@ async def _install_plugins(
 
         plugin_name, marketplace_name = plugin_spec.rsplit('@', 1)
 
+        # Namespace plugin cache by marketplace to avoid collisions when
+        # two marketplaces expose plugins with the same name.
+        marketplace_install_dir = installed_dir / marketplace_name
+        marketplace_install_dir.mkdir(parents=True, exist_ok=True)
+
         # Check if plugin already cloned (manifest can be at root or
         # .claude-plugin/). Plugins installed to installed_dir, not marketplace
-        plugin_path = installed_dir / plugin_name
+        plugin_path = marketplace_install_dir / plugin_name
         plugin_manifest = plugin_path / 'plugin.json'
         alt_manifest = plugin_path / '.claude-plugin' / 'plugin.json'
         if plugin_path.exists() and (
@@ -311,7 +318,7 @@ async def _install_plugins(
             )
             try:
                 await git.clone_to_directory(
-                    working_directory=installed_dir,
+                    working_directory=marketplace_install_dir,
                     clone_url=clone_url,
                     destination=pathlib.Path(plugin_name),
                     depth=None,
@@ -338,7 +345,7 @@ async def _install_plugins(
             )
             try:
                 await git.clone_to_directory(
-                    working_directory=installed_dir,
+                    working_directory=marketplace_install_dir,
                     clone_url=clone_url,
                     destination=pathlib.Path(plugin_name),
                     depth=None,
@@ -537,8 +544,9 @@ class Claude(mixins.WorkflowLoggerMixin):
     async def _ensure_plugins_installed(self) -> None:
         """Install Claude marketplaces and plugins if not already done.
 
-        Installs to the working directory (.claude/plugins/) to avoid
-        polluting the user's ~/.claude directory.
+        Installs to the shared cache directory so marketplaces and plugins
+        are reused across projects within a single CLI invocation (and
+        across invocations) instead of being re-cloned per project.
 
         This is called lazily before the first agent query to avoid
         running async code from __init__ which may be called from
@@ -548,7 +556,7 @@ class Claude(mixins.WorkflowLoggerMixin):
             return
 
         LOGGER.debug('Installing Claude marketplaces and plugins')
-        plugins_dir = self.context.working_directory / '.claude' / 'plugins'
+        plugins_dir = self.configuration.cache_dir / 'claude-plugins'
         try:
             self._installed_plugin_paths = (
                 await self._install_marketplaces_and_plugins(
