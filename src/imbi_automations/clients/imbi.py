@@ -561,6 +561,37 @@ class Imbi(http.BaseURLHTTPClient):
             raise
         return True
 
+    async def add_project_note(self, project_id: int, content: str) -> None:
+        """Add a note to a project.
+
+        Args:
+            project_id: Imbi project ID
+            content: Markdown note content
+
+        Raises:
+            httpx.HTTPError: If API request fails
+
+        """
+        LOGGER.debug('Adding note to project %d', project_id)
+
+        response = await self.post(
+            f'/projects/{project_id}/notes', json={'content': content}
+        )
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            try:
+                error_body = response.text
+            except (AttributeError, UnicodeDecodeError):
+                error_body = '<unable to read response body>'
+            LOGGER.error(
+                'Failed to add note to project %d: HTTP %d - %s',
+                project_id,
+                response.status_code,
+                error_body,
+            )
+            raise
+
     async def add_project_link(
         self, project_id: int, link_type: str, url: str
     ) -> None:

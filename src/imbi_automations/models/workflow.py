@@ -518,6 +518,7 @@ class WorkflowImbiActionCommand(enum.StrEnum):
     """
 
     add_project_link = 'add_project_link'
+    add_project_note = 'add_project_note'
     batch_update_facts = 'batch_update_facts'
     delete_project_fact = 'delete_project_fact'
     get_project_fact = 'get_project_fact'
@@ -560,6 +561,9 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     link_type: str | None = None
     url: str | None = None
 
+    # Fields for add_project_note command
+    content: str | None = None
+
     # Fields for update_project_type command
     project_type: str | None = None
 
@@ -567,6 +571,7 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     command_field: typing.ClassVar[str] = 'command'
     required_fields: typing.ClassVar[dict[object, set[str]]] = {
         WorkflowImbiActionCommand.add_project_link: {'link_type', 'url'},
+        WorkflowImbiActionCommand.add_project_note: {'content'},
         WorkflowImbiActionCommand.batch_update_facts: {'facts'},
         WorkflowImbiActionCommand.delete_project_fact: {'fact_name'},
         WorkflowImbiActionCommand.get_project_fact: {'fact_name'},
@@ -577,6 +582,7 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     }
     allowed_fields: typing.ClassVar[dict[object, set[str]]] = {
         WorkflowImbiActionCommand.add_project_link: {'link_type', 'url'},
+        WorkflowImbiActionCommand.add_project_note: {'content'},
         WorkflowImbiActionCommand.batch_update_facts: {
             'facts',
             'skip_validations',
