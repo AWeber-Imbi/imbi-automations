@@ -519,6 +519,7 @@ fact_value = "FastAPI"
 | Command | Description |
 |---------|-------------|
 | `add_project_link` | Add external links to projects |
+| `add_project_note` | Add a markdown note to a project (supports Jinja2 templates) |
 | `batch_update_facts` | Update multiple facts in a single operation |
 | `delete_project_fact` | Remove obsolete project facts |
 | `get_project_fact` | Retrieve fact values for conditional logic |

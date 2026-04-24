@@ -433,7 +433,7 @@ class Imbi(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to update fact %s for project %d: HTTP %d - %s',
@@ -474,7 +474,7 @@ class Imbi(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to update facts for project %d: HTTP %d - %s',
@@ -549,7 +549,7 @@ class Imbi(http.BaseURLHTTPClient):
                 return False
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to delete fact %s for project %d: HTTP %d - %s',
@@ -582,7 +582,7 @@ class Imbi(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to add note to project %d: HTTP %d - %s',
@@ -628,7 +628,7 @@ class Imbi(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to add link to project %d: HTTP %d - %s',
@@ -719,7 +719,7 @@ class Imbi(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to update project type for project %d: HTTP %d - %s',
@@ -788,7 +788,7 @@ class Imbi(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to update environments for project %d: HTTP %d - %s',
@@ -890,7 +890,7 @@ class Imbi(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except AttributeError, UnicodeDecodeError:
+            except (AttributeError, UnicodeDecodeError):
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to update attributes for project %d: HTTP %d - %s',
@@ -937,7 +937,7 @@ class Imbi(http.BaseURLHTTPClient):
                     project_id,
                 )
                 return
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             # Fall back to string comparison if conversion fails
             current_str = (
                 str(current_value) if current_value is not None else None
