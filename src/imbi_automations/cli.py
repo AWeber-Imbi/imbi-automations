@@ -70,11 +70,15 @@ def workflow(path: str) -> models.Workflow:
         raise argparse.ArgumentTypeError(
             f'Workflow path is not a directory: {path}'
         )
-    for workflow_file in ('workflow.toml', 'config.toml'):
-        if (path_obj / workflow_file).is_file():
-            if workflow_file == 'config.toml':
-                LOGGER.warning('config.toml is deprecated, use workflow.toml')
-            return _load_workflow(path_obj / workflow_file)
+    if (path_obj / 'workflow.toml').is_file():
+        return _load_workflow(path_obj / 'workflow.toml')
+
+    if (path_obj / 'config.toml').is_file():
+        raise argparse.ArgumentTypeError(
+            f'Found config.toml in workflow directory: {path}\n'
+            f'config.toml is no longer supported. Please rename it to '
+            f'workflow.toml.'
+        )
 
     raise argparse.ArgumentTypeError(
         f'Missing workflow configuration file in workflow directory: '
@@ -136,7 +140,7 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
         metavar='WORKFLOW',
         type='workflow',
         help='Path to the directory containing the workflow to run '
-        '(expects workflow.toml, falls back to config.toml)',
+        '(expects workflow.toml)',
     )
 
     # Target argument group - specify how to target repositories

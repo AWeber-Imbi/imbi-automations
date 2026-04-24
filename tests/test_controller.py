@@ -703,8 +703,8 @@ class ControllerResumeTestCase(base.AsyncTestCase):
 
             workflow_path = pathlib.Path(tmpdir) / 'workflow'
             workflow_path.mkdir()
-            (workflow_path / 'config.toml').write_text(
-                '[workflow]\nname="test"'
+            (workflow_path / 'workflow.toml').write_text(
+                'name = "test"\nactions = []\n'
             )
 
             state = models.ResumeState(
