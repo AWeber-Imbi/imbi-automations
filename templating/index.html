@@ -1,0 +1,2096 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../actions/template/">
+      
+      
+        <link rel="next" href="../debugging/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Templating - Imbi Automations</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#jinja2-templating-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Imbi Automations" class="md-header__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Imbi Automations
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Templating
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
+  Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../docker/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docker
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Imbi Automations" class="md-nav__button md-logo" aria-label="Imbi Automations" data-md-component="logo">
+      
+  <img src="../logo.svg" alt="logo">
+
+    </a>
+    Imbi Automations
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AWeber-Imbi/imbi-automations" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AWeber-Imbi/imbi-automations
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment-variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Environment Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../path-schemes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Path Schemes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Actions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About Actions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/stages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action Stages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/callable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Callable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Git
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/imbi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imbi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/jira/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jira
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/shell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shell
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../actions/template/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Template
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Templating
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-context-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Context Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Context Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        workflow (Workflow)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../debugging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-context-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Context Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Context Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        workflow (Workflow)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="jinja2-templating-system">Jinja2 Templating System<a class="headerlink" href="#jinja2-templating-system" title="Permanent link">&para;</a></h1>
+<p>Imbi Automations uses <a href="https://jinja.palletsprojects.com/">Jinja2</a> as its template engine to provide dynamic content generation across workflows, prompts, and file actions. This document describes the templating system, available context variables, and usage examples.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The templating system enables:</p>
+<ul>
+<li>Dynamic workflow prompts with project-specific context</li>
+<li>Template-based file generation with full project metadata</li>
+<li>AI prompt customization using project facts and repository data</li>
+<li>Pull request and commit message generation</li>
+<li>Variable substitution in shell commands and Docker operations</li>
+</ul>
+<h2 id="template-context">Template Context<a class="headerlink" href="#template-context" title="Permanent link">&para;</a></h2>
+<p>All templates receive a <code>WorkflowContext</code> object that provides access to:</p>
+<h3 id="core-context-variables">Core Context Variables<a class="headerlink" href="#core-context-variables" title="Permanent link">&para;</a></h3>
+<h4 id="workflow-workflow"><code>workflow</code> (Workflow)<a class="headerlink" href="#workflow-workflow" title="Permanent link">&para;</a></h4>
+<p>Complete workflow definition and configuration.</p>
+<p><strong>Available fields:</strong></p>
+<ul>
+<li><code>workflow.configuration.name</code> - Workflow name</li>
+<li><code>workflow.configuration.description</code> - Workflow description</li>
+<li><code>workflow.configuration.prompt</code> - Workflow-level prompt URL/path</li>
+<li><code>workflow.configuration.git.*</code> - Git configuration (checkout, depth, branch)</li>
+<li><code>workflow.configuration.github.*</code> - GitHub settings (create_pull_request)</li>
+<li><code>workflow.configuration.filter.*</code> - Workflow filter criteria</li>
+</ul>
+<p><strong>Example:</strong>
+```jinja2</p>
+<h1 id="workflow-workflowconfigurationname">Workflow: {{ workflow.configuration.name }}<a class="headerlink" href="#workflow-workflowconfigurationname" title="Permanent link">&para;</a></h1>
+<p>{{ workflow.configuration.description }}
+```</p>
+<h4 id="imbi_project-imbiproject"><code>imbi_project</code> (ImbiProject)<a class="headerlink" href="#imbi_project-imbiproject" title="Permanent link">&para;</a></h4>
+<p>Complete project metadata from Imbi project management system.</p>
+<p><strong>Core fields:</strong></p>
+<ul>
+<li><code>imbi_project.id</code> - Project ID (integer)</li>
+<li><code>imbi_project.name</code> - Human-readable project name</li>
+<li><code>imbi_project.slug</code> - URL-safe project identifier (kebab-case)</li>
+<li><code>imbi_project.description</code> - Project description (may be None)</li>
+<li><code>imbi_project.namespace</code> - Project namespace name</li>
+<li><code>imbi_project.namespace_slug</code> - Namespace slug</li>
+<li><code>imbi_project.project_type</code> - Human-readable project type</li>
+<li><code>imbi_project.project_type_slug</code> - Project type slug</li>
+<li><code>imbi_project.imbi_url</code> - URL to project in Imbi</li>
+</ul>
+<p><strong>Project metadata:</strong></p>
+<ul>
+<li><code>imbi_project.dependencies</code> - List of dependent project IDs</li>
+<li><code>imbi_project.environments</code> - List of environment names (e.g., <code>["development", "production"]</code>)</li>
+<li><code>imbi_project.facts</code> - Dictionary of project facts (key-value pairs)</li>
+<li><code>imbi_project.identifiers</code> - External system identifiers (GitHub, GitLab, etc.)</li>
+<li><code>imbi_project.links</code> - Dictionary of external links</li>
+<li><code>imbi_project.urls</code> - Dictionary of project URLs</li>
+<li><code>imbi_project.project_score</code> - Project health score</li>
+</ul>
+<p><strong>Example:</strong>
+```jinja2
+Project: {{ imbi_project.name }}
+Slug: {{ imbi_project.slug }}
+Type: {{ imbi_project.project_type }}</p>
+<p>{% if imbi_project.description %}
+Description: {{ imbi_project.description }}
+{% endif %}</p>
+<p>{% if imbi_project.facts %}
+Facts:
+{% for key, value in imbi_project.facts.items() %}
+  - {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
+```</p>
+<h4 id="github_repository-githubrepository-none"><code>github_repository</code> (GitHubRepository | None)<a class="headerlink" href="#github_repository-githubrepository-none" title="Permanent link">&para;</a></h4>
+<p>GitHub repository metadata (only available when GitHub identifier exists).</p>
+<p><strong>Core fields:</strong></p>
+<ul>
+<li><code>github_repository.id</code> - Repository ID</li>
+<li><code>github_repository.name</code> - Repository name</li>
+<li><code>github_repository.full_name</code> - Full name (org/repo)</li>
+<li><code>github_repository.owner.login</code> - Owner username</li>
+<li><code>github_repository.private</code> - Boolean: is private</li>
+<li><code>github_repository.description</code> - Repository description</li>
+<li><code>github_repository.html_url</code> - GitHub web URL</li>
+<li><code>github_repository.ssh_url</code> - SSH clone URL</li>
+<li><code>github_repository.clone_url</code> - HTTPS clone URL</li>
+</ul>
+<p><strong>Additional fields:</strong></p>
+<ul>
+<li><code>github_repository.fork</code> - Boolean: is fork</li>
+<li><code>github_repository.created_at</code> - Creation timestamp</li>
+<li><code>github_repository.updated_at</code> - Last update timestamp</li>
+<li><code>github_repository.pushed_at</code> - Last push timestamp</li>
+<li><code>github_repository.size</code> - Repository size in KB</li>
+<li><code>github_repository.stargazers_count</code> - Star count</li>
+<li><code>github_repository.watchers_count</code> - Watcher count</li>
+<li><code>github_repository.language</code> - Primary language</li>
+<li><code>github_repository.has_issues</code> - Boolean: issues enabled</li>
+<li><code>github_repository.has_projects</code> - Boolean: projects enabled</li>
+<li><code>github_repository.has_wiki</code> - Boolean: wiki enabled</li>
+<li><code>github_repository.archived</code> - Boolean: is archived</li>
+<li><code>github_repository.disabled</code> - Boolean: is disabled</li>
+<li><code>github_repository.default_branch</code> - Default branch name</li>
+</ul>
+<p><strong>Example:</strong>
+<code>jinja2
+{% if github_repository %}
+Repository: {{ github_repository.full_name }}
+URL: {{ github_repository.html_url }}
+Language: {{ github_repository.language }}
+Default Branch: {{ github_repository.default_branch }}
+{% endif %}</code></p>
+<h4 id="working_directory-pathlibpath-none"><code>working_directory</code> (pathlib.Path | None)<a class="headerlink" href="#working_directory-pathlibpath-none" title="Permanent link">&para;</a></h4>
+<p>Absolute path to the temporary working directory containing the cloned repository.</p>
+<p><strong>Example:</strong>
+<code>jinja2
+Working directory: {{ working_directory }}
+Repository location: {{ working_directory }}/repository</code></p>
+<h4 id="starting_commit-str-none"><code>starting_commit</code> (str | None)<a class="headerlink" href="#starting_commit-str-none" title="Permanent link">&para;</a></h4>
+<p>Git commit SHA of the repository HEAD when workflow execution started.</p>
+<p><strong>Example:</strong>
+<code>jinja2
+Starting commit: {{ starting_commit }}</code></p>
+<h4 id="pull_request-githubpullrequest-none"><code>pull_request</code> (GitHubPullRequest | None)<a class="headerlink" href="#pull_request-githubpullrequest-none" title="Permanent link">&para;</a></h4>
+<p>Pull request information, available only in followup stage actions after PR creation.</p>
+<p><strong>Available fields:</strong></p>
+<ul>
+<li><code>pull_request.number</code> - PR number (integer)</li>
+<li><code>pull_request.html_url</code> - PR URL on GitHub</li>
+<li><code>pull_request.state</code> - PR state ("open", "closed", "merged")</li>
+<li><code>pull_request.title</code> - PR title</li>
+<li><code>pull_request.head.sha</code> - Head commit SHA</li>
+<li><code>pull_request.head.ref</code> - Head branch name</li>
+<li><code>pull_request.base.ref</code> - Base branch name</li>
+<li><code>pull_request.mergeable</code> - Whether PR can be merged (boolean or None)</li>
+<li><code>pull_request.mergeable_state</code> - Merge state ("clean", "dirty", "blocked", etc.)</li>
+</ul>
+<p><strong>Example:</strong>
+<code>jinja2
+{% if pull_request %}
+PR #{{ pull_request.number }}: {{ pull_request.html_url }}
+Head SHA: {{ pull_request.head.sha }}
+State: {{ pull_request.state }}
+{% endif %}</code></p>
+<h4 id="pr_branch-str-none"><code>pr_branch</code> (str | None)<a class="headerlink" href="#pr_branch-str-none" title="Permanent link">&para;</a></h4>
+<p>Branch name for the pull request, available only in followup stage actions.</p>
+<p><strong>Example:</strong>
+<code>jinja2
+{% if pr_branch %}
+PR Branch: {{ pr_branch }}
+{% endif %}</code></p>
+<p>See <a href="../actions/stages/">Action Stages</a> for followup stage documentation.</p>
+<h3 id="custom-template-functions">Custom Template Functions<a class="headerlink" href="#custom-template-functions" title="Permanent link">&para;</a></h3>
+<p>The templating system provides custom functions accessible within templates:</p>
+<h4 id="read_filefile_path"><code>read_file(file_path)</code><a class="headerlink" href="#read_filefile_path" title="Permanent link">&para;</a></h4>
+<p>Reads the contents of a file and returns it as a string.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>file_path</code> - Path to file (supports ResourceUrl schemes: <code>repository:///</code>, <code>workflow:///</code>, <code>extracted:///</code>, etc.)</li>
+</ul>
+<p><strong>Returns:</strong> File contents as string</p>
+<p><strong>Example:</strong>
+<code>jinja2
+Description: {{ read_file('repository:///DESCRIPTION.txt').strip() }}</code></p>
+<p><strong>Usage in Imbi actions:</strong>
+<code>toml
+[[actions]]
+name = "update-from-generated-file"
+type = "imbi"
+command = "update_project"
+attributes = {
+    description = "{{ read_file('repository:///GENERATED_DESCRIPTION.txt').strip() }}"
+}</code></p>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Load AI-generated content from files</li>
+<li>Read README excerpts for descriptions</li>
+<li>Extract version strings from files</li>
+<li>Load configuration snippets</li>
+</ul>
+<p><strong>Available in:</strong> Template actions, Imbi action fields, Claude prompts</p>
+<h4 id="extract_image_from_dockerfiledockerfile_path"><code>extract_image_from_dockerfile(dockerfile_path)</code><a class="headerlink" href="#extract_image_from_dockerfiledockerfile_path" title="Permanent link">&para;</a></h4>
+<p>Extracts the base Docker image from a Dockerfile.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>dockerfile_path</code> - Path to Dockerfile (supports <code>repository:///</code> URL scheme)</li>
+</ul>
+<p><strong>Returns:</strong> Base image name (e.g., <code>python:3.12-slim</code>)</p>
+<p><strong>Example:</strong>
+<code>jinja2
+Base image: {{ extract_image_from_dockerfile('repository:///Dockerfile') }}</code></p>
+<p><strong>Usage in workflow:</strong>
+<code>toml
+[[actions]]
+name = "extract-constraints"
+type = "docker"
+command = "extract"
+image = "{{ extract_image_from_dockerfile('repository:///Dockerfile') }}"
+source = "/tmp/constraints.txt"
+destination = "extracted:///constraints.txt"</code></p>
+<h4 id="compare_semvercurrent-target"><code>compare_semver(current, target)</code><a class="headerlink" href="#compare_semvercurrent-target" title="Permanent link">&para;</a></h4>
+<p>Compares two semantic versions and returns a dict with comparison results.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>current</code> - Current version string (e.g., "18.2.0", "3.9.18-4")</li>
+<li><code>target</code> - Target version string to compare against</li>
+</ul>
+<p><strong>Returns:</strong> Dict with:</p>
+<ul>
+<li><code>is_older</code>: True if current &lt; target</li>
+<li><code>is_equal</code>: True if current == target</li>
+<li><code>is_newer</code>: True if current &gt; target</li>
+<li><code>comparison</code>: -1 (older), 0 (equal), or 1 (newer)</li>
+<li><code>current_major</code>, <code>current_minor</code>, <code>current_patch</code>, <code>current_build</code></li>
+<li><code>target_major</code>, <code>target_minor</code>, <code>target_patch</code>, <code>target_build</code></li>
+</ul>
+<p><strong>Version handling:</strong></p>
+<ul>
+<li>Strips prefixes like <code>v</code>, <code>^</code>, <code>~</code>, <code>&gt;=</code></li>
+<li>Handles partial versions (e.g., "3.9" → "3.9.0")</li>
+<li>Supports build numbers (e.g., "3.9.18-4")</li>
+</ul>
+<p><strong>Example:</strong>
+<code>jinja2
+{% set result = compare_semver('18.2.0', '19.0.0') %}
+{% if result.is_older %}
+Current version {{ result.current_version }} is older than {{ result.target_version }}
+{% endif %}</code></p>
+<p><strong>Available in:</strong> All templates, <code>when</code> conditions</p>
+<h4 id="get_component_versionpath-component"><code>get_component_version(path, component)</code><a class="headerlink" href="#get_component_versionpath-component" title="Permanent link">&para;</a></h4>
+<p>Extracts a dependency version from a manifest file.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>path</code> - ResourceUrl path to manifest file (e.g., "repository:///package.json")</li>
+<li><code>component</code> - Name of the dependency to extract</li>
+</ul>
+<p><strong>Supported file types:</strong></p>
+<ul>
+<li><code>package.json</code>: Searches dependencies, devDependencies, peerDependencies</li>
+<li><code>pyproject.toml</code>: Searches project.dependencies, optional-dependencies, Poetry dependencies</li>
+</ul>
+<p><strong>Returns:</strong> Clean version string without prefixes</p>
+<p><strong>Example:</strong>
+<code>jinja2
+React version: {{ get_component_version('repository:///package.json', 'react') }}
+Pydantic version: {{ get_component_version('repository:///pyproject.toml', 'pydantic') }}</code></p>
+<p><strong>Combined with compare_semver:</strong>
+<code>jinja2
+{% set react_version = get_component_version('repository:///package.json', 'react') %}
+{% set comparison = compare_semver(react_version, '19.0.0') %}
+{% if comparison.is_older %}
+React {{ react_version }} is older than 19.0.0 - upgrade recommended
+{% endif %}</code></p>
+<p><strong>Available in:</strong> All templates, <code>when</code> conditions</p>
+<h2 id="template-usage">Template Usage<a class="headerlink" href="#template-usage" title="Permanent link">&para;</a></h2>
+<h3 id="1-claude-action-prompts">1. Claude Action Prompts<a class="headerlink" href="#1-claude-action-prompts" title="Permanent link">&para;</a></h3>
+<p>Claude actions use Jinja2 templates for AI prompts:</p>
+<p><code>toml
+[[actions]]
+name = "standardize-dunder-init"
+type = "claude"
+prompt = "prompts/init.md.j2"
+validation_prompt = "prompts/validate-init.md.j2"</code></p>
+<p><strong>Example prompt template (<code>prompts/init.md.j2</code>):</strong>
+```jinja2</p>
+<h1 id="python-package-initpy-version-standardization">Python Package <strong>init</strong>.py Version Standardization<a class="headerlink" href="#python-package-initpy-version-standardization" title="Permanent link">&para;</a></h1>
+<p>Update the package's <code>__init__.py</code> file to standardize version handling.</p>
+<h2 id="context-variables">Context Variables<a class="headerlink" href="#context-variables" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Project name: <code>{{ imbi_project.name }}</code></li>
+<li>Package name: <code>{{ imbi_project.slug }}</code></li>
+<li>Project description: <code>{{ imbi_project.description }}</code></li>
+</ul>
+<h2 id="current-facts">Current Facts<a class="headerlink" href="#current-facts" title="Permanent link">&para;</a></h2>
+<p>{% if imbi_project.facts %}
+{% for key, value in imbi_project.facts.items() %}
+- {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}</p>
+<h2 id="repository-information">Repository Information<a class="headerlink" href="#repository-information" title="Permanent link">&para;</a></h2>
+<p>{% if github_repository %}
+- Repository: {{ github_repository.full_name }}
+- Primary language: {{ github_repository.language }}
+{% endif %}
+```</p>
+<h3 id="2-template-actions">2. Template Actions<a class="headerlink" href="#2-template-actions" title="Permanent link">&para;</a></h3>
+<p>Template actions render entire files or directories:</p>
+<p><code>toml
+[[actions]]
+name = "render-config"
+type = "template"
+source_path = "templates/config.yaml.j2"
+destination_path = "repository:///config/app.yaml"</code></p>
+<p><strong>Example template file (<code>templates/config.yaml.j2</code>):</strong>
+```jinja2
+application:
+  name: {{ imbi_project.name }}
+  slug: {{ imbi_project.slug }}
+  version: "{{ imbi_project.facts.get('Version', '0.0.0') }}"</p>
+<p>{% if imbi_project.environments %}
+environments:
+{% for env in imbi_project.environments %}
+  - {{ env }}
+{% endfor %}
+{% endif %}</p>
+<p>{% if github_repository %}
+repository:
+  url: {{ github_repository.html_url }}
+  default_branch: {{ github_repository.default_branch }}
+{% endif %}
+```</p>
+<h3 id="3-shell-command-templating">3. Shell Command Templating<a class="headerlink" href="#3-shell-command-templating" title="Permanent link">&para;</a></h3>
+<p>Shell commands support inline Jinja2 templating:</p>
+<p><code>toml
+[[actions]]
+name = "update-version"
+type = "shell"
+command = "sed -i '' 's/version = .*/version = \"{{ imbi_project.facts.Version }}\"/' pyproject.toml"</code></p>
+<h3 id="4-docker-image-extraction">4. Docker Image Extraction<a class="headerlink" href="#4-docker-image-extraction" title="Permanent link">&para;</a></h3>
+<p>Use <code>extract_image_from_dockerfile()</code> in Docker actions:</p>
+<p><code>toml
+[[actions]]
+name = "extract-constraints"
+type = "docker"
+command = "extract"
+image = "{{ extract_image_from_dockerfile('repository:///Dockerfile') }}"
+source = "/tmp/constraints.txt"
+destination = "extracted:///constraints.txt"</code></p>
+<h3 id="5-pull-request-generation">5. Pull Request Generation<a class="headerlink" href="#5-pull-request-generation" title="Permanent link">&para;</a></h3>
+<p>Pull request summaries are generated from templates with commit context:</p>
+<p><strong>Template (<code>prompts/pull-request-summary.md.j2</code>):</strong>
+```jinja2</p>
+<h1 id="workflowconfigurationname">{{ workflow.configuration.name }}<a class="headerlink" href="#workflowconfigurationname" title="Permanent link">&para;</a></h1>
+<p>{{ workflow.configuration.description }}</p>
+<h2 id="project-details">Project Details<a class="headerlink" href="#project-details" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Project</strong>: {{ imbi_project.name }}</li>
+<li><strong>Type</strong>: {{ imbi_project.project_type }}</li>
+<li><strong>Imbi URL</strong>: {{ imbi_project.imbi_url }}</li>
+</ul>
+<p>{% if github_repository %}</p>
+<h2 id="repository">Repository<a class="headerlink" href="#repository" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Name</strong>: {{ github_repository.full_name }}</li>
+<li><strong>Language</strong>: {{ github_repository.language }}
+{% endif %}</li>
+</ul>
+<h2 id="changes-summary">Changes Summary<a class="headerlink" href="#changes-summary" title="Permanent link">&para;</a></h2>
+<p>{{ summary }}
+```</p>
+<h3 id="6-directory-templates">6. Directory Templates<a class="headerlink" href="#6-directory-templates" title="Permanent link">&para;</a></h3>
+<p>Template actions can render entire directories recursively:</p>
+<p><code>toml
+[[actions]]
+name = "enforce-ci-scripts"
+type = "template"
+source_path = "templates/ci"
+destination_path = "repository:///ci/"</code></p>
+<p>All files in <code>templates/ci/</code> are rendered with full context and written to <code>repository:///ci/</code>.</p>
+<h2 id="resource-url-schemes">Resource URL Schemes<a class="headerlink" href="#resource-url-schemes" title="Permanent link">&para;</a></h2>
+<p>The templating system supports custom URL schemes for path resolution:</p>
+<ul>
+<li><strong><code>repository:///</code></strong> - Files in the cloned git repository</li>
+<li><strong><code>workflow:///</code></strong> - Files in the workflow directory</li>
+<li><strong><code>extracted:///</code></strong> - Files extracted during workflow execution</li>
+<li><strong><code>file:///</code></strong> - Absolute file system paths</li>
+</ul>
+<p><strong>Example:</strong>
+<code>toml
+[[actions]]
+name = "copy-gitignore"
+type = "file"
+command = "copy"
+source = "workflow:///.gitignore"
+destination = "repository:///.gitignore"</code></p>
+<h2 id="jinja2-configuration">Jinja2 Configuration<a class="headerlink" href="#jinja2-configuration" title="Permanent link">&para;</a></h2>
+<p>The templating environment uses:
+- <strong><code>autoescape=False</code></strong> - No HTML escaping (templates are code, not HTML)
+- <strong><code>undefined=jinja2.StrictUndefined</code></strong> - Raises errors for undefined variables (fail fast)</p>
+<p>This ensures templates fail early if variables are missing rather than silently producing incorrect output.</p>
+<h2 id="common-patterns">Common Patterns<a class="headerlink" href="#common-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="conditional-sections">Conditional Sections<a class="headerlink" href="#conditional-sections" title="Permanent link">&para;</a></h3>
+<p>```jinja2
+{% if imbi_project.facts.get('Framework') %}
+This project uses {{ imbi_project.facts.Framework }}.
+{% endif %}</p>
+<p>{% if github_repository and github_repository.language == 'Python' %}
+Python-specific instructions...
+{% endif %}
+```</p>
+<h3 id="iterating-over-collections">Iterating Over Collections<a class="headerlink" href="#iterating-over-collections" title="Permanent link">&para;</a></h3>
+<p>```jinja2
+{% if imbi_project.environments %}
+Environments:
+{% for env in imbi_project.environments %}
+  - {{ env }}
+{% endfor %}
+{% endif %}</p>
+<p>{% if imbi_project.facts %}
+Project Facts:
+{% for key, value in imbi_project.facts.items() %}
+  {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
+```</p>
+<h3 id="default-values">Default Values<a class="headerlink" href="#default-values" title="Permanent link">&para;</a></h3>
+<p><code>jinja2
+Project: {{ imbi_project.name }}
+Description: {{ imbi_project.description or "No description available" }}
+Version: {{ imbi_project.facts.get('Version', '0.0.0') }}</code></p>
+<h3 id="multi-line-strings">Multi-line Strings<a class="headerlink" href="#multi-line-strings" title="Permanent link">&para;</a></h3>
+<p>```jinja2
+"""
+{{ imbi_project.name }}
+{{ "=" * imbi_project.name|length }}
+{{ imbi_project.description or "No description" }}</p>
+<p>"""
+```</p>
+<h3 id="template-inheritance">Template Inheritance<a class="headerlink" href="#template-inheritance" title="Permanent link">&para;</a></h3>
+<p>While not commonly used in this system, Jinja2 supports template inheritance:</p>
+<p>```jinja2
+{% extends "base.md.j2" %}</p>
+<p>{% block content %}
+Project-specific content here
+{% endblock %}
+```</p>
+<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Use strict undefined checking</strong> - Let templates fail on missing variables</li>
+<li><strong>Provide defaults</strong> - Use <code>or</code> operator or <code>get()</code> method for optional fields</li>
+<li><strong>Check for None</strong> - Many fields can be <code>None</code>, always check before accessing</li>
+<li><strong>Use descriptive variable names</strong> - Context is self-documenting</li>
+<li><strong>Keep templates readable</strong> - Use whitespace and comments liberally</li>
+<li><strong>Validate template output</strong> - Use validation prompts for Claude actions</li>
+<li><strong>Test with multiple projects</strong> - Different project types have different facts</li>
+</ol>
+<h2 id="debugging-templates">Debugging Templates<a class="headerlink" href="#debugging-templates" title="Permanent link">&para;</a></h2>
+<h3 id="enable-verbose-logging">Enable Verbose Logging<a class="headerlink" href="#enable-verbose-logging" title="Permanent link">&para;</a></h3>
+<p>Run workflows with verbose flag to see rendered templates:</p>
+<p><code>bash
+imbi-automations config.toml workflows/my-workflow --verbose --project my-project</code></p>
+<h3 id="check-template-syntax">Check Template Syntax<a class="headerlink" href="#check-template-syntax" title="Permanent link">&para;</a></h3>
+<p>Use <code>has_template_syntax()</code> to detect Jinja2 patterns:</p>
+<p>```python
+from imbi_automations import prompts</p>
+<p>if prompts.has_template_syntax(command):
+    # Command contains {{ }}, {% %}, or {# #}
+    rendered = prompts.render(context, command, **context.model_dump())
+```</p>
+<h3 id="common-errors">Common Errors<a class="headerlink" href="#common-errors" title="Permanent link">&para;</a></h3>
+<p><strong><code>UndefinedError: 'None' has no attribute 'name'</code></strong>
+- Check if object exists before accessing attributes
+- Use conditional checks: <code>{% if github_repository %}...{% endif %}</code></p>
+<p><strong><code>UndefinedError: 'dict object' has no attribute 'Programming_Language'</code></strong>
+- Use <code>.get()</code> method for dictionary access: <code>imbi_project.facts.get('Programming Language')</code>
+- Facts use spaces, not underscores in keys</p>
+<p><strong>Template renders empty string</strong>
+- Check that source file exists and is readable
+- Verify URL scheme is correct (<code>repository:///</code>, not <code>repository://</code>)</p>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<h3 id="complete-claude-action-example">Complete Claude Action Example<a class="headerlink" href="#complete-claude-action-example" title="Permanent link">&para;</a></h3>
+<p><strong>Workflow configuration:</strong>
+<code>toml
+[[actions]]
+name = "update-readme"
+type = "claude"
+prompt = "prompts/update-readme.md.j2"</code></p>
+<p><strong>Prompt template (<code>prompts/update-readme.md.j2</code>):</strong>
+```jinja2</p>
+<h1 id="readme-update-task">README Update Task<a class="headerlink" href="#readme-update-task" title="Permanent link">&para;</a></h1>
+<p>Update the README.md file for {{ imbi_project.name }}.</p>
+<h2 id="project-information">Project Information<a class="headerlink" href="#project-information" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Name</strong>: {{ imbi_project.name }}</li>
+<li><strong>Type</strong>: {{ imbi_project.project_type }}</li>
+<li><strong>Description</strong>: {{ imbi_project.description or "No description available" }}</li>
+</ul>
+<p>{% if imbi_project.facts %}</p>
+<h2 id="project-facts">Project Facts<a class="headerlink" href="#project-facts" title="Permanent link">&para;</a></h2>
+<p>{% for key, value in imbi_project.facts.items() %}
+- <strong>{{ key }}</strong>: {{ value }}
+{% endfor %}
+{% endif %}</p>
+<p>{% if github_repository %}</p>
+<h2 id="repository_1">Repository<a class="headerlink" href="#repository_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>URL</strong>: {{ github_repository.html_url }}</li>
+<li><strong>Language</strong>: {{ github_repository.language }}</li>
+<li><strong>Default Branch</strong>: {{ github_repository.default_branch }}
+{% endif %}</li>
+</ul>
+<h2 id="task">Task<a class="headerlink" href="#task" title="Permanent link">&para;</a></h2>
+<p>Update the README.md to reflect the current project state, including:
+1. Project name and description
+2. Programming language and framework
+3. Build and test instructions
+4. Links to relevant documentation
+```</p>
+<h3 id="complete-template-action-example">Complete Template Action Example<a class="headerlink" href="#complete-template-action-example" title="Permanent link">&para;</a></h3>
+<p><strong>Workflow configuration:</strong>
+<code>toml
+[[actions]]
+name = "render-compose"
+type = "template"
+source_path = "templates/compose.yaml.j2"
+destination_path = "repository:///compose.yaml"</code></p>
+<p><strong>Template file (<code>templates/compose.yaml.j2</code>):</strong>
+```jinja2
+version: '3.8'</p>
+<p>services:
+  {{ imbi_project.slug }}:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: {{ imbi_project.slug }}:latest
+    container_name: {{ imbi_project.slug }}</p>
+<div class="codehilite"><pre><span></span><code><span class="x">environment:</span>
+<span class="x">  - APP_NAME=</span><span class="cp">{{</span> <span class="nv">imbi_project.name</span> <span class="cp">}}</span>
+<span class="x">  - APP_SLUG=</span><span class="cp">{{</span> <span class="nv">imbi_project.slug</span> <span class="cp">}}</span>
+<span class="x">  </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">imbi_project.facts.get</span><span class="o">(</span><span class="s1">&#39;Framework&#39;</span><span class="o">)</span> <span class="cp">%}</span>
+<span class="x">  - FRAMEWORK=</span><span class="cp">{{</span> <span class="nv">imbi_project.facts.Framework</span> <span class="cp">}}</span>
+<span class="x">  </span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">if</span> <span class="nv">imbi_project.project_type_slug</span> <span class="k">in</span> <span class="o">[</span><span class="s1">&#39;apis&#39;</span><span class="o">,</span> <span class="s1">&#39;web-applications&#39;</span><span class="o">]</span> <span class="cp">%}</span>
+<span class="x">ports:</span>
+<span class="x">  - &quot;8080:8080&quot;</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">if</span> <span class="nv">imbi_project.facts.get</span><span class="o">(</span><span class="s1">&#39;Database&#39;</span><span class="o">)</span> <span class="cp">%}</span>
+<span class="x">depends_on:</span>
+<span class="x">  - database</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+
+<span class="x">volumes:</span>
+<span class="x">  - .:/app</span>
+
+<span class="cp">{%</span> <span class="k">if</span> <span class="nv">imbi_project.environments</span> <span class="cp">%}</span>
+<span class="x"># Configured environments: </span><span class="cp">{{</span> <span class="nv">imbi_project.environments</span><span class="o">|</span><span class="nf">join</span><span class="o">(</span><span class="s1">&#39;, &#39;</span><span class="o">)</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</code></pre></div>
+
+<p>{% if imbi_project.facts.get('Database') == 'PostgreSQL' %}
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB={{ imbi_project.slug }}
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - postgres-data:/var/lib/postgresql/data</p>
+<p>volumes:
+  postgres-data:
+{% endif %}
+```</p>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://jinja.palletsprojects.com/">Jinja2 Documentation</a></li>
+<li><a href="../workflow-configuration/">Workflow Configuration</a> - Complete workflow configuration reference</li>
+<li><a href="../actions/">Actions Reference</a> - Action implementations and usage</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright 2025 - AWeber
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.tabs", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
