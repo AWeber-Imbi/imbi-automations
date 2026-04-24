@@ -548,7 +548,7 @@ wheels = [
 
 [[package]]
 name = "imbi-automations"
-version = "1.0.0b11"
+version = "1.0.0b12"
 source = { editable = "." }
 dependencies = [
     { name = "anthropic", extra = ["bedrock"] },
