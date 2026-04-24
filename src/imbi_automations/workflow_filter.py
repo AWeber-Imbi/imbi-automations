@@ -65,6 +65,10 @@ class Filter(mixins.WorkflowLoggerMixin):
                 and project.id not in workflow_filter.project_ids
             )
             or (
+                workflow_filter.exclude_project_ids
+                and project.id in workflow_filter.exclude_project_ids
+            )
+            or (
                 workflow_filter.project_environments
                 and not self._filter_environments(project, workflow_filter)
             )

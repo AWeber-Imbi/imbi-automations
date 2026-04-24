@@ -88,6 +88,7 @@ class WorkflowFilter(pydantic.BaseModel):
     """
 
     project_ids: set[int] = set()
+    exclude_project_ids: set[int] = set()
     project_types: set[str] = set()
     project_facts: dict[str, bool | int | float | str] = {}
     project_environments: set[str] = set()
