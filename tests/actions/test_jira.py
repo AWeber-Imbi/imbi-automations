@@ -230,7 +230,15 @@ class JiraActionsTestCase(base.AsyncTestCase):
         )
         mock_client = mock.AsyncMock()
         mock_client.create_issue.return_value = self._issue('SEC-7')
-        tool = self.executor._build_create_handler(action, mock_client)
+        tool = self.executor._build_create_handler(
+            action,
+            mock_client,
+            project_key='SEC',
+            issue_type='Task',
+            labels=['a', 'b'],
+            components=['c'],
+            priority='High',
+        )
 
         result = await tool({'summary': 'Hello', 'description': 'World'})
 
@@ -254,7 +262,15 @@ class JiraActionsTestCase(base.AsyncTestCase):
         mock_client.create_issue.side_effect = httpx.HTTPStatusError(
             'bad', request=request, response=response
         )
-        tool = self.executor._build_create_handler(action, mock_client)
+        tool = self.executor._build_create_handler(
+            action,
+            mock_client,
+            project_key='SEC',
+            issue_type='Task',
+            labels=['automated'],
+            components=['AppSec'],
+            priority=None,
+        )
 
         result = await tool({'summary': 's', 'description': 'd'})
 
@@ -266,7 +282,15 @@ class JiraActionsTestCase(base.AsyncTestCase):
     async def test_tool_closure_rejects_missing_fields(self) -> None:
         action = self._make_action()
         mock_client = mock.AsyncMock()
-        tool = self.executor._build_create_handler(action, mock_client)
+        tool = self.executor._build_create_handler(
+            action,
+            mock_client,
+            project_key='SEC',
+            issue_type='Task',
+            labels=['automated'],
+            components=['AppSec'],
+            priority=None,
+        )
 
         result = await tool({'summary': 'only summary'})
         self.assertTrue(result.get('is_error'))
@@ -280,6 +304,48 @@ class JiraActionsTestCase(base.AsyncTestCase):
                 command='create_ticket',
                 # Missing project_key and prompt
             )
+
+    async def test_create_ticket_renders_templated_project_key(self) -> None:
+        """project_key and labels support Jinja2 templates (e.g. for mapping
+        imbi_project.namespace_slug to a Jira project key)."""
+        action = self._make_action(
+            project_key=(
+                "{{ {'ns':'MAPPED','other':'OTHER'}"
+                '[imbi_project.namespace_slug] }}'
+            ),
+            labels=['automated', '{{ imbi_project.slug }}'],
+        )
+        captured: dict[str, object] = {}
+        real_build = self.executor._build_create_handler
+
+        def capture_build(*args: object, **kwargs: object) -> object:
+            captured.update(kwargs)
+            return real_build(*args, **kwargs)
+
+        async def fake_session(prompt: str, **_kwargs: object) -> None:
+            self.assertIn('MAPPED', prompt)
+            await self._simulate_tool_call(
+                self.executor, action, self._issue('MAPPED-1')
+            )
+
+        with (
+            mock.patch.object(
+                self.executor,
+                '_build_create_handler',
+                side_effect=capture_build,
+            ),
+            mock.patch(
+                'imbi_automations.claude.Claude.custom_tool_session',
+                side_effect=fake_session,
+            ),
+        ):
+            await self.executor.execute(action)
+
+        self.assertEqual(captured.get('project_key'), 'MAPPED')
+        self.assertEqual(captured.get('labels'), ['automated', 'test-project'])
+        self.assertEqual(captured.get('issue_type'), 'Task')
+        self.assertEqual(captured.get('components'), ['AppSec'])
+        self.assertIsNone(captured.get('priority'))
 
     async def test_unsupported_command_raises(self) -> None:
         action = self._make_action()

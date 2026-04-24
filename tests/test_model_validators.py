@@ -1,7 +1,9 @@
 import pathlib
 import re
 import unittest
+from unittest import mock
 
+from imbi_automations.models.configuration import Configuration
 from imbi_automations.models.workflow import (
     WorkflowCondition,
     WorkflowDockerAction,
@@ -9,6 +11,7 @@ from imbi_automations.models.workflow import (
     WorkflowFileAction,
     WorkflowFileActionCommand,
 )
+from tests import base
 
 
 class ModelValidatorsTestCase(unittest.TestCase):
@@ -99,6 +102,39 @@ class ModelValidatorsTestCase(unittest.TestCase):
             WorkflowCondition(file_contains='x')
         with self.assertRaises(ValueError):
             WorkflowCondition(file=pathlib.Path('f'))
+
+
+class ConfigurationJiraEnvTestCase(base.AsyncTestCase):
+    """Jira configuration should be auto-populated from ATLASSIAN_* env vars
+    when the user omits a `[jira]` section in config.toml."""
+
+    def test_jira_populated_from_env_vars_without_section(self) -> None:
+        env = {
+            'ATLASSIAN_DOMAIN': 'example.atlassian.net',
+            'ATLASSIAN_EMAIL': 'bot@example.com',
+            'ATLASSIAN_API_KEY': 'secret',
+            'GH_TOKEN': 'gh-token',
+            'IMBI_API_KEY': 'imbi-key',
+            'IMBI_HOSTNAME': 'imbi.example.com',
+        }
+        with mock.patch.dict('os.environ', env, clear=True):
+            cfg = Configuration()
+        self.assertIsNotNone(cfg.jira)
+        self.assertEqual(cfg.jira.domain, 'example.atlassian.net')
+        self.assertEqual(cfg.jira.email, 'bot@example.com')
+        self.assertEqual(
+            cfg.jira.api_key.get_secret_value(), 'secret'
+        )
+
+    def test_jira_left_none_when_env_vars_missing(self) -> None:
+        env = {
+            'GH_TOKEN': 'gh-token',
+            'IMBI_API_KEY': 'imbi-key',
+            'IMBI_HOSTNAME': 'imbi.example.com',
+        }
+        with mock.patch.dict('os.environ', env, clear=True):
+            cfg = Configuration()
+        self.assertIsNone(cfg.jira)
 
 
 if __name__ == '__main__':
