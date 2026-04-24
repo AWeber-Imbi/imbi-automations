@@ -27,6 +27,7 @@ nav:
       - Git: actions/git.md
       - GitHub: actions/github.md
       - Imbi: actions/imbi.md
+      - Jira: actions/jira.md
       - Shell: actions/shell.md
       - Template: actions/template.md
     - Templating: templating.md

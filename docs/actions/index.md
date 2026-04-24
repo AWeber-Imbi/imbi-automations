@@ -39,6 +39,7 @@ See [Action Stages](stages.md) for complete stage documentation.
 | [Git](git.md) | Version control operations | Extract commits, branch management |
 | [GitHub](github.md) | GitHub-specific operations | Environment sync, workflow management |
 | [Imbi](imbi.md) | Imbi project management | Update project facts and metadata |
+| [Jira](jira.md) | Jira ticket creation | Create tickets via agentic Claude session |
 | [Shell](shell.md) | Command execution | Run tests, build processes, scripts |
 | [Template](template.md) | Jinja2 file generation | Generate configs, documentation |
 
