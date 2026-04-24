@@ -49,6 +49,20 @@ class Filter(mixins.WorkflowLoggerMixin):
         if workflow_filter is None:
             return project
 
+        # Hard exclusion / allowlist precedence: exclude_project_ids wins
+        # over project_ids when the same id appears in both sets.
+        if (
+            workflow_filter.exclude_project_ids
+            and project.id in workflow_filter.exclude_project_ids
+        ):
+            return None
+
+        if (
+            workflow_filter.project_ids
+            and project.id not in workflow_filter.project_ids
+        ):
+            return None
+
         if (
             (
                 workflow_filter.github_identifier_required
@@ -59,10 +73,6 @@ class Filter(mixins.WorkflowLoggerMixin):
                         self.configuration.imbi.github_identifier
                     )
                 )
-            )
-            or (
-                workflow_filter.project_ids
-                and project.id not in workflow_filter.project_ids
             )
             or (
                 workflow_filter.project_environments

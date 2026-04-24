@@ -801,3 +801,33 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
 
         result = await self.filter.filter_project(project, wf_filter)
         self.assertIsNone(result)
+
+    async def test_exclude_project_ids_excluded(self) -> None:
+        """Test project is excluded when its id is in exclude_project_ids."""
+        project = self._create_project(id=123)
+
+        wf_filter = models.WorkflowFilter(exclude_project_ids={123, 456})
+
+        result = await self.filter.filter_project(project, wf_filter)
+        self.assertIsNone(result)
+
+    async def test_exclude_project_ids_not_excluded(self) -> None:
+        """Test project passes when its id is not in exclude_project_ids."""
+        project = self._create_project(id=789)
+
+        wf_filter = models.WorkflowFilter(exclude_project_ids={123, 456})
+
+        result = await self.filter.filter_project(project, wf_filter)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.id, 789)
+
+    async def test_exclude_project_ids_wins_over_allowlist(self) -> None:
+        """Test exclude_project_ids excludes even when id is in project_ids."""
+        project = self._create_project(id=123)
+
+        wf_filter = models.WorkflowFilter(
+            project_ids={123, 456}, exclude_project_ids={123}
+        )
+
+        result = await self.filter.filter_project(project, wf_filter)
+        self.assertIsNone(result)

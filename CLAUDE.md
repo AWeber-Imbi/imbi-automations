@@ -78,6 +78,9 @@ project_types = ["apis", "consumers"]
 project_facts = {"Programming Language" = "Python 3.12"}
 github_identifier_required = true
 exclude_open_workflow_prs = true  # Skip projects with open PRs
+exclude_project_ids = [456, 789]  # Blocklist specific project IDs
+# If an ID appears in both project_ids and exclude_project_ids,
+# exclude_project_ids takes precedence and the project is skipped.
 
 [github]
 create_pull_request = true
