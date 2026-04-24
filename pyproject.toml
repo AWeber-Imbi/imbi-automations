@@ -39,6 +39,7 @@ dependencies = [
   "colorlog",
   "httpx",
   "jinja2",
+  "markdown",
   "msgpack>=1.0.0",
   "pydantic",
   "pydantic-settings",

@@ -77,7 +77,9 @@ class TestJiraClient(base.AsyncTestCase):
         self.assertNotIn('labels', body['fields'])
         self.assertNotIn('components', body['fields'])
 
-    async def test_create_issue_wraps_description_as_adf(self) -> None:
+    async def test_create_issue_converts_markdown_description_to_adf(
+        self,
+    ) -> None:
         captured: dict[str, httpx.Request] = {}
 
         def handler(request: httpx.Request) -> httpx.Response:
@@ -98,25 +100,30 @@ class TestJiraClient(base.AsyncTestCase):
         await client.create_issue(
             project_key='SEC',
             summary='S',
-            description='Para one.\n\nPara two line1\nPara two line2',
+            description='# Overview\n\nA **bold** thing.',
         )
 
         body = json.loads(captured['request'].content)
-        adf = body['fields']['description']
-        self.assertEqual(adf['type'], 'doc')
-        self.assertEqual(adf['version'], 1)
-        self.assertEqual(len(adf['content']), 2)
-        para1, para2 = adf['content']
+        doc = body['fields']['description']
+        self.assertEqual(doc['type'], 'doc')
+        self.assertEqual(doc['version'], 1)
+        heading, paragraph = doc['content']
+        self.assertEqual(heading['type'], 'heading')
+        self.assertEqual(heading['attrs'], {'level': 1})
         self.assertEqual(
-            para1['content'], [{'type': 'text', 'text': 'Para one.'}]
+            heading['content'], [{'type': 'text', 'text': 'Overview'}]
         )
-        # Second paragraph contains a hardBreak between the two lines.
+        self.assertEqual(paragraph['type'], 'paragraph')
         self.assertEqual(
-            para2['content'],
+            paragraph['content'],
             [
-                {'type': 'text', 'text': 'Para two line1'},
-                {'type': 'hardBreak'},
-                {'type': 'text', 'text': 'Para two line2'},
+                {'type': 'text', 'text': 'A '},
+                {
+                    'type': 'text',
+                    'text': 'bold',
+                    'marks': [{'type': 'strong'}],
+                },
+                {'type': 'text', 'text': ' thing.'},
             ],
         )
 
@@ -166,16 +173,3 @@ class TestJiraClient(base.AsyncTestCase):
             await client.create_issue(
                 project_key='NOPE', summary='x', issue_type='Task'
             )
-
-
-class TestMarkdownToADF(base.AsyncTestCase):
-    async def test_blank_input_produces_single_empty_paragraph(self) -> None:
-        adf = jira._markdown_to_adf('')
-        self.assertEqual(
-            adf,
-            {
-                'type': 'doc',
-                'version': 1,
-                'content': [{'type': 'paragraph', 'content': []}],
-            },
-        )

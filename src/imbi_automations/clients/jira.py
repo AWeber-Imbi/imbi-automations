@@ -6,7 +6,7 @@ import typing
 
 import httpx
 
-from imbi_automations import models
+from imbi_automations import adf, models
 
 from . import http
 
@@ -49,9 +49,9 @@ class Jira(http.BaseURLHTTPClient):
     ) -> models.JiraIssueCreated:
         """Create a Jira issue.
 
-        `description` is accepted as a plain-text / markdown string and
-        wrapped into a minimal Atlassian Document Format (ADF) envelope —
-        callers should not hand-author ADF.
+        `description` is accepted as a markdown string and converted to an
+        Atlassian Document Format (ADF) document — callers should not
+        hand-author ADF.
         """
         fields: dict[str, typing.Any] = {
             'project': {'key': project_key},
@@ -59,7 +59,7 @@ class Jira(http.BaseURLHTTPClient):
             'issuetype': {'name': issue_type},
         }
         if description is not None:
-            fields['description'] = _markdown_to_adf(description)
+            fields['description'] = adf.markdown_to_adf(description)
         if labels:
             fields['labels'] = labels
         if components:
@@ -82,7 +82,7 @@ class Jira(http.BaseURLHTTPClient):
         except httpx.HTTPStatusError:
             try:
                 error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
+            except AttributeError, UnicodeDecodeError:
                 error_body = '<unable to read response body>'
             LOGGER.error(
                 'Failed to create Jira issue in %s: HTTP %d - %s',
@@ -92,26 +92,3 @@ class Jira(http.BaseURLHTTPClient):
             )
             raise
         return models.JiraIssueCreated.model_validate(response.json())
-
-
-def _markdown_to_adf(text: str) -> dict[str, typing.Any]:
-    """Wrap a plain-text/markdown string into a minimal ADF document.
-
-    Each blank-line-separated block becomes a paragraph; newlines inside a
-    block become hard breaks. This is intentionally minimal — rich ADF
-    authoring is out of scope for the `jira` action's v1.
-    """
-    blocks = [block for block in text.split('\n\n') if block.strip()]
-    if not blocks:
-        blocks = ['']
-    paragraphs: list[dict[str, typing.Any]] = []
-    for block in blocks:
-        lines = block.split('\n')
-        content: list[dict[str, typing.Any]] = []
-        for idx, line in enumerate(lines):
-            if idx > 0:
-                content.append({'type': 'hardBreak'})
-            if line:
-                content.append({'type': 'text', 'text': line})
-        paragraphs.append({'type': 'paragraph', 'content': content})
-    return {'type': 'doc', 'version': 1, 'content': paragraphs}
