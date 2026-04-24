@@ -61,6 +61,26 @@ class TestMarkdownToADF(base.AsyncTestCase):
         self.assertEqual(block['attrs'], {'language': 'python'})
         self.assertEqual(block['content'][0]['text'], 'print(1)\n')
 
+    async def test_hr_inside_blockquote_stays_nested(self) -> None:
+        doc = adf.markdown_to_adf('> before\n>\n> ---\n>\n> after')
+        self.assertEqual(len(doc['content']), 1)
+        bq = doc['content'][0]
+        self.assertEqual(bq['type'], 'blockquote')
+        child_types = [c['type'] for c in bq['content']]
+        self.assertIn('rule', child_types)
+
+    async def test_fenced_code_inside_list_item_stays_nested(self) -> None:
+        parser = adf._HTMLToADFParser()
+        parser.feed(
+            '<ul><li><p>item</p><pre><code>print(1)\n</code></pre></li></ul>'
+        )
+        result = parser.result()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]['type'], 'bulletList')
+        item = result[0]['content'][0]
+        child_types = [c['type'] for c in item['content']]
+        self.assertIn('codeBlock', child_types)
+
     async def test_table(self) -> None:
         md = '| A | B |\n|---|---|\n| 1 | 2 |'
         doc = adf.markdown_to_adf(md)

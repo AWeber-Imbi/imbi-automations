@@ -126,8 +126,6 @@ _MARK_TAGS: dict[str, str] = {
     'em': 'em',
     'i': 'em',
     'code': 'code',
-    'del': 'strike',
-    's': 'strike',
 }
 
 
@@ -172,7 +170,7 @@ class _HTMLToADFParser(html.parser.HTMLParser):
             self._marks.append({'type': _MARK_TAGS[tag]})
             return
         if tag == 'hr':
-            self._doc.append({'type': 'rule'})
+            self._finish_block({'type': 'rule'})
             return
         if tag == 'br':
             self._add_hard_break()
@@ -192,7 +190,7 @@ class _HTMLToADFParser(html.parser.HTMLParser):
             text = self._pre_text
             if text:
                 node['content'].append({'type': 'text', 'text': text})
-            self._doc.append(node)
+            self._finish_block(node)
             return
         if tag == 'code' and self._in_pre:
             return
