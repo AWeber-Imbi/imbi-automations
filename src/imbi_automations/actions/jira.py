@@ -75,7 +75,15 @@ class JiraActions(mixins.WorkflowLoggerMixin):
                 'provide a [jira] section in config.toml.'
             )
 
-        jira_client = clients.Jira.get_instance(config=self.configuration.jira)
+        jira_client = clients.Jira(self.configuration.jira)
+        try:
+            await self._run_create_ticket(action, jira_client)
+        finally:
+            await jira_client.http_client.aclose()
+
+    async def _run_create_ticket(
+        self, action: models.WorkflowJiraAction, jira_client: clients.Jira
+    ) -> None:
         base_prompt = prompts.render(
             self.context,
             action.prompt,
