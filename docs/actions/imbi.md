@@ -287,6 +287,39 @@ link_type = "Repository"
 url = "https://github.com/{{ github_repository.full_name }}"
 ```
 
+### add_project_note
+
+Adds a markdown note to the current project. Notes appear on the project's Notes tab in Imbi and are a good place to record review results, audit findings, or other human-readable context.
+
+**Configuration:**
+```toml
+[[actions]]
+name = "record-security-review"
+type = "imbi"
+command = "add_project_note"
+content = """
+# Security Review — {{ workflow.configuration.name }}
+
+Performed against commit `{{ starting_commit }}`.
+
+## Findings
+
+{{ variables.security_findings }}
+"""
+```
+
+**Fields:**
+
+- `content` (string, required): Markdown note content. Supports Jinja2 templates with full workflow context (`imbi_project`, `github_repository`, `variables`, `starting_commit`, etc.).
+
+**Use Cases:**
+
+- Persist AI-generated security, dependency, or compliance review results
+- Attach audit findings to a project for future reference
+- Record the outcome of an automated transformation in human-readable form
+
+**Note:** Each invocation creates a new note. If you want a single evolving note, read + update via the API directly rather than appending with this action.
+
 ### update_project_type
 
 Changes the project type classification.

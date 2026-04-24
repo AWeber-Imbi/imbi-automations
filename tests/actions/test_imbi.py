@@ -526,6 +526,103 @@ class ImbiActionsTestCase(base.AsyncTestCase):
             )
 
     @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_add_project_note_success(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test successful project note addition."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='add-note',
+            type='imbi',
+            command='add_project_note',
+            content='Security review complete.',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.add_project_note.assert_called_once_with(
+            project_id=123, content='Security review complete.'
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_add_project_note_with_template(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test add_project_note with Jinja2 template in content."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='add-note-template',
+            type='imbi',
+            command='add_project_note',
+            content='# Review for {{ imbi_project.slug }}\n\nDetails here.',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.add_project_note.assert_called_once_with(
+            project_id=123,
+            content='# Review for test-project\n\nDetails here.',
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_add_project_note_with_variables(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test add_project_note with variables in content template."""
+        mock_client = mock.AsyncMock()
+        mock_get_instance.return_value = mock_client
+
+        self.context.variables['findings'] = '3 high, 1 medium'
+
+        action = models.WorkflowImbiAction(
+            name='add-note-var',
+            type='imbi',
+            command='add_project_note',
+            content='Findings: {{ variables.findings }}',
+        )
+
+        await self.imbi_executor.execute(action)
+
+        mock_client.add_project_note.assert_called_once_with(
+            project_id=123, content='Findings: 3 high, 1 medium'
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_execute_add_project_note_http_error(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        """Test add_project_note propagates HTTP errors."""
+        mock_client = mock.AsyncMock()
+        mock_client.add_project_note.side_effect = httpx.HTTPError('boom')
+        mock_get_instance.return_value = mock_client
+
+        action = models.WorkflowImbiAction(
+            name='add-note-err',
+            type='imbi',
+            command='add_project_note',
+            content='hello',
+        )
+
+        with self.assertRaises(httpx.HTTPError):
+            await self.imbi_executor.execute(action)
+
+    async def test_execute_add_project_note_missing_content(self) -> None:
+        """Test add_project_note model validation requires content."""
+        import pydantic
+
+        with self.assertRaises(pydantic.ValidationError):
+            models.WorkflowImbiAction(
+                name='add-note-missing',
+                type='imbi',
+                command='add_project_note',
+                # Missing content
+            )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
     async def test_execute_update_project_type_success(
         self, mock_get_instance: mock.MagicMock
     ) -> None:

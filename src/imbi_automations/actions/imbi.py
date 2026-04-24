@@ -36,6 +36,8 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
         match action.command:
             case models.WorkflowImbiActionCommand.add_project_link:
                 await self._add_project_link(action)
+            case models.WorkflowImbiActionCommand.add_project_note:
+                await self._add_project_note(action)
             case models.WorkflowImbiActionCommand.batch_update_facts:
                 await self._batch_update_facts(action)
             case models.WorkflowImbiActionCommand.delete_project_fact:
@@ -470,6 +472,71 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 self.context.total_actions,
                 action.name,
                 action.link_type,
+                self.context.imbi_project.id,
+            )
+
+    async def _add_project_note(
+        self, action: models.WorkflowImbiAction
+    ) -> None:
+        """Add a note to a project via Imbi API.
+
+        Args:
+            action: Action with content (supports Jinja2 templates)
+
+        Raises:
+            ValueError: If content is missing
+            httpx.HTTPError: If API request fails
+
+        """
+        if not action.content:
+            raise ValueError('content is required for add_project_note')
+
+        rendered_content = prompts.render_template_string(
+            action.content,
+            workflow=self.context.workflow,
+            github_repository=self.context.github_repository,
+            imbi_project=self.context.imbi_project,
+            working_directory=self.context.working_directory,
+            starting_commit=self.context.starting_commit,
+            variables=self.context.variables,
+        )
+
+        client = clients.Imbi.get_instance(config=self.configuration.imbi)
+
+        self.logger.debug(
+            '%s [%s/%s] %s adding note (%d chars) for project %d (%s)',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            len(rendered_content),
+            self.context.imbi_project.id,
+            self.context.imbi_project.name,
+        )
+
+        try:
+            await client.add_project_note(
+                project_id=self.context.imbi_project.id,
+                content=rendered_content,
+            )
+        except httpx.HTTPError as exc:
+            self.logger.error(
+                '%s [%s/%s] %s failed to add note for project %d: %s',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
+                self.context.imbi_project.id,
+                exc,
+            )
+            raise
+        else:
+            self.logger.info(
+                '%s [%s/%s] %s added note for project %d',
+                self.context.imbi_project.slug,
+                self.context.current_action_index,
+                self.context.total_actions,
+                action.name,
                 self.context.imbi_project.id,
             )
 
