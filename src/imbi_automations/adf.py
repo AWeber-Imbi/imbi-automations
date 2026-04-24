@@ -249,13 +249,13 @@ class _HTMLToADFParser(html.parser.HTMLParser):
                 break
 
     def _add_hard_break(self) -> None:
-        node: dict[str, typing.Any] = {'type': 'hardBreak'}
-        if self._stack:
-            current = self._stack[-1]
-            content = current.setdefault('content', [])
-            content.append(node)
-        else:
-            self._doc.append(node)
+        if not self._stack:
+            # hardBreak is an inline node; ADF requires block-level nodes
+            # at the document root, so drop a stray <br> with no parent.
+            return
+        current = self._stack[-1]
+        content = current.setdefault('content', [])
+        content.append({'type': 'hardBreak'})
 
     @staticmethod
     def _make_block_node(tag: str) -> dict[str, typing.Any]:

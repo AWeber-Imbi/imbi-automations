@@ -61,6 +61,11 @@ class TestMarkdownToADF(base.AsyncTestCase):
         self.assertEqual(block['attrs'], {'language': 'python'})
         self.assertEqual(block['content'][0]['text'], 'print(1)\n')
 
+    async def test_stray_br_at_root_is_dropped(self) -> None:
+        parser = adf._HTMLToADFParser()
+        parser.feed('<br>')
+        self.assertEqual(parser.result(), [])
+
     async def test_hr_inside_blockquote_stays_nested(self) -> None:
         doc = adf.markdown_to_adf('> before\n>\n> ---\n>\n> after')
         self.assertEqual(len(doc['content']), 1)
