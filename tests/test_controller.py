@@ -703,7 +703,7 @@ class ControllerResumeTestCase(base.AsyncTestCase):
 
             workflow_path = pathlib.Path(tmpdir) / 'workflow'
             workflow_path.mkdir()
-            (workflow_path / 'config.toml').write_text(
+            (workflow_path / 'workflow.toml').write_text(
                 '[workflow]\nname="test"'
             )
 

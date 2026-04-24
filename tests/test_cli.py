@@ -134,36 +134,19 @@ actions = []
         self.assertEqual(result.path, self.workflow_dir)
         self.assertEqual(result.configuration.name, 'Test Workflow')
 
-    def test_workflow_config_toml_fallback(self) -> None:
-        """Test workflow parser falls back to config.toml."""
+    def test_workflow_config_toml_rejected(self) -> None:
+        """Test workflow parser rejects config.toml with a clear error."""
         config_file = self.workflow_dir / 'config.toml'
         config_file.write_text("""
-name = "Test Workflow Fallback"
+name = "Test Workflow Legacy"
 actions = []
 """)
 
-        result = cli.workflow(str(self.workflow_dir))
+        with self.assertRaises(argparse.ArgumentTypeError) as ctx:
+            cli.workflow(str(self.workflow_dir))
 
-        self.assertIsInstance(result, models.Workflow)
-        self.assertEqual(result.path, self.workflow_dir)
-        self.assertEqual(result.configuration.name, 'Test Workflow Fallback')
-
-    def test_workflow_prefers_workflow_toml(self) -> None:
-        """Test workflow parser prefers workflow.toml over config.toml."""
-        # Create both files
-        (self.workflow_dir / 'workflow.toml').write_text("""
-name = "Workflow TOML"
-actions = []
-""")
-        (self.workflow_dir / 'config.toml').write_text("""
-name = "Config TOML"
-actions = []
-""")
-
-        result = cli.workflow(str(self.workflow_dir))
-
-        # Should use workflow.toml
-        self.assertEqual(result.configuration.name, 'Workflow TOML')
+        self.assertIn('config.toml', str(ctx.exception))
+        self.assertIn('workflow.toml', str(ctx.exception))
 
     def test_workflow_not_a_directory(self) -> None:
         """Test workflow parser with non-directory path."""

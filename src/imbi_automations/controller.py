@@ -193,10 +193,10 @@ class Automation(mixins.WorkflowLoggerMixin):
                 f'{state.workflow_path}'
             )
 
-        state_config_file = state.workflow_path / 'config.toml'
+        state_config_file = state.workflow_path / 'workflow.toml'
         if not state_config_file.exists():
             raise RuntimeError(
-                f'Workflow from state file missing config.toml: '
+                f'Workflow from state file missing workflow.toml: '
                 f'{state_config_file}'
             )
 
