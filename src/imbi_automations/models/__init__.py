@@ -4,7 +4,7 @@ Centralizes imports for configuration, API responses (GitHub, Imbi),
 workflow definitions, git operations, and Claude Code integration models.
 """
 
-from . import configuration, imbi, mcp
+from . import configuration, imbi, jira, mcp
 from .claude import (
     ClaudeAgentPlanningResult,
     ClaudeAgentResponse,
@@ -24,6 +24,7 @@ from .configuration import (
     GitConfiguration,
     GitHubConfiguration,
     ImbiConfiguration,
+    JiraConfiguration,
 )
 from .git import GitCommit, GitCommitSummary, GitFileChange
 from .github import (
@@ -49,6 +50,7 @@ from .imbi import (
     ImbiProjectLink,
     ImbiProjectType,
 )
+from .jira import JiraIssueCreated
 from .mcp import McpHttpServer, McpServerConfig, McpSSEServer, McpStdioServer
 from .resume_state import ResumeState
 from .workflow import (
@@ -82,6 +84,8 @@ from .workflow import (
     WorkflowGitHubCommand,
     WorkflowImbiAction,
     WorkflowImbiActionCommand,
+    WorkflowJiraAction,
+    WorkflowJiraActionCommand,
     WorkflowShellAction,
     WorkflowTemplateAction,
 )
@@ -89,6 +93,7 @@ from .workflow import (
 __all__ = [
     'configuration',
     'imbi',
+    'jira',
     'mcp',
     'AnthropicConfiguration',
     'ClaudeAgentConfiguration',
@@ -130,6 +135,8 @@ __all__ = [
     'ImbiProjectFactTypeRange',
     'ImbiProjectLink',
     'ImbiProjectType',
+    'JiraConfiguration',
+    'JiraIssueCreated',
     'McpHttpServer',
     'McpServerConfig',
     'McpSSEServer',
@@ -163,6 +170,8 @@ __all__ = [
     'WorkflowGitHubCommand',
     'WorkflowImbiAction',
     'WorkflowImbiActionCommand',
+    'WorkflowJiraAction',
+    'WorkflowJiraActionCommand',
     'WorkflowShellAction',
     'WorkflowTemplateAction',
 ]
