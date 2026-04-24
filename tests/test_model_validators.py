@@ -11,6 +11,7 @@ from imbi_automations.models.workflow import (
     WorkflowFileAction,
     WorkflowFileActionCommand,
 )
+from tests import base
 
 
 class ModelValidatorsTestCase(unittest.TestCase):
@@ -103,7 +104,7 @@ class ModelValidatorsTestCase(unittest.TestCase):
             WorkflowCondition(file=pathlib.Path('f'))
 
 
-class ConfigurationJiraEnvTestCase(unittest.TestCase):
+class ConfigurationJiraEnvTestCase(base.AsyncTestCase):
     """Jira configuration should be auto-populated from ATLASSIAN_* env vars
     when the user omits a `[jira]` section in config.toml."""
 

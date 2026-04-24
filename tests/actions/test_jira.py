@@ -328,17 +328,24 @@ class JiraActionsTestCase(base.AsyncTestCase):
                 self.executor, action, self._issue('MAPPED-1')
             )
 
-        with mock.patch.object(
-            self.executor, '_build_create_handler', side_effect=capture_build
-        ):
-            with mock.patch(
+        with (
+            mock.patch.object(
+                self.executor,
+                '_build_create_handler',
+                side_effect=capture_build,
+            ),
+            mock.patch(
                 'imbi_automations.claude.Claude.custom_tool_session',
                 side_effect=fake_session,
-            ):
-                await self.executor.execute(action)
+            ),
+        ):
+            await self.executor.execute(action)
 
         self.assertEqual(captured.get('project_key'), 'MAPPED')
         self.assertEqual(captured.get('labels'), ['automated', 'test-project'])
+        self.assertEqual(captured.get('issue_type'), 'Task')
+        self.assertEqual(captured.get('components'), ['AppSec'])
+        self.assertIsNone(captured.get('priority'))
 
     async def test_unsupported_command_raises(self) -> None:
         action = self._make_action()

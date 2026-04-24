@@ -6,6 +6,7 @@ for validation with SecretStr for sensitive data and environment variable
 defaults.
 """
 
+import contextlib
 import pathlib
 import typing
 
@@ -223,11 +224,9 @@ class Configuration(pydantic.BaseModel):
                     continue
                 data[field] = settings_cls(**data[field])
             elif field in optional_env_only_fields:
-                try:
+                # Required env vars not set — leave as None (opt-in).
+                with contextlib.suppress(pydantic.ValidationError):
                     data[field] = settings_cls()
-                except pydantic.ValidationError:
-                    # Required env vars not set — leave as None (opt-in).
-                    pass
         return data
 
     ai_commits: bool = False
