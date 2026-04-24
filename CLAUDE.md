@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 Guidance for AI agents working with this codebase. Maintain this file when making significant architectural changes.
 
@@ -301,6 +301,7 @@ url = "https://git.example.com/plugins.git"
 ```
 
 **Marketplace source types:**
+
 | Type | Required Field | Description |
 |------|----------------|-------------|
 | `github` | `repo` | GitHub repository (e.g., `org/repo`) |
@@ -337,7 +338,7 @@ State saved in `.state` file (MessagePack format) with:
 
 - Base class: `AsyncTestCase` (extends `unittest.IsolatedAsyncioTestCase`)
 - HTTP mocking: `httpx.MockTransport` with JSON fixtures in `tests/data/`
-- 480 tests with full async support
+- 813 tests with full async support
 
 ## CI/CD
 
