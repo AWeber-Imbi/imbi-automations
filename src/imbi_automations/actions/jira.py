@@ -84,17 +84,31 @@ class JiraActions(mixins.WorkflowLoggerMixin):
     async def _run_create_ticket(
         self, action: models.WorkflowJiraAction, jira_client: clients.Jira
     ) -> None:
+        project_key = self._render(action.project_key)
+        issue_type = self._render(action.issue_type)
+        priority = self._render(action.priority)
+        labels = [self._render(label) for label in action.labels]
+        components = [self._render(c) for c in action.components]
+
         base_prompt = prompts.render(
             self.context,
             action.prompt,
-            project_key=action.project_key,
-            issue_type=action.issue_type,
-            labels=action.labels,
-            components=action.components,
-            priority=action.priority,
+            project_key=project_key,
+            issue_type=issue_type,
+            labels=labels,
+            components=components,
+            priority=priority,
         )
 
-        handler = self._build_create_handler(action, jira_client)
+        handler = self._build_create_handler(
+            action,
+            jira_client,
+            project_key=project_key,
+            issue_type=issue_type,
+            labels=labels,
+            components=components,
+            priority=priority,
+        )
         create_tool = claude_agent_sdk.tool(
             'create_jira_issue',
             (
@@ -189,8 +203,34 @@ class JiraActions(mixins.WorkflowLoggerMixin):
                 'browse_url': jira_client.browse_url(issue.key),
             }
 
+    def _render(self, value: str | None) -> str | None:
+        """Render a workflow-configured string as a Jinja2 template.
+
+        Returns the input unchanged when it is None or does not contain any
+        Jinja2 delimiters, so unused/empty fields are pass-through.
+        """
+        if value is None or ('{{' not in value and '{%' not in value):
+            return value
+        return prompts.render_template_string(
+            value,
+            workflow=self.context.workflow,
+            github_repository=self.context.github_repository,
+            imbi_project=self.context.imbi_project,
+            working_directory=self.context.working_directory,
+            starting_commit=self.context.starting_commit,
+            variables=self.context.variables,
+        )
+
     def _build_create_handler(
-        self, action: models.WorkflowJiraAction, jira_client: clients.Jira
+        self,
+        action: models.WorkflowJiraAction,
+        jira_client: clients.Jira,
+        *,
+        project_key: str,
+        issue_type: str,
+        labels: list[str],
+        components: list[str],
+        priority: str | None,
     ) -> typing.Callable[..., typing.Awaitable[dict[str, typing.Any]]]:
         """Return the raw tool-handler coroutine bound to the action config.
 
@@ -219,13 +259,13 @@ class JiraActions(mixins.WorkflowLoggerMixin):
 
             try:
                 issue = await jira_client.create_issue(
-                    project_key=action.project_key,
+                    project_key=project_key,
                     summary=summary,
-                    issue_type=action.issue_type,
+                    issue_type=issue_type,
                     description=description,
-                    labels=list(action.labels) or None,
-                    components=list(action.components) or None,
-                    priority=action.priority,
+                    labels=list(labels) or None,
+                    components=list(components) or None,
+                    priority=priority,
                 )
             except httpx.HTTPStatusError as err:
                 err_text = (

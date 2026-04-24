@@ -212,12 +212,22 @@ class Configuration(pydantic.BaseModel):
             'imbi': ImbiConfiguration,
             'jira': JiraConfiguration,
         }
+        # Optional sections that should auto-populate from env vars when the
+        # user did not provide a section in config.toml. This lets users
+        # configure Jira (and others) entirely via env vars.
+        optional_env_only_fields = {'jira'}
         for field, settings_cls in settings_fields.items():
             if field in data and data[field] is not None:
                 # Skip if already an instance (e.g., from direct construction)
                 if isinstance(data[field], settings_cls):
                     continue
                 data[field] = settings_cls(**data[field])
+            elif field in optional_env_only_fields:
+                try:
+                    data[field] = settings_cls()
+                except pydantic.ValidationError:
+                    # Required env vars not set — leave as None (opt-in).
+                    pass
         return data
 
     ai_commits: bool = False
