@@ -13,6 +13,7 @@ Supported action types:
 - git: Git operations (extract from history, clone repositories)
 - github: GitHub-specific operations and API integrations
 - imbi: Imbi API operations and integrations
+- jira: Jira ticket creation via agentic Claude session
 - shell: Shell command execution with templating support
 - template: Jinja2 template rendering with full workflow context
 """
@@ -29,6 +30,7 @@ from . import (
     git,
     github,
     imbi,
+    jira,
     shell,
     template,
 )
@@ -61,6 +63,7 @@ class Actions(mixins.WorkflowLoggerMixin):
             | models.WorkflowGitAction
             | models.WorkflowGitHubAction
             | models.WorkflowImbiAction
+            | models.WorkflowJiraAction
             | models.WorkflowShellAction
             | models.WorkflowTemplateAction
         ),
@@ -93,6 +96,10 @@ class Actions(mixins.WorkflowLoggerMixin):
                 )
             case models.WorkflowActionTypes.imbi:
                 obj = imbi.ImbiActions(
+                    self.configuration, context, self.verbose
+                )
+            case models.WorkflowActionTypes.jira:
+                obj = jira.JiraActions(
                     self.configuration, context, self.verbose
                 )
             case models.WorkflowActionTypes.shell:

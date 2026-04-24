@@ -157,6 +157,23 @@ class ImbiConfiguration(pydantic_settings.BaseSettings):
     sonarqube_link: str = 'SonarQube'
 
 
+class JiraConfiguration(pydantic_settings.BaseSettings):
+    """Atlassian / Jira Cloud configuration for the `jira` action type.
+
+    Uses Basic auth (email + API key) against the Jira Cloud REST v3 API.
+    Reads from shared Atlassian env vars: ATLASSIAN_DOMAIN, ATLASSIAN_EMAIL,
+    ATLASSIAN_API_KEY.
+    """
+
+    model_config = pydantic_settings.SettingsConfigDict(
+        env_prefix='ATLASSIAN_', **BASE_SETTINGS
+    )
+
+    domain: str
+    email: str
+    api_key: pydantic.SecretStr
+
+
 class Configuration(pydantic.BaseModel):
     """Main application configuration.
 
@@ -193,6 +210,7 @@ class Configuration(pydantic.BaseModel):
             'git': GitConfiguration,
             'github': GitHubConfiguration,
             'imbi': ImbiConfiguration,
+            'jira': JiraConfiguration,
         }
         for field, settings_cls in settings_fields.items():
             if field in data and data[field] is not None:
@@ -218,4 +236,5 @@ class Configuration(pydantic.BaseModel):
     git: GitConfiguration = pydantic.Field(default_factory=GitConfiguration)
     github: GitHubConfiguration | None = None
     imbi: ImbiConfiguration | None = None
+    jira: JiraConfiguration | None = None
     preserve_on_error: bool = False

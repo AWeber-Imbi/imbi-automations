@@ -1,9 +1,9 @@
 """Workflow definition models with comprehensive action and condition support.
 
 Defines the complete workflow structure including actions (callable, claude,
-docker, file, git, github, imbi, shell, template), conditions (local and
-remote file checks), filters (project targeting), and workflow context for
-execution state management.
+docker, file, git, github, imbi, jira, shell, template), conditions (local
+and remote file checks), filters (project targeting), and workflow context
+for execution state management.
 """
 
 import enum
@@ -121,6 +121,7 @@ class WorkflowActionTypes(enum.StrEnum):
     git = 'git'
     github = 'github'
     imbi = 'imbi'
+    jira = 'jira'
     shell = 'shell'
     template = 'template'
 
@@ -606,6 +607,60 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     }
 
 
+class WorkflowJiraActionCommand(enum.StrEnum):
+    """Jira action commands.
+
+    Currently only supports creating a ticket. Future commands (add_comment,
+    transition_ticket, link_issue) are out of scope for the initial release.
+    """
+
+    create_ticket = 'create_ticket'
+
+
+class WorkflowJiraAction(validators.CommandRulesMixin, WorkflowAction):
+    """Action for creating Jira tickets via an agentic Claude session.
+
+    The action invokes Claude Agent SDK with a configurable task prompt and
+    an in-process MCP tool that posts to the Jira Cloud REST API. The agent
+    authors the ticket summary and description; the action config provides
+    the project_key, issue_type, labels, and components.
+    """
+
+    type: typing.Literal['jira'] = 'jira'
+    command: WorkflowJiraActionCommand
+    committable: bool = False
+
+    # Fields for create_ticket command
+    project_key: str | None = None
+    issue_type: str = 'Task'
+    labels: list[str] = []
+    components: list[str] = []
+    priority: str | None = None
+    prompt: ResourceUrl | None = None
+    variable_name: str | None = None
+    max_cycles: int = 3
+    timeout: str | None = None
+
+    # CommandRulesMixin configuration
+    command_field: typing.ClassVar[str] = 'command'
+    required_fields: typing.ClassVar[dict[object, set[str]]] = {
+        WorkflowJiraActionCommand.create_ticket: {'project_key', 'prompt'}
+    }
+    allowed_fields: typing.ClassVar[dict[object, set[str]]] = {
+        WorkflowJiraActionCommand.create_ticket: {
+            'project_key',
+            'issue_type',
+            'labels',
+            'components',
+            'priority',
+            'prompt',
+            'variable_name',
+            'max_cycles',
+            'timeout',
+        }
+    }
+
+
 class WorkflowShellAction(WorkflowAction):
     """Action for shell command execution with templating support.
 
@@ -640,6 +695,7 @@ WorkflowActions = typing.Annotated[
         | WorkflowGitAction
         | WorkflowGitHubAction
         | WorkflowImbiAction
+        | WorkflowJiraAction
         | WorkflowShellAction
         | WorkflowTemplateAction
     ),

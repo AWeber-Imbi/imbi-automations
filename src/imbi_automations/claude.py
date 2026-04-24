@@ -606,6 +606,72 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         return self._submitted_response
 
+    async def custom_tool_session(
+        self,
+        prompt: str,
+        *,
+        mcp_server_name: str,
+        mcp_server: typing.Any,
+        allowed_tools: list[str],
+        cwd: pathlib.Path | None = None,
+        timeout: str = '5m',
+    ) -> None:
+        """Run a one-shot SDK session with a custom MCP tool.
+
+        Reuses the initialized working dir, settings, and installed plugin
+        paths from this Claude instance. Does not use the planning/task/
+        validation agent structure — the prompt is submitted directly.
+        """
+        import pytimeparse2
+
+        timeout_seconds = pytimeparse2.parse(timeout)
+        if timeout_seconds is None:
+            raise ValueError(f'Invalid timeout format: {timeout}')
+
+        await self._ensure_plugins_installed()
+
+        mcp_servers: dict[str, typing.Any] = {mcp_server_name: mcp_server}
+        for (
+            name,
+            config,
+        ) in self.context.workflow.configuration.mcp_servers.items():
+            mcp_servers[name] = _expand_mcp_config(config.model_dump())
+
+        sdk_plugins: list[types.SdkPluginConfig] = [
+            types.SdkPluginConfig(type='local', path=plugin.path)
+            for plugin in self._merged_local_plugins
+        ]
+        for plugin_path in self._installed_plugin_paths:
+            sdk_plugins.append(
+                types.SdkPluginConfig(type='local', path=plugin_path)
+            )
+
+        options = claude_agent_sdk.ClaudeAgentOptions(
+            allowed_tools=allowed_tools,
+            cwd=cwd or self.context.working_directory,
+            mcp_servers=mcp_servers,
+            model=self.configuration.claude.model,
+            plugins=sdk_plugins,
+            settings=str(self._settings_path),
+            setting_sources=['local'],
+            permission_mode='bypassPermissions',
+        )
+        client = claude_agent_sdk.ClaudeSDKClient(options)
+
+        async def run() -> None:
+            await client.connect()
+            try:
+                await client.query(prompt)
+                async for message in client.receive_response():
+                    self._parse_message(message)
+            finally:
+                try:
+                    await client.disconnect()
+                except Exception as exc:  # noqa: BLE001
+                    LOGGER.debug('SDK disconnect failed: %s', exc)
+
+        await asyncio.wait_for(run(), timeout=timeout_seconds)
+
     async def anthropic_query(
         self, prompt: str, model: str | None = None
     ) -> str:
