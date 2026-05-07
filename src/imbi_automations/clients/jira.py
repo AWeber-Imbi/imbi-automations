@@ -1,6 +1,7 @@
 """Jira Cloud REST API client."""
 
 import base64
+import json
 import logging
 import typing
 
@@ -69,26 +70,24 @@ class Jira(http.BaseURLHTTPClient):
         if extra_fields:
             fields.update(extra_fields)
 
+        body = {'fields': fields}
         LOGGER.debug(
-            'Creating Jira issue in project %s (type=%s)',
+            'POST /rest/api/3/issue (project=%s, type=%s) body=%s',
             project_key,
             issue_type,
+            json.dumps(body, default=str),
         )
-        response = await self.post(
-            '/rest/api/3/issue', json={'fields': fields}
-        )
+        response = await self.post('/rest/api/3/issue', json=body)
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except AttributeError, UnicodeDecodeError:
-                error_body = '<unable to read response body>'
             LOGGER.error(
-                'Failed to create Jira issue in %s: HTTP %d - %s',
+                'Failed to create Jira issue in %s: HTTP %d\n'
+                'Request body: %s\nResponse body: %s',
                 project_key,
                 response.status_code,
-                error_body,
+                json.dumps(body, default=str),
+                response.text,
             )
             raise
         return models.JiraIssueCreated.model_validate(response.json())
