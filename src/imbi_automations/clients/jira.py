@@ -81,13 +81,19 @@ class Jira(http.BaseURLHTTPClient):
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError:
+            safe_fields = dict(fields)
+            if 'description' in safe_fields:
+                safe_fields['description'] = '<redacted>'
+            if 'summary' in safe_fields:
+                safe_fields['summary'] = '<redacted>'
             LOGGER.error(
                 'Failed to create Jira issue in %s: HTTP %d\n'
-                'Request body: %s\nResponse body: %s',
+                'Request body (redacted): %s\n'
+                'Response body (truncated): %s',
                 project_key,
                 response.status_code,
-                json.dumps(body, default=str),
-                response.text,
+                json.dumps({'fields': safe_fields}, default=str),
+                response.text[:2000],
             )
             raise
         return models.JiraIssueCreated.model_validate(response.json())
