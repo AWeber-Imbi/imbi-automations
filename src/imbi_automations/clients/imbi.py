@@ -400,15 +400,18 @@ class Imbi(http.BaseURLHTTPClient):
         Returns ``True`` if the attribute existed and was removed,
         ``False`` if it was already absent.
         """
+        path = f'/{name}'
+        if path in _DOC_PATH_RESERVED:
+            raise ValueError(
+                f'Attribute {name!r} is read-only on a project'
+            )
         project = await self.get_project(project_id)
         if project is None:
             raise ValueError(f'Project not found: {project_id}')
         extras = project.model_extra or {}
         if name not in extras and getattr(project, name, None) is None:
             return False
-        await self._patch_project(
-            project_id, [{'op': 'remove', 'path': f'/{name}'}]
-        )
+        await self._patch_project(project_id, [{'op': 'remove', 'path': path}])
         return True
 
     # -- Project relationship writes ------------------------------------
@@ -560,11 +563,15 @@ class Imbi(http.BaseURLHTTPClient):
         self, project_id: str, operations: list[dict[str, typing.Any]]
     ) -> models.ImbiProject:
         """Apply RFC 6902 operations to a project and return the result."""
+        safe_ops = [
+            {'op': op.get('op'), 'path': op.get('path')}
+            for op in operations
+        ]
         LOGGER.debug(
             'PATCH project %s with %d op(s): %s',
             project_id,
             len(operations),
-            operations,
+            safe_ops,
         )
         response = await self._request(
             'PATCH', f'projects/{project_id}', json=operations
@@ -580,10 +587,9 @@ class Imbi(http.BaseURLHTTPClient):
             response.raise_for_status()
         except httpx.HTTPStatusError:
             LOGGER.error(
-                'PATCH failed for project %s: HTTP %d — %s',
+                'PATCH failed for project %s: HTTP %d',
                 project_id,
                 response.status_code,
-                response.text,
             )
             raise
         return models.ImbiProject.model_validate(response.json())

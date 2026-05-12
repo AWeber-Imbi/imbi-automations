@@ -202,6 +202,49 @@ class ImbiClientAuthTestCase(base.AsyncTestCase):
             f'Bearer {second_access}',
         )
 
+    async def test_client_credentials_exchange_then_request(self) -> None:
+        access_token = _make_jwt()
+        recorder = _Recorder(
+            [
+                _resp(
+                    http.HTTPStatus.OK,
+                    json_body={
+                        'access_token': access_token,
+                        'refresh_token': 'refresh-1',
+                        'token_type': 'bearer',
+                    },
+                ),
+                _resp(http.HTTPStatus.OK, json_body=[]),
+            ]
+        )
+        transport = httpx.MockTransport(recorder)
+        config = models.ImbiConfiguration(
+            organization=ORG,
+            base_url=BASE,
+            auth=models.ImbiClientCredentialsAuth(
+                client_id='cc_id',
+                client_secret='cc_secret',  # noqa: S106
+            ),
+        )
+        client = imbi.Imbi(config, transport)
+        await client.get_environments()
+        self.assertEqual(len(recorder.requests), 2)
+        token_req = recorder.requests[0]
+        self.assertEqual(token_req.method, 'POST')
+        self.assertEqual(str(token_req.url), f'{BASE}/api/auth/token')
+        self.assertEqual(
+            token_req.headers.get('Content-Type'),
+            'application/x-www-form-urlencoded',
+        )
+        body = token_req.content.decode('utf-8')
+        self.assertIn('grant_type=client_credentials', body)
+        self.assertIn('client_id=cc_id', body)
+        self.assertIn('client_secret=cc_secret', body)
+        api_call = recorder.requests[1]
+        self.assertEqual(
+            api_call.headers['Authorization'], f'Bearer {access_token}'
+        )
+
     async def test_api_key_401_does_not_attempt_refresh(self) -> None:
         recorder = _Recorder(
             [_resp(http.HTTPStatus.UNAUTHORIZED, text='nope')]
@@ -480,6 +523,15 @@ class ImbiClientPatchesTestCase(base.AsyncTestCase):
         self.assertEqual(
             ops, [{'op': 'remove', 'path': '/programming_language'}]
         )
+
+    async def test_delete_project_attribute_rejects_reserved_path(
+        self,
+    ) -> None:
+        client, recorder = self._client([])
+        with self.assertRaises(ValueError):
+            await client.delete_project_attribute('proj_x', 'team')
+        # No HTTP traffic — guard short-circuits before GET/PATCH.
+        self.assertEqual(recorder.requests, [])
 
     async def test_add_project_link_uses_link_definition_slug(self) -> None:
         project = project_payload(project_id='proj_x')
