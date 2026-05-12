@@ -13,7 +13,7 @@ _FIXTURES = pathlib.Path(__file__).parent / 'data' / 'imbi'
 
 def load_imbi_fixture(name: str) -> typing.Any:
     """Return the parsed JSON fixture at ``tests/data/imbi/<name>``."""
-    return json.loads((_FIXTURES / name).read_text())
+    return json.loads((_FIXTURES / name).read_text(encoding='utf-8'))
 
 
 def auth_response(
