@@ -1,0 +1,14 @@
+{
+  "sections": [
+    {
+      "name": "Tech",
+      "slug": "tech",
+      "properties": {
+        "programming_language": {
+          "type": "string",
+          "enum": ["Python 3.12", "Go 1.22"]
+        }
+      }
+    }
+  ]
+}

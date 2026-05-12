@@ -1,0 +1,4 @@
+[
+  {"name": "Prod", "slug": "production"},
+  {"name": "Stage", "slug": "staging"}
+]

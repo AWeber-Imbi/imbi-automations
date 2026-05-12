@@ -12,7 +12,7 @@ import httpx
 from imbi_automations import models
 from imbi_automations.clients import http as ia_http
 from imbi_automations.clients import imbi
-from tests import base
+from tests import base, factories
 
 BASE = 'https://imbi.test.com'
 ORG = 'test-org'
@@ -137,11 +137,7 @@ class ImbiClientAuthTestCase(base.AsyncTestCase):
             [
                 _resp(
                     http.HTTPStatus.OK,
-                    json_body={
-                        'access_token': access_token,
-                        'refresh_token': 'refresh-1',
-                        'token_type': 'bearer',
-                    },
+                    json_body=factories.auth_response(access_token),
                 ),
                 _resp(http.HTTPStatus.OK, json_body=[]),
             ]
@@ -168,20 +164,18 @@ class ImbiClientAuthTestCase(base.AsyncTestCase):
             [
                 _resp(  # login
                     http.HTTPStatus.OK,
-                    json_body={
-                        'access_token': first_access,
-                        'refresh_token': 'refresh-1',
-                        'token_type': 'bearer',
-                    },
+                    json_body=factories.auth_response(
+                        first_access,
+                        refresh_token='refresh-1',  # noqa: S106
+                    ),
                 ),
                 _resp(http.HTTPStatus.UNAUTHORIZED),  # request 1
                 _resp(  # refresh
                     http.HTTPStatus.OK,
-                    json_body={
-                        'access_token': second_access,
-                        'refresh_token': 'refresh-2',
-                        'token_type': 'bearer',
-                    },
+                    json_body=factories.auth_response(
+                        second_access,
+                        refresh_token='refresh-2',  # noqa: S106
+                    ),
                 ),
                 _resp(http.HTTPStatus.OK, json_body=[]),  # request retry
             ]
@@ -208,11 +202,7 @@ class ImbiClientAuthTestCase(base.AsyncTestCase):
             [
                 _resp(
                     http.HTTPStatus.OK,
-                    json_body={
-                        'access_token': access_token,
-                        'refresh_token': 'refresh-1',
-                        'token_type': 'bearer',
-                    },
+                    json_body=factories.auth_response(access_token),
                 ),
                 _resp(http.HTTPStatus.OK, json_body=[]),
             ]
@@ -277,10 +267,7 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
             [
                 _resp(
                     http.HTTPStatus.OK,
-                    json_body=[
-                        {'name': 'Prod', 'slug': 'production'},
-                        {'name': 'Stage', 'slug': 'staging'},
-                    ],
+                    json_body=factories.load_imbi_fixture('environments.json'),
                 )
             ]
         )
@@ -295,10 +282,9 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
             [
                 _resp(
                     http.HTTPStatus.OK,
-                    json_body=[
-                        {'name': 'API', 'slug': 'api'},
-                        {'name': 'Consumer', 'slug': 'consumer'},
-                    ],
+                    json_body=factories.load_imbi_fixture(
+                        'project_types.json'
+                    ),
                 )
             ]
         )
@@ -310,13 +296,9 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
             [
                 _resp(
                     http.HTTPStatus.OK,
-                    json_body=[
-                        {
-                            'name': 'GitHub Repository',
-                            'slug': 'github-repository',
-                            'url_template': None,
-                        }
-                    ],
+                    json_body=factories.load_imbi_fixture(
+                        'link_definitions.json'
+                    ),
                 )
             ]
         )
@@ -412,20 +394,9 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
             [
                 _resp(
                     http.HTTPStatus.OK,
-                    json_body={
-                        'sections': [
-                            {
-                                'name': 'Tech',
-                                'slug': 'tech',
-                                'properties': {
-                                    'programming_language': {
-                                        'type': 'string',
-                                        'enum': ['Python 3.12', 'Go 1.22'],
-                                    }
-                                },
-                            }
-                        ]
-                    },
+                    json_body=factories.load_imbi_fixture(
+                        'project_schema.json'
+                    ),
                 )
             ]
         )
@@ -535,13 +506,7 @@ class ImbiClientPatchesTestCase(base.AsyncTestCase):
 
     async def test_add_project_link_uses_link_definition_slug(self) -> None:
         project = project_payload(project_id='proj_x')
-        defs = [
-            {
-                'name': 'GitHub Repository',
-                'slug': 'github-repository',
-                'url_template': None,
-            }
-        ]
+        defs = factories.load_imbi_fixture('link_definitions.json')
         client, recorder = self._client(
             [
                 _resp(http.HTTPStatus.OK, json_body=defs),  # link definitions
@@ -679,16 +644,9 @@ class ImbiClientPatchesTestCase(base.AsyncTestCase):
             [
                 _resp(
                     http.HTTPStatus.CREATED,
-                    json_body={
-                        'id': 'doc_x',
-                        'title': 'Release Notes',
-                        'content': 'body',
-                        'created_by': 'gavinr',
-                        'created_at': '2026-05-11T00:00:00+00:00',
-                        'project_id': 'proj_x',
-                        'is_pinned': False,
-                        'tags': [],
-                    },
+                    json_body=factories.load_imbi_fixture(
+                        'document_created.json'
+                    ),
                 )
             ]
         )
