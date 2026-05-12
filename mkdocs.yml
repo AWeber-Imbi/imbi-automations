@@ -6,6 +6,7 @@ edit_uri: edit/main/docs/
 
 nav:
   - Home: index.md
+  - Migrating from Imbi v1: migrating-from-v1.md
   - Architecture: architecture.md
   - Configuration:
      - Configuration File: configuration.md
