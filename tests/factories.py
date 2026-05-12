@@ -2,9 +2,29 @@
 
 from __future__ import annotations
 
+import json
+import pathlib
 import typing
 
 from imbi_automations import models
+
+_FIXTURES = pathlib.Path(__file__).parent / 'data' / 'imbi'
+
+
+def load_imbi_fixture(name: str) -> typing.Any:
+    """Return the parsed JSON fixture at ``tests/data/imbi/<name>``."""
+    return json.loads((_FIXTURES / name).read_text(encoding='utf-8'))
+
+
+def auth_response(
+    access_token: str,
+    refresh_token: str = 'refresh-1',  # noqa: S107
+) -> dict[str, typing.Any]:
+    """Return an ``auth_token_response.json`` fixture with tokens filled in."""
+    payload = load_imbi_fixture('auth_token_response.json')
+    payload['access_token'] = access_token
+    payload['refresh_token'] = refresh_token
+    return payload
 
 
 def make_project(
