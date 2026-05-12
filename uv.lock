@@ -930,16 +930,16 @@ wheels = [
 
 [[package]]
 name = "mkdocstrings-python-xref"
-version = "2.1.0"
+version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "griffe" },
     { name = "mkdocstrings" },
     { name = "mkdocstrings-python" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e5/47/93f56f44e8af645ce170068820331ca9ee3a362881b6e23483b41d7e5565/mkdocstrings_python_xref-2.1.0.tar.gz", hash = "sha256:e0fb9ff069e3b92f749b7b29c5209b4ad9e27158a54e93d85200ad79c57fe415", size = 16850, upload-time = "2026-02-21T16:37:29.416Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/e0/10cf8e825376622ff584af4274cabfe3781f6b531200220a2280d2d4b071/mkdocstrings_python_xref-2.1.1.tar.gz", hash = "sha256:649c2d35dbd766ee8f57706bc2af4b2f1f0090862821e83e58224aa9cad3e589", size = 17874, upload-time = "2026-04-26T14:43:19.509Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/82/8510f4f89db374d264d7d2cf6de91fd1de1b896c66a248d3cc64103f90bb/mkdocstrings_python_xref-2.1.0-py3-none-any.whl", hash = "sha256:bcc3a879a52d7dee343c494115662af269405dfec3c3edbe06226fc2245d4b91", size = 17029, upload-time = "2026-02-21T16:37:31.489Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/37/7263b08d95cae74c5d301d65620619cc2e641c2e4f487597d659dd568c98/mkdocstrings_python_xref-2.1.1-py3-none-any.whl", hash = "sha256:a5f4d36cba7ff83e639293d41d76b98554d9ebbe093af6f415b20af0511b9bc4", size = 18019, upload-time = "2026-04-26T14:43:21.836Z" },
 ]
 
 [[package]]
