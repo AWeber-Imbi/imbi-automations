@@ -139,10 +139,10 @@ project_types = ["api"]   # list, even with one entry
 
 Note that v2 attribute names are **blueprint attribute slugs** (typically
 snake_case), not display labels. Run a project through Imbi's UI or the
-`/projects/{id}/schema` endpoint to discover the slugs your org has
-defined. The new `update_project` command takes an `attributes = { ... }`
-dict and is the more idiomatic v2 way to write multiple attributes at
-once — see [Imbi actions](actions/imbi.md).
+`/api/organizations/{org}/projects/{id}/schema` endpoint to discover the
+slugs your org has defined. The new `update_project` command takes an
+`attributes = { ... }` dict and is the more idiomatic v2 way to write
+multiple attributes at once — see [Imbi actions](actions/imbi.md).
 
 ### Filter changes
 
@@ -236,7 +236,7 @@ upgrader for `.state` files.
 
 ```bash
 # Drop any pre-upgrade error directories
-rm -rf ./errors/<workflow>/<project>-<timestamp>/
+rm -rf "./errors/{workflow}/{project}-{timestamp}/"
 ```
 
 This is also a good moment to delete stale error directories from before
@@ -265,8 +265,9 @@ useful work against it:
   `[imbi].organization`.
 - Project blueprints are loaded for every project type you target.
   The CLI resolves `attribute_name` values against the per-project
-  schema served at `GET /projects/{id}/schema`; if blueprints aren't
-  loaded, you'll get `attribute not allowed` errors on writes.
+  schema served at `GET /api/organizations/{org}/projects/{id}/schema`;
+  if blueprints aren't loaded, you'll get `attribute not allowed`
+  errors on writes.
 
 If you are also running the Imbi v1 → v2 server migration, load
 blueprints **before** migrating project data. The Imbi orchestrator's
@@ -300,8 +301,8 @@ configured:
 - [ ] Delete or accept loss of old `.state` files under `./errors/`
 - [ ] Bump the installed version: `pip install -U imbi-automations` or
       `uv pip install -U imbi-automations`
-- [ ] Smoke test: `imbi-automations config.toml workflows/<one>
-      --project-id proj_<known-id>` and confirm the run reaches at
+- [ ] Smoke test: `imbi-automations config.toml workflows/{one}
+      --project-id "proj_{known-id}"` and confirm the run reaches at
       least the clone phase
 
 ## See also
