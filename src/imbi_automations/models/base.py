@@ -19,9 +19,9 @@ class BaseModel(pydantic.BaseModel):
     """
 
     def __hash__(self) -> int:
-        return hash(json.dumps(self.model_dump(), sort_keys=True))
+        return hash(json.dumps(self.model_dump(mode='json'), sort_keys=True))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False
-        return self.model_dump() == other.model_dump()
+        return self.model_dump(mode='json') == other.model_dump(mode='json')

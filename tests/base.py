@@ -22,7 +22,13 @@ class AsyncTestCase(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        ia_http.HTTPClient._instances.clear()
+        # Some tests reassign ``_instances`` on subclasses (notably
+        # ``BaseURLHTTPClient``); that shadows the parent's dict so a
+        # plain ``HTTPClient._instances.clear()`` no longer reaches the
+        # leaked Imbi/GitHub singletons. Drop any shadowing override.
+        for cls in (ia_http.BaseURLHTTPClient, ia_http.HTTPClient):
+            if '_instances' in cls.__dict__:
+                cls._instances = {}
         self.http_client_transport = httpx.MockTransport(
             self._handle_mock_request
         )

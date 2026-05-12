@@ -24,7 +24,7 @@ class ProjectLogFilter(logging.Filter):
     the async context of the target project.
     """
 
-    def __init__(self, project_id: int) -> None:
+    def __init__(self, project_id: str) -> None:
         """Initialize filter for specific project ID.
 
         Args:
@@ -57,7 +57,7 @@ class ProjectLogCapture:
     by using contextvars to isolate logs per async task.
     """
 
-    def __init__(self, project_id: int, buffer_size: int = 10000) -> None:
+    def __init__(self, project_id: str, buffer_size: int = 10000) -> None:
         """Initialize log capture for specific project.
 
         Args:

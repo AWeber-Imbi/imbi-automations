@@ -7,7 +7,7 @@ from unittest import mock
 
 from imbi_automations import models
 from imbi_automations.actions import git as git_actions
-from tests import base
+from tests import base, factories
 
 
 class GitActionsTestCase(base.AsyncTestCase):
@@ -33,23 +33,19 @@ class GitActionsTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers={'github': 'test-org/test-project'},
                 links=None,
                 name='Test Project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )
@@ -59,7 +55,9 @@ class GitActionsTestCase(base.AsyncTestCase):
                 token='test-key'  # noqa: S106
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 

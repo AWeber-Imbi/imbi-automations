@@ -13,6 +13,8 @@ import pydantic
 
 from . import github
 
+SCHEMA_VERSION = 2
+
 
 class ResumeState(pydantic.BaseModel):
     """State required to resume a failed workflow execution.
@@ -20,14 +22,19 @@ class ResumeState(pydantic.BaseModel):
     This model captures all context needed to reconstruct the workflow
     execution state and resume from the point of failure. Serialized
     to MessagePack binary format (.state file) in the error directory.
+
+    ``schema_version`` is bumped whenever the on-disk shape changes;
+    older ``.state`` files are rejected at load time rather than
+    silently re-keyed.
     """
+
+    schema_version: int = SCHEMA_VERSION
 
     # Workflow identification
     workflow_slug: str
     workflow_path: pathlib.Path
 
-    # Project information
-    project_id: int
+    project_id: str
     project_slug: str
 
     # Execution state
@@ -84,9 +91,19 @@ class ResumeState(pydantic.BaseModel):
             Deserialized ResumeState instance
 
         Raises:
+            ValueError: If the schema_version does not match
             msgpack.exceptions.ExtraData: If data contains extra bytes
             msgpack.exceptions.UnpackException: If data is malformed
             pydantic.ValidationError: If data doesn't match model schema
 
         """
-        return cls.model_validate(msgpack.unpackb(data, raw=False))
+        payload = msgpack.unpackb(data, raw=False)
+        if isinstance(payload, dict) and payload.get('schema_version') not in (
+            None,
+            SCHEMA_VERSION,
+        ):
+            raise ValueError(
+                f'Resume state schema version {payload["schema_version"]} '
+                f'is not compatible with current version {SCHEMA_VERSION}'
+            )
+        return cls.model_validate(payload)

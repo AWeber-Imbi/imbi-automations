@@ -9,7 +9,7 @@ from unittest import mock
 
 from imbi_automations import models
 from imbi_automations.actions import callablea
-from tests import base
+from tests import base, factories
 
 
 # Test fixtures - sample callables
@@ -67,23 +67,19 @@ class CallableActionTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers=None,
                 links=None,
                 name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )
@@ -93,7 +89,9 @@ class CallableActionTestCase(base.AsyncTestCase):
                 token='test-key'  # noqa: S106
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -210,7 +208,9 @@ class CallableActionTestCase(base.AsyncTestCase):
         await self.callable_executor.execute(action)
 
         # Template rendering converts to strings
-        mock_callable.assert_called_once_with('test-project', '123', 'test')
+        mock_callable.assert_called_once_with(
+            'test-project', 'proj_123', 'test'
+        )
 
     async def test_execute_templated_kwargs(self) -> None:
         """Test execution with Jinja2-templated keyword arguments."""
@@ -223,7 +223,7 @@ class CallableActionTestCase(base.AsyncTestCase):
             kwargs={
                 'project_name': '{{ imbi_project.name }}',
                 'project_slug': '{{ imbi_project.slug }}',
-                'project_type': '{{ imbi_project.project_type }}',
+                'team_slug': '{{ imbi_project.team.slug }}',
             },
         )
 
@@ -232,7 +232,7 @@ class CallableActionTestCase(base.AsyncTestCase):
         mock_callable.assert_called_once_with(
             project_name='test-project',
             project_slug='test-project',
-            project_type='API',
+            team_slug='test-namespace',
         )
 
     async def test_execute_mixed_templated_and_literal_args(self) -> None:
@@ -398,10 +398,10 @@ class CallableActionTestCase(base.AsyncTestCase):
             type='callable',
             callable=mock_callable,
             args=[
-                '{{ imbi_project.namespace }}/{{ imbi_project.name }}',
-                '{{ imbi_project.id | int }}',
+                '{{ imbi_project.team.name }}/{{ imbi_project.name }}',
+                '{{ imbi_project.id }}',
                 (
-                    '{% if imbi_project.id > 100 %}'
+                    '{% if imbi_project.id == "proj_123" %}'
                     'large{% else %}small{% endif %}'
                 ),
             ],
@@ -410,7 +410,7 @@ class CallableActionTestCase(base.AsyncTestCase):
         await self.callable_executor.execute(action)
 
         mock_callable.assert_called_once_with(
-            'test-namespace/test-project', '123', 'large'
+            'test-namespace/test-project', 'proj_123', 'large'
         )
 
     async def test_execute_logs_debug_message(self) -> None:

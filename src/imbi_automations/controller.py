@@ -387,7 +387,7 @@ class Automation(mixins.WorkflowLoggerMixin):
     ) -> list[models.ImbiProject]:
         """Filter projects based on workflow configuration
 
-        project_ids: set[int] = pydantic.Field(default_factory=set)
+        project_ids: set[str] = pydantic.Field(default_factory=set)
         project_types: set[str] = pydantic.Field(default_factory=set)
         project_facts: dict[str, bool | int | float | str] = (
             pydantic.Field(default_factory=dict)
@@ -508,7 +508,7 @@ class Automation(mixins.WorkflowLoggerMixin):
         self, project: models.ImbiProject
     ) -> bool:
         self.logger.info(
-            'Processing Project %i - %s', project.id, project.slug
+            'Processing Project %s - %s', project.id, project.slug
         )
         github_repository = await self._get_github_repository(project)
 
@@ -530,7 +530,7 @@ class Automation(mixins.WorkflowLoggerMixin):
                 return False
 
             self.logger.info(
-                'Completed processing %s (%i)', project.name, project.id
+                'Completed processing %s (%s)', project.name, project.id
             )
             return True
         finally:
@@ -557,30 +557,22 @@ class Automation(mixins.WorkflowLoggerMixin):
         )
 
     def _validate_workflow_filter_project_facts(self) -> None:
-        """Validate workflow filter project facts against cache if available.
+        """Validate workflow filter project attribute keys.
+
+        Attribute schemas vary per project blueprint, so we only check
+        that keys are valid identifier strings at parse time;
+        per-project schema validation runs lazily against
+        ``GET /projects/{id}/schema`` in :class:`Filter`.
 
         :raises: RuntimeError
 
         """
-        self._validate_workflow_filter_set_values(
-            'project fact type',
-            set(self.workflow.configuration.filter.project_facts.keys()),
-            self.registry.project_fact_type_names,
-        )
         for name in self.workflow.configuration.filter.project_facts:
-            value = self.workflow.configuration.filter.project_facts[name]
-            if not self.registry.validate_project_fact_value(name, value):
-                fact_type = self.registry.get_project_fact_type(name)
-                if fact_type:
-                    raise RuntimeError(
-                        f'Invalid value for fact type {name}: "{value}" '
-                        f'(expected {fact_type.data_type} '
-                        f'{fact_type.fact_type})'
-                    )
-                else:
-                    raise RuntimeError(
-                        f'Invalid value for fact type {name}: "{value}"'
-                    )
+            if not name or not name.replace('_', '').isalnum():
+                raise RuntimeError(
+                    f'Invalid project attribute name "{name}": expected '
+                    'a snake_case identifier'
+                )
 
     def _validate_workflow_filter_project_types(self) -> None:
         """Validate workflow filter environments against Imbi values

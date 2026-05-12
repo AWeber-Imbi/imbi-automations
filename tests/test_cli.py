@@ -63,11 +63,12 @@ class LoadConfigurationTestCase(unittest.TestCase):
     """Test configuration loading."""
 
     def test_load_configuration_valid_toml(self) -> None:
-        """Test loading valid configuration from TOML."""
+        """Test loading valid v2 configuration from TOML."""
         config_toml = """
 [imbi]
-hostname = "imbi.example.com"
-api_key = "test-key"
+organization = "test-org"
+base_url = "https://imbi.example.com"
+api_key = "ik_test"
 
 [github]
 token = "github-token"
@@ -77,7 +78,10 @@ token = "github-token"
         config = cli.load_configuration(config_file)
 
         self.assertIsInstance(config, models.Configuration)
-        self.assertEqual(config.imbi.hostname, 'imbi.example.com')
+        self.assertEqual(config.imbi.organization, 'test-org')
+        self.assertEqual(
+            str(config.imbi.base_url).rstrip('/'), 'https://imbi.example.com'
+        )
         self.assertEqual(
             config.github.token.get_secret_value(), 'github-token'
         )
@@ -95,11 +99,13 @@ invalid syntax
 
     def test_load_configuration_validation_error(self) -> None:
         """Test configuration validation errors."""
-        # Invalid type for a field
+        # base_url must be a URL, so a bare hostname triggers the
+        # AnyHttpUrl validator.
         config_toml = """
 [imbi]
-hostname = "imbi.example.com"
-api_key = 123
+organization = "test-org"
+base_url = "not-a-url"
+api_key = "ik_test"
 """
         config_file = io.StringIO(config_toml)
 
@@ -198,8 +204,9 @@ class ParseArgsTestCase(unittest.TestCase):
         self.config_file = pathlib.Path(self.temp_dir.name) / 'config.toml'
         self.config_file.write_text("""
 [imbi]
-hostname = "imbi.example.com"
-api_key = "test-key"
+organization = "test-org"
+base_url = "https://imbi.example.com"
+api_key = "ik_test"
 
 [github]
 token = "github-token"
@@ -227,7 +234,7 @@ actions = []
             ]
         )
 
-        self.assertEqual(args.project_id, 123)
+        self.assertEqual(args.project_id, '123')
         self.assertIsInstance(args.workflow, models.Workflow)
 
     def test_parse_args_project_type(self) -> None:
@@ -405,10 +412,11 @@ class MainExecutionTestCase(unittest.TestCase):
         self.config_file = pathlib.Path(self.temp_dir.name) / 'config.toml'
         self.config_file.write_text("""
 [imbi]
-hostname = "imbi.example.com"
-api_key = "test-key"
+organization = "test-org"
+base_url = "https://imbi.example.com"
+api_key = "ik_test"
 github_identifier = "github"
-github_link = "GitHub"
+github_link = "github-repository"
 
 [github]
 token = "github-token"

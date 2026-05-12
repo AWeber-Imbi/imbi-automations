@@ -33,7 +33,7 @@ create_pull_request = true
 
 # Workflow filter configuration
 [filter]
-project_ids = [123, 456]
+project_ids = ["proj_123", "proj_456"]
 project_types = ["apis", "consumers"]
 project_facts = {"Programming Language" = "Python 3.12", "Framework" = "FastAPI"}
 project_environments = ["development", "staging"]
