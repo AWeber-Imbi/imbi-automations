@@ -6,7 +6,7 @@ import unittest
 from unittest import mock
 
 from imbi_automations import committer, models
-from tests import base
+from tests import base, factories
 
 
 class CommitterRoutingTestCase(base.AsyncTestCase):
@@ -29,23 +29,19 @@ class CommitterRoutingTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers=None,
                 links=None,
                 name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )
@@ -67,7 +63,11 @@ class CommitterRoutingTestCase(base.AsyncTestCase):
             git=models.GitConfiguration(
                 user_name='Test', user_email='test@example.com'
             ),
-            imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
+            imbi=models.ImbiConfiguration(
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
+            ),
         )
         action = models.WorkflowAction(name='test-action', ai_commit=True)
 
@@ -92,7 +92,11 @@ class CommitterRoutingTestCase(base.AsyncTestCase):
             git=models.GitConfiguration(
                 user_name='Test', user_email='test@example.com'
             ),
-            imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
+            imbi=models.ImbiConfiguration(
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
+            ),
         )
         action = models.WorkflowAction(name='test-action', ai_commit=False)
 
@@ -119,7 +123,11 @@ class CommitterRoutingTestCase(base.AsyncTestCase):
             git=models.GitConfiguration(
                 user_name='Test', user_email='test@example.com'
             ),
-            imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
+            imbi=models.ImbiConfiguration(
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
+            ),
         )
         action = models.WorkflowAction(name='test-action', ai_commit=True)
 
@@ -144,7 +152,11 @@ class CommitterRoutingTestCase(base.AsyncTestCase):
             git=models.GitConfiguration(
                 user_name='Test', user_email='test@example.com'
             ),
-            imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
+            imbi=models.ImbiConfiguration(
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
+            ),
         )
         action = models.WorkflowAction(name='test-action', ai_commit=True)
 
@@ -181,7 +193,11 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
             git=models.GitConfiguration(
                 user_name='Test', user_email='test@example.com'
             ),
-            imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
+            imbi=models.ImbiConfiguration(
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
+            ),
         )
 
         self.workflow = models.Workflow(
@@ -193,23 +209,19 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers=None,
                 links=None,
                 name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )
@@ -395,7 +407,11 @@ class ManualCommitTestCase(base.AsyncTestCase):
             git=models.GitConfiguration(
                 user_name='Test Author', user_email='test@example.com'
             ),
-            imbi=models.ImbiConfiguration(api_key='test', hostname='test.com'),
+            imbi=models.ImbiConfiguration(
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
+            ),
         )
 
         self.workflow = models.Workflow(
@@ -407,23 +423,19 @@ class ManualCommitTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers=None,
                 links=None,
                 name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )

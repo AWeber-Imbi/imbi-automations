@@ -122,9 +122,7 @@ class ConfigurationJiraEnvTestCase(base.AsyncTestCase):
         self.assertIsNotNone(cfg.jira)
         self.assertEqual(cfg.jira.domain, 'example.atlassian.net')
         self.assertEqual(cfg.jira.email, 'bot@example.com')
-        self.assertEqual(
-            cfg.jira.api_key.get_secret_value(), 'secret'
-        )
+        self.assertEqual(cfg.jira.api_key.get_secret_value(), 'secret')
 
     def test_jira_left_none_when_env_vars_missing(self) -> None:
         env = {

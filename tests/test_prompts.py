@@ -7,6 +7,7 @@ import unittest
 import pydantic
 
 from imbi_automations import models, prompts
+from tests import factories
 
 
 class PromptsTestBase(unittest.TestCase):
@@ -24,23 +25,19 @@ class PromptsTestBase(unittest.TestCase):
         )
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers=None,
                 links=None,
                 name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_dir,
         )

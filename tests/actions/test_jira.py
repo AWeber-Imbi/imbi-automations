@@ -9,7 +9,7 @@ import pydantic
 
 from imbi_automations import models
 from imbi_automations.actions import jira as jira_actions
-from tests import base
+from tests import base, factories
 
 
 class JiraActionsTestCase(base.AsyncTestCase):
@@ -35,23 +35,19 @@ class JiraActionsTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts={},
+                attributes={},
                 identifiers={},
                 links=None,
                 name='Test Project',
-                namespace='ns',
-                namespace_slug='ns',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='ns',
+                team_slug='ns',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )
@@ -307,11 +303,10 @@ class JiraActionsTestCase(base.AsyncTestCase):
 
     async def test_create_ticket_renders_templated_project_key(self) -> None:
         """project_key and labels support Jinja2 templates (e.g. for mapping
-        imbi_project.namespace_slug to a Jira project key)."""
+        imbi_project.team.slug to a Jira project key)."""
         action = self._make_action(
             project_key=(
-                "{{ {'ns':'MAPPED','other':'OTHER'}"
-                '[imbi_project.namespace_slug] }}'
+                "{{ {'ns':'MAPPED','other':'OTHER'}[imbi_project.team.slug] }}"
             ),
             labels=['automated', '{{ imbi_project.slug }}'],
         )

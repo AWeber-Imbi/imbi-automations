@@ -1,11 +1,16 @@
-"""Imbi project management system API client.
+"""Imbi API client.
 
-Provides integration with the Imbi project management system API for
-retrieving projects, project types, environments, and other project
-metadata used throughout the automation workflows.
+Targets the org-scoped Imbi API. Authenticates via API key
+(``Bearer ik_…``), OAuth2 client credentials, or password login;
+JWTs are refreshed transparently on 401. Project mutations are
+expressed as RFC 6902 JSON Patch.
 """
 
-import copy
+from __future__ import annotations
+
+import base64
+import datetime
+import json
 import logging
 import typing
 
@@ -18,14 +23,169 @@ from . import http
 
 LOGGER = logging.getLogger(__name__)
 
+_TOKEN_SKEW = datetime.timedelta(seconds=30)
+
+# Mirrors imbi-api's ``projects._RESERVED_FIELDS`` plus the two
+# response-only fields (``score``, ``relationships``) the server
+# never accepts on a PATCH. Fields with dedicated setters
+# (``/team``, ``/project_types``, ``/environments``) live here so
+# misuse of the attribute-PATCH path raises locally rather than
+# round-tripping a 400.
+_DOC_PATH_RESERVED = frozenset(
+    [
+        '/id',
+        '/team',
+        '/project_types',
+        '/environments',
+        '/created_at',
+        '/updated_at',
+        '/archived',
+        '/archived_at',
+        '/score',
+        '/relationships',
+    ]
+)
+
+
+def _patch_op(
+    path: str, current: typing.Any, value: typing.Any
+) -> dict[str, typing.Any] | None:
+    """Return a single JSON Patch op, or ``None`` when no change is needed.
+
+    ``value=None`` means "remove". ``current=None`` (with a non-None
+    ``value``) becomes ``add``; otherwise ``replace``.
+    """
+    if value is None:
+        if current is None:
+            return None
+        return {'op': 'remove', 'path': path}
+    if current == value:
+        return None
+    op = 'replace' if current is not None else 'add'
+    return {'op': op, 'path': path, 'value': value}
+
+
+def _decode_jwt_exp(token: str) -> datetime.datetime | None:
+    """Return the JWT's ``exp`` claim as an aware UTC datetime."""
+    try:
+        _, payload_b64, _ = token.split('.')
+    except ValueError:
+        return None
+    padding = '=' * (-len(payload_b64) % 4)
+    try:
+        payload = json.loads(
+            base64.urlsafe_b64decode(payload_b64 + padding).decode('utf-8')
+        )
+    except (ValueError, UnicodeDecodeError):
+        return None
+    exp = payload.get('exp')
+    if not isinstance(exp, (int, float)):
+        return None
+    return datetime.datetime.fromtimestamp(float(exp), tz=datetime.UTC)
+
+
+class _AuthManager:
+    """Issues and refreshes the Imbi access token."""
+
+    def __init__(
+        self, client: httpx.AsyncClient, base_url: str, auth: models.ImbiAuth
+    ) -> None:
+        self._client = client
+        self._base_url = base_url.rstrip('/')
+        self._auth = auth
+        self._access_token: str | None = None
+        self._refresh_token: str | None = None
+        self._exp: datetime.datetime | None = None
+
+    @property
+    def static_api_key(self) -> str | None:
+        """Return the raw API key when using ``api_key`` auth, else None."""
+        if isinstance(self._auth, models.ImbiApiKeyAuth):
+            return self._auth.value.get_secret_value()
+        return None
+
+    def _is_expired(self) -> bool:
+        if self._exp is None:
+            return True
+        now = datetime.datetime.now(datetime.UTC)
+        return now + _TOKEN_SKEW >= self._exp
+
+    async def access_token(self) -> str:
+        """Return a usable access token, fetching one if needed."""
+        key = self.static_api_key
+        if key is not None:
+            return key
+        if self._access_token and not self._is_expired():
+            return self._access_token
+        await self._issue()
+        return typing.cast('str', self._access_token)
+
+    async def refresh(self) -> str:
+        """Force a refresh and return the new access token."""
+        if self.static_api_key is not None:
+            return self.static_api_key
+        if self._refresh_token:
+            try:
+                await self._refresh()
+                return typing.cast('str', self._access_token)
+            except httpx.HTTPStatusError:
+                LOGGER.debug('Imbi refresh token rejected, re-authenticating')
+        await self._issue()
+        return typing.cast('str', self._access_token)
+
+    async def _issue(self) -> None:
+        if isinstance(self._auth, models.ImbiClientCredentialsAuth):
+            response = await self._client.post(
+                f'{self._base_url}/api/auth/token',
+                data={
+                    'grant_type': 'client_credentials',
+                    'client_id': self._auth.client_id.get_secret_value(),
+                    'client_secret': (
+                        self._auth.client_secret.get_secret_value()
+                    ),
+                },
+                headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            )
+        elif isinstance(self._auth, models.ImbiPasswordAuth):
+            response = await self._client.post(
+                f'{self._base_url}/api/auth/login',
+                json={
+                    'email': self._auth.email,
+                    'password': self._auth.password.get_secret_value(),
+                },
+            )
+        else:
+            raise RuntimeError(
+                f'Unsupported Imbi auth mode: {type(self._auth).__name__}'
+            )
+        response.raise_for_status()
+        self._store(response.json())
+
+    async def _refresh(self) -> None:
+        response = await self._client.post(
+            f'{self._base_url}/api/auth/token/refresh',
+            json={'refresh_token': self._refresh_token},
+        )
+        response.raise_for_status()
+        self._store(response.json())
+
+    def _store(self, payload: dict[str, typing.Any]) -> None:
+        access = payload.get('access_token')
+        if not isinstance(access, str):
+            raise RuntimeError('Imbi auth response missing access_token')
+        self._access_token = access
+        refresh = payload.get('refresh_token')
+        if isinstance(refresh, str):
+            self._refresh_token = refresh
+        self._exp = _decode_jwt_exp(access)
+
 
 class Imbi(http.BaseURLHTTPClient):
-    """Imbi project management system API client.
+    """Imbi API client.
 
-    Provides access to the Imbi API for retrieving projects, project
-    types, environments, facts, and other project metadata used for
-    workflow targeting and context enrichment. Supports OpenSearch-based
-    project queries.
+    All requests are scoped to a single organization. Path prefix
+    ``/api/organizations/{org_slug}`` is added automatically; only
+    auth endpoints (``/api/auth/...``) bypass the org scope.
     """
 
     def __init__(
@@ -34,1070 +194,396 @@ class Imbi(http.BaseURLHTTPClient):
         transport: httpx.BaseTransport | None = None,
     ) -> None:
         super().__init__(transport=transport)
-        self._base_url = f'https://{config.hostname}'
-        self.add_header('Private-Token', config.api_key.get_secret_value())
+        self._base_url = str(config.base_url).rstrip('/')
+        self._org_slug = config.organization
+        self._config = config
+        if config.auth is None:
+            raise RuntimeError('ImbiConfiguration is missing an auth block')
+        self._auth_manager = _AuthManager(
+            self.http_client, self._base_url, config.auth
+        )
+
+    @property
+    def org_slug(self) -> str:
+        """Return the org slug this client is bound to."""
+        return self._org_slug
+
+    @property
+    def org_base(self) -> str:
+        """Return the URL prefix for every org-scoped endpoint."""
+        return f'{self._base_url}/api/organizations/{self._org_slug}'
+
+    async def _request(
+        self, method: str, path: str, **kwargs: typing.Any
+    ) -> httpx.Response:
+        """Issue an HTTP request with bearer auth + one 401-refresh retry."""
+        url = self._url_for(path)
+        token = await self._auth_manager.access_token()
+        headers = dict(kwargs.pop('headers', None) or {})
+        headers['Authorization'] = f'Bearer {token}'
+        response = await self.http_client.request(
+            method, url, headers=headers, **kwargs
+        )
+        if response.status_code != 401 or self._auth_manager.static_api_key:
+            return response
+        token = await self._auth_manager.refresh()
+        headers['Authorization'] = f'Bearer {token}'
+        return await self.http_client.request(
+            method, url, headers=headers, **kwargs
+        )
+
+    def _url_for(self, path: str) -> str:
+        if path.startswith(('http://', 'https://')):
+            return path
+        if path.startswith('/api/'):
+            return f'{self._base_url}{path}'
+        return f'{self.org_base}/{path.lstrip("/")}'
+
+    # -- Reads ----------------------------------------------------------
 
     @async_lru.alru_cache(maxsize=1)
     async def get_environments(self) -> list[models.ImbiEnvironment]:
-        """Get all project fact types.
-
-        Returns:
-            List of all project fact types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/environments')
+        """List environments defined for the organization."""
+        response = await self._request('GET', 'environments/')
         response.raise_for_status()
         return [
-            models.ImbiEnvironment.model_validate(datum)
-            for datum in response.json()
+            models.ImbiEnvironment.model_validate(entry)
+            for entry in response.json()
         ]
 
-    async def get_project(self, project_id: int) -> models.ImbiProject | None:
-        result = await self._opensearch_projects(
-            self._search_project_id(project_id)
-        )
-        return result[0] if result else None
-
-    async def get_project_fact_type_enums(
-        self,
-    ) -> list[models.ImbiProjectFactTypeEnum]:
-        """Get all of the project fact types.
-
-        Returns:
-            List of project fact type enums
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-type-enums')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactTypeEnum.model_validate(fact)
-            for fact in response.json()
-        ]
-
-    async def get_project_fact_type_id_by_name(
-        self, fact_name: str
-    ) -> int | None:
-        """Get fact type ID by name.
-
-        Args:
-            fact_name: Name of the fact type
-
-        Returns:
-            Fact type ID or None if not found
-
-        """
-        fact_types = await self.get_project_fact_types()
-        for fact_type in fact_types:
-            if fact_type.name == fact_name:
-                return fact_type.id
-        return None
-
-    async def get_project_fact_type_ranges(
-        self,
-    ) -> list[models.ImbiProjectFactTypeRange]:
-        """Get all of the project fact types.
-
-        Returns:
-            List of project fact type ranges
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-type-ranges')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactTypeRange.model_validate(fact)
-            for fact in response.json()
-        ]
-
-    async def get_project_fact_types(self) -> list[models.ImbiProjectFactType]:
-        """Get all of the project fact types.
-
-        Returns:
-            List of project fact types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-fact-types')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFactType.model_validate(fact)
-            for fact in response.json()
-        ]
-
-    async def get_project_fact_value(
-        self, project_id: int, fact_name: str
-    ) -> str | None:
-        """Get current value of a specific project fact.
-
-        Args:
-            project_id: Imbi project ID
-            fact_name: Name of the fact to retrieve
-
-        Returns:
-            Current fact value or None if not set
-
-        """
-        facts = await self.get_project_facts(project_id)
-        for fact in facts:
-            if fact.fact_name == fact_name:
-                return str(fact.value) if fact.value is not None else None
-        return None
-
-    async def get_project_facts(
-        self, project_id: int
-    ) -> list[models.ImbiProjectFact]:
-        """Get all facts for a project.
-
-        Args:
-            project_id: Imbi project ID
-
-        Returns:
-            List of project facts
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get(f'/projects/{project_id}/facts')
-        response.raise_for_status()
-        return [
-            models.ImbiProjectFact.model_validate(fact)
-            for fact in response.json()
-        ]
-
+    @async_lru.alru_cache(maxsize=1)
     async def get_project_types(self) -> list[models.ImbiProjectType]:
-        """Get all project types.
-
-        Returns:
-            List of all project types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-types')
+        """List project types defined for the organization."""
+        response = await self._request('GET', 'project-types/')
         response.raise_for_status()
         return [
-            models.ImbiProjectType.model_validate(project_type)
-            for project_type in response.json()
+            models.ImbiProjectType.model_validate(entry)
+            for entry in response.json()
         ]
 
-    async def get_projects(self) -> list[models.ImbiProject]:
-        """Get all active Imbi projects.
+    @async_lru.alru_cache(maxsize=1)
+    async def get_link_definitions(self) -> list[models.ImbiLinkDefinition]:
+        """List link definitions defined for the organization."""
+        response = await self._request('GET', 'link-definitions/')
+        response.raise_for_status()
+        return [
+            models.ImbiLinkDefinition.model_validate(entry)
+            for entry in response.json()
+        ]
 
-        Returns:
-            List of all active Imbi projects
+    async def get_project(self, project_id: str) -> models.ImbiProject | None:
+        """Fetch a single project by Nano-ID."""
+        response = await self._request('GET', f'projects/{project_id}')
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        return models.ImbiProject.model_validate(response.json())
 
-        """
-        all_projects = []
-        page_size = 100
-        start_from = 0
-
-        while True:
-            query = self._opensearch_payload()
-            query['query'] = {'match': {'archived': False}}
-            query['from'] = start_from
-            query['size'] = page_size
-
-            page_projects = await self._opensearch_projects(query)
-            if not page_projects:
-                break
-
-            all_projects.extend(page_projects)
-            start_from += page_size
-
-            # Break if we got fewer results than page_size (last page)
-            if len(page_projects) < page_size:
-                break
-
-        LOGGER.debug('Found %d total active projects', len(all_projects))
-
-        # Sort by project slug for deterministic results
-        all_projects.sort(key=lambda project: project.slug)
-
-        return all_projects
+    async def get_projects(
+        self, include_archived: bool = False
+    ) -> list[models.ImbiProject]:
+        """List every project in the organization."""
+        params: dict[str, typing.Any] = {}
+        if include_archived:
+            params['include_archived'] = 'true'
+        response = await self._request(
+            'GET', 'projects/', params=params or None
+        )
+        response.raise_for_status()
+        projects = [
+            models.ImbiProject.model_validate(entry)
+            for entry in response.json()
+        ]
+        projects.sort(key=lambda p: p.slug)
+        return projects
 
     async def get_projects_by_type(
-        self, project_type_slug: str
+        self, project_type_slug: str, include_archived: bool = False
     ) -> list[models.ImbiProject]:
-        """Get all projects of a specific project type using slug."""
-        all_projects = []
-        page_size = 100  # OpenSearch default is usually 10, increase to 100
-        start_from = 0
+        """List every project of a specific type slug in the organization."""
+        params: dict[str, typing.Any] = {'project_type': project_type_slug}
+        if include_archived:
+            params['include_archived'] = 'true'
+        response = await self._request('GET', 'projects/', params=params)
+        response.raise_for_status()
+        projects = [
+            models.ImbiProject.model_validate(entry)
+            for entry in response.json()
+        ]
+        projects.sort(key=lambda p: p.slug)
+        return projects
 
-        while True:
-            query = self._search_project_type_slug(project_type_slug)
-            # Add pagination parameters
-            query['from'] = start_from
-            query['size'] = page_size
-
-            LOGGER.debug(
-                'Fetching projects page: from=%d, size=%d, slug=%s',
-                start_from,
-                page_size,
-                project_type_slug,
-            )
-
-            page_results = await self._opensearch_projects(query)
-
-            if not page_results:
-                # No more results
-                break
-
-            all_projects.extend(page_results)
-
-            # If we got fewer results than page_size, we've reached the end
-            if len(page_results) < page_size:
-                break
-
-            start_from += page_size
-
-        LOGGER.debug(
-            'Found %d total projects with project_type_slug: %s',
-            len(all_projects),
-            project_type_slug,
-        )
-
-        # Sort by project slug for deterministic results
-        all_projects.sort(key=lambda project: project.slug)
-
-        return all_projects
+    async def get_project_schema(
+        self, project_id: str
+    ) -> models.ImbiProjectSchema:
+        """Return the merged blueprint schema for a project."""
+        response = await self._request('GET', f'projects/{project_id}/schema')
+        response.raise_for_status()
+        return models.ImbiProjectSchema.model_validate(response.json())
 
     async def search_projects_by_github_url(
         self, github_url: str
     ) -> list[models.ImbiProject]:
-        """Search for Imbi projects by GitHub repository URL in project links.
+        """Find projects whose links dict contains ``github_url``.
 
-        Args:
-            github_url: GitHub repository URL to search for
-
-        Returns:
-            List of matching Imbi projects
-
+        Imbi has no server-side search endpoint, so this lists every
+        project in the org and filters client-side. Cost is O(N) per
+        call; cache results in the workflow when scanning many URLs.
         """
-        query = self._opensearch_payload()
-        query['query'] = {
-            'bool': {
-                'must': [
-                    {'match': {'archived': False}},
-                    {
-                        'nested': {
-                            'path': 'links',
-                            'query': {
-                                'bool': {
-                                    'must': [
-                                        {'match': {'links.url': github_url}}
-                                    ]
-                                }
-                            },
-                        }
-                    },
-                ]
-            }
-        }
-        return await self._opensearch_projects(query)
+        normalized = github_url.rstrip('/')
+        projects = await self.get_projects()
+        matches: list[models.ImbiProject] = []
+        for project in projects:
+            for url in project.links.values():
+                if str(url).rstrip('/') == normalized:
+                    matches.append(project)
+                    break
+        return matches
 
-    async def update_project_fact(
-        self,
-        project_id: int,
-        fact_name: str | None = None,
-        fact_type_id: int | None = None,
-        value: bool | int | float | str | None = None,
-        skip_validations: bool = False,
-    ) -> None:
-        """Update a single project fact by name or ID.
+    # -- Project attribute writes ---------------------------------------
 
-        Args:
-            project_id: Imbi project ID
-            fact_name: Name of the fact to update (alternative to fact_type_id)
-            fact_type_id: ID of the fact type (alternative to fact_name)
-            value: New value for the fact, or "unset" to remove the fact
-            skip_validations: Skip project type and current value validations
+    async def get_project_attribute(
+        self, project_id: str, name: str
+    ) -> typing.Any:
+        """Return the value of a blueprint-defined attribute, or None."""
+        project = await self.get_project(project_id)
+        if project is None:
+            return None
+        extras = project.model_extra or {}
+        if name in extras:
+            return extras[name]
+        return getattr(project, name, None)
 
-        Raises:
-            ValueError: If neither fact_name nor fact_type_id provided
-            httpx.HTTPError: If API request fails
-
-        """
-        if not fact_name and not fact_type_id:
-            raise ValueError(
-                'Either fact_name or fact_type_id must be provided'
-            )
-
-        # If fact_name is provided, look up the fact_type_id
-        if fact_name and not fact_type_id:
-            fact_type_id = await self.get_project_fact_type_id_by_name(
-                fact_name
-            )
-            if not fact_type_id:
-                raise ValueError(f'Fact type not found: {fact_name}')
-
-        # Perform enhanced validations unless explicitly skipped
-        if not skip_validations:
-            # Get project information to validate project type compatibility
-            project = await self.get_project(project_id)
-            if not project:
-                raise ValueError(f'Project not found: {project_id}')
-
-            # Validate that the fact type supports this project's type
-            fact_types = await self.get_project_fact_types()
-            fact_type = next(
-                (ft for ft in fact_types if ft.id == fact_type_id), None
-            )
-
-            if fact_type and fact_type.project_type_ids:
-                # Get project type ID from project_type_slug
-                project_types = await self.get_project_types()
-                project_type = next(
-                    (
-                        pt
-                        for pt in project_types
-                        if pt.slug == project.project_type_slug
-                    ),
-                    None,
-                )
-
-                if (
-                    project_type
-                    and project_type.id not in fact_type.project_type_ids
-                ):
-                    LOGGER.debug(
-                        'Skipping fact update for project %d (%s) - '
-                        'fact type "%s" not supported for project type "%s"',
-                        project_id,
-                        project.name,
-                        fact_name or fact_type_id,
-                        project.project_type_slug,
-                    )
-                    return
-
-            # Check if current value is the same to avoid unnecessary updates
-            current_value = await self.get_project_fact_value(
-                project_id, fact_name or str(fact_type_id)
-            )
-
-            # Convert values to strings for comparison (API stores as strings)
-            current_str = (
-                str(current_value) if current_value is not None else None
-            )
-            new_str = str(value) if value is not None else None
-
-            if current_str == new_str:
-                LOGGER.debug(
-                    'Skipping fact update for project %d - '
-                    'value unchanged (%s = %s)',
-                    project_id,
-                    fact_name or fact_type_id,
-                    value,
-                )
-                return
-
-        # Handle "null" value by setting to null
-        if value == 'null':
-            LOGGER.debug(
-                'Setting fact %s to null for project %d',
-                fact_name or fact_type_id,
-                project_id,
-            )
-            # Skip null updates if Imbi doesn't support them (avoid 400 errors)
-            LOGGER.warning(
-                'Skipping null fact update for project %d', project_id
-            )
-            return
-
-        LOGGER.debug(
-            'Updating fact %s to %s for project %d (fact_type_id=%s)',
-            fact_name or fact_type_id,
-            value,
-            project_id,
-            fact_type_id,
-        )
-
-        payload = [{'fact_type_id': fact_type_id, 'value': value}]
-        LOGGER.debug('Sending payload: %s', payload)
-        response = await self.post(
-            f'/projects/{project_id}/facts', json=payload
-        )
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
-            LOGGER.error(
-                'Failed to update fact %s for project %d: HTTP %d - %s',
-                fact_name or fact_type_id,
-                project_id,
-                response.status_code,
-                error_body,
-            )
-            raise
-
-    async def update_project_facts(
-        self,
-        project_id: int,
-        facts: list[tuple[int, bool | int | float | str]],
-    ) -> None:
-        """Update multiple project facts in a single request.
-
-        Args:
-            project_id: Imbi project ID
-            facts: List of (fact_type_id, value) tuples
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        payload = [
-            {'fact_type_id': fact_type_id, 'value': value}
-            for fact_type_id, value in facts
-        ]
-        LOGGER.debug(
-            'Sending facts payload for project %d: %s', project_id, payload
-        )
-        response = await self.post(
-            f'/projects/{project_id}/facts', json=payload
-        )
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
-            LOGGER.error(
-                'Failed to update facts for project %d: HTTP %d - %s',
-                project_id,
-                response.status_code,
-                error_body,
-            )
-            raise
-
-    async def delete_project_fact(
-        self,
-        project_id: int,
-        fact_name: str | None = None,
-        fact_type_id: int | None = None,
+    async def set_project_attribute(
+        self, project_id: str, name: str, value: typing.Any
     ) -> bool:
-        """Delete a project fact by setting its value to null.
+        """Set a blueprint-defined attribute via JSON Patch.
 
-        Args:
-            project_id: Imbi project ID
-            fact_name: Name of the fact to delete (alternative to fact_type_id)
-            fact_type_id: ID of the fact type (alternative to fact_name)
-
-        Returns:
-            True if fact was deleted, False if fact didn't exist
-
-        Raises:
-            ValueError: If neither fact_name nor fact_type_id provided
-            httpx.HTTPError: If API request fails
-
+        Returns ``True`` when a PATCH was issued, ``False`` when the
+        value already matched. ``value=None`` removes the attribute.
         """
-        if not fact_name and not fact_type_id:
-            raise ValueError(
-                'Either fact_name or fact_type_id must be provided'
-            )
+        return await self.set_project_attributes(project_id, {name: value})
 
-        # If fact_name is provided, look up the fact_type_id
-        if fact_name and not fact_type_id:
-            fact_type_id = await self.get_project_fact_type_id_by_name(
-                fact_name
-            )
-            if not fact_type_id:
-                raise ValueError(f'Fact type not found: {fact_name}')
-
-        # Check if fact currently exists
-        current_value = await self.get_project_fact_value(
-            project_id, fact_name or str(fact_type_id)
-        )
-        if current_value is None:
-            LOGGER.debug(
-                'Fact %s not set for project %d, nothing to delete',
-                fact_name or fact_type_id,
-                project_id,
-            )
+    async def set_project_attributes(
+        self, project_id: str, attributes: dict[str, typing.Any]
+    ) -> bool:
+        """Patch one or more attributes in a single request."""
+        if not attributes:
             return False
+        project = await self.get_project(project_id)
+        if project is None:
+            raise ValueError(f'Project not found: {project_id}')
+        extras = project.model_extra or {}
 
-        LOGGER.debug(
-            'Deleting fact %s for project %d (fact_type_id=%s)',
-            fact_name or fact_type_id,
-            project_id,
-            fact_type_id,
-        )
+        ops: list[dict[str, typing.Any]] = []
+        for name, value in attributes.items():
+            path = f'/{name}'
+            if path in _DOC_PATH_RESERVED:
+                raise ValueError(
+                    f'Attribute {name!r} is read-only on a project'
+                )
+            current = extras.get(name, getattr(project, name, None))
+            op = _patch_op(path, current, value)
+            if op is not None:
+                ops.append(op)
 
-        # Delete by sending empty value
-        response = await self.delete(
-            f'/projects/{project_id}/facts/{fact_type_id}'
-        )
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            # 404 means fact doesn't exist, which is fine for delete
-            if response.status_code == 404:
-                return False
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
-            LOGGER.error(
-                'Failed to delete fact %s for project %d: HTTP %d - %s',
-                fact_name or fact_type_id,
-                project_id,
-                response.status_code,
-                error_body,
-            )
-            raise
+        if not ops:
+            return False
+        await self._patch_project(project_id, ops)
         return True
 
-    async def add_project_note(self, project_id: int, content: str) -> None:
-        """Add a note to a project.
+    async def delete_project_attribute(
+        self, project_id: str, name: str
+    ) -> bool:
+        """Remove a blueprint-defined attribute.
 
-        Args:
-            project_id: Imbi project ID
-            content: Markdown note content
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
+        Returns ``True`` if the attribute existed and was removed,
+        ``False`` if it was already absent.
         """
-        LOGGER.debug('Adding note to project %d', project_id)
-
-        response = await self.post(
-            f'/projects/{project_id}/notes', json={'content': content}
+        project = await self.get_project(project_id)
+        if project is None:
+            raise ValueError(f'Project not found: {project_id}')
+        extras = project.model_extra or {}
+        if name not in extras and getattr(project, name, None) is None:
+            return False
+        await self._patch_project(
+            project_id, [{'op': 'remove', 'path': f'/{name}'}]
         )
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
-            LOGGER.error(
-                'Failed to add note to project %d: HTTP %d - %s',
-                project_id,
-                response.status_code,
-                error_body,
-            )
-            raise
+        return True
+
+    # -- Project relationship writes ------------------------------------
+
+    async def add_project_document(
+        self,
+        project_id: str,
+        title: str,
+        content: str,
+        tags: list[str] | None = None,
+    ) -> models.ImbiDocument:
+        """Attach a document to a project."""
+        payload: dict[str, typing.Any] = {
+            'title': title,
+            'content': content,
+            'tags': list(tags or []),
+        }
+        response = await self._request(
+            'POST', f'projects/{project_id}/documents/', json=payload
+        )
+        response.raise_for_status()
+        return models.ImbiDocument.model_validate(response.json())
 
     async def add_project_link(
-        self, project_id: int, link_type: str, url: str
-    ) -> None:
-        """Add a link to a project.
-
-        Args:
-            project_id: Imbi project ID
-            link_type: Type of link (e.g., 'Repository', 'Documentation')
-            url: URL for the link
-
-        Raises:
-            ValueError: If link_type not found
-            httpx.HTTPError: If API request fails
-
-        """
-        # Get link type ID from name
-        link_types = await self.get_link_types()
-        link_type_obj = next(
-            (lt for lt in link_types if lt.name == link_type), None
-        )
-        if not link_type_obj:
-            raise ValueError(f'Link type not found: {link_type}')
-
-        LOGGER.debug(
-            'Adding %s link to project %d: %s', link_type, project_id, url
-        )
-
-        payload = {'link_type_id': link_type_obj.id, 'url': url}
-        response = await self.post(
-            f'/projects/{project_id}/links', json=payload
-        )
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
-            LOGGER.error(
-                'Failed to add link to project %d: HTTP %d - %s',
-                project_id,
-                response.status_code,
-                error_body,
+        self, project_id: str, link_definition_slug: str, url: str
+    ) -> bool:
+        """Attach an external link to a project."""
+        definitions = await self.get_link_definitions()
+        slugs = {d.slug for d in definitions}
+        if link_definition_slug not in slugs:
+            raise ValueError(
+                f'Unknown link definition slug: {link_definition_slug}'
             )
-            raise
-
-    async def get_link_types(self) -> list[models.ImbiLinkType]:
-        """Get all link types.
-
-        Returns:
-            List of link types
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        response = await self.get('/project-link-types')
-        response.raise_for_status()
-        return [
-            models.ImbiLinkType.model_validate(link_type)
-            for link_type in response.json()
-        ]
-
-    async def update_project_type(
-        self, project_id: int, project_type_slug: str
-    ) -> None:
-        """Update the project type for a project.
-
-        Args:
-            project_id: Imbi project ID
-            project_type_slug: Slug of the new project type
-
-        Raises:
-            ValueError: If project not found or project type not found
-            httpx.HTTPError: If API request fails
-
-        """
-        # Verify project exists
         project = await self.get_project(project_id)
-        if not project:
+        if project is None:
             raise ValueError(f'Project not found: {project_id}')
-
-        # Skip if already the same type
-        if project.project_type_slug == project_type_slug:
-            LOGGER.debug(
-                'Project %d already has project_type_slug %s, skipping',
-                project_id,
-                project_type_slug,
-            )
-            return
-
-        # Verify project type exists
-        project_types = await self.get_project_types()
-        project_type = next(
-            (pt for pt in project_types if pt.slug == project_type_slug), None
+        current = project.links.get(link_definition_slug)
+        normalized_current = (
+            str(current).rstrip('/') if current is not None else None
         )
-        if not project_type:
-            raise ValueError(f'Project type not found: {project_type_slug}')
-
-        LOGGER.debug(
-            'Updating project %d type from %s to %s',
-            project_id,
-            project.project_type_slug,
-            project_type_slug,
+        op = _patch_op(
+            f'/links/{link_definition_slug}',
+            normalized_current,
+            url.rstrip('/'),
         )
+        if op is None:
+            return False
+        if op['op'] != 'remove':
+            op['value'] = url
+        await self._patch_project(project_id, [op])
+        return True
 
-        payload = [
-            {
-                'op': 'replace',
-                'path': '/project_type_id',
-                'value': project_type.id,
-            }
-        ]
-        response = await self.patch(f'/projects/{project_id}', json=payload)
-
-        if response.status_code == 304:
-            LOGGER.debug(
-                'Project type already set for project %d (HTTP 304)',
-                project_id,
-            )
-            return
-
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
-            LOGGER.error(
-                'Failed to update project type for project %d: HTTP %d - %s',
-                project_id,
-                response.status_code,
-                error_body,
-            )
-            raise
-
-    async def update_project_environments(
-        self, project_id: int, environments: list[str]
-    ) -> None:
-        """Update environments for a project using JSON Patch.
-
-        Args:
-            project_id: Imbi project ID
-            environments: List of environment names (e.g., ["Testing"])
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        # Get current project data to check existing environments
+    async def remove_project_link(
+        self, project_id: str, link_definition_slug: str
+    ) -> bool:
+        """Remove an external link from a project."""
         project = await self.get_project(project_id)
-        if not project:
+        if project is None:
             raise ValueError(f'Project not found: {project_id}')
-
-        # Extract current environment names
-        current_env_names = (
-            sorted([env.name for env in project.environments])
-            if project.environments
-            else []
-        )
-        new_env_names = sorted(environments)
-
-        # Skip update if environments are unchanged
-        if current_env_names == new_env_names:
-            LOGGER.debug(
-                'Environments unchanged for project %d, skipping update',
-                project_id,
-            )
-            return
-
-        LOGGER.debug(
-            'Updating environments for project %d from %s to %s',
+        if link_definition_slug not in project.links:
+            return False
+        await self._patch_project(
             project_id,
-            current_env_names,
-            new_env_names,
+            [{'op': 'remove', 'path': f'/links/{link_definition_slug}'}],
         )
+        return True
 
-        payload = [
-            {'op': 'replace', 'path': '/environments', 'value': environments}
-        ]
-        response = await self.patch(f'/projects/{project_id}', json=payload)
+    async def set_project_identifier(
+        self, project_id: str, name: str, value: int | str | None
+    ) -> bool:
+        """Set or remove a project identifier."""
+        project = await self.get_project(project_id)
+        if project is None:
+            raise ValueError(f'Project not found: {project_id}')
+        current = project.identifiers.get(name)
+        # Identifiers are compared as strings (server stores int|str).
+        normalized_current = str(current) if current is not None else None
+        normalized_value = str(value) if value is not None else None
+        op = _patch_op(
+            f'/identifiers/{name}', normalized_current, normalized_value
+        )
+        if op is None:
+            return False
+        if op['op'] != 'remove':
+            op['value'] = value
+        await self._patch_project(project_id, [op])
+        return True
 
-        # HTTP 304 Not Modified is success (no changes needed)
-        if response.status_code == 304:
-            LOGGER.debug(
-                'Environments already set for project %d (HTTP 304)',
-                project_id,
-            )
-            return
+    async def set_project_types(
+        self, project_id: str, slugs: list[str]
+    ) -> bool:
+        """Replace the project's type slugs.
 
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
-            LOGGER.error(
-                'Failed to update environments for project %d: HTTP %d - %s',
-                project_id,
-                response.status_code,
-                error_body,
-            )
-            raise
-
-    async def update_project_attributes(
-        self, project_id: int, attributes: dict[str, typing.Any]
-    ) -> None:
-        """Update project attributes using JSON Patch.
-
-        Generic method for updating any project attributes. Constructs JSON
-        Patch operations for changed attributes, skipping unchanged values.
-
-        Args:
-            project_id: Imbi project ID
-            attributes: Dict of attribute names to new values. Keys should
-                match ImbiProject model field names (e.g., 'description',
-                'name', etc.). Values support any JSON-serializable type.
-
-        Raises:
-            ValueError: If project not found or no attributes provided
-            httpx.HTTPError: If API request fails
-
-        Example:
-            await client.update_project_attributes(
-                project_id=123,
-                attributes={
-                    'description': 'New description',
-                    'name': 'Updated Name',
+        The PATCH document exposes types as ``project_type_slugs``
+        (a deduplicated list of slugs); ``project_types`` on
+        ``ProjectResponse`` is the materialized list of types.
+        """
+        if not slugs:
+            raise ValueError('project must have at least one type slug')
+        deduped = list(dict.fromkeys(slugs))
+        project = await self.get_project(project_id)
+        if project is None:
+            raise ValueError(f'Project not found: {project_id}')
+        current = [pt.slug for pt in project.project_types]
+        if current == deduped:
+            return False
+        await self._patch_project(
+            project_id,
+            [
+                {
+                    'op': 'replace',
+                    'path': '/project_type_slugs',
+                    'value': deduped,
                 }
-            )
-
-        """
-        if not attributes:
-            raise ValueError('attributes dict cannot be empty')
-
-        # Get current project data to check existing values
-        project = await self.get_project(project_id)
-        if not project:
-            raise ValueError(f'Project not found: {project_id}')
-
-        # Build JSON Patch operations for changed attributes
-        patch_ops = []
-        for attr_name, new_value in attributes.items():
-            # Get current value from project (use getattr for safety)
-            current_value = getattr(project, attr_name, None)
-
-            # Skip if value unchanged
-            if current_value == new_value:
-                LOGGER.debug(
-                    'Attribute "%s" unchanged for project %d, skipping',
-                    attr_name,
-                    project_id,
-                )
-                continue
-
-            LOGGER.debug(
-                'Updating %s for project %d from "%s" to "%s"',
-                attr_name,
-                project_id,
-                current_value,
-                new_value,
-            )
-
-            patch_ops.append(
-                {'op': 'replace', 'path': f'/{attr_name}', 'value': new_value}
-            )
-
-        # Skip API call if no changes needed
-        if not patch_ops:
-            LOGGER.debug(
-                'No attribute changes for project %d, skipping update',
-                project_id,
-            )
-            return
-
-        LOGGER.debug(
-            'Sending PATCH to project %d with %d operations: %s',
-            project_id,
-            len(patch_ops),
-            patch_ops,
+            ],
         )
+        return True
 
-        response = await self.patch(f'/projects/{project_id}', json=patch_ops)
+    async def set_project_environments(
+        self, project_id: str, env_slugs: list[str]
+    ) -> bool:
+        """Replace the project's environments.
 
-        # HTTP 304 Not Modified is success (no changes needed)
-        if response.status_code == 304:
-            LOGGER.debug(
-                'Attributes already set for project %d (HTTP 304)', project_id
+        Emits one PATCH op per env added or removed (vs the project's
+        current set). Edge properties on existing environments are
+        preserved by the API because we only touch the slugs that
+        actually changed.
+        """
+        project = await self.get_project(project_id)
+        if project is None:
+            raise ValueError(f'Project not found: {project_id}')
+        current = {env.slug for env in project.environments}
+        desired = set(env_slugs)
+        if current == desired:
+            return False
+        ops: list[dict[str, typing.Any]] = []
+        for slug in sorted(desired - current):
+            ops.append(
+                {'op': 'add', 'path': f'/environments/{slug}', 'value': {}}
             )
-            return
+        for slug in sorted(current - desired):
+            ops.append({'op': 'remove', 'path': f'/environments/{slug}'})
+        await self._patch_project(project_id, ops)
+        return True
 
+    # -- Low-level patch -------------------------------------------------
+
+    async def _patch_project(
+        self, project_id: str, operations: list[dict[str, typing.Any]]
+    ) -> models.ImbiProject:
+        """Apply RFC 6902 operations to a project and return the result."""
+        LOGGER.debug(
+            'PATCH project %s with %d op(s): %s',
+            project_id,
+            len(operations),
+            operations,
+        )
+        response = await self._request(
+            'PATCH', f'projects/{project_id}', json=operations
+        )
+        if response.status_code == 304:
+            project = await self.get_project(project_id)
+            if project is None:
+                raise RuntimeError(
+                    f'Project {project_id} disappeared during PATCH'
+                )
+            return project
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError:
-            try:
-                error_body = response.text
-            except (AttributeError, UnicodeDecodeError):
-                error_body = '<unable to read response body>'
             LOGGER.error(
-                'Failed to update attributes for project %d: HTTP %d - %s',
+                'PATCH failed for project %s: HTTP %d — %s',
                 project_id,
                 response.status_code,
-                error_body,
+                response.text,
             )
             raise
-
-    async def update_project_github_identifier(
-        self, project_id: int, identifier_name: str, value: int | str | None
-    ) -> None:
-        """Update GitHub identifier for a project only if different.
-
-        Args:
-            project_id: Imbi project ID
-            identifier_name: Name of the identifier (typically "github")
-            value: New identifier value
-
-        Raises:
-            httpx.HTTPError: If API request fails
-
-        """
-        # Get current project data to check existing identifier
-        project = await self.get_project(project_id)
-        if not project:
-            raise ValueError(f'Project not found: {project_id}')
-
-        current_value = None
-        if project.identifiers and identifier_name in project.identifiers:
-            current_value = project.identifiers[identifier_name]
-
-        # Convert both values to integers for comparison if possible
-        try:
-            current_int = (
-                int(current_value) if current_value is not None else None
-            )
-            new_int = int(value) if value is not None else None
-
-            if current_int == new_int:
-                LOGGER.debug(
-                    'Identifier %s unchanged for project %d, skipping update',
-                    identifier_name,
-                    project_id,
-                )
-                return
-        except (ValueError, TypeError):
-            # Fall back to string comparison if conversion fails
-            current_str = (
-                str(current_value) if current_value is not None else None
-            )
-            new_str = str(value) if value is not None else None
-
-            if current_str == new_str:
-                LOGGER.debug(
-                    'Identifier %s unchanged for project %d, skipping update',
-                    identifier_name,
-                    project_id,
-                )
-                return
-
-        LOGGER.info(
-            'Updating %s identifier from %s to %s for project %d (%s)',
-            identifier_name,
-            current_value,
-            value,
-            project_id,
-            project.name,
-        )
-
-        # Update identifier via API
-        if value is None:
-            # Delete identifier
-            response = await self.delete(
-                f'/projects/{project_id}/identifiers/{identifier_name}'
-            )
-        elif current_value is None:
-            # Create new identifier
-            payload = {
-                'integration_name': identifier_name,
-                'external_id': str(value),
-            }
-            response = await self.post(
-                f'/projects/{project_id}/identifiers', json=payload
-            )
-        else:
-            # Update existing identifier using JSON Patch
-            payload = [
-                {'op': 'replace', 'path': '/external_id', 'value': str(value)}
-            ]
-            response = await self.patch(
-                f'/projects/{project_id}/identifiers/{identifier_name}',
-                json=payload,
-            )
-
-        response.raise_for_status()
-
-    async def _add_imbi_url(
-        self, project: dict[str, typing.Any]
-    ) -> models.ImbiProject:
-        value = project['_source'].copy()
-        value['imbi_url'] = f'{self.base_url}/ui/projects/{value["id"]}'
-        environments = set({})
-        imbi_environments = await self.get_environments()
-        for environment in value.get('environments') or []:
-            for imbi_environment in imbi_environments:
-                if (
-                    environment == imbi_environment.name
-                    or environment == imbi_environment.slug
-                ):
-                    environments.add(imbi_environment)
-        if environments:
-            value['environments'] = environments
-        return models.ImbiProject.model_validate(value)
-
-    async def _opensearch_projects(
-        self, query: dict[str, typing.Any]
-    ) -> list[models.ImbiProject]:
-        try:
-            data = await self._opensearch_request(
-                '/opensearch/projects', query
-            )
-        except (httpx.RequestError, httpx.HTTPStatusError) as err:
-            LOGGER.error(
-                'Error searching Imbi projects: Request error %s', err
-            )
-            return []
-        if not data or 'hits' not in data or 'hits' not in data['hits']:
-            return []
-        projects = []
-        for project in data['hits']['hits']:
-            projects.append(await self._add_imbi_url(project))
-        return projects
-
-    def _search_project_id(self, value: int) -> dict[str, typing.Any]:
-        """Return a query payload for searching by project ID."""
-        payload = self._opensearch_payload()
-        payload['query'] = {
-            'bool': {'filter': [{'term': {'_id': f'{value}'}}]}
-        }
-        return payload
-
-    def _search_project_type_slug(self, value: str) -> dict[str, typing.Any]:
-        """Return a query payload for searching by project_type_slug."""
-        payload = self._opensearch_payload()
-        payload['query'] = {
-            'bool': {
-                'must': [
-                    {'match': {'archived': False}},
-                    {'term': {'project_type_slug.keyword': value}},
-                ]
-            }
-        }
-        return payload
-
-    def _search_projects(self, value: str) -> dict[str, typing.Any]:
-        payload = self._opensearch_payload()
-        slug_value = value.lower().replace(' ', '-')
-        payload['query'] = {
-            'bool': {
-                'must': [{'match': {'archived': False}}],
-                'should': [
-                    {
-                        'term': {
-                            'name': {'value': value, 'case_insensitive': True}
-                        }
-                    },
-                    {'fuzzy': {'name': {'value': value}}},
-                    {'match_phrase': {'name': {'query': value}}},
-                    {
-                        'term': {
-                            'slug': {
-                                'value': slug_value,
-                                'case_insensitive': True,
-                            }
-                        }
-                    },
-                ],
-                'minimum_should_match': 1,
-            }
-        }
-        return payload
-
-    @staticmethod
-    def _opensearch_payload() -> dict[str, typing.Any]:
-        return copy.deepcopy(
-            {
-                '_source': {
-                    'exclude': ['archived', 'component_versions', 'components']
-                },
-                'query': {'bool': {'must': {'term': {'archived': False}}}},
-            }
-        )
-
-    async def _opensearch_request(
-        self, url: str, query: dict[str, typing.Any]
-    ) -> dict[str, typing.Any]:
-        LOGGER.debug('Query: %r', query)
-        response = await self.post(url, json=query)
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as err:
-            LOGGER.error('Error searching Imbi projects: %s', err)
-            LOGGER.debug('Response: %r', response.content)
-            raise err
-        try:
-            return response.json() if response.content else {}
-        except ValueError as err:
-            LOGGER.error('Error deserializing the response: %s', err)
-            raise err
+        return models.ImbiProject.model_validate(response.json())

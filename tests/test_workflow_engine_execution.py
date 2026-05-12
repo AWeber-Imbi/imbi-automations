@@ -15,7 +15,7 @@ from unittest import mock
 import msgpack
 
 from imbi_automations import models, workflow_engine
-from tests import base
+from tests import base, factories
 
 
 def create_mock_github_repository(
@@ -68,7 +68,9 @@ class WorkflowEngineSetupTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
         self.workflow = models.Workflow(
@@ -77,23 +79,19 @@ class WorkflowEngineSetupTestCase(base.AsyncTestCase):
                 name='test-workflow', actions=[]
             ),
         )
-        self.project = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        self.project = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=None,
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
     async def test_init_validates_claude_requirement_for_claude_actions(
@@ -117,7 +115,9 @@ class WorkflowEngineSetupTestCase(base.AsyncTestCase):
             claude=models.ClaudeAgentConfiguration(enabled=False),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -143,7 +143,9 @@ class WorkflowEngineSetupTestCase(base.AsyncTestCase):
             claude=models.ClaudeAgentConfiguration(enabled=False),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -210,7 +212,7 @@ class WorkflowEngineSetupTestCase(base.AsyncTestCase):
             resume_state = models.ResumeState(
                 workflow_slug='test-workflow',
                 workflow_path=self.workflow.path,
-                project_id=123,
+                project_id='proj_123',
                 project_slug='test-project',
                 failed_action_index=1,
                 failed_action_name='action-1',
@@ -262,7 +264,7 @@ class WorkflowEngineSetupTestCase(base.AsyncTestCase):
             resume_state = models.ResumeState(
                 workflow_slug='test-workflow',
                 workflow_path=self.workflow.path,
-                project_id=123,
+                project_id='proj_123',
                 project_slug='test-project',
                 failed_action_index=1,
                 failed_action_name='action-1',
@@ -303,7 +305,9 @@ class WorkflowEnginePrimaryStageTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -322,23 +326,19 @@ class WorkflowEnginePrimaryStageTestCase(base.AsyncTestCase):
             ),
         )
 
-        self.project = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        self.project = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=None,
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
     def tearDown(self) -> None:
@@ -538,7 +538,9 @@ class WorkflowEnginePrimaryStageTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
             preserve_on_error=True,
             error_dir=pathlib.Path(self.temp_dir.name) / 'errors',
@@ -670,7 +672,9 @@ class WorkflowEnginePullRequestTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -692,23 +696,19 @@ class WorkflowEnginePullRequestTestCase(base.AsyncTestCase):
             ),
         )
 
-        self.project = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        self.project = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=None,
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
         self.github_repo = create_mock_github_repository()
@@ -1046,27 +1046,25 @@ class WorkflowEngineFollowupStageTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
-        self.project = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        self.project = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=None,
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
         self.pr = models.GitHubPullRequest(
@@ -1337,7 +1335,9 @@ class WorkflowEngineFollowupStageTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
             preserve_on_error=True,
             error_dir=pathlib.Path(self.temp_dir.name) / 'errors',
@@ -1431,7 +1431,9 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -1464,23 +1466,19 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
             ),
         )
 
-        self.project = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        self.project = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=None,
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
     def tearDown(self) -> None:
@@ -1503,7 +1501,7 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
         resume_state = models.ResumeState(
             workflow_slug='test-workflow',
             workflow_path=self.workflow_path,
-            project_id=123,
+            project_id='proj_123',
             project_slug='test-project',
             failed_action_index=1,
             failed_action_name='action-2',
@@ -1559,7 +1557,7 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
         resume_state = models.ResumeState(
             workflow_slug='test-workflow',
             workflow_path=self.workflow_path,
-            project_id=123,
+            project_id='proj_123',
             project_slug='test-project',
             failed_action_index=1,
             failed_action_name='action-2',
@@ -1616,7 +1614,7 @@ class WorkflowEngineResumabilityTestCase(base.AsyncTestCase):
         resume_state = models.ResumeState(
             workflow_slug='test-workflow',
             workflow_path=self.workflow_path,
-            project_id=123,
+            project_id='proj_123',
             project_slug='test-project',
             failed_action_index=0,
             failed_action_name='action-1',
@@ -1702,7 +1700,9 @@ class WorkflowEngineDryRunTestCase(base.AsyncTestCase):
             ),
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
             dry_run=True,
             dry_run_dir=pathlib.Path(self.temp_dir.name) / 'dry-run',
@@ -1724,23 +1724,19 @@ class WorkflowEngineDryRunTestCase(base.AsyncTestCase):
             ),
         )
 
-        self.project = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        self.project = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=None,
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
     def tearDown(self) -> None:

@@ -34,7 +34,7 @@ class Filter(mixins.WorkflowLoggerMixin):
     ) -> models.ImbiProject | None:
         """Filter projects based on workflow configuration
 
-        project_ids: set[int] = pydantic.Field(default_factory=set)
+        project_ids: set[str] = pydantic.Field(default_factory=set)
         project_types: set[str] = pydantic.Field(default_factory=set)
         project_facts: dict[str, bool | int | float | str] = (
             pydantic.Field(default_factory=dict)
@@ -84,8 +84,10 @@ class Filter(mixins.WorkflowLoggerMixin):
             )
             or (
                 workflow_filter.project_types
-                and project.project_type_slug
-                not in workflow_filter.project_types
+                and not any(
+                    pt.slug in workflow_filter.project_types
+                    for pt in project.project_types
+                )
             )
             or (
                 workflow_filter.project
@@ -223,18 +225,15 @@ class Filter(mixins.WorkflowLoggerMixin):
     def _filter_project_facts(
         project: models.ImbiProject, workflow_filter: models.WorkflowFilter
     ) -> models.ImbiProject | None:
-        """Filter projects based on project facts."""
-        if not project.facts:
-            return None
+        """Filter projects based on blueprint-defined attributes."""
+        extras = project.model_extra or {}
         for name, value in workflow_filter.project_facts.items():
-            LOGGER.debug('Validating %s is %s', name, value)
-            # OpenSearch facts are lowercased and underscore delimited
-            slug = name.lower().replace(' ', '_')
-            if project.facts.get(slug) != value:
+            current = extras.get(name, getattr(project, name, None))
+            if current != value:
                 LOGGER.debug(
-                    'Project fact %s value of "%s" is not "%s"',
+                    'Project attribute %s value of "%s" is not "%s"',
                     name,
-                    project.facts.get(slug),
+                    current,
                     value,
                 )
                 return None

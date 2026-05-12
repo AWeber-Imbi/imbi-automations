@@ -7,6 +7,7 @@ import unittest
 import uuid
 
 from imbi_automations import models, utils
+from tests import factories
 
 
 class UtilsTestCase(unittest.TestCase):
@@ -26,23 +27,19 @@ class UtilsTestCase(unittest.TestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers=None,
                 links=None,
                 name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.temp_path,
         )
@@ -665,49 +662,39 @@ packages = ["my.package"]
         # hash(a) == hash(b).
         #
         # Create two projects with same data but different dict key order
-        project1 = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        project1 = factories.make_project(
+            id='proj_123',
             description='Test project',
-            environments=None,
-            facts={'language': 'Python', 'framework': 'FastAPI'},
+            attributes={'language': 'Python', 'framework': 'FastAPI'},
             identifiers={'github': 'org/repo', 'jira': 'PROJ'},
-            links={'docs': 'https://example.com', 'wiki': 'https://wiki.com'},
-            name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
-            slug='test-project',
-            urls={
+            links={
+                'docs': 'https://example.com',
+                'wiki': 'https://wiki.com',
                 'prod': 'https://prod.com',
                 'staging': 'https://staging.com',
             },
-            imbi_url='https://imbi.example.com/projects/123',
+            name='test-project',
+            team_slug='test-namespace',
+            project_type_slugs=['api'],
+            slug='test-project',
         )
 
         # Same data, but dict keys in different order
-        project2 = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        project2 = factories.make_project(
+            id='proj_123',
             description='Test project',
-            environments=None,
-            facts={'framework': 'FastAPI', 'language': 'Python'},
+            attributes={'framework': 'FastAPI', 'language': 'Python'},
             identifiers={'jira': 'PROJ', 'github': 'org/repo'},
-            links={'wiki': 'https://wiki.com', 'docs': 'https://example.com'},
-            name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
-            slug='test-project',
-            urls={
+            links={
+                'wiki': 'https://wiki.com',
+                'docs': 'https://example.com',
                 'staging': 'https://staging.com',
                 'prod': 'https://prod.com',
             },
-            imbi_url='https://imbi.example.com/projects/123',
+            name='test-project',
+            team_slug='test-namespace',
+            project_type_slugs=['api'],
+            slug='test-project',
         )
 
         # Verify equality works correctly (should be True)

@@ -44,10 +44,28 @@ host = "github.com"
 
 # Imbi Project Management Configuration
 [imbi]
-api_key = "your-imbi-api-key"
-hostname = "imbi.example.com"
+organization = "your-org-slug"
+base_url = "https://imbi.example.com"
+api_key = "ik_your_imbi_api_key"          # convenience for [imbi.auth] = api_key
+
+# Alternative explicit auth — pick one of these instead of [imbi].api_key:
+# [imbi.auth]
+# type = "api_key"
+# value = "ik_..."
+
+# [imbi.auth]
+# type = "client_credentials"
+# client_id = "cc_..."
+# client_secret = "..."
+
+# [imbi.auth]
+# type = "password"
+# email = "user@example.com"
+# password = "..."
+
+# Slug defaults for identifiers/links, override to match your blueprints.
 github_identifier = "github"
-github_link = "GitHub Repository"
+github_link = "github-repository"
 ```
 
 ## Global Settings
@@ -498,63 +516,105 @@ This will automatically use `api.github.enterprise.com` for API requests.
 
 ## Imbi Configuration
 
-Configuration for Imbi project management system integration.
+Configuration for the Imbi API. Every request is scoped to a single
+organization slug; the client prepends `/api/organizations/{slug}` to
+all paths.
+
+### [imbi].organization
+
+Imbi organization slug to operate against.
+
+**Type:** `string`
+**Required:** Always
+
+```toml
+[imbi]
+organization = "platform"
+```
+
+### [imbi].base_url
+
+Public root URL of the Imbi server. The `/api` prefix is added by
+the client; do **not** include it here.
+
+**Type:** `AnyHttpUrl`
+**Required:** Always
+
+```toml
+[imbi]
+base_url = "https://imbi.example.com"
+```
 
 ### [imbi].api_key
 
-Imbi API authentication key.
+Convenience shortcut for `[imbi.auth] type = "api_key"`. When set,
+authentication uses the supplied API key as a bearer token directly
+(no token exchange).
 
-**Type:** `string` (secret)  
-**Required:** Always (core functionality)  
-
-```toml
-[imbi]
-api_key = "your-imbi-api-key-uuid"
-```
-
-### [imbi].hostname
-
-Imbi instance hostname.
-
-**Type:** `string`  
-**Required:** Always  
+**Type:** `string` (secret)
+**Env var:** `IMBI_API_KEY`
 
 ```toml
 [imbi]
-hostname = "imbi.example.com"
+api_key = "ik_..."
 ```
+
+### [imbi.auth]
+
+Explicit auth block. One of three discriminated variants; takes
+precedence over `[imbi].api_key` when both are set.
+
+```toml
+[imbi.auth]
+type = "api_key"
+value = "ik_..."
+
+# OR
+
+[imbi.auth]
+type = "client_credentials"
+client_id = "cc_..."
+client_secret = "..."
+
+# OR (dev only)
+
+[imbi.auth]
+type = "password"
+email = "user@example.com"
+password = "..."
+```
+
+JWTs from `client_credentials` and `password` auth are cached in
+memory; the client transparently refreshes via
+`POST /api/auth/token/refresh` on a 401 response and retries the
+original request once before failing.
 
 ### [imbi].*_identifier
 
-Project identifier field names in Imbi for external systems.
+Project identifier slugs in Imbi for external systems.
 
-**Type:** `string`  
-**Defaults:**  
+**Type:** `string`
+**Defaults:**
 
-- `github_identifier = "github`
-- `pagerduty_identifier = "pagerduty`
-- `sonarqube_identifier = "sonarqube`
-- `sentry_identifier = "sentry`
-
-These specify which Imbi project identifier fields contain external system references:
-
-```toml
-[imbi]
-github_identifier = "github-id"
-```
+- `github_identifier = "github"`
+- `pagerduty_identifier = "pagerduty"`
+- `sonarqube_identifier = "sonarqube"`
+- `sentry_identifier = "sentry"`
 
 ### [imbi].*_link
 
-Link type names in Imbi for external system URLs.
+Link definition slugs (per-org, defined by blueprints) for external
+system URLs.
 
-**Type:** `string`  
-**Defaults:**  
+**Type:** `string`
+**Defaults:**
 
-- `github_link = "GitHub Repository`
-- `grafana_link = "Grafana Dashboard`
-- `pagerduty_link = "PagerDuty`
-- `sentry_link = "Sentry`
-- `sonarqube_link = "SonarQube`
+- `github_link = "github-repository"`
+- `grafana_link = "grafana-dashboard"`
+- `pagerduty_link = "pagerduty"`
+- `sentry_link = "sentry"`
+- `sonarqube_link = "sonarqube"`
+
 
 These specify the link type names used in Imbi to store external URLs:
 

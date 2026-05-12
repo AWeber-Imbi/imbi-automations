@@ -147,9 +147,9 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
     target_group = parser.add_mutually_exclusive_group(required=True)
     target_group.add_argument(
         '--project-id',
-        type=int,
+        type=str,
         metavar='ID',
-        help='Process a single project by Project ID',
+        help='Process a single project by Nano-ID',
     )
     target_group.add_argument(
         '--project-type',

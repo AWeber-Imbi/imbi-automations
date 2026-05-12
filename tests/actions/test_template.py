@@ -6,7 +6,7 @@ import unittest
 
 from imbi_automations import models
 from imbi_automations.actions import template
-from tests import base
+from tests import base, factories
 
 
 class TemplateActionsTestCase(base.AsyncTestCase):
@@ -31,34 +31,24 @@ class TemplateActionsTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project description',
                 environments=[
                     models.ImbiEnvironment(
-                        name='Development',
-                        slug='development',
-                        icon_class='fas fa-bug',
+                        name='Development', slug='development'
                     ),
                     models.ImbiEnvironment(
-                        name='Production',
-                        slug='production',
-                        icon_class='fas fa-globe',
+                        name='Production', slug='production'
                     ),
                 ],
-                facts={'Programming Language': 'Python 3.12'},
+                attributes={'programming_language': 'Python 3.12'},
                 identifiers={'github': 'test-org/test-project'},
-                links=None,
                 name='Test Project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_slug='test-namespace',
+                team_name='test-namespace',
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )
@@ -68,7 +58,9 @@ class TemplateActionsTestCase(base.AsyncTestCase):
                 token='test-key'  # noqa: S106
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -106,13 +98,13 @@ class TemplateActionsTestCase(base.AsyncTestCase):
         self.assertIn('slug: test-project', content)
 
     async def test_execute_template_with_facts(self) -> None:
-        """Test template rendering with project facts."""
+        """Test template rendering with blueprint-defined attributes."""
         source_file = self.working_directory / 'workflow' / 'pyproject.toml.j2'
         source_file.write_text(
             '[project]\n'
             'name = "{{ imbi_project.slug }}"\n'
-            'requires-python = ">={{ imbi_project.facts'
-            '["Programming Language"].split()[-1] }}"\n'
+            'requires-python = ">='
+            '{{ imbi_project.programming_language.split()[-1] }}"\n'
         )
 
         action = models.WorkflowTemplateAction(
@@ -167,7 +159,7 @@ class TemplateActionsTestCase(base.AsyncTestCase):
             '{"name": "{{ imbi_project.slug }}"}\n'
         )
         (template_dir / 'subdir' / 'nested.txt.j2').write_text(
-            'Namespace: {{ imbi_project.namespace }}\n'
+            'Team: {{ imbi_project.team.name }}\n'
         )
 
         action = models.WorkflowTemplateAction(
@@ -193,7 +185,7 @@ class TemplateActionsTestCase(base.AsyncTestCase):
 
         nested = output_dir / 'subdir' / 'nested.txt.j2'
         self.assertTrue(nested.exists())
-        self.assertIn('Namespace: test-namespace', nested.read_text())
+        self.assertIn('Team: test-namespace', nested.read_text())
 
     async def test_execute_source_not_exists(self) -> None:
         """Test error when template source doesn't exist."""
@@ -236,7 +228,7 @@ class TemplateActionsTestCase(base.AsyncTestCase):
         """Test template rendering with Jinja2 conditionals."""
         source_file = self.working_directory / 'workflow' / 'conditional.j2'
         source_file.write_text(
-            '{% if imbi_project.project_type == "API" %}'
+            '{% if imbi_project.project_types[0].slug == "api" %}'
             'This is an API project\n'
             '{% else %}'
             'This is not an API project\n'

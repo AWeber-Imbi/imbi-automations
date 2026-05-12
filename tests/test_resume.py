@@ -16,7 +16,7 @@ class ResumeStateTestCase(unittest.TestCase):
         state = models.ResumeState(
             workflow_slug='test-workflow',
             workflow_path=pathlib.Path('/tmp/workflows/test-workflow'),  # noqa: S108
-            project_id=123,
+            project_id='proj_123',
             project_slug='test-project',
             failed_action_index=2,
             failed_action_name='test-action',
@@ -77,7 +77,7 @@ class ResumeStateTestCase(unittest.TestCase):
         state = models.ResumeState(
             workflow_slug='test-workflow',
             workflow_path=pathlib.Path('/tmp/workflows/test-workflow'),  # noqa: S108
-            project_id=123,
+            project_id='proj_123',
             project_slug='test-project',
             failed_action_index=1,
             failed_action_name='failing-action',

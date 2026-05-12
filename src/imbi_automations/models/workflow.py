@@ -82,13 +82,14 @@ class WorkflowFilter(pydantic.BaseModel):
     Supports filtering by project IDs, types, facts, environments, and GitHub
     workflow status to efficiently target subsets of projects.
 
-    Note: project_facts keys are automatically normalized to slug format
-    (lowercase with underscores) to match OpenSearch data format. Fact values
-    can be boolean, integer, float, or string to match Imbi fact data types.
+    Note: ``project_facts`` keys are blueprint-defined attribute names
+    (snake_case property keys on the project entity). Values can be
+    boolean, integer, float, or string. ``project_ids`` and
+    ``exclude_project_ids`` hold Nano-ID strings.
     """
 
-    project_ids: set[int] = set()
-    exclude_project_ids: set[int] = set()
+    project_ids: set[str] = set()
+    exclude_project_ids: set[str] = set()
     project_types: set[str] = set()
     project_facts: dict[str, bool | int | float | str] = {}
     project_environments: set[str] = set()
@@ -542,69 +543,69 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     command: WorkflowImbiActionCommand
     committable: bool = False
 
-    # Fields for set_project_fact, get_project_fact, delete_project_fact
-    fact_name: str | None = None
+    attribute_name: str | None = None
     value: bool | int | float | str | None = None
     skip_validations: bool = False
-
-    # Fields for get_project_fact - variable to store the result
     variable_name: str | None = None
-
-    # Fields for set_environments command
     values: list[str] = []
-
-    # Fields for update_project command
     attributes: dict[str, typing.Any] = {}
-
-    # Fields for batch_update_facts command
     facts: dict[str, bool | int | float | str] = {}
-
-    # Fields for add_project_link command
-    link_type: str | None = None
+    link_definition_slug: str | None = None
     url: str | None = None
-
-    # Fields for add_project_note command
+    title: str | None = None
     content: str | None = None
-
-    # Fields for update_project_type command
-    project_type: str | None = None
+    tags: list[str] = []
+    project_types: list[str] = []
 
     # CommandRulesMixin configuration
     command_field: typing.ClassVar[str] = 'command'
     required_fields: typing.ClassVar[dict[object, set[str]]] = {
-        WorkflowImbiActionCommand.add_project_link: {'link_type', 'url'},
-        WorkflowImbiActionCommand.add_project_note: {'content'},
+        WorkflowImbiActionCommand.add_project_link: {
+            'link_definition_slug',
+            'url',
+        },
+        WorkflowImbiActionCommand.add_project_note: {'title', 'content'},
         WorkflowImbiActionCommand.batch_update_facts: {'facts'},
-        WorkflowImbiActionCommand.delete_project_fact: {'fact_name'},
-        WorkflowImbiActionCommand.get_project_fact: {'fact_name'},
+        WorkflowImbiActionCommand.delete_project_fact: {'attribute_name'},
+        WorkflowImbiActionCommand.get_project_fact: {'attribute_name'},
         WorkflowImbiActionCommand.set_environments: {'values'},
-        WorkflowImbiActionCommand.set_project_fact: {'fact_name', 'value'},
+        WorkflowImbiActionCommand.set_project_fact: {
+            'attribute_name',
+            'value',
+        },
         WorkflowImbiActionCommand.update_project: {'attributes'},
-        WorkflowImbiActionCommand.update_project_type: {'project_type'},
+        WorkflowImbiActionCommand.update_project_type: {'project_types'},
     }
     allowed_fields: typing.ClassVar[dict[object, set[str]]] = {
-        WorkflowImbiActionCommand.add_project_link: {'link_type', 'url'},
-        WorkflowImbiActionCommand.add_project_note: {'content'},
+        WorkflowImbiActionCommand.add_project_link: {
+            'link_definition_slug',
+            'url',
+        },
+        WorkflowImbiActionCommand.add_project_note: {
+            'title',
+            'content',
+            'tags',
+        },
         WorkflowImbiActionCommand.batch_update_facts: {
             'facts',
             'skip_validations',
         },
         WorkflowImbiActionCommand.delete_project_fact: {
-            'fact_name',
+            'attribute_name',
             'skip_validations',
         },
         WorkflowImbiActionCommand.get_project_fact: {
-            'fact_name',
+            'attribute_name',
             'variable_name',
         },
         WorkflowImbiActionCommand.set_environments: {'values'},
         WorkflowImbiActionCommand.set_project_fact: {
-            'fact_name',
+            'attribute_name',
             'value',
             'skip_validations',
         },
         WorkflowImbiActionCommand.update_project: {'attributes'},
-        WorkflowImbiActionCommand.update_project_type: {'project_type'},
+        WorkflowImbiActionCommand.update_project_type: {'project_types'},
     }
 
 

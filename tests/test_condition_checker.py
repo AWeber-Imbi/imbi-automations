@@ -6,7 +6,7 @@ import unittest
 from unittest import mock
 
 from imbi_automations import condition_checker, models
-from tests import base
+from tests import base, factories
 
 
 class ConditionCheckerTestCase(base.AsyncTestCase):
@@ -36,7 +36,9 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
         # Create configuration and checker
         self.config = models.Configuration(
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.test.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
             github=models.GitHubConfiguration(
                 token='test-github-key',  # noqa: S106
@@ -57,23 +59,19 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
 
         self.context = models.WorkflowContext(
             workflow=self.workflow,
-            imbi_project=models.ImbiProject(
-                id=123,
-                dependencies=None,
+            imbi_project=factories.make_project(
+                id='proj_123',
                 description='Test project',
                 environments=None,
-                facts=None,
+                attributes=None,
                 identifiers=None,
                 links=None,
                 name='test-project',
-                namespace='test-namespace',
-                namespace_slug='test-namespace',
-                project_score=None,
-                project_type='API',
-                project_type_slug='api',
+                team_name='test-namespace',
+                team_slug='test-namespace',
+                score=None,
+                project_type_slugs=['api'],
                 slug='test-project',
-                urls=None,
-                imbi_url='https://imbi.example.com/projects/123',
             ),
             working_directory=self.working_directory,
         )
@@ -574,7 +572,9 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
         # Create checker without GitHub config
         config_no_github = models.Configuration(
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.test.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             )
         )
         checker_no_github = condition_checker.ConditionChecker(

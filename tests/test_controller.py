@@ -13,32 +13,26 @@ from unittest import mock
 
 import httpx
 
-from imbi_automations import controller, imc, models
-from tests import base
+from imbi_automations import clients, controller, imc, models
+from tests import base, factories
 
 
-def create_test_project(**kwargs: typing.Any) -> models.ImbiProject:  # noqa: ANN401
+def create_test_project(
+    *,
+    id: int | str = 1,
+    project_type_slug: str | None = None,
+    **kwargs: typing.Any,
+) -> models.ImbiProject:
     """Helper to create a test ImbiProject with default values."""
-    defaults = {
-        'id': 1,
-        'dependencies': None,
-        'description': 'Test project',
-        'environments': None,
-        'facts': None,
-        'identifiers': None,
-        'links': None,
-        'name': 'test-project',
-        'namespace': 'test-namespace',
-        'namespace_slug': 'test-namespace',
-        'project_score': None,
-        'project_type': 'API',
-        'project_type_slug': 'api',
-        'slug': 'test-project',
-        'urls': None,
-        'imbi_url': 'https://imbi.example.com/projects/1',
-    }
-    defaults.update(kwargs)
-    return models.ImbiProject(**defaults)
+    project_id = f'proj_{id}' if isinstance(id, int) else id
+    project_type_slugs = kwargs.pop('project_type_slugs', None) or (
+        (project_type_slug,) if project_type_slug else ('api',)
+    )
+    kwargs.setdefault('team_slug', 'test-namespace')
+    kwargs.setdefault('description', 'Test project')
+    return factories.make_project(
+        id=project_id, project_type_slugs=project_type_slugs, **kwargs
+    )
 
 
 class ControllerInitializationTestCase(base.AsyncTestCase):
@@ -49,8 +43,13 @@ class ControllerInitializationTestCase(base.AsyncTestCase):
         self.config = models.Configuration(
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
         )
         self.workflow = models.Workflow(
             path=pathlib.Path('/tmp/workflows/test'),
@@ -99,7 +98,7 @@ class ControllerInitializationTestCase(base.AsyncTestCase):
             verbose=False,
             resume=None,
             rerun_followup=None,
-            project_id=123,
+            project_id='proj_123',
             project_type=None,
             all_projects=False,
             github_repository=None,
@@ -174,8 +173,13 @@ class ControllerProjectFilteringTestCase(base.AsyncTestCase):
         self.config = models.Configuration(
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
         )
         self.workflow = models.Workflow(
             path=pathlib.Path('/tmp/workflows/test'),
@@ -212,7 +216,7 @@ class ControllerProjectFilteringTestCase(base.AsyncTestCase):
             result = await automation._filter_projects(projects)
 
             self.assertEqual(len(result), 1)
-            self.assertEqual(result[0].id, 1)
+            self.assertEqual(result[0].id, 'proj_1')
             self.assertEqual(mock_filter.call_count, 2)
 
     async def test_filter_projects_with_concurrency(self) -> None:
@@ -282,7 +286,7 @@ class ControllerProjectFilteringTestCase(base.AsyncTestCase):
         result = await automation._filter_projects(projects)
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].id, 1)
+        self.assertEqual(result[0].id, 'proj_1')
 
 
 class ControllerSingleProjectTestCase(base.AsyncTestCase):
@@ -293,8 +297,13 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
         self.config = models.Configuration(
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
         )
         self.workflow = models.Workflow(
             path=pathlib.Path('/tmp/workflows/test'),
@@ -309,7 +318,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             verbose=False,
             max_concurrency=5,
             exit_on_error=False,
-            project_id=123,
+            project_id='proj_123',
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -336,7 +345,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             verbose=False,
             max_concurrency=5,
             exit_on_error=False,
-            project_id=123,
+            project_id='proj_123',
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -368,7 +377,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             verbose=False,
             max_concurrency=5,
             exit_on_error=False,
-            project_id=123,
+            project_id='proj_123',
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -397,8 +406,13 @@ class ControllerProjectTypeTestCase(base.AsyncTestCase):
         self.config = models.Configuration(
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
         )
         self.workflow = models.Workflow(
             path=pathlib.Path('/tmp/workflows/test'),
@@ -418,14 +432,7 @@ class ControllerProjectTypeTestCase(base.AsyncTestCase):
 
         automation = controller.Automation(args, self.config, self.workflow)
         automation.registry.cache_data.project_types = [
-            models.ImbiProjectType(
-                id=1,
-                slug='apis',
-                name='APIs',
-                plural_name='APIs',
-                icon_class='fa-api',
-                environment_urls=False,
-            )
+            models.ImbiProjectType(name='APIs', slug='apis')
         ]
 
         with mock.patch.object(
@@ -457,14 +464,7 @@ class ControllerProjectTypeTestCase(base.AsyncTestCase):
 
         automation = controller.Automation(args, self.config, self.workflow)
         automation.registry.cache_data.project_types = [
-            models.ImbiProjectType(
-                id=1,
-                slug='apis',
-                name='APIs',
-                plural_name='APIs',
-                icon_class='fa-api',
-                environment_urls=False,
-            )
+            models.ImbiProjectType(name='APIs', slug='apis')
         ]
 
         with self.assertRaises(RuntimeError) as ctx:
@@ -481,8 +481,13 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
         self.config = models.Configuration(
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
         )
         self.workflow = models.Workflow(
             path=pathlib.Path('/tmp/workflows/test'),
@@ -619,8 +624,13 @@ class ControllerResumeTestCase(base.AsyncTestCase):
         self.config = models.Configuration(
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
         )
         self.workflow = models.Workflow(
             path=pathlib.Path('/tmp/workflows/test'),
@@ -658,7 +668,7 @@ class ControllerResumeTestCase(base.AsyncTestCase):
             state = models.ResumeState(
                 workflow_slug='test-workflow',
                 workflow_path=pathlib.Path('/nonexistent/workflow'),
-                project_id=123,
+                project_id='proj_123',
                 project_slug='test-project',
                 failed_action_index=0,
                 failed_action_name='test-action',
@@ -710,7 +720,7 @@ class ControllerResumeTestCase(base.AsyncTestCase):
             state = models.ResumeState(
                 workflow_slug='test-workflow',
                 workflow_path=workflow_path,
-                project_id=123,
+                project_id='proj_123',
                 project_slug='test-project',
                 failed_action_index=0,
                 failed_action_name='test-action',
@@ -775,8 +785,13 @@ class ControllerFilterValidationTestCase(base.AsyncTestCase):
         self.config = models.Configuration(
             github=models.GitHubConfiguration(token='test-token'),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
         )
 
     def test_validate_workflow_filter_environments(self) -> None:
@@ -869,14 +884,7 @@ class ControllerFilterValidationTestCase(base.AsyncTestCase):
 
         automation = controller.Automation(args, self.config, workflow)
         automation.registry.cache_data.project_types = [
-            models.ImbiProjectType(
-                id=1,
-                slug='apis',
-                name='APIs',
-                plural_name='APIs',
-                icon_class='fa-api',
-                environment_urls=False,
-            )
+            models.ImbiProjectType(name='APIs', slug='apis')
         ]
 
         automation._validate_workflow_filter_project_types()
@@ -896,14 +904,7 @@ class ControllerFilterValidationTestCase(base.AsyncTestCase):
 
         automation = controller.Automation(args, self.config, workflow)
         automation.registry.cache_data.project_types = [
-            models.ImbiProjectType(
-                id=1,
-                slug='apis',
-                name='APIs',
-                plural_name='APIs',
-                icon_class='fa-api',
-                environment_urls=False,
-            )
+            models.ImbiProjectType(name='APIs', slug='apis')
         ]
 
         with self.assertRaises(RuntimeError) as ctx:
@@ -912,7 +913,23 @@ class ControllerFilterValidationTestCase(base.AsyncTestCase):
         self.assertIn('not a valid project type', str(ctx.exception))
 
     def test_validate_workflow_filter_project_facts(self) -> None:
-        """Test project fact validation."""
+        """Valid snake_case attribute keys pass at parse time."""
+        workflow = models.Workflow(
+            path=pathlib.Path('/tmp/workflows/test'),
+            configuration=models.WorkflowConfiguration(
+                name='test-workflow',
+                actions=[],
+                filter=models.WorkflowFilter(
+                    project_facts={'programming_language': 'Python 3.12'}
+                ),
+            ),
+        )
+        args = argparse.Namespace(verbose=False)
+        automation = controller.Automation(args, self.config, workflow)
+        automation._validate_workflow_filter_project_facts()
+
+    def test_validate_workflow_filter_invalid_project_fact_value(self) -> None:
+        """Invalid (non-identifier) attribute keys are rejected at parse."""
         workflow = models.Workflow(
             path=pathlib.Path('/tmp/workflows/test'),
             configuration=models.WorkflowConfiguration(
@@ -923,65 +940,8 @@ class ControllerFilterValidationTestCase(base.AsyncTestCase):
                 ),
             ),
         )
-
         args = argparse.Namespace(verbose=False)
-
         automation = controller.Automation(args, self.config, workflow)
-        automation.registry.cache_data.project_fact_types = [
-            models.ImbiProjectFactType(
-                id=1,
-                name='Programming Language',
-                fact_type='enum',
-                data_type='string',
-                description='Programming language',
-            )
-        ]
-        automation.registry.cache_data.project_fact_type_enums = [
-            models.ImbiProjectFactTypeEnum(
-                id=1, fact_type_id=1, value='Python 3.12', score=10
-            ),
-            models.ImbiProjectFactTypeEnum(
-                id=2, fact_type_id=1, value='Python 3.11', score=9
-            ),
-        ]
-
-        automation._validate_workflow_filter_project_facts()
-
-    def test_validate_workflow_filter_invalid_project_fact_value(self) -> None:
-        """Test error on invalid project fact value."""
-        workflow = models.Workflow(
-            path=pathlib.Path('/tmp/workflows/test'),
-            configuration=models.WorkflowConfiguration(
-                name='test-workflow',
-                actions=[],
-                filter=models.WorkflowFilter(
-                    project_facts={'Programming Language': 'InvalidValue'}
-                ),
-            ),
-        )
-
-        args = argparse.Namespace(verbose=False)
-
-        automation = controller.Automation(args, self.config, workflow)
-        automation.registry.cache_data.project_fact_types = [
-            models.ImbiProjectFactType(
-                id=1,
-                name='Programming Language',
-                fact_type='enum',
-                data_type='string',
-                description='Programming language',
-            )
-        ]
-        automation.registry.cache_data.project_fact_type_enums = [
-            models.ImbiProjectFactTypeEnum(
-                id=1, fact_type_id=1, value='Python 3.12', score=10
-            ),
-            models.ImbiProjectFactTypeEnum(
-                id=2, fact_type_id=1, value='Python 3.11', score=9
-            ),
-        ]
-
         with self.assertRaises(RuntimeError) as ctx:
             automation._validate_workflow_filter_project_facts()
-
-        self.assertIn('Invalid value for fact type', str(ctx.exception))
+        self.assertIn('Invalid project attribute name', str(ctx.exception))

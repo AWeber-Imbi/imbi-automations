@@ -1,5 +1,7 @@
 """Imbi actions for workflow execution."""
 
+import typing
+
 import httpx
 
 from imbi_automations import clients, mixins, models, prompts
@@ -55,30 +57,45 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             case _:
                 raise RuntimeError(f'Unsupported command: {action.command}')
 
+    # -- Helpers --------------------------------------------------------
+
+    def _client(self) -> clients.Imbi:
+        return clients.Imbi.get_instance(config=self.configuration.imbi)
+
+    def _project_id(self) -> str:
+        return self.context.imbi_project.id
+
+    def _attribute_name(self, action: models.WorkflowImbiAction) -> str:
+        if not action.attribute_name:
+            raise ValueError(
+                f"'attribute_name' is required for command '{action.command}'"
+            )
+        return action.attribute_name
+
+    def _render(self, template: str) -> str:
+        return prompts.render_template_string(
+            template,
+            workflow=self.context.workflow,
+            github_repository=self.context.github_repository,
+            imbi_project=self.context.imbi_project,
+            working_directory=self.context.working_directory,
+            starting_commit=self.context.starting_commit,
+            variables=self.context.variables,
+        )
+
+    # -- Commands -------------------------------------------------------
+
     async def _set_environments(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Set environments via Imbi API.
-
-        Args:
-            action: Action with values list of environment slugs or names
-
-        Raises:
-            ValueError: If values is missing or registry is not available
-            httpx.HTTPError: If API request fails
-
-        """
         if not action.values:
             raise ValueError('values is required for set_environments')
-
         if not self.context.registry:
             raise ValueError(
                 'ImbiMetadataCache registry not available in context'
             )
-
-        # Translate environment slugs/names to names
         try:
-            environment_names = self.context.registry.translate_environments(
+            env_slugs = self.context.registry.translate_environments(
                 action.values
             )
         except ValueError as exc:
@@ -90,578 +107,375 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             )
             raise
 
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
         self.logger.debug(
-            '%s [%s/%s] %s setting environments to %s for project %d (%s)',
+            '%s [%s/%s] %s setting environments to %s for project %s (%s)',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            environment_names,
-            self.context.imbi_project.id,
+            env_slugs,
+            self._project_id(),
             self.context.imbi_project.name,
         )
-
         try:
-            await client.update_project_environments(
-                project_id=self.context.imbi_project.id,
-                environments=environment_names,
+            await self._client().set_project_environments(
+                project_id=self._project_id(), env_slugs=env_slugs
             )
         except httpx.HTTPError as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to set environments for project %d: %s',
+                '%s [%s/%s] %s failed to set environments: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                self.context.imbi_project.id,
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s successfully updated environments for '
-                'project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                self.context.imbi_project.id,
-            )
-
-    async def _update_project(self, action: models.WorkflowImbiAction) -> None:
-        """Update project attributes via Imbi API.
-
-        Args:
-            action: Action with attributes dict (supports Jinja2 templates)
-
-        Raises:
-            ValueError: If attributes is missing or empty
-            httpx.HTTPError: If API request fails
-
-        """
-        if not action.attributes:
-            raise ValueError('attributes is required for update_project')
-
-        # Render Jinja2 templates in attribute values
-        rendered_attributes = {}
-        for attr_name, attr_value in action.attributes.items():
-            # Only render string values (templates)
-            if isinstance(attr_value, str):
-                rendered_value = prompts.render_template_string(
-                    attr_value,
-                    workflow=self.context.workflow,
-                    github_repository=self.context.github_repository,
-                    imbi_project=self.context.imbi_project,
-                    working_directory=self.context.working_directory,
-                    starting_commit=self.context.starting_commit,
-                    variables=self.context.variables,
-                )
-                rendered_attributes[attr_name] = rendered_value
-            else:
-                # Pass through non-string values unchanged
-                rendered_attributes[attr_name] = attr_value
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
-        # Log which attributes are being updated
-        attr_summary = ', '.join(
-            f'{k}="{v}"' for k, v in rendered_attributes.items()
-        )
-        self.logger.debug(
-            '%s [%s/%s] %s updating project %d (%s) with: %s',
+        self.logger.info(
+            '%s [%s/%s] %s updated environments for project %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            self.context.imbi_project.id,
+            self._project_id(),
+        )
+
+    async def _update_project(self, action: models.WorkflowImbiAction) -> None:
+        if not action.attributes:
+            raise ValueError('attributes is required for update_project')
+
+        rendered: dict[str, typing.Any] = {}
+        for name, value in action.attributes.items():
+            rendered[name] = (
+                self._render(value) if isinstance(value, str) else value
+            )
+
+        attr_summary = ', '.join(f'{k}="{v}"' for k, v in rendered.items())
+        self.logger.debug(
+            '%s [%s/%s] %s updating project %s (%s) with: %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            self._project_id(),
             self.context.imbi_project.name,
             attr_summary,
         )
-
         try:
-            await client.update_project_attributes(
-                project_id=self.context.imbi_project.id,
-                attributes=rendered_attributes,
+            await self._client().set_project_attributes(
+                project_id=self._project_id(), attributes=rendered
             )
         except (httpx.HTTPError, ValueError) as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to update project %d: %s',
+                '%s [%s/%s] %s failed to update project %s: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                self.context.imbi_project.id,
+                self._project_id(),
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s successfully updated project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                self.context.imbi_project.id,
-            )
+        self.logger.info(
+            '%s [%s/%s] %s updated project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            self._project_id(),
+        )
 
     async def _set_project_fact(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Set a project fact via Imbi API.
-
-        Args:
-            action: Action with fact_name and value
-
-        Raises:
-            ValueError: If fact_name or value is missing
-            httpx.HTTPError: If API request fails
-
-        """
-        if not action.fact_name or action.value is None:
-            raise ValueError(
-                'fact_name and value are required for set_project_fact'
-            )
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
+        name = self._attribute_name(action)
+        if action.value is None:
+            raise ValueError('value is required for set_project_fact')
         self.logger.debug(
-            '%s [%s/%s] %s setting fact "%s" to "%s" for project %d (%s)',
+            '%s [%s/%s] %s setting attribute "%s" = "%s" on project %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            action.fact_name,
+            name,
             action.value,
-            self.context.imbi_project.id,
-            self.context.imbi_project.name,
+            self._project_id(),
         )
-
         try:
-            await client.update_project_fact(
-                project_id=self.context.imbi_project.id,
-                fact_name=action.fact_name,
-                value=action.value,
-                skip_validations=action.skip_validations,
+            await self._client().set_project_attribute(
+                project_id=self._project_id(), name=name, value=action.value
             )
-        except (httpx.HTTPError, ValueError, RuntimeError) as exc:
+        except (httpx.HTTPError, ValueError) as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to set fact "%s" for project %d: %s',
+                '%s [%s/%s] %s failed to set attribute "%s": %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                action.fact_name,
-                self.context.imbi_project.id,
+                name,
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s successfully updated fact "%s" for project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                action.fact_name,
-                self.context.imbi_project.id,
-            )
+        self.logger.info(
+            '%s [%s/%s] %s updated attribute "%s" on project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            name,
+            self._project_id(),
+        )
 
     async def _get_project_fact(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Get a project fact value and optionally store it in a variable.
-
-        Args:
-            action: Action with fact_name and optional variable_name
-
-        Raises:
-            ValueError: If fact_name is missing
-            httpx.HTTPError: If API request fails
-
-        """
-        if not action.fact_name:
-            raise ValueError('fact_name is required for get_project_fact')
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
+        name = self._attribute_name(action)
         self.logger.debug(
-            '%s [%s/%s] %s getting fact "%s" for project %d (%s)',
+            '%s [%s/%s] %s reading attribute "%s" on project %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            action.fact_name,
-            self.context.imbi_project.id,
-            self.context.imbi_project.name,
+            name,
+            self._project_id(),
         )
-
         try:
-            value = await client.get_project_fact_value(
-                project_id=self.context.imbi_project.id,
-                fact_name=action.fact_name,
+            value = await self._client().get_project_attribute(
+                project_id=self._project_id(), name=name
             )
         except httpx.HTTPError as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to get fact "%s" for project %d: %s',
+                '%s [%s/%s] %s failed to read attribute "%s": %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                action.fact_name,
-                self.context.imbi_project.id,
+                name,
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s got fact "%s" = "%s" for project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                action.fact_name,
-                value,
-                self.context.imbi_project.id,
-            )
-
-            # Store in workflow variables if variable_name specified
-            if action.variable_name:
-                self.context.variables[action.variable_name] = value
-                self.logger.debug(
-                    '%s stored fact value in variable "%s"',
-                    self.context.imbi_project.slug,
-                    action.variable_name,
-                )
+        self.logger.info(
+            '%s [%s/%s] %s attribute "%s" = "%s" on project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            name,
+            value,
+            self._project_id(),
+        )
+        if action.variable_name:
+            self.context.variables[action.variable_name] = value
 
     async def _delete_project_fact(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Delete a project fact via Imbi API.
-
-        Args:
-            action: Action with fact_name
-
-        Raises:
-            ValueError: If fact_name is missing
-            httpx.HTTPError: If API request fails
-
-        """
-        if not action.fact_name:
-            raise ValueError('fact_name is required for delete_project_fact')
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
+        name = self._attribute_name(action)
         self.logger.debug(
-            '%s [%s/%s] %s deleting fact "%s" for project %d (%s)',
+            '%s [%s/%s] %s removing attribute "%s" on project %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            action.fact_name,
-            self.context.imbi_project.id,
-            self.context.imbi_project.name,
+            name,
+            self._project_id(),
         )
-
         try:
-            deleted = await client.delete_project_fact(
-                project_id=self.context.imbi_project.id,
-                fact_name=action.fact_name,
+            deleted = await self._client().delete_project_attribute(
+                project_id=self._project_id(), name=name
             )
         except (httpx.HTTPError, ValueError) as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to delete fact "%s" for project %d: %s',
+                '%s [%s/%s] %s failed to remove attribute "%s": %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                action.fact_name,
-                self.context.imbi_project.id,
+                name,
                 exc,
             )
             raise
-        else:
-            if deleted:
-                self.logger.info(
-                    '%s [%s/%s] %s deleted fact "%s" for project %d',
-                    self.context.imbi_project.slug,
-                    self.context.current_action_index,
-                    self.context.total_actions,
-                    action.name,
-                    action.fact_name,
-                    self.context.imbi_project.id,
-                )
-            else:
-                self.logger.info(
-                    '%s [%s/%s] %s fact "%s" not set for project %d, '
-                    'nothing to delete',
-                    self.context.imbi_project.slug,
-                    self.context.current_action_index,
-                    self.context.total_actions,
-                    action.name,
-                    action.fact_name,
-                    self.context.imbi_project.id,
-                )
+        action_msg = 'removed' if deleted else 'already absent'
+        self.logger.info(
+            '%s [%s/%s] %s attribute "%s" %s on project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            name,
+            action_msg,
+            self._project_id(),
+        )
 
     async def _add_project_link(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Add a link to a project via Imbi API.
-
-        Args:
-            action: Action with link_type and url
-
-        Raises:
-            ValueError: If link_type or url is missing
-            httpx.HTTPError: If API request fails
-
-        """
-        if not action.link_type or not action.url:
+        slug = action.link_definition_slug
+        if not slug or not action.url:
             raise ValueError(
-                'link_type and url are required for add_project_link'
+                "'link_definition_slug' and 'url' are required for "
+                'add_project_link'
             )
-
-        # Render URL template if it contains Jinja2 syntax
-        rendered_url = prompts.render_template_string(
-            action.url,
-            workflow=self.context.workflow,
-            github_repository=self.context.github_repository,
-            imbi_project=self.context.imbi_project,
-            working_directory=self.context.working_directory,
-            starting_commit=self.context.starting_commit,
-            variables=self.context.variables,
-        )
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
+        rendered = self._render(action.url)
         self.logger.debug(
-            '%s [%s/%s] %s adding %s link "%s" for project %d (%s)',
+            '%s [%s/%s] %s adding link "%s"="%s" on project %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            action.link_type,
-            rendered_url,
-            self.context.imbi_project.id,
-            self.context.imbi_project.name,
+            slug,
+            rendered,
+            self._project_id(),
         )
-
         try:
-            await client.add_project_link(
-                project_id=self.context.imbi_project.id,
-                link_type=action.link_type,
-                url=rendered_url,
+            await self._client().add_project_link(
+                project_id=self._project_id(),
+                link_definition_slug=slug,
+                url=rendered,
             )
         except (httpx.HTTPError, ValueError) as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to add link for project %d: %s',
+                '%s [%s/%s] %s failed to add link "%s": %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                self.context.imbi_project.id,
+                slug,
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s added %s link for project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                action.link_type,
-                self.context.imbi_project.id,
-            )
+        self.logger.info(
+            '%s [%s/%s] %s added link "%s" on project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            slug,
+            self._project_id(),
+        )
 
     async def _add_project_note(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Add a note to a project via Imbi API.
-
-        Args:
-            action: Action with content (supports Jinja2 templates)
-
-        Raises:
-            ValueError: If content is missing
-            httpx.HTTPError: If API request fails
-
-        """
-        if not action.content:
-            raise ValueError('content is required for add_project_note')
-
-        rendered_content = prompts.render_template_string(
-            action.content,
-            workflow=self.context.workflow,
-            github_repository=self.context.github_repository,
-            imbi_project=self.context.imbi_project,
-            working_directory=self.context.working_directory,
-            starting_commit=self.context.starting_commit,
-            variables=self.context.variables,
-        )
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
+        if not action.title or not action.content:
+            raise ValueError(
+                "'title' and 'content' are required for add_project_note"
+            )
+        title = self._render(action.title)
+        body = self._render(action.content)
         self.logger.debug(
-            '%s [%s/%s] %s adding note (%d chars) for project %d (%s)',
+            '%s [%s/%s] %s creating document "%s" (%d chars) on project %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            len(rendered_content),
-            self.context.imbi_project.id,
-            self.context.imbi_project.name,
+            title,
+            len(body),
+            self._project_id(),
         )
-
         try:
-            await client.add_project_note(
-                project_id=self.context.imbi_project.id,
-                content=rendered_content,
+            document = await self._client().add_project_document(
+                project_id=self._project_id(),
+                title=title,
+                content=body,
+                tags=action.tags,
             )
         except httpx.HTTPError as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to add note for project %d: %s',
+                '%s [%s/%s] %s failed to create document: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                self.context.imbi_project.id,
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s added note for project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                self.context.imbi_project.id,
-            )
+        self.logger.info(
+            '%s [%s/%s] %s created document %s on project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            document.id,
+            self._project_id(),
+        )
 
     async def _update_project_type(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Update the project type via Imbi API.
-
-        Args:
-            action: Action with project_type (slug)
-
-        Raises:
-            ValueError: If project_type is missing
-            httpx.HTTPError: If API request fails
-
-        """
-        if not action.project_type:
+        slugs = action.project_types
+        if not slugs:
             raise ValueError(
-                'project_type is required for update_project_type'
+                "'project_types' is required for update_project_type"
             )
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
         self.logger.debug(
-            '%s [%s/%s] %s updating project type to "%s" for project %d (%s)',
+            '%s [%s/%s] %s setting project types to %s on project %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            action.project_type,
-            self.context.imbi_project.id,
-            self.context.imbi_project.name,
+            slugs,
+            self._project_id(),
         )
-
         try:
-            await client.update_project_type(
-                project_id=self.context.imbi_project.id,
-                project_type_slug=action.project_type,
+            await self._client().set_project_types(
+                project_id=self._project_id(), slugs=slugs
             )
         except (httpx.HTTPError, ValueError) as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to update project type for '
-                'project %d: %s',
+                '%s [%s/%s] %s failed to set project types: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                self.context.imbi_project.id,
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s updated project type to "%s" for project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                action.project_type,
-                self.context.imbi_project.id,
-            )
+        self.logger.info(
+            '%s [%s/%s] %s set project types to %s on project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            slugs,
+            self._project_id(),
+        )
 
     async def _batch_update_facts(
         self, action: models.WorkflowImbiAction
     ) -> None:
-        """Update multiple project facts in a single operation.
-
-        Args:
-            action: Action with facts dict (fact_name -> value)
-
-        Raises:
-            ValueError: If facts is empty
-            httpx.HTTPError: If API request fails
-
-        """
         if not action.facts:
             raise ValueError('facts is required for batch_update_facts')
-
-        client = clients.Imbi.get_instance(config=self.configuration.imbi)
-
-        # Convert fact names to fact_type_ids
-        facts_to_update: list[tuple[int, bool | int | float | str]] = []
-        for fact_name, value in action.facts.items():
-            fact_type_id = await client.get_project_fact_type_id_by_name(
-                fact_name
-            )
-            if not fact_type_id:
-                raise ValueError(f'Fact type not found: {fact_name}')
-            facts_to_update.append((fact_type_id, value))
-
         fact_summary = ', '.join(f'{k}="{v}"' for k, v in action.facts.items())
         self.logger.debug(
-            '%s [%s/%s] %s batch updating facts for project %d (%s): %s',
+            '%s [%s/%s] %s batch updating attributes on project %s: %s',
             self.context.imbi_project.slug,
             self.context.current_action_index,
             self.context.total_actions,
             action.name,
-            self.context.imbi_project.id,
-            self.context.imbi_project.name,
+            self._project_id(),
             fact_summary,
         )
-
         try:
-            await client.update_project_facts(
-                project_id=self.context.imbi_project.id, facts=facts_to_update
+            await self._client().set_project_attributes(
+                project_id=self._project_id(), attributes=dict(action.facts)
             )
-        except httpx.HTTPError as exc:
+        except (httpx.HTTPError, ValueError) as exc:
             self.logger.error(
-                '%s [%s/%s] %s failed to batch update facts for '
-                'project %d: %s',
+                '%s [%s/%s] %s failed to batch update attributes: %s',
                 self.context.imbi_project.slug,
                 self.context.current_action_index,
                 self.context.total_actions,
                 action.name,
-                self.context.imbi_project.id,
                 exc,
             )
             raise
-        else:
-            self.logger.info(
-                '%s [%s/%s] %s batch updated %d facts for project %d',
-                self.context.imbi_project.slug,
-                self.context.current_action_index,
-                self.context.total_actions,
-                action.name,
-                len(action.facts),
-                self.context.imbi_project.id,
-            )
+        self.logger.info(
+            '%s [%s/%s] %s batch updated %d attribute(s) on project %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            len(action.facts),
+            self._project_id(),
+        )

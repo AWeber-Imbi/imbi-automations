@@ -13,31 +13,15 @@ import httpx
 
 from imbi_automations import errors, models
 from imbi_automations.clients import github
-from tests import base
+from tests import base, factories
 
 
 def create_test_project(**kwargs: typing.Any) -> models.ImbiProject:  # noqa: ANN401
     """Helper to create test ImbiProject with defaults."""
-    defaults = {
-        'id': 1,
-        'dependencies': None,
-        'description': 'Test project',
-        'environments': None,
-        'facts': None,
-        'identifiers': None,
-        'links': None,
-        'name': 'test-project',
-        'namespace': 'test-namespace',
-        'namespace_slug': 'test-namespace',
-        'project_score': None,
-        'project_type': 'API',
-        'project_type_slug': 'api',
-        'slug': 'test-project',
-        'urls': None,
-        'imbi_url': 'https://imbi.example.com/projects/1',
-    }
-    defaults.update(kwargs)
-    return models.ImbiProject(**defaults)
+    kwargs.setdefault('id', 'proj_1')
+    kwargs.setdefault('team_slug', 'test-namespace')
+    kwargs.setdefault('project_type_slugs', ['api'])
+    return factories.make_project(**kwargs)
 
 
 def create_test_repository(**kwargs: typing.Any) -> models.GitHubRepository:  # noqa: ANN401
@@ -182,10 +166,11 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
                 token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key',
-                hostname='imbi.example.com',
+                organization='test-org',
+                base_url='https://imbi.example.com',
+                api_key='ik_test',
                 github_identifier='github',
-                github_link='GitHub',
+                github_link='github-repository',
             ),
         )
         self.client = github.GitHub(
@@ -258,7 +243,9 @@ class GitHubEnvironmentsTestCase(base.AsyncTestCase):
                 token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
         self.client = github.GitHub(
@@ -323,7 +310,9 @@ class GitHubPullRequestTestCase(base.AsyncTestCase):
                 token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
         self.client = github.GitHub(
@@ -479,7 +468,9 @@ class GitHubFileOperationsTestCase(base.AsyncTestCase):
                 token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
         self.client = github.GitHub(
@@ -590,7 +581,9 @@ class GitHubWorkflowTestCase(base.AsyncTestCase):
                 token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
         self.client = github.GitHub(
@@ -633,7 +626,9 @@ class GitHubRepositoryUpdateTestCase(base.AsyncTestCase):
                 token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
         self.client = github.GitHub(
@@ -668,7 +663,9 @@ class GitHubJobLogsTestCase(base.AsyncTestCase):
                 token='test-token', host='github.com'
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
         self.client = github.GitHub(

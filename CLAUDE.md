@@ -4,7 +4,9 @@ Guidance for AI agents working with this codebase. Maintain this file when makin
 
 ## Project Overview
 
-CLI framework for executing workflows across repositories with Imbi project management and GitHub integration. Provides AI-powered transformations via Claude Code SDK, automated PR creation, and project fact management.
+CLI framework for executing workflows across repositories with Imbi project management and GitHub integration. Provides AI-powered transformations via Claude Code SDK, automated PR creation, and blueprint-defined project attribute management.
+
+Targets the org-scoped Imbi API (`/api/organizations/{org_slug}/...`) with JWT auth and JSON-Patch project mutations. Workflow TOMLs use `attribute_name`, `link_definition_slug`, `project_types` (list), and Nano-ID strings for project IDs.
 
 ## Quick Reference
 
@@ -356,8 +358,9 @@ State saved in `.state` file (MessagePack format) with:
 
 ### Imbi Metadata Cache (`imc.py`)
 - 15-minute TTL, stored in `~/.cache/imbi-automations/metadata.json`
-- Caches: environments, project types, fact types with enums/ranges
-- Validates workflow filters at parse time
+- Caches per-org: environments, project types, link definitions
+- Cache file carries a `schema_version`; mismatches are discarded
+- Blueprint-defined project attribute schemas are NOT cached here — they vary per project and are resolved against `GET /projects/{id}/schema` at runtime
 
 ### GitHub Actions (`actions/github.py`)
 - `sync_environments`: Syncs Imbi environments to GitHub

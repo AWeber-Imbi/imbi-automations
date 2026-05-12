@@ -1,163 +1,168 @@
-"""Imbi project management system API models.
+"""Imbi API models.
 
-Defines Pydantic models for Imbi API responses including projects, project
-types, environments, links, facts, and other project metadata used for
-workflow targeting and context enrichment.
+Pydantic models for the org-scoped Imbi API: projects, teams,
+environments, project types, link definitions, documents, and the
+blueprint-merged project schema. ``ImbiProject`` uses
+``extra='allow'`` so blueprint-defined attributes round-trip through
+parse → patch → serialize without being mentioned by name here.
 """
 
+import datetime
 import typing
+
+import pydantic
 
 from . import base
 
 
+class ImbiOrganization(base.BaseModel):
+    """Reference to the owning organization."""
+
+    id: str | None = None
+    name: str
+    slug: str
+
+
+class ImbiTeam(base.BaseModel):
+    """A team within an organization."""
+
+    id: str | None = None
+    name: str
+    slug: str
+    description: str | None = None
+    icon: pydantic.HttpUrl | str | None = None
+    organization: ImbiOrganization | None = None
+
+
 class ImbiEnvironment(base.BaseModel):
-    """Imbi environment with metadata.
+    """Imbi environment.
 
-    The slug field is auto-generated from the name if not provided,
-    converting to lowercase and replacing spaces with hyphens.
+    Blueprint-defined edge properties (e.g. ``url``) flow through
+    via ``extra='allow'`` when an environment appears on a project's
+    ``DEPLOYED_IN`` edge.
     """
 
+    model_config = pydantic.ConfigDict(extra='allow')
+
+    id: str | None = None
     name: str
     slug: str
-    icon_class: str
     description: str | None = None
-
-
-class ImbiProjectLink(base.BaseModel):
-    """External link associated with an Imbi project.
-
-    Represents links to external systems like GitHub, PagerDuty, etc.
-    """
-
-    id: int | None = None
-    project_id: int
-    link_type_id: int
-    created_by: str
-    last_modified_by: str | None = None
-    url: str
-
-
-class ImbiProject(base.BaseModel):
-    """Imbi project with metadata and external system integrations.
-
-    Complete project definition including dependencies, facts, identifiers
-    for external systems, and links to related services.
-
-    The environments field contains ImbiEnvironment objects with both
-    name and slug properties.
-    """
-
-    id: int
-    dependencies: list[int] | None
-    description: str | None
-    environments: list[ImbiEnvironment] | None
-    facts: dict[str, typing.Any] | None
-    identifiers: dict[str, typing.Any] | None
-    links: dict[str, str] | None
-    name: str
-    namespace: str
-    namespace_slug: str
-    project_score: str | None
-    project_type: str
-    project_type_slug: str
-    slug: str
-    urls: dict[str, str] | None
-    imbi_url: str
-
-
-class ImbiProjectFact(base.BaseModel):
-    """Individual fact value for a project.
-
-    Represents a single fact value recorded for a project with scoring,
-    weighting, and audit information.
-    """
-
-    fact_type_id: int
-    fact_name: str | None = None
-    recorded_at: str | None = None
-    recorded_by: str | None = None
-    value: bool | int | float | str | None = None
-    score: int | None = None
-    weight: int | None = None
-
-
-class ImbiProjectFactType(base.BaseModel):
-    """Definition of a project fact type with validation rules.
-
-    Defines metadata schema for project facts including data type
-    (boolean, integer, number, string), fact type (enum, free-form,
-    range), and UI options.
-    """
-
-    id: int
-    created_by: str | None = None
-    last_modified_by: str | None = None
-    name: str
-    description: str | None = None
-    project_type_ids: list[int] = []
-    fact_type: typing.Literal['enum', 'range', 'free-form']
-    data_type: typing.Literal[
-        'boolean', 'date', 'decimal', 'integer', 'string', 'timestamp'
-    ]
-    ui_options: list[str] = []
-    weight: float = 0.0
-
-
-class ImbiProjectFactTypeEnum(base.BaseModel):
-    """Enumerated value option for enum-type project facts.
-
-    Defines a single allowed value for enum fact types with optional icon
-    and scoring information.
-    """
-
-    id: int
-    fact_type_id: int
-    created_by: str | None = None
-    last_modified_by: str | None = None
-    value: str
-    icon_class: str | None = None
-    score: int
-
-
-class ImbiProjectFactTypeRange(base.BaseModel):
-    """Range min/max values for range-type project facts."""
-
-    id: int
-    fact_type_id: int
-    created_by: str | None = None
-    last_modified_by: str | None = None
-    max_value: int | float
-    min_value: int | float
-    score: int
+    icon: pydantic.HttpUrl | str | None = None
+    sort_order: int = 0
+    label_color: str | None = None
+    organization: ImbiOrganization | None = None
 
 
 class ImbiProjectType(base.BaseModel):
-    """Project type definition in Imbi.
+    """Project type definition."""
 
-    Categorizes projects with metadata for icon display and environment URL
-    support.
-    """
-
-    id: int
-    created_by: str | None = None
-    last_modified_by: str | None = None
+    id: str | None = None
     name: str
-    plural_name: str
-    description: str | None = None
     slug: str
-    icon_class: str
-    environment_urls: bool = False
+    description: str | None = None
+    icon: pydantic.HttpUrl | str | None = None
+    organization: ImbiOrganization | None = None
 
 
-class ImbiLinkType(base.BaseModel):
-    """Link type definition in Imbi.
+class ImbiLinkDefinition(base.BaseModel):
+    """Per-organization link definition.
 
-    Defines types of links that can be associated with projects
-    (e.g., Repository, Documentation, Dashboard).
+    Each definition is keyed by ``slug`` (e.g. ``github-repository``)
+    and may carry an ``url_template`` rendered with project context.
     """
 
-    id: int
-    created_by: str | None = None
-    last_modified_by: str | None = None
+    id: str | None = None
     name: str
-    icon_class: str | None = None
+    slug: str
+    description: str | None = None
+    icon: pydantic.HttpUrl | str | None = None
+    url_template: str | None = None
+    organization: ImbiOrganization | None = None
+
+
+class ImbiRelationshipLink(base.BaseModel):
+    """Hypermedia-style link to a related collection."""
+
+    href: str
+    count: int = 0
+
+
+class ImbiProject(base.BaseModel):
+    """Imbi project.
+
+    Blueprint-defined attributes are accepted as model extras and
+    round-trip cleanly. Read attributes directly off the instance
+    (``project.programming_language``) or via ``model_extra``.
+    """
+
+    model_config = pydantic.ConfigDict(extra='allow')
+
+    id: str
+    name: str
+    slug: str
+    description: str | None = None
+    icon: pydantic.HttpUrl | str | None = None
+    created_at: datetime.datetime | None = None
+    updated_at: datetime.datetime | None = None
+    archived: bool = False
+    archived_at: datetime.datetime | None = None
+    team: ImbiTeam
+    project_types: list[ImbiProjectType] = []
+    environments: list[ImbiEnvironment] = []
+    links: dict[str, pydantic.AnyUrl] = {}
+    identifiers: dict[str, int | str] = {}
+    score: float | None = None
+    relationships: dict[str, ImbiRelationshipLink] | None = None
+
+
+class ImbiDocument(base.BaseModel):
+    """Project-attached document."""
+
+    id: str
+    title: str = ''
+    content: str
+    project_id: str
+    created_by: str
+    created_at: datetime.datetime
+    updated_by: str | None = None
+    updated_at: datetime.datetime | None = None
+    is_pinned: bool = False
+    tags: list[dict[str, str]] = []
+
+
+class ImbiBlueprintSectionProperty(base.BaseModel):
+    """One property from a blueprint's JSON Schema."""
+
+    model_config = pydantic.ConfigDict(extra='allow')
+
+    type: str | None = None
+    format: str | None = None
+    title: str | None = None
+    description: str | None = None
+    enum: list[str] | None = None
+    default: typing.Any = None
+    minimum: float | None = None
+    maximum: float | None = None
+
+
+class ImbiBlueprintSection(base.BaseModel):
+    """One blueprint's contribution to the project schema."""
+
+    name: str
+    slug: str
+    description: str | None = None
+    properties: dict[str, ImbiBlueprintSectionProperty] = {}
+
+
+class ImbiProjectSchema(base.BaseModel):
+    """Merged blueprint schema for a single project."""
+
+    sections: list[ImbiBlueprintSection] = []
+
+    def property_keys(self) -> set[str]:
+        """Return every blueprint-defined property key for the project."""
+        keys: set[str] = set()
+        for section in self.sections:
+            keys.update(section.properties.keys())
+        return keys

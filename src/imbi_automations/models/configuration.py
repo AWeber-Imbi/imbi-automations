@@ -134,28 +134,95 @@ class GitHubConfiguration(pydantic_settings.BaseSettings):
         return f'https://api.{self.host}'
 
 
-class ImbiConfiguration(pydantic_settings.BaseSettings):
-    """Imbi project management system configuration.
+class ImbiApiKeyAuth(pydantic.BaseModel):
+    """API-key authentication for Imbi.
 
-    Defines project identifiers and link types for mapping external systems
-    (GitHub, GitLab, PagerDuty, SonarQube, Sentry, Grafana) to Imbi projects.
+    The key is sent as a Bearer token; the Imbi API detects the
+    ``ik_`` prefix and validates it via the API-key path. No token
+    exchange is required.
+    """
+
+    type: typing.Literal['api_key'] = 'api_key'
+    value: pydantic.SecretStr
+
+
+class ImbiClientCredentialsAuth(pydantic.BaseModel):
+    """OAuth2 client-credentials authentication for Imbi.
+
+    Exchanges ``client_id`` (``cc_...``) + ``client_secret`` for an
+    access/refresh-token pair via ``POST /api/auth/token``.
+    """
+
+    type: typing.Literal['client_credentials'] = 'client_credentials'
+    client_id: pydantic.SecretStr
+    client_secret: pydantic.SecretStr
+
+
+class ImbiPasswordAuth(pydantic.BaseModel):
+    """Username/password authentication for Imbi (dev only).
+
+    Exchanges ``email`` + ``password`` for an access/refresh-token
+    pair via ``POST /api/auth/login``.
+    """
+
+    type: typing.Literal['password'] = 'password'
+    email: str
+    password: pydantic.SecretStr
+
+
+ImbiAuth = typing.Annotated[
+    ImbiApiKeyAuth | ImbiClientCredentialsAuth | ImbiPasswordAuth,
+    pydantic.Field(discriminator='type'),
+]
+
+
+class ImbiConfiguration(pydantic_settings.BaseSettings):
+    """Imbi API configuration.
+
+    Targets the org-scoped Imbi API. Authentication is one of three
+    discriminated variants — API key (default), OAuth2 client
+    credentials, or password login — configured via the nested
+    ``[imbi.auth]`` section. Setting ``api_key`` directly (or
+    ``IMBI_API_KEY`` in the environment) is interpreted as
+    ``auth = {type = "api_key", value = "..."}``.
+
+    ``identifier`` / ``link`` slugs are blueprint-defined.
     """
 
     model_config = pydantic_settings.SettingsConfigDict(
         env_prefix='IMBI_', **BASE_SETTINGS
     )
 
-    api_key: pydantic.SecretStr
-    hostname: str
+    organization: str
+    base_url: pydantic.AnyHttpUrl
+    auth: ImbiAuth | None = None
+    # Input-only convenience for the api-key auth variant. Populated
+    # from ``[imbi].api_key`` in TOML or ``IMBI_API_KEY`` in the env
+    # via pydantic-settings; folded into ``auth`` by the validator
+    # below and zeroed out so the secret lives in exactly one place.
+    api_key: pydantic.SecretStr | None = pydantic.Field(
+        default=None, exclude=True, repr=False
+    )
     github_identifier: str = 'github'
     pagerduty_identifier: str = 'pagerduty'
     sonarqube_identifier: str = 'sonarqube'
     sentry_identifier: str = 'sentry'
-    github_link: str = 'GitHub Repository'
-    grafana_link: str = 'Grafana Dashboard'
-    pagerduty_link: str = 'PagerDuty'
-    sentry_link: str = 'Sentry'
-    sonarqube_link: str = 'SonarQube'
+    github_link: str = 'github-repository'
+    grafana_link: str = 'grafana-dashboard'
+    pagerduty_link: str = 'pagerduty'
+    sentry_link: str = 'sentry'
+    sonarqube_link: str = 'sonarqube'
+
+    @pydantic.model_validator(mode='after')
+    def _coerce_api_key_to_auth(self) -> ImbiConfiguration:
+        if self.auth is None:
+            if self.api_key is None:
+                raise ValueError(
+                    'imbi.auth or imbi.api_key (IMBI_API_KEY) is required'
+                )
+            self.auth = ImbiApiKeyAuth(value=self.api_key)
+        self.api_key = None
+        return self
 
 
 class JiraConfiguration(pydantic_settings.BaseSettings):

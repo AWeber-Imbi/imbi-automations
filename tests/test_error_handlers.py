@@ -310,7 +310,7 @@ class ResumeStateErrorTrackingTestCase(unittest.TestCase):
         state = models.ResumeState(
             workflow_slug='test-workflow',
             workflow_path=pathlib.Path('/workflow'),
-            project_id=123,
+            project_id='proj_123',
             project_slug='test-project',
             failed_action_index=0,
             failed_action_name='test-action',
@@ -331,7 +331,7 @@ class ResumeStateErrorTrackingTestCase(unittest.TestCase):
         state = models.ResumeState(
             workflow_slug='test-workflow',
             workflow_path=pathlib.Path('/workflow'),
-            project_id=123,
+            project_id='proj_123',
             project_slug='test-project',
             failed_action_index=0,
             failed_action_name='test-action',

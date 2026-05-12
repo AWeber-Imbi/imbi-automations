@@ -8,7 +8,7 @@ import httpx
 
 from imbi_automations import errors, models
 from imbi_automations.actions import github
-from tests import base
+from tests import base, factories
 
 
 class GitHubActionsTestCase(base.AsyncTestCase):
@@ -35,33 +35,19 @@ class GitHubActionsTestCase(base.AsyncTestCase):
         self.github_repository.default_branch = 'main'
 
         # Create mock Imbi project
-        self.imbi_project = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        self.imbi_project = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=[
-                models.ImbiEnvironment(
-                    name='Development', slug='development', icon_class='fa-dev'
-                ),
-                models.ImbiEnvironment(
-                    name='Staging', slug='staging', icon_class='fa-stage'
-                ),
-                models.ImbiEnvironment(
-                    name='Production', slug='production', icon_class='fa-prod'
-                ),
+                models.ImbiEnvironment(name='Development', slug='development'),
+                models.ImbiEnvironment(name='Staging', slug='staging'),
+                models.ImbiEnvironment(name='Production', slug='production'),
             ],
-            facts=None,
-            identifiers=None,
-            links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_slug='test-namespace',
+            team_name='test-namespace',
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
         # Create context with GitHub repository
@@ -78,7 +64,9 @@ class GitHubActionsTestCase(base.AsyncTestCase):
                 token='test-key'  # noqa: S106
             ),
             imbi=models.ImbiConfiguration(
-                api_key='test-key', hostname='imbi.example.com'
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
             ),
         )
 
@@ -144,23 +132,19 @@ class GitHubActionsTestCase(base.AsyncTestCase):
     async def test_sync_environments_no_environments_in_imbi(self) -> None:
         """Test sync with None environments deletes all GitHub envs."""
         # Create context with no environments (None)
-        imbi_project_no_envs = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        imbi_project_no_envs = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=None,
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
         context_no_envs = models.WorkflowContext(
@@ -357,23 +341,19 @@ class GitHubActionsTestCase(base.AsyncTestCase):
     async def test_sync_environments_empty_imbi_list(self) -> None:
         """Test sync with empty environments list deletes all GitHub envs."""
         # Create project with empty list (not None)
-        imbi_project_empty = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        imbi_project_empty = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=[],
-            facts=None,
+            attributes=None,
             identifiers=None,
             links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_name='test-namespace',
+            team_slug='test-namespace',
+            score=None,
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
         context_empty = models.WorkflowContext(
@@ -430,33 +410,19 @@ class GitHubActionsTestCase(base.AsyncTestCase):
     async def test_sync_environments_sorted_order(self) -> None:
         """Test environments are sorted alphabetically in logs."""
         # Create project with unsorted environments
-        imbi_project_unsorted = models.ImbiProject(
-            id=123,
-            dependencies=None,
+        imbi_project_unsorted = factories.make_project(
+            id='proj_123',
             description='Test project',
             environments=[
-                models.ImbiEnvironment(
-                    name='Staging', slug='staging', icon_class='fa-stage'
-                ),
-                models.ImbiEnvironment(
-                    name='Production', slug='production', icon_class='fa-prod'
-                ),
-                models.ImbiEnvironment(
-                    name='Development', slug='development', icon_class='fa-dev'
-                ),
+                models.ImbiEnvironment(name='Staging', slug='staging'),
+                models.ImbiEnvironment(name='Production', slug='production'),
+                models.ImbiEnvironment(name='Development', slug='development'),
             ],
-            facts=None,
-            identifiers=None,
-            links=None,
             name='test-project',
-            namespace='test-namespace',
-            namespace_slug='test-namespace',
-            project_score=None,
-            project_type='API',
-            project_type_slug='api',
+            team_slug='test-namespace',
+            team_name='test-namespace',
+            project_type_slugs=['api'],
             slug='test-project',
-            urls=None,
-            imbi_url='https://imbi.example.com/projects/123',
         )
 
         context_unsorted = models.WorkflowContext(
