@@ -148,3 +148,7 @@ docs = [
   "mkdocstrings-python-xref>=1.6,<3",
   "mkdocstrings[python]>=0.26,<1.1",
 ]
+
+[tool.uv]
+exclude-newer = "7 days"
+exclude-newer-package = { "imbi-common" = false, "imbi-plugin-aws" = false, "imbi-plugin-github" = false, "imbi-plugin-logzio" = false, "imbi-plugin-oidc" = false, "imbi-plugin-pagerduty" = false, "imbi-plugin-sentry" = false, "imbi-plugin-sonarqube" = false }
