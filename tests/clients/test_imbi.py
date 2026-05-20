@@ -241,7 +241,7 @@ class ImbiClientAuthTestCase(base.AsyncTestCase):
         )
         transport = httpx.MockTransport(recorder)
         client = imbi.Imbi(self.api_key_config, transport)
-        with self.assertRaises(httpx.HTTPStatusError):
+        with self.assertRaisesRegex(RuntimeError, '401 Unauthorized'):
             await client.get_environments()
         self.assertEqual(len(recorder.requests), 1)
 
