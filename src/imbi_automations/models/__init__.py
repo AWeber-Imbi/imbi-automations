@@ -54,6 +54,7 @@ from .imbi import (
     ImbiProjectSchema,
     ImbiProjectType,
     ImbiRelationshipLink,
+    ImbiRelationships,
     ImbiTeam,
 )
 from .jira import JiraIssueCreated
@@ -146,6 +147,7 @@ __all__ = [
     'ImbiProjectSchema',
     'ImbiProjectType',
     'ImbiRelationshipLink',
+    'ImbiRelationships',
     'ImbiTeam',
     'JiraConfiguration',
     'JiraIssueCreated',
