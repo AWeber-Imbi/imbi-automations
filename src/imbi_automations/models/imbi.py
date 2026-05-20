@@ -88,6 +88,14 @@ class ImbiRelationshipLink(base.BaseModel):
     count: int = 0
 
 
+class ImbiRelationships(base.BaseModel):
+    """Project relationship summary returned by the Imbi API."""
+
+    href: str
+    outbound_count: int = 0
+    inbound_count: int = 0
+
+
 class ImbiProject(base.BaseModel):
     """Imbi project.
 
@@ -113,7 +121,7 @@ class ImbiProject(base.BaseModel):
     links: dict[str, pydantic.AnyUrl] = {}
     identifiers: dict[str, int | str] = {}
     score: float | None = None
-    relationships: dict[str, ImbiRelationshipLink] | None = None
+    relationships: ImbiRelationships | None = None
 
 
 class ImbiDocument(base.BaseModel):
