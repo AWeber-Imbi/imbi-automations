@@ -224,7 +224,10 @@ class Imbi(http.BaseURLHTTPClient):
         response = await self.http_client.request(
             method, url, headers=headers, **kwargs
         )
-        if response.status_code == 401 and self._auth_manager.static_api_key:
+        if (
+            response.status_code == 401
+            and self._auth_manager.static_api_key is not None
+        ):
             raise RuntimeError(
                 'Imbi API returned 401 Unauthorized. The api_key in your '
                 'config is invalid or expired. Check [imbi] api_key in your '
