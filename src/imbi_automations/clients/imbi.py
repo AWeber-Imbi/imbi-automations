@@ -224,7 +224,16 @@ class Imbi(http.BaseURLHTTPClient):
         response = await self.http_client.request(
             method, url, headers=headers, **kwargs
         )
-        if response.status_code != 401 or self._auth_manager.static_api_key:
+        if (
+            response.status_code == 401
+            and self._auth_manager.static_api_key is not None
+        ):
+            raise RuntimeError(
+                'Imbi API returned 401 Unauthorized. The api_key in your '
+                'config is invalid or expired. Check [imbi] api_key in your '
+                'config.toml, or set IMBI_API_KEY in the environment.'
+            )
+        if response.status_code != 401:
             return response
         token = await self._auth_manager.refresh()
         headers['Authorization'] = f'Bearer {token}'
@@ -402,9 +411,7 @@ class Imbi(http.BaseURLHTTPClient):
         """
         path = f'/{name}'
         if path in _DOC_PATH_RESERVED:
-            raise ValueError(
-                f'Attribute {name!r} is read-only on a project'
-            )
+            raise ValueError(f'Attribute {name!r} is read-only on a project')
         project = await self.get_project(project_id)
         if project is None:
             raise ValueError(f'Project not found: {project_id}')
@@ -564,8 +571,7 @@ class Imbi(http.BaseURLHTTPClient):
     ) -> models.ImbiProject:
         """Apply RFC 6902 operations to a project and return the result."""
         safe_ops = [
-            {'op': op.get('op'), 'path': op.get('path')}
-            for op in operations
+            {'op': op.get('op'), 'path': op.get('path')} for op in operations
         ]
         LOGGER.debug(
             'PATCH project %s with %d op(s): %s',
