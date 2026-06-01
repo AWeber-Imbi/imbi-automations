@@ -394,12 +394,12 @@ actions = []
                 str(self.config_file),
                 str(self.workflow_dir),
                 '--rerun-followup',
-                '42',
+                'proj_8FwQ1aN3',
                 '--pr-number',
                 '99',
             ]
         )
-        self.assertEqual(args.rerun_followup, 42)
+        self.assertEqual(args.rerun_followup, 'proj_8FwQ1aN3')
         self.assertEqual(args.pr_number, 99)
 
 
