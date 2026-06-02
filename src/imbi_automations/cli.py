@@ -183,10 +183,10 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
     )
     target_group.add_argument(
         '--rerun-followup',
-        type=int,
-        metavar='PROJECT_ID',
-        help='Re-run followup stage for a project with an existing PR '
-        '(requires --pr-number)',
+        type=str,
+        metavar='ID',
+        help='Re-run followup stage for a project by Nano-ID with an '
+        'existing PR (requires --pr-number)',
     )
 
     parser.add_argument(
