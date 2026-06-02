@@ -125,6 +125,8 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         description='Imbi Automations',
+        epilog='For full documentation visit '
+        'https://aweber-imbi.github.io/imbi-automations/',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.register('type', 'workflow', workflow)
