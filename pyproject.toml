@@ -66,6 +66,10 @@ include = [
   "src/imbi_automations/claude-code/**/*",
 ]
 
+# Bundle the Markdown documentation for the `docs` CLI subcommand
+[tool.hatch.build.targets.wheel.force-include]
+"docs" = "imbi_automations/docs"
+
 [tool.hatch.envs.default.scripts]
 serve-docs = ["mkdocs serve -a localhost:8080"]
 

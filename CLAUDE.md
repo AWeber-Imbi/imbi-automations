@@ -19,6 +19,7 @@ uv sync --all-groups --all-extras --frozen && uv run pre-commit install
 uv run imbi-automations config.toml workflows/workflow-name --all-projects
 uv run imbi-automations config.toml workflows/workflow-name --project-id proj_8FwQ1aN3
 uv run imbi-automations config.toml workflows/workflow-name --resume ./errors/workflow/project-timestamp
+uv run imbi-automations docs [TOPIC] [--plain]  # Browse bundled docs in the terminal
 
 # Testing & Quality
 uv run pytest                          # Run tests

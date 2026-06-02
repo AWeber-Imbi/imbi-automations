@@ -18,6 +18,22 @@ imbi-automations CONFIG WORKFLOW [OPTIONS]
 imbi-automations config.toml workflows/update-python --all-projects
 ```
 
+## Documentation Browser
+
+The full documentation is bundled with the package and can be browsed
+in the terminal via the `docs` subcommand:
+
+```bash
+imbi-automations docs                    # List all topics
+imbi-automations docs workflows          # Render a topic
+imbi-automations docs actions/claude     # Render a nested topic
+imbi-automations docs --plain workflows  # Raw Markdown (for piping/agents)
+```
+
+Without a topic, all available topics are listed with their titles.
+With `--plain`, output is raw Markdown instead of rendered terminal
+output — useful for piping to other tools or consumption by AI agents.
+
 ## Complete Syntax
 
 ```bash

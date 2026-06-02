@@ -16,7 +16,7 @@ import typing
 import colorlog
 import pydantic
 
-from imbi_automations import controller, models, tracker, utils, version
+from imbi_automations import controller, docs, models, tracker, utils, version
 
 LOGGER = logging.getLogger(__name__)
 
@@ -125,6 +125,8 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         description='Imbi Automations',
+        epilog='Run "imbi-automations docs" to browse the bundled '
+        'documentation in the terminal.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.register('type', 'workflow', workflow)
@@ -275,7 +277,13 @@ def main() -> None:
 
     Parses arguments, loads configuration, validates workflow requirements,
     and executes the automation controller with proper error handling.
+
+    The `docs` subcommand is dispatched before normal argument parsing
+    since the primary parser requires positional config/workflow args.
     """
+    if len(sys.argv) > 1 and sys.argv[1] == 'docs':
+        docs.main(sys.argv[2:])
+        return
     args = parse_args()
     configure_logging(args.debug)
 
