@@ -525,6 +525,7 @@ class WorkflowImbiActionCommand(enum.StrEnum):
     batch_update_facts = 'batch_update_facts'
     delete_project_fact = 'delete_project_fact'
     get_project_fact = 'get_project_fact'
+    request = 'request'
     set_environments = 'set_environments'
     set_project_fact = 'set_project_fact'
     update_project = 'update_project'
@@ -556,6 +557,11 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     content: str | None = None
     tags: list[str] = []
     project_types: list[str] = []
+    method: str | None = None
+    path: str | None = None
+    body: dict[str, typing.Any] | list[typing.Any] | None = None
+    query: dict[str, str] = {}
+    allow_writes: bool = False
 
     # CommandRulesMixin configuration
     command_field: typing.ClassVar[str] = 'command'
@@ -568,6 +574,7 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
         WorkflowImbiActionCommand.batch_update_facts: {'facts'},
         WorkflowImbiActionCommand.delete_project_fact: {'attribute_name'},
         WorkflowImbiActionCommand.get_project_fact: {'attribute_name'},
+        WorkflowImbiActionCommand.request: {'method', 'path'},
         WorkflowImbiActionCommand.set_environments: {'values'},
         WorkflowImbiActionCommand.set_project_fact: {
             'attribute_name',
@@ -596,6 +603,14 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
         },
         WorkflowImbiActionCommand.get_project_fact: {
             'attribute_name',
+            'variable_name',
+        },
+        WorkflowImbiActionCommand.request: {
+            'method',
+            'path',
+            'body',
+            'query',
+            'allow_writes',
             'variable_name',
         },
         WorkflowImbiActionCommand.set_environments: {'values'},

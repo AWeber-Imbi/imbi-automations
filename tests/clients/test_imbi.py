@@ -277,6 +277,26 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
             str(recorder.requests[0].url), f'{ORG_BASE}/environments/'
         )
 
+    async def test_request_json_org_scoped_with_params(self) -> None:
+        client, recorder = self._client(
+            [_resp(http.HTTPStatus.OK, json_body=[{'slug': 'runbook'}])]
+        )
+        result = await client.request_json(
+            'GET', 'document-templates/', params={'project_type': 'api'}
+        )
+        self.assertEqual(result, [{'slug': 'runbook'}])
+        self.assertEqual(
+            str(recorder.requests[0].url),
+            f'{ORG_BASE}/document-templates/?project_type=api',
+        )
+
+    async def test_request_json_204_returns_none(self) -> None:
+        client, _ = self._client([_resp(http.HTTPStatus.NO_CONTENT)])
+        result = await client.request_json(
+            'DELETE', 'document-templates/runbook'
+        )
+        self.assertIsNone(result)
+
     async def test_get_project_types(self) -> None:
         client, _ = self._client(
             [

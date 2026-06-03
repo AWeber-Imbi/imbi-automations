@@ -46,6 +46,8 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
                 await self._delete_project_fact(action)
             case models.WorkflowImbiActionCommand.get_project_fact:
                 await self._get_project_fact(action)
+            case models.WorkflowImbiActionCommand.request:
+                await self._request_passthrough(action)
             case models.WorkflowImbiActionCommand.set_project_fact:
                 await self._set_project_fact(action)
             case models.WorkflowImbiActionCommand.set_environments:
@@ -82,6 +84,16 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             starting_commit=self.context.starting_commit,
             variables=self.context.variables,
         )
+
+    def _render_body(self, value: typing.Any) -> typing.Any:
+        """Recursively render Jinja2 in string leaves of a request body."""
+        if isinstance(value, str):
+            return self._render(value)
+        if isinstance(value, dict):
+            return {key: self._render_body(val) for key, val in value.items()}
+        if isinstance(value, list):
+            return [self._render_body(item) for item in value]
+        return value
 
     # -- Commands -------------------------------------------------------
 
@@ -399,6 +411,36 @@ class ImbiActions(mixins.WorkflowLoggerMixin):
             document.id,
             self._project_id(),
         )
+
+    async def _request_passthrough(
+        self, action: models.WorkflowImbiAction
+    ) -> None:
+        if not action.method or not action.path:
+            raise ValueError("'method' and 'path' are required for request")
+        method = action.method.upper()
+        if method not in {'GET', 'HEAD'} and not action.allow_writes:
+            raise ValueError(
+                f'{action.name}: {method} requires allow_writes = true'
+            )
+        path = self._render(action.path)
+        params = {
+            key: self._render(val) for key, val in action.query.items()
+        } or None
+        body = self._render_body(action.body)
+        self.logger.debug(
+            '%s [%s/%s] %s request %s %s',
+            self.context.imbi_project.slug,
+            self.context.current_action_index,
+            self.context.total_actions,
+            action.name,
+            method,
+            path,
+        )
+        result = await self._client().request_json(
+            method, path, params=params, json=body
+        )
+        if action.variable_name:
+            self.context.variables[action.variable_name] = result
 
     async def _update_project_type(
         self, action: models.WorkflowImbiAction

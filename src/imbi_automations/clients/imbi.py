@@ -76,7 +76,7 @@ def _decode_jwt_exp(token: str) -> datetime.datetime | None:
         payload = json.loads(
             base64.urlsafe_b64decode(payload_b64 + padding).decode('utf-8')
         )
-    except (ValueError, UnicodeDecodeError):
+    except ValueError, UnicodeDecodeError:
         return None
     exp = payload.get('exp')
     if not isinstance(exp, (int, float)):
@@ -247,6 +247,28 @@ class Imbi(http.BaseURLHTTPClient):
         if path.startswith('/api/'):
             return f'{self._base_url}{path}'
         return f'{self.org_base}/{path.lstrip("/")}'
+
+    async def request_json(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: dict[str, typing.Any] | None = None,
+        json: typing.Any = None,
+    ) -> typing.Any:
+        """Issue a generic request and return parsed JSON (or ``None``).
+
+        Powers the workflow ``request`` escape-hatch action. Path
+        resolution and auth follow the same rules as every other client
+        call (see :meth:`_url_for` and :meth:`_request`): a bare path is
+        org-scoped, an ``/api/`` path hits the host root, and an absolute
+        URL is used verbatim.
+        """
+        response = await self._request(method, path, params=params, json=json)
+        response.raise_for_status()
+        if response.status_code == 204 or not response.content:
+            return None
+        return response.json()
 
     # -- Reads ----------------------------------------------------------
 
