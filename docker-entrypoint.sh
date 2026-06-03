@@ -74,10 +74,13 @@ if [ -d "$INIT_DIR" ] && [ "$(ls -A $INIT_DIR 2>/dev/null)" ]; then
         pip install --user --no-cache-dir -r "$f" >> /opt/logs/entrypoint.log 2>&1
     done
 
-    # Run shell scripts
+    # Run shell scripts (abort the entrypoint if any script fails)
     for f in $SH_FILES; do
         echo "Running script: $f"
-        bash "$f"
+        if ! bash "$f"; then
+            echo "Error: initialization script failed: $f" >&2
+            exit 1
+        fi
     done
 
     echo "Initialization complete."
