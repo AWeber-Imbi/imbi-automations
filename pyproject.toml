@@ -147,6 +147,10 @@ docs = [
   "mkdocs-material>9.5,<10",
   "mkdocstrings-python-xref>=1.6,<3",
   "mkdocstrings[python]>=0.26,<1.1",
+  # 10.21.3 stops passing filename=None to Pygments' HtmlFormatter, which
+  # crashes on Pygments >=2.19 (html.escape(None)) and breaks fenced code
+  # rendering. Keep this floor until the transitive pin is >= this.
+  "pymdown-extensions>=10.21.3",
 ]
 
 [tool.uv]
