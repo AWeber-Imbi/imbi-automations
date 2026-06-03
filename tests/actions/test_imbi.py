@@ -6,6 +6,7 @@ import unittest
 from unittest import mock
 
 import httpx
+import pydantic
 
 from imbi_automations import models
 from imbi_automations.actions import imbi as imbi_actions
@@ -408,6 +409,93 @@ class ImbiActionsTestCase(base.AsyncTestCase):
         )
         with self.assertRaises(ValueError):
             await self.imbi_executor.execute(action)
+
+    # -- request -------------------------------------------------------
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_request_get_captures_response(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        client = mock.AsyncMock()
+        client.request_json.return_value = [{'slug': 'runbook'}]
+        mock_get_instance.return_value = client
+        action = models.WorkflowImbiAction(
+            name='load-templates',
+            type='imbi',
+            command='request',
+            method='GET',
+            path='document-templates/',
+            query={'project_type': '{{ imbi_project.project_types[0].slug }}'},
+            variable_name='templates',
+        )
+        await self.imbi_executor.execute(action)
+        client.request_json.assert_awaited_once_with(
+            'GET',
+            'document-templates/',
+            params={'project_type': 'api'},
+            json=None,
+        )
+        self.assertEqual(
+            self.context.variables.get('templates'), [{'slug': 'runbook'}]
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_request_post_renders_body_with_allow_writes(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        client = mock.AsyncMock()
+        client.request_json.return_value = {'id': 'doc_1'}
+        mock_get_instance.return_value = client
+        action = models.WorkflowImbiAction(
+            name='create-doc',
+            type='imbi',
+            command='request',
+            method='post',
+            path='projects/{{ imbi_project.id }}/documents/',
+            body={
+                'title': '{{ imbi_project.name }}',
+                'content': 'body',
+                'tags': ['auto'],
+            },
+            allow_writes=True,
+        )
+        await self.imbi_executor.execute(action)
+        client.request_json.assert_awaited_once_with(
+            'POST',
+            'projects/proj_123/documents/',
+            params=None,
+            json={
+                'title': 'Test Project',
+                'content': 'body',
+                'tags': ['auto'],
+            },
+        )
+
+    @mock.patch('imbi_automations.clients.Imbi.get_instance')
+    async def test_request_write_without_allow_writes_raises(
+        self, mock_get_instance: mock.MagicMock
+    ) -> None:
+        client = mock.AsyncMock()
+        mock_get_instance.return_value = client
+        action = models.WorkflowImbiAction(
+            name='danger',
+            type='imbi',
+            command='request',
+            method='DELETE',
+            path='document-templates/runbook',
+        )
+        with self.assertRaises(ValueError):
+            await self.imbi_executor.execute(action)
+        client.request_json.assert_not_awaited()
+
+    def test_request_requires_method_and_path(self) -> None:
+        with self.assertRaises(pydantic.ValidationError):
+            models.WorkflowImbiAction(
+                name='bad',
+                type='imbi',
+                command='request',
+                path='document-templates/',
+            )
 
 
 if __name__ == '__main__':

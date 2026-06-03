@@ -62,10 +62,29 @@ uv run pre-commit run --all-files      # All hooks
 | `file` | `filea.py` | Copy/move/delete with glob support |
 | `git` | `git.py` | Extract files from history, branch ops |
 | `github` | `github.py` | Environment sync, repository updates |
-| `imbi` | `imbi.py` | Project facts, links, notes, type management |
+| `imbi` | `imbi.py` | Project facts, links, notes, type management, generic `request` escape hatch |
 | `jira` | `jira.py` | Create Jira tickets via agentic Claude session |
 | `shell` | `shell.py` | Command execution with Jinja2 |
 | `template` | `template.py` | Jinja2 file generation |
+
+### Imbi `request` escape hatch
+
+`command = "request"` reaches any Imbi API endpoint without a dedicated
+command. `method` + `path` are required; `path` is org-scoped (a bare path
+resolves under `/api/organizations/{org}/`, an `/api/...` path hits the host
+root). `path`/`query`/`body` are Jinja2-rendered; the JSON response is captured
+into `variable_name`. Mutating methods require `allow_writes = true`.
+
+```toml
+[[actions]]
+name = "load-doc-templates"
+type = "imbi"
+command = "request"
+method = "GET"
+path = "document-templates/"
+query = { project_type = "{{ imbi_project.project_types[0].slug }}" }
+variable_name = "doc_templates"
+```
 
 ## Workflow Configuration
 

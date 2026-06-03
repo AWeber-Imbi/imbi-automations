@@ -320,6 +320,41 @@ Performed against commit `{{ starting_commit }}`.
 
 **Note:** Each invocation creates a new note. If you want a single evolving note, read + update via the API directly rather than appending with this action.
 
+### request
+
+Generic escape hatch that reaches any Imbi API endpoint without a dedicated command. Use it for endpoints that don't have a purpose-built command yet (for example, retrieving document/note templates).
+
+**Configuration:**
+```toml
+[[actions]]
+name = "load-doc-templates"
+type = "imbi"
+command = "request"
+method = "GET"
+path = "document-templates/"
+query = { project_type = "{{ imbi_project.project_types[0].slug }}" }
+variable_name = "doc_templates"
+```
+
+**Fields:**
+
+- `method` (string, required): HTTP method (`GET`, `POST`, `PATCH`, `DELETE`, etc.).
+- `path` (string, required): Request path, Jinja2-templated. A bare path is **org-scoped** (resolved under `/api/organizations/{org}/`); a path beginning with `/api/` hits the host root. Absolute URLs are rejected so the bearer token is never sent to an arbitrary host.
+- `query` (table, optional): Query-string parameters; values are Jinja2-templated.
+- `body` (any JSON value, optional): JSON request body — a table, array, or scalar (string/number/boolean/null); string leaves are Jinja2-templated.
+- `allow_writes` (boolean, optional, default `false`): Required to be `true` for any method other than `GET`/`HEAD`. Guards against unintended mutations.
+- `variable_name` (string, optional): Captures the parsed JSON response into `variables.<name>` for later actions (`{{ variables.doc_templates }}`). A `204`/empty response captures `None`.
+
+**Authentication, refresh, and org scoping are identical to every other Imbi action** — the request rides the same authenticated client.
+
+**Use Cases:**
+
+- Read endpoints that have no dedicated command (e.g. `document-templates/`)
+- One-off writes during a workflow (with `allow_writes = true`)
+- Capturing API data into a variable to drive later actions or conditions
+
+**Note:** Prefer a dedicated command when one exists — they validate inputs more strictly. Reach for `request` for the long tail.
+
 ### update_project_type
 
 Changes the project type classification.
@@ -523,6 +558,7 @@ fact_value = "FastAPI"
 | `batch_update_facts` | Update multiple facts in a single operation |
 | `delete_project_fact` | Remove obsolete project facts |
 | `get_project_fact` | Retrieve fact values for conditional logic |
+| `request` | Generic escape hatch to any Imbi API endpoint (read by default; writes need `allow_writes`) |
 | `set_environments` | Update project environments with smart validation |
 | `set_project_fact` | Update or create project facts with validation |
 | `update_project` | Update any project attributes with template support |
