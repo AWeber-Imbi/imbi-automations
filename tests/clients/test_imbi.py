@@ -297,6 +297,13 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
         )
         self.assertIsNone(result)
 
+    async def test_request_json_rejects_absolute_url(self) -> None:
+        client, recorder = self._client([])
+        for url in ('http://evil.example.com/steal', 'https://evil/steal'):
+            with self.assertRaisesRegex(ValueError, 'Imbi-relative paths'):
+                await client.request_json('GET', url)
+        self.assertEqual(len(recorder.requests), 0)
+
     async def test_get_project_types(self) -> None:
         client, _ = self._client(
             [

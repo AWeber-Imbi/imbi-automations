@@ -261,9 +261,15 @@ class Imbi(http.BaseURLHTTPClient):
         Powers the workflow ``request`` escape-hatch action. Path
         resolution and auth follow the same rules as every other client
         call (see :meth:`_url_for` and :meth:`_request`): a bare path is
-        org-scoped, an ``/api/`` path hits the host root, and an absolute
-        URL is used verbatim.
+        org-scoped and an ``/api/`` path hits the host root. Absolute
+        URLs are rejected so the bearer token is never sent to an
+        arbitrary host.
         """
+        if path.startswith(('http://', 'https://')):
+            raise ValueError(
+                'request_json only supports Imbi-relative paths, not '
+                f'absolute URLs: {path}'
+            )
         response = await self._request(method, path, params=params, json=json)
         response.raise_for_status()
         if response.status_code == 204 or not response.content:

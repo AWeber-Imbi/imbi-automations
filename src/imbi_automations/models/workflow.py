@@ -559,7 +559,7 @@ class WorkflowImbiAction(validators.CommandRulesMixin, WorkflowAction):
     project_types: list[str] = []
     method: str | None = None
     path: str | None = None
-    body: dict[str, typing.Any] | list[typing.Any] | None = None
+    body: typing.Any = None
     query: dict[str, str] = {}
     allow_writes: bool = False
 

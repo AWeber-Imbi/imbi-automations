@@ -339,9 +339,9 @@ variable_name = "doc_templates"
 **Fields:**
 
 - `method` (string, required): HTTP method (`GET`, `POST`, `PATCH`, `DELETE`, etc.).
-- `path` (string, required): Request path, Jinja2-templated. A bare path is **org-scoped** (resolved under `/api/organizations/{org}/`); a path beginning with `/api/` hits the host root; an absolute URL is used verbatim.
+- `path` (string, required): Request path, Jinja2-templated. A bare path is **org-scoped** (resolved under `/api/organizations/{org}/`); a path beginning with `/api/` hits the host root. Absolute URLs are rejected so the bearer token is never sent to an arbitrary host.
 - `query` (table, optional): Query-string parameters; values are Jinja2-templated.
-- `body` (table or array, optional): JSON request body; string leaves are Jinja2-templated.
+- `body` (any JSON value, optional): JSON request body — a table, array, or scalar (string/number/boolean/null); string leaves are Jinja2-templated.
 - `allow_writes` (boolean, optional, default `false`): Required to be `true` for any method other than `GET`/`HEAD`. Guards against unintended mutations.
 - `variable_name` (string, optional): Captures the parsed JSON response into `variables.<name>` for later actions (`{{ variables.doc_templates }}`). A `204`/empty response captures `None`.
 
