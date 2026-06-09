@@ -43,8 +43,12 @@ class ClaudeAgentConfiguration(pydantic_settings.BaseSettings):
     """Claude Agent SDK configuration.
 
     Configures the Claude Agent SDK executable path, base prompt file, model
-    selection, whether AI-powered transformations are enabled, and
-    marketplace/plugin settings.
+    selection, reasoning effort, whether AI-powered transformations are
+    enabled, and marketplace/plugin settings.
+
+    ``effort`` controls the reasoning budget: ``low`` (fastest), ``medium``,
+    ``high`` (default, deep reasoning), ``xhigh`` (Opus 4.7 only; falls back
+    to ``high`` on other models), or ``max``.
 
     Plugin configuration supports:
     - enabled_plugins: Map of "plugin@marketplace" to enabled state
@@ -74,6 +78,7 @@ class ClaudeAgentConfiguration(pydantic_settings.BaseSettings):
     base_prompt: pathlib.Path | None = None
     enabled: bool = True
     model: str = pydantic.Field(default='claude-haiku-4-5')
+    effort: typing.Literal['low', 'medium', 'high', 'xhigh', 'max'] = 'high'
     plugins: claude_models.ClaudePluginConfig = pydantic.Field(
         default_factory=claude_models.ClaudePluginConfig
     )
