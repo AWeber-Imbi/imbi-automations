@@ -444,8 +444,16 @@ class Automation(mixins.WorkflowLoggerMixin):
 
     async def _process_imbi_project(self) -> bool:
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
-        project = await client.get_project(self.args.project_id)
-        return await self._process_workflow_from_imbi_project(project)
+        projects = []
+        for project_id in self.args.project_id:
+            project = await client.get_project(project_id)
+            if project is None:
+                self.logger.error('Project %s not found', project_id)
+                return False
+            projects.append(project)
+        return await self._process_imbi_projects_common(
+            projects, apply_filter=False
+        )
 
     async def _process_imbi_project_type(self) -> bool:
         self._validate_project_type_slug(self.args.project_type)
@@ -461,10 +469,12 @@ class Automation(mixins.WorkflowLoggerMixin):
         return await self._process_imbi_projects_common(projects)
 
     async def _process_imbi_projects_common(
-        self, projects: list[models.ImbiProject]
+        self, projects: list[models.ImbiProject], apply_filter: bool = True
     ) -> bool:
         self.logger.debug('Found %d total active projects', len(projects))
-        filtered = await self._filter_projects(projects)
+        filtered = (
+            await self._filter_projects(projects) if apply_filter else projects
+        )
 
         semaphore = asyncio.Semaphore(self.args.max_concurrency)
 
