@@ -98,7 +98,7 @@ class ControllerInitializationTestCase(base.AsyncTestCase):
             verbose=False,
             resume=None,
             rerun_followup=None,
-            project_id='proj_123',
+            project_id=['proj_123'],
             project_type=None,
             all_projects=False,
             github_repository=None,
@@ -318,7 +318,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             verbose=False,
             max_concurrency=5,
             exit_on_error=False,
-            project_id='proj_123',
+            project_id=['proj_123'],
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -345,7 +345,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             verbose=False,
             max_concurrency=5,
             exit_on_error=False,
-            project_id='proj_123',
+            project_id=['proj_123'],
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -377,7 +377,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             verbose=False,
             max_concurrency=5,
             exit_on_error=False,
-            project_id='proj_123',
+            project_id=['proj_123'],
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -396,6 +396,86 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             result = await automation._process_imbi_project()
 
             self.assertFalse(result)
+
+    async def test_process_imbi_project_multiple_ids(self) -> None:
+        """Test processing multiple projects via repeated --project-id."""
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=False,
+            project_id=['proj_123', 'proj_456'],
+        )
+
+        automation = controller.Automation(args, self.config, self.workflow)
+
+        project = create_test_project(id=123, slug='test-api', name='Test API')
+
+        self.http_client_side_effect = httpx.Response(
+            200, json=project.model_dump()
+        )
+
+        with mock.patch.object(
+            automation, '_process_workflow_from_imbi_project'
+        ) as mock_process:
+            mock_process.return_value = True
+
+            result = await automation._process_imbi_project()
+
+            self.assertTrue(result)
+            self.assertEqual(mock_process.call_count, 2)
+
+    async def test_process_imbi_project_multiple_ids_bypass_filter(
+        self,
+    ) -> None:
+        """Test explicit project IDs are not subject to workflow filters."""
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=False,
+            project_id=['proj_123', 'proj_456'],
+        )
+
+        automation = controller.Automation(args, self.config, self.workflow)
+
+        project = create_test_project(id=123, slug='test-api', name='Test API')
+
+        self.http_client_side_effect = httpx.Response(
+            200, json=project.model_dump()
+        )
+
+        with (
+            mock.patch.object(
+                automation, '_process_workflow_from_imbi_project'
+            ) as mock_process,
+            mock.patch.object(automation, '_filter_projects') as mock_filter,
+        ):
+            mock_process.return_value = True
+
+            result = await automation._process_imbi_project()
+
+            self.assertTrue(result)
+            mock_filter.assert_not_called()
+
+    async def test_process_imbi_project_not_found(self) -> None:
+        """Test failure when a specified project ID does not exist."""
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=False,
+            project_id=['proj_missing'],
+        )
+
+        automation = controller.Automation(args, self.config, self.workflow)
+
+        self.http_client_side_effect = httpx.Response(404)
+
+        with mock.patch.object(
+            automation, '_process_workflow_from_imbi_project'
+        ) as mock_process:
+            result = await automation._process_imbi_project()
+
+            self.assertFalse(result)
+            mock_process.assert_not_called()
 
 
 class ControllerProjectTypeTestCase(base.AsyncTestCase):

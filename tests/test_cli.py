@@ -234,8 +234,23 @@ actions = []
             ]
         )
 
-        self.assertEqual(args.project_id, '123')
+        self.assertEqual(args.project_id, ['123'])
         self.assertIsInstance(args.workflow, models.Workflow)
+
+    def test_parse_args_multiple_project_ids(self) -> None:
+        """Test parsing with --project-id specified multiple times."""
+        args = cli.parse_args(
+            [
+                str(self.config_file),
+                str(self.workflow_dir),
+                '--project-id',
+                '123',
+                '--project-id',
+                '456',
+            ]
+        )
+
+        self.assertEqual(args.project_id, ['123', '456'])
 
     def test_parse_args_project_type(self) -> None:
         """Test parsing with --project-type."""
