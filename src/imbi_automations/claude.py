@@ -25,6 +25,12 @@ LOGGER = logging.getLogger(__name__)
 BASE_PATH = pathlib.Path(__file__).parent
 COMMIT = 'commit'
 
+# Serializes marketplace/plugin installation across concurrently-running
+# Claude instances. They all write to the same shared cache directory, so
+# without this two projects can clone into the same path at once (or read a
+# marketplace mid-clone before its manifest exists).
+_PLUGIN_INSTALL_LOCK = asyncio.Lock()
+
 
 def _expand_env_vars(value: str) -> str:
     """Expand $VAR and ${VAR} patterns in a string.
@@ -557,18 +563,21 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         LOGGER.debug('Installing Claude marketplaces and plugins')
         plugins_dir = self.configuration.cache_dir / 'claude-plugins'
-        try:
-            self._installed_plugin_paths = (
-                await self._install_marketplaces_and_plugins(
-                    self._pending_plugin_config, plugins_dir
+        async with _PLUGIN_INSTALL_LOCK:
+            if self._plugins_installed:
+                return
+            try:
+                self._installed_plugin_paths = (
+                    await self._install_marketplaces_and_plugins(
+                        self._pending_plugin_config, plugins_dir
+                    )
                 )
-            )
-            self._plugins_installed = True
-        except RuntimeError as exc:
-            LOGGER.error(
-                'Failed to install Claude marketplaces/plugins: %s', exc
-            )
-            raise
+                self._plugins_installed = True
+            except RuntimeError as exc:
+                LOGGER.error(
+                    'Failed to install Claude marketplaces/plugins: %s', exc
+                )
+                raise
 
     async def _execute_sdk_query(self, prompt: str) -> AgentResult | None:
         """Execute SDK query and capture tool-based response.

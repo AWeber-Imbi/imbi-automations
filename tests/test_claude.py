@@ -1,5 +1,6 @@
 """Comprehensive tests for the claude module."""
 
+import asyncio
 import json
 import pathlib
 import tempfile
@@ -496,6 +497,63 @@ class ClaudeTestCase(base.AsyncTestCase):
         # Client is created lazily on first query, not during init
         self.assertIsNone(claude_instance._client)
         mock_client_class.assert_not_called()
+
+    async def test_ensure_plugins_installed_serialized(self) -> None:
+        """Concurrent installs are serialized by the module-level lock.
+
+        Multiple Claude instances share one cache directory, so the install
+        must not overlap or two projects clone into the same path at once.
+        """
+        plugin_config = models.ClaudePluginConfig(
+            marketplaces={
+                'm': models.ClaudeMarketplace(
+                    source=models.ClaudeMarketplaceSource(
+                        source=models.ClaudeMarketplaceSourceType.directory,
+                        path='/marketplace/m',
+                    )
+                )
+            }
+        )
+
+        active = 0
+        max_active = 0
+
+        async def fake_install(*_args: object, **_kwargs: object) -> list[str]:
+            nonlocal active, max_active
+            active += 1
+            max_active = max(max_active, active)
+            await asyncio.sleep(0)
+            active -= 1
+            return []
+
+        instances = []
+        for _ in range(5):
+            with (
+                mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+                mock.patch(
+                    'builtins.open',
+                    new_callable=mock.mock_open,
+                    read_data='Mock system prompt',
+                ),
+            ):
+                instance = claude.Claude(
+                    config=self.config, context=self.context
+                )
+            instance._pending_plugin_config = plugin_config
+            instances.append(instance)
+
+        with mock.patch.object(
+            claude.Claude,
+            '_install_marketplaces_and_plugins',
+            side_effect=fake_install,
+        ):
+            await asyncio.gather(
+                *(i._ensure_plugins_installed() for i in instances)
+            )
+
+        self.assertEqual(max_active, 1)
+        for instance in instances:
+            self.assertTrue(instance._plugins_installed)
 
     # Note: Removed obsolete _parse_message tests that tested return values.
     # The _parse_message method was refactored to return None and work via
