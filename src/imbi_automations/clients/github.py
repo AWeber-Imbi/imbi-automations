@@ -96,16 +96,20 @@ class GitHub(http.BaseURLHTTPClient):
             url: GitHub repository URL from an Imbi project link
 
         Returns:
-            GitHubRepository object or None if the URL cannot be parsed
-            or the repository is not found
+            GitHubRepository object or None if the URL cannot be parsed,
+            is not on the configured GitHub host, or the repository is
+            not found
 
         Raises:
             httpx.HTTPError: If API request fails (except 404)
 
         """
-        path = urllib.parse.urlparse(str(url)).path
-        segments = [segment for segment in path.split('/') if segment]
-        if len(segments) < 2:
+        parsed = urllib.parse.urlparse(str(url))
+        segments = [segment for segment in parsed.path.split('/') if segment]
+        if (
+            parsed.hostname != self.configuration.github.host.lower()
+            or len(segments) < 2
+        ):
             LOGGER.warning('Could not parse owner/repo from URL: %s', url)
             return None
         owner, repo = segments[0], segments[1].removesuffix('.git')

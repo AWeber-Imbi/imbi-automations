@@ -233,6 +233,14 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
 
         self.assertIsNone(result)
 
+    async def test_get_repository_by_link_wrong_host(self) -> None:
+        """Test a link URL on a different host returns None."""
+        result = await self.client.get_repository_by_url(
+            'https://gitlab.example.com/org/test-repo'
+        )
+
+        self.assertIsNone(result)
+
     async def test_get_repository_no_identifier_or_link(self) -> None:
         """Test retrieval returns None with no identifier or link."""
         project = create_test_project()  # No identifiers or links
