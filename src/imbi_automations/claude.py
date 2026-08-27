@@ -12,6 +12,7 @@ import os
 import pathlib
 import re
 import typing
+import weakref
 
 import anthropic
 import claude_agent_sdk
@@ -28,8 +29,21 @@ COMMIT = 'commit'
 # Serializes marketplace/plugin installation across concurrently-running
 # Claude instances. They all write to the same shared cache directory, so
 # without this two projects can clone into the same path at once (or read a
-# marketplace mid-clone before its manifest exists).
-_PLUGIN_INSTALL_LOCK = asyncio.Lock()
+# marketplace mid-clone before its manifest exists). Keyed by event loop
+# because an asyncio.Lock binds to the loop it first contends on and raises
+# if a different loop later uses it.
+_PLUGIN_INSTALL_LOCKS: weakref.WeakKeyDictionary[
+    asyncio.AbstractEventLoop, asyncio.Lock
+] = weakref.WeakKeyDictionary()
+
+
+def _plugin_install_lock() -> asyncio.Lock:
+    """Return the plugin install lock for the running event loop."""
+    loop = asyncio.get_running_loop()
+    lock = _PLUGIN_INSTALL_LOCKS.get(loop)
+    if lock is None:
+        lock = _PLUGIN_INSTALL_LOCKS[loop] = asyncio.Lock()
+    return lock
 
 
 def _expand_env_vars(value: str) -> str:
@@ -563,7 +577,7 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         LOGGER.debug('Installing Claude marketplaces and plugins')
         plugins_dir = self.configuration.cache_dir / 'claude-plugins'
-        async with _PLUGIN_INSTALL_LOCK:
+        async with _plugin_install_lock():
             if self._plugins_installed:
                 return
             try:

@@ -578,6 +578,28 @@ class ClaudeTestCase(base.AsyncTestCase):
         for instance in instances:
             self.assertTrue(instance._plugins_installed)
 
+    def test_plugin_install_lock_is_per_event_loop(self) -> None:
+        """Each event loop gets its own lock.
+
+        An asyncio.Lock binds to the loop it first contends on, so a single
+        module-level lock would raise RuntimeError when a second loop (for
+        example another IsolatedAsyncioTestCase) contends on it.
+        """
+
+        async def contend() -> asyncio.Lock:
+            lock = claude._plugin_install_lock()
+
+            async def hold() -> None:
+                async with claude._plugin_install_lock():
+                    await asyncio.sleep(0)
+
+            await asyncio.gather(hold(), hold())
+            return lock
+
+        first = asyncio.run(contend())
+        second = asyncio.run(contend())
+        self.assertIsNot(first, second)
+
     # Note: Removed obsolete _parse_message tests that tested return values.
     # The _parse_message method was refactored to return None and work via
     # side effects.
