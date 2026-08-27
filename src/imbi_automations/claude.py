@@ -12,6 +12,7 @@ import os
 import pathlib
 import re
 import typing
+import weakref
 
 import anthropic
 import claude_agent_sdk
@@ -24,6 +25,25 @@ from imbi_automations import git, mixins, models, prompts, tracker
 LOGGER = logging.getLogger(__name__)
 BASE_PATH = pathlib.Path(__file__).parent
 COMMIT = 'commit'
+
+# Serializes marketplace/plugin installation across concurrently-running
+# Claude instances. They all write to the same shared cache directory, so
+# without this two projects can clone into the same path at once (or read a
+# marketplace mid-clone before its manifest exists). Keyed by event loop
+# because an asyncio.Lock binds to the loop it first contends on and raises
+# if a different loop later uses it.
+_PLUGIN_INSTALL_LOCKS: weakref.WeakKeyDictionary[
+    asyncio.AbstractEventLoop, asyncio.Lock
+] = weakref.WeakKeyDictionary()
+
+
+def _plugin_install_lock() -> asyncio.Lock:
+    """Return the plugin install lock for the running event loop."""
+    loop = asyncio.get_running_loop()
+    lock = _PLUGIN_INSTALL_LOCKS.get(loop)
+    if lock is None:
+        lock = _PLUGIN_INSTALL_LOCKS[loop] = asyncio.Lock()
+    return lock
 
 
 def _expand_env_vars(value: str) -> str:
@@ -557,18 +577,21 @@ class Claude(mixins.WorkflowLoggerMixin):
 
         LOGGER.debug('Installing Claude marketplaces and plugins')
         plugins_dir = self.configuration.cache_dir / 'claude-plugins'
-        try:
-            self._installed_plugin_paths = (
-                await self._install_marketplaces_and_plugins(
-                    self._pending_plugin_config, plugins_dir
+        async with _plugin_install_lock():
+            if self._plugins_installed:
+                return
+            try:
+                self._installed_plugin_paths = (
+                    await self._install_marketplaces_and_plugins(
+                        self._pending_plugin_config, plugins_dir
+                    )
                 )
-            )
-            self._plugins_installed = True
-        except RuntimeError as exc:
-            LOGGER.error(
-                'Failed to install Claude marketplaces/plugins: %s', exc
-            )
-            raise
+                self._plugins_installed = True
+            except RuntimeError as exc:
+                LOGGER.error(
+                    'Failed to install Claude marketplaces/plugins: %s', exc
+                )
+                raise
 
     async def _execute_sdk_query(self, prompt: str) -> AgentResult | None:
         """Execute SDK query and capture tool-based response.
