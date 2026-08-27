@@ -498,6 +498,29 @@ class ClaudeTestCase(base.AsyncTestCase):
         self.assertIsNone(claude_instance._client)
         mock_client_class.assert_not_called()
 
+    @mock.patch('claude_agent_sdk.ClaudeAgentOptions')
+    @mock.patch('claude_agent_sdk.ClaudeSDKClient')
+    @mock.patch(
+        'builtins.open',
+        new_callable=mock.mock_open,
+        read_data='Mock system prompt',
+    )
+    def test_create_client_passes_effort(
+        self,
+        mock_file: mock.MagicMock,
+        mock_client_class: mock.MagicMock,
+        mock_options: mock.MagicMock,
+    ) -> None:
+        """_create_client forwards configured effort to the SDK options."""
+        self.config.claude.effort = 'xhigh'
+        claude_instance = claude.Claude(
+            config=self.config, context=self.context
+        )
+
+        claude_instance._create_client()
+
+        self.assertEqual(mock_options.call_args.kwargs['effort'], 'xhigh')
+
     async def test_ensure_plugins_installed_serialized(self) -> None:
         """Concurrent installs are serialized by the module-level lock.
 

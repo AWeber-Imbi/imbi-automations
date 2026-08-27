@@ -226,6 +226,54 @@ class ConditionCheckerTestCase(base.AsyncTestCase):
 
         self.assertFalse(result)  # .py files exist, so condition fails
 
+    def test_check_glob_pattern_triple_slash_form(self) -> None:
+        """Test file_exists glob with the documented scheme:///path form."""
+        condition = models.WorkflowCondition(
+            file_exists='repository:///**/*.py'
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_check_glob_pattern_with_literal_prefix(self) -> None:
+        """Test file_exists glob preceded by literal path components."""
+        condition = models.WorkflowCondition(
+            file_exists='repository:///src/**'
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
+    def test_check_glob_pattern_with_literal_prefix_failure(self) -> None:
+        """Test file_exists glob with a literal prefix that doesn't exist."""
+        condition = models.WorkflowCondition(
+            file_exists='repository:///k8s/production/**'
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertFalse(result)
+
+    def test_check_glob_pattern_with_literal_prefix_two_slash(self) -> None:
+        """Test file_exists glob with literal prefix, scheme://path form."""
+        condition = models.WorkflowCondition(
+            file_exists='repository://src/**/*.py'
+        )
+
+        result = self.checker.check(
+            self.context, models.WorkflowConditionType.all, [condition]
+        )
+
+        self.assertTrue(result)
+
     def test_check_condition_type_any_success(self) -> None:
         """Test condition_type 'any' with mixed conditions."""
         conditions = [

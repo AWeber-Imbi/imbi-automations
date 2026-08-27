@@ -30,7 +30,7 @@ imbi-automations [-h] [-V] [--debug] [-v]
                  [--dry-run-dir DIR]
                  [--cache-dir DIR]
                  [--start-from-project ID_OR_SLUG]
-                 (--project-id ID |
+                 (--project-id ID [--project-id ID ...] |
                   --project-type SLUG |
                   --all-projects |
                   --github-repository URL |
@@ -88,14 +88,20 @@ workflows/my-workflow/
 
 ### --project-id ID
 
-Process a single Imbi project by ID.
+Process one or more Imbi projects by ID. Repeat the flag to target
+multiple projects in a single run; explicitly listed projects bypass
+the workflow's `[filter]` section (engine conditions still apply).
 
-**Type:** Integer
-**Use Case:** Testing workflows on specific project
+**Type:** Nano-ID string (repeatable)
+**Use Case:** Testing workflows on specific projects
 
 **Example:**
 ```bash
 imbi-automations config.toml workflows/fix-config --project-id 123
+
+# Multiple projects in one run
+imbi-automations config.toml workflows/fix-config \
+  --project-id 123 --project-id 456 --max-concurrency 2
 ```
 
 **Output:**

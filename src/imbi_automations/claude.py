@@ -658,6 +658,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         options = claude_agent_sdk.ClaudeAgentOptions(
             allowed_tools=allowed_tools,
             cwd=cwd or self.context.working_directory,
+            effort=self.configuration.claude.effort,
             mcp_servers=mcp_servers,
             model=self.configuration.claude.model,
             plugins=sdk_plugins,
@@ -802,6 +803,7 @@ class Claude(mixins.WorkflowLoggerMixin):
                 'mcp__agent_tools__submit_agent_response',
             ],
             cwd=self.context.working_directory / 'repository',
+            effort=self.configuration.claude.effort,
             mcp_servers=mcp_servers,
             model=self.configuration.claude.model,
             plugins=sdk_plugins,

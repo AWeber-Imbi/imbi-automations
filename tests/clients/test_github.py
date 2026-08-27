@@ -192,6 +192,63 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
         self.assertEqual(result.full_name, 'org/test-repo')
         self.assertEqual(result.default_branch, 'main')
 
+    async def test_get_repository_by_link(self) -> None:
+        """Test repository retrieval via project link URL fallback."""
+        project = create_test_project(
+            links={'github-repository': 'https://github.com/org/test-repo'}
+        )
+
+        repo_data = create_github_repo_response_data()
+
+        self.http_client_side_effect = httpx.Response(200, json=repo_data)
+
+        result = await self.client.get_repository(project)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.full_name, 'org/test-repo')
+
+    async def test_get_repository_by_link_strips_git_suffix(self) -> None:
+        """Test repository link URLs with a .git suffix resolve cleanly."""
+        captured: dict[str, str] = {}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            captured['path'] = request.url.path
+            return httpx.Response(200, json=create_github_repo_response_data())
+
+        client = github.GitHub(
+            self.config, transport=httpx.MockTransport(handler)
+        )
+        result = await client.get_repository_by_url(
+            'https://github.com/org/test-repo.git'
+        )
+
+        self.assertIsNotNone(result)
+        self.assertEqual(captured['path'], '/repos/org/test-repo')
+
+    async def test_get_repository_by_link_unparseable(self) -> None:
+        """Test an unparseable link URL returns None."""
+        result = await self.client.get_repository_by_url(
+            'https://github.com/org'
+        )
+
+        self.assertIsNone(result)
+
+    async def test_get_repository_by_link_invalid_url(self) -> None:
+        """Test a URL that urlparse rejects returns None."""
+        result = await self.client.get_repository_by_url(
+            'https://[github.com/org/test-repo'
+        )
+
+        self.assertIsNone(result)
+
+    async def test_get_repository_by_link_wrong_host(self) -> None:
+        """Test a link URL on a different host returns None."""
+        result = await self.client.get_repository_by_url(
+            'https://gitlab.example.com/org/test-repo'
+        )
+
+        self.assertIsNone(result)
+
     async def test_get_repository_no_identifier_or_link(self) -> None:
         """Test retrieval returns None with no identifier or link."""
         project = create_test_project()  # No identifiers or links
