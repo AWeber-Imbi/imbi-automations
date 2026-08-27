@@ -445,7 +445,7 @@ class Automation(mixins.WorkflowLoggerMixin):
     async def _process_imbi_project(self) -> bool:
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
         projects = []
-        for project_id in self.args.project_id:
+        for project_id in dict.fromkeys(self.args.project_id):
             project = await client.get_project(project_id)
             if project is None:
                 self.logger.error('Project %s not found', project_id)

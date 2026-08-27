@@ -424,6 +424,33 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             self.assertTrue(result)
             self.assertEqual(mock_process.call_count, 2)
 
+    async def test_process_imbi_project_duplicate_ids(self) -> None:
+        """Test duplicate --project-id values are processed once."""
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=False,
+            project_id=['proj_123', 'proj_123'],
+        )
+
+        automation = controller.Automation(args, self.config, self.workflow)
+
+        project = create_test_project(id=123, slug='test-api', name='Test API')
+
+        self.http_client_side_effect = httpx.Response(
+            200, json=project.model_dump()
+        )
+
+        with mock.patch.object(
+            automation, '_process_workflow_from_imbi_project'
+        ) as mock_process:
+            mock_process.return_value = True
+
+            result = await automation._process_imbi_project()
+
+            self.assertTrue(result)
+            self.assertEqual(mock_process.call_count, 1)
+
     async def test_process_imbi_project_multiple_ids_bypass_filter(
         self,
     ) -> None:
