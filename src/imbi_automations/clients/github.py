@@ -104,7 +104,11 @@ class GitHub(http.BaseURLHTTPClient):
             httpx.HTTPError: If API request fails (except 404)
 
         """
-        parsed = urllib.parse.urlparse(str(url))
+        try:
+            parsed = urllib.parse.urlparse(str(url))
+        except ValueError:
+            LOGGER.warning('Could not parse owner/repo from URL: %s', url)
+            return None
         segments = [segment for segment in parsed.path.split('/') if segment]
         if (
             parsed.hostname != self.configuration.github.host.lower()

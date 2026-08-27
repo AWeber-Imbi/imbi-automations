@@ -233,6 +233,14 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
 
         self.assertIsNone(result)
 
+    async def test_get_repository_by_link_invalid_url(self) -> None:
+        """Test a URL that urlparse rejects returns None."""
+        result = await self.client.get_repository_by_url(
+            'https://[github.com/org/test-repo'
+        )
+
+        self.assertIsNone(result)
+
     async def test_get_repository_by_link_wrong_host(self) -> None:
         """Test a link URL on a different host returns None."""
         result = await self.client.get_repository_by_url(
