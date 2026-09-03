@@ -162,12 +162,19 @@ Processing 664 projects...
 
 ### --github-repository URL
 
-Process a single GitHub repository by URL.
+Process the Imbi project whose `github-repository` link points at the
+given repository. The workflow `[filter]` is skipped, as with `--project-id`.
 
 **Type:** URL string
 **Format:** `https://github.com/org/repo` or `org/repo`  
 
-**Use Case:** Target specific GitHub repository
+**Use Case:** Target a project by its repository when you don't know the
+Imbi project ID.
+
+**Matching:** The URL is compared against each project's link
+(configured via `imbi.github_link`) ignoring scheme, case, trailing slash,
+and a `.git` suffix. Bare `org/repo` resolves against `github.host`. The
+run fails if no project links to the repository.
 
 **Example:**
 ```bash
@@ -183,6 +190,10 @@ imbi-automations config.toml workflows/fix-actions \
 ```
 
 ### --github-organization ORG
+
+**Not yet implemented.** The flag is accepted but the run fails with a
+clear error. Use `--project-type` or `--all-projects` with a workflow
+`[filter]` instead.
 
 Process all repositories in a GitHub organization.
 
@@ -205,6 +216,9 @@ Completed: 30/32 successful
 ```
 
 ### --all-github-repositories
+
+**Not yet implemented.** The flag is accepted but the run fails with a
+clear error. Use `--all-projects` instead.
 
 Process all GitHub repositories across all organizations.
 

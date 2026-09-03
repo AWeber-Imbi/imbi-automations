@@ -505,6 +505,158 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             mock_process.assert_not_called()
 
 
+class GitHubRepositoryUrlTestCase(base.AsyncTestCase):
+    """Test canonicalization of --github-repository values."""
+
+    def test_accepted_formats(self) -> None:
+        expected = 'https://github.com/org/repo'
+        for value in (
+            'https://github.com/org/repo',
+            'https://github.com/org/repo/',
+            'https://github.com/org/repo.git',
+            'github.com/org/repo',
+            'org/repo',
+            ' org/repo ',
+        ):
+            with self.subTest(value=value):
+                self.assertEqual(
+                    controller.github_repository_url(value, 'github.com'),
+                    expected,
+                )
+
+    def test_bare_owner_repo_uses_default_host(self) -> None:
+        self.assertEqual(
+            controller.github_repository_url('org/repo', 'ghe.example.com'),
+            'https://ghe.example.com/org/repo',
+        )
+
+    def test_explicit_host_wins_over_default(self) -> None:
+        self.assertEqual(
+            controller.github_repository_url(
+                'https://github.com/org/repo', 'ghe.example.com'
+            ),
+            'https://github.com/org/repo',
+        )
+
+    def test_invalid_value_raises(self) -> None:
+        for value in ('repo', '', 'https://github.com/org'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                controller.github_repository_url(value, 'github.com')
+
+
+class ControllerGitHubProjectTestCase(base.AsyncTestCase):
+    """Test --github-repository target processing."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.config = models.Configuration(
+            github=models.GitHubConfiguration(token='test-token'),
+            imbi=models.ImbiConfiguration(
+                organization='test-org',
+                base_url='https://imbi.test.com',
+                api_key='ik_test',
+            ),
+        )
+        self.instance = clients.Imbi.get_instance(
+            config=self.config.imbi, transport=self.http_client_transport
+        )
+        self.workflow = models.Workflow(
+            path=pathlib.Path('/tmp/workflows/test'),
+            configuration=models.WorkflowConfiguration(
+                name='test-workflow', actions=[]
+            ),
+        )
+        self.projects = [
+            create_test_project(
+                id=1,
+                slug='match',
+                links={'github-repository': 'https://github.com/org/Match'},
+            ),
+            create_test_project(
+                id=2,
+                slug='other',
+                links={'github-repository': 'https://github.com/org/other'},
+            ),
+        ]
+        self.http_client_side_effect = httpx.Response(
+            200,
+            json=[
+                project.model_dump(mode='json') for project in self.projects
+            ],
+        )
+
+    def _automation(self, value: str) -> controller.Automation:
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=False,
+            github_repository=value,
+        )
+        return controller.Automation(args, self.config, self.workflow)
+
+    async def test_iterator(self) -> None:
+        automation = self._automation('org/repo')
+        automation.args.resume = None
+        automation.args.rerun_followup = None
+        automation.args.project_id = None
+        automation.args.project_type = None
+        automation.args.all_projects = False
+        self.assertEqual(
+            automation.iterator, controller.AutomationIterator.github_project
+        )
+
+    async def test_processes_matching_project(self) -> None:
+        automation = self._automation('org/match.git')
+        with mock.patch.object(
+            automation, '_process_workflow_from_imbi_project'
+        ) as mock_process:
+            mock_process.return_value = True
+            result = await automation._process_github_project()
+
+        self.assertTrue(result)
+        mock_process.assert_called_once()
+        self.assertEqual(mock_process.call_args.args[0].slug, 'match')
+
+    async def test_skips_workflow_filter(self) -> None:
+        automation = self._automation('https://github.com/org/match')
+        with (
+            mock.patch.object(automation, '_filter_projects') as mock_filter,
+            mock.patch.object(
+                automation, '_process_workflow_from_imbi_project'
+            ) as mock_process,
+        ):
+            mock_process.return_value = True
+            await automation._process_github_project()
+        mock_filter.assert_not_called()
+
+    async def test_no_matching_project(self) -> None:
+        automation = self._automation('org/missing')
+        with mock.patch.object(
+            automation, '_process_workflow_from_imbi_project'
+        ) as mock_process:
+            result = await automation._process_github_project()
+
+        self.assertFalse(result)
+        mock_process.assert_not_called()
+
+    async def test_invalid_value(self) -> None:
+        automation = self._automation('nonsense')
+        with mock.patch.object(
+            automation, '_process_workflow_from_imbi_project'
+        ) as mock_process:
+            result = await automation._process_github_project()
+
+        self.assertFalse(result)
+        mock_process.assert_not_called()
+
+    async def test_unimplemented_targets_raise(self) -> None:
+        automation = self._automation('org/repo')
+        with self.assertRaises(RuntimeError):
+            await automation._process_github_organization()
+        with self.assertRaises(RuntimeError):
+            await automation._process_github_repositories()
+
+
 class ControllerProjectTypeTestCase(base.AsyncTestCase):
     """Test project type iterator functionality."""
 
