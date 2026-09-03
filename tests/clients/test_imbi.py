@@ -416,6 +416,30 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
         )
         self.assertEqual([p.slug for p in result], ['match'])
 
+    async def test_search_projects_by_github_url_normalizes(self) -> None:
+        client, _ = self._client(
+            [
+                _resp(
+                    http.HTTPStatus.OK,
+                    json_body=[
+                        project_payload(
+                            project_id='1',
+                            slug='match',
+                            links={
+                                'github-repository': (
+                                    'https://github.com/Org/Match.git'
+                                )
+                            },
+                        )
+                    ],
+                )
+            ]
+        )
+        result = await client.search_projects_by_github_url(
+            'http://github.com/org/match/'
+        )
+        self.assertEqual([p.slug for p in result], ['match'])
+
     async def test_get_project_schema(self) -> None:
         client, recorder = self._client(
             [

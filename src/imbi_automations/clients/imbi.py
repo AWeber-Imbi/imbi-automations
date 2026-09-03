@@ -12,16 +12,27 @@ import base64
 import datetime
 import json
 import logging
+import re
 import typing
 
 import async_lru
 import httpx
+import pydantic
 
 from imbi_automations import models
 
 from . import http
 
 LOGGER = logging.getLogger(__name__)
+
+URL_SCHEME_PATTERN = re.compile(r'^[a-z][a-z0-9+.-]*://', re.IGNORECASE)
+
+
+def normalize_repository_url(url: str | pydantic.AnyUrl) -> str:
+    """Strip scheme, trailing slash, and ``.git`` and lowercase a URL."""
+    stripped = URL_SCHEME_PATTERN.sub('', str(url).strip())
+    return stripped.rstrip('/').removesuffix('.git').lower()
+
 
 _TOKEN_SKEW = datetime.timedelta(seconds=30)
 
@@ -363,19 +374,21 @@ class Imbi(http.BaseURLHTTPClient):
     ) -> list[models.ImbiProject]:
         """Find projects whose links dict contains ``github_url``.
 
-        Imbi has no server-side search endpoint, so this lists every
-        project in the org and filters client-side. Cost is O(N) per
-        call; cache results in the workflow when scanning many URLs.
+        Comparison ignores scheme, case, trailing slashes, and a ``.git``
+        suffix. Imbi has no server-side search endpoint, so this lists
+        every project in the org and filters client-side. Cost is O(N)
+        per call; cache results in the workflow when scanning many URLs.
         """
-        normalized = github_url.rstrip('/')
+        normalized = normalize_repository_url(github_url)
         projects = await self.get_projects()
-        matches: list[models.ImbiProject] = []
-        for project in projects:
-            for url in project.links.values():
-                if str(url).rstrip('/') == normalized:
-                    matches.append(project)
-                    break
-        return matches
+        return [
+            project
+            for project in projects
+            if any(
+                normalize_repository_url(url) == normalized
+                for url in project.links.values()
+            )
+        ]
 
     # -- Project attribute writes ---------------------------------------
 
