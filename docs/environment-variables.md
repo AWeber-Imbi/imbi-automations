@@ -51,11 +51,13 @@ Environment variables for Claude Agent SDK integration.
 | `CLAUDE_BASE_PROMPT` | path | (built-in) | Custom base prompt file path |
 | `CLAUDE_ENABLED` | boolean | `true` | Enable Claude Code actions |
 | `CLAUDE_MODEL` | string | `claude-haiku-4-5` | Model for Claude Agent SDK |
+| `CLAUDE_EFFORT` | string | `high` | Reasoning effort (`low`, `medium`, `high`, `xhigh`, `max`) |
 
 **Example:**
 ```bash
 export CLAUDE_EXECUTABLE="/usr/local/bin/claude"
 export CLAUDE_MODEL="claude-sonnet-4-5"
+export CLAUDE_EFFORT="high"
 export CLAUDE_ENABLED="true"
 ```
 

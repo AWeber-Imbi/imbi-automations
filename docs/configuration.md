@@ -270,6 +270,28 @@ Available models include:
 - `claude-sonnet-4-5` - Balanced performance
 - `claude-opus-4-5` - Most capable
 
+### [claude].effort
+
+Reasoning effort for Claude Code SDK operations. Higher effort spends more of
+the model's reasoning budget for deeper analysis at the cost of speed.
+
+**Type:** `string`
+**Default:** `high`
+**Environment Variable:** `CLAUDE_EFFORT`
+
+```toml
+[claude]
+effort = "high"
+```
+
+Available levels:
+
+- `low` - Minimal thinking, fastest responses
+- `medium` - Moderate thinking
+- `high` - Deep reasoning (default)
+- `xhigh` - Extended reasoning (Opus 4.7 only; falls back to `high` on other models)
+- `max` - Maximum effort
+
 ### [claude].base_prompt
 
 Custom base prompt file for Claude Code sessions.

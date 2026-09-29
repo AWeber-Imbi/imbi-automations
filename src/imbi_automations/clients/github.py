@@ -8,8 +8,10 @@ remote file checking.
 
 import logging
 import typing
+import urllib.parse
 
 import httpx
+import pydantic
 
 from imbi_automations import errors, models
 
@@ -79,8 +81,65 @@ class GitHub(http.BaseURLHTTPClient):
 
         """
         response = await self.get(f'/repositories/{repo_id}')
+        return self._parse_repository_response(response, f'ID {repo_id}')
+
+    async def get_repository_by_url(
+        self, url: pydantic.AnyUrl | str
+    ) -> models.GitHubRepository | None:
+        """Get a repository from an Imbi project link URL.
+
+        Parses the owner and repository name from a GitHub repository URL
+        (e.g. ``https://github.com/org/repo``) and resolves it via the
+        GitHub API.
+
+        Args:
+            url: GitHub repository URL from an Imbi project link
+
+        Returns:
+            GitHubRepository object or None if the URL cannot be parsed,
+            is not on the configured GitHub host, or the repository is
+            not found
+
+        Raises:
+            httpx.HTTPError: If API request fails (except 404)
+
+        """
+        try:
+            parsed = urllib.parse.urlparse(str(url))
+        except ValueError:
+            LOGGER.warning('Could not parse owner/repo from URL: %s', url)
+            return None
+        segments = [segment for segment in parsed.path.split('/') if segment]
+        if (
+            parsed.hostname != self.configuration.github.host.lower()
+            or len(segments) < 2
+        ):
+            LOGGER.warning('Could not parse owner/repo from URL: %s', url)
+            return None
+        owner, repo = segments[0], segments[1].removesuffix('.git')
+        response = await self.get(f'/repos/{owner}/{repo}')
+        return self._parse_repository_response(response, f'{owner}/{repo}')
+
+    def _parse_repository_response(
+        self, response: httpx.Response, identifier: str
+    ) -> models.GitHubRepository | None:
+        """Parse a GitHub repository API response into a model.
+
+        Args:
+            response: GitHub API response from a repository lookup
+            identifier: Human-readable repository identifier for logging
+
+        Returns:
+            GitHubRepository object or None if not found
+
+        Raises:
+            errors.GitHubRateLimitError: If the API rate limit is exceeded
+            errors.GitHubNotFoundError: If access to the repository is denied
+            httpx.HTTPError: If API request fails (except 404)
+
+        """
         if response.status_code == http.HTTPStatus.NOT_FOUND:
-            LOGGER.debug('Repository not found for ID %s (404)', repo_id)
+            LOGGER.debug('Repository not found for %s (404)', identifier)
             return None
         elif response.status_code == http.HTTPStatus.FORBIDDEN:
             response_data = response.json() if response.content else {}
@@ -91,17 +150,17 @@ class GitHub(http.BaseURLHTTPClient):
                 raise errors.GitHubRateLimitError(message)
             else:
                 LOGGER.warning(
-                    'Access forbidden for repository ID %s (403): %s',
-                    repo_id,
+                    'Access forbidden for repository %s (403): %s',
+                    identifier,
                     message,
                 )
                 raise errors.GitHubNotFoundError(
-                    f'Access denied for repository ID {repo_id}'
+                    f'Access denied for repository {identifier}'
                 )
         elif not response.is_success:
             LOGGER.error(
-                'GitHub API error for repository ID %s (%s): %s',
-                repo_id,
+                'GitHub API error for repository %s (%s): %s',
+                identifier,
                 response.status_code,
                 response.text,
             )
@@ -111,7 +170,7 @@ class GitHub(http.BaseURLHTTPClient):
             return models.GitHubRepository(**response.json())
         except (httpx.HTTPError, ValueError, KeyError) as exc:
             LOGGER.error(
-                'Failed to parse repository data for ID %s: %s', repo_id, exc
+                'Failed to parse repository data for %s: %s', identifier, exc
             )
             raise
 

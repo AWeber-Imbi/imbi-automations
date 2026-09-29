@@ -17,7 +17,7 @@ uv sync --all-groups --all-extras --frozen && uv run pre-commit install
 # Run CLI
 # Note: Workflow directories must contain workflow.toml
 uv run imbi-automations config.toml workflows/workflow-name --all-projects
-uv run imbi-automations config.toml workflows/workflow-name --project-id proj_8FwQ1aN3
+uv run imbi-automations config.toml workflows/workflow-name --project-id proj_8FwQ1aN3  # repeatable for multiple projects
 uv run imbi-automations config.toml workflows/workflow-name --resume ./errors/workflow/project-timestamp
 
 # Testing & Quality

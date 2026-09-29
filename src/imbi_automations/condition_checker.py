@@ -280,8 +280,10 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
             regex matches any file (Pattern)
 
         """
-        # Extract the path component from the ResourceUrl
-        file_str = str(resource_url).split('://', 1)[-1]
+        # Extract the path component from the ResourceUrl, dropping the
+        # leading slash of the scheme:///path form so the glob pattern is
+        # always relative (pathlib rejects absolute glob patterns)
+        file_str = str(resource_url).split('://', 1)[-1].lstrip('/')
 
         if isinstance(file_str, str):
             # Check if it's a glob pattern (contains *, ?, [, or **)
@@ -306,14 +308,15 @@ class ConditionChecker(mixins.WorkflowLoggerMixin):
                 for _ in range(len(parts) - pattern_idx):
                     base_path = base_path.parent
 
-                # Now apply the glob pattern
-                if file_str.startswith('**/'):
+                # Glob only the pattern components; base_path already holds
+                # the literal components before the first glob part
+                pattern = '/'.join(parts[pattern_idx:])
+                if pattern.startswith('**/'):
                     # Recursive glob
-                    pattern = file_str[3:]  # Remove **/ prefix
-                    matches = base_path.rglob(pattern)
+                    matches = base_path.rglob(pattern[3:])
                 else:
                     # Regular glob
-                    matches = base_path.glob(file_str)
+                    matches = base_path.glob(pattern)
 
                 # Return True if any files match the pattern
                 try:
