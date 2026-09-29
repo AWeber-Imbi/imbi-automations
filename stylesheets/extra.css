@@ -1,0 +1,25 @@
+/* Custom color scheme for Imbi Automations */
+
+/* Light mode - primary color rgb(29 78 216) = #1d4ed8 (blue-700) */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: rgb(29, 78, 216);
+  --md-primary-fg-color--light: rgb(59, 130, 246);
+  --md-primary-fg-color--dark: rgb(30, 64, 175);
+}
+
+/* Dark mode - use slightly lighter blue for better contrast */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: rgb(59, 130, 246);
+  --md-primary-fg-color--light: rgb(96, 165, 250);
+  --md-primary-fg-color--dark: rgb(37, 99, 235);
+}
+
+/* Ensure header uses the custom color */
+.md-header {
+  background-color: var(--md-primary-fg-color);
+}
+
+/* Navigation tabs styling */
+.md-tabs {
+  background-color: var(--md-primary-fg-color);
+}
