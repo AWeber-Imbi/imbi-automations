@@ -30,6 +30,7 @@ imbi-automations [-h] [-V] [--debug] [-v]
                  [--dry-run-dir DIR]
                  [--cache-dir DIR]
                  [--start-from-project ID_OR_SLUG]
+                 [--include-archived]
                  (--project-id ID [--project-id ID ...] |
                   --project-type SLUG |
                   --all-projects |
@@ -220,6 +221,22 @@ imbi-automations config.toml workflows/security-update \
 **Note:** Discovers repositories from all organizations the API key has access to.  
 
 ## Execution Control Options
+
+### --include-archived
+
+Include archived projects when you use `--all-projects` or `--project-type`.
+Without this flag, the Imbi API returns only active projects.
+`--project-id` always fetches the project, archived or not.
+
+**Type:** Flag (boolean)
+**Default:** Off (active projects only)
+
+**Example:**
+```bash
+imbi-automations config.toml workflows/move-projects-to-teams \
+  --all-projects \
+  --include-archived
+```
 
 ### --start-from-project ID_OR_SLUG
 

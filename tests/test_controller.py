@@ -535,6 +535,7 @@ class ControllerProjectTypeTestCase(base.AsyncTestCase):
             max_concurrency=5,
             exit_on_error=False,
             project_type='apis',
+            include_archived=False,
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -610,6 +611,7 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             max_concurrency=5,
             exit_on_error=True,
             all_projects=True,
+            include_archived=False,
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -650,6 +652,7 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             max_concurrency=5,
             exit_on_error=False,
             all_projects=True,
+            include_archived=False,
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -692,6 +695,7 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             max_concurrency=5,
             exit_on_error=False,
             all_projects=True,
+            include_archived=False,
         )
 
         automation = controller.Automation(args, self.config, self.workflow)
@@ -721,6 +725,53 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             result = await automation._process_imbi_projects()
 
             self.assertFalse(result)
+
+    async def test_process_imbi_projects_include_archived(self) -> None:
+        """Test --include-archived is passed to the project listing."""
+        for include_archived in (False, True):
+            with self.subTest(include_archived=include_archived):
+                args = argparse.Namespace(
+                    verbose=False,
+                    max_concurrency=5,
+                    exit_on_error=False,
+                    all_projects=True,
+                    include_archived=include_archived,
+                )
+                automation = controller.Automation(
+                    args, self.config, self.workflow
+                )
+                with mock.patch.object(
+                    self.instance,
+                    'get_projects',
+                    new=mock.AsyncMock(return_value=[]),
+                ) as mock_get:
+                    await automation._process_imbi_projects()
+
+                mock_get.assert_awaited_once_with(
+                    include_archived=include_archived
+                )
+
+    async def test_process_imbi_project_type_include_archived(self) -> None:
+        """Test --include-archived is passed to the by-type listing."""
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=False,
+            project_type='apis',
+            include_archived=True,
+        )
+        automation = controller.Automation(args, self.config, self.workflow)
+        automation.registry.cache_data.project_types = [
+            models.ImbiProjectType(name='APIs', slug='apis')
+        ]
+        with mock.patch.object(
+            self.instance,
+            'get_projects_by_type',
+            new=mock.AsyncMock(return_value=[]),
+        ) as mock_get:
+            await automation._process_imbi_project_type()
+
+        mock_get.assert_awaited_once_with('apis', include_archived=True)
 
 
 class ControllerResumeTestCase(base.AsyncTestCase):
