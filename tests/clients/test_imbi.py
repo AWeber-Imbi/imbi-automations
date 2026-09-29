@@ -380,6 +380,21 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
         url = recorder.requests[0].url
         self.assertEqual(str(url.path), f'/api/organizations/{ORG}/projects/')
         self.assertEqual(url.params.get('project_type'), 'api')
+        self.assertIsNone(url.params.get('include_archived'))
+
+    async def test_get_projects_include_archived(self) -> None:
+        client, recorder = self._client(
+            [
+                _resp(http.HTTPStatus.OK, json_body=[]),
+                _resp(http.HTTPStatus.OK, json_body=[]),
+            ]
+        )
+        await client.get_projects(include_archived=True)
+        await client.get_projects_by_type('api', include_archived=True)
+        for request in recorder.requests:
+            self.assertEqual(
+                request.url.params.get('include_archived'), 'true'
+            )
 
     async def test_search_projects_by_github_url_filters_client_side(
         self,

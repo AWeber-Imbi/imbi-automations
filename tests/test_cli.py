@@ -257,6 +257,20 @@ actions = []
         )
 
         self.assertTrue(args.all_projects)
+        self.assertFalse(args.include_archived)
+
+    def test_parse_args_include_archived(self) -> None:
+        """Test parsing with --include-archived."""
+        args = cli.parse_args(
+            [
+                str(self.config_file),
+                str(self.workflow_dir),
+                '--all-projects',
+                '--include-archived',
+            ]
+        )
+
+        self.assertTrue(args.include_archived)
 
     def test_parse_args_resume(self) -> None:
         """Test parsing with --resume."""
