@@ -514,6 +514,7 @@ class GitHubRepositoryUrlTestCase(base.AsyncTestCase):
             'https://github.com/org/repo',
             'https://github.com/org/repo/',
             'https://github.com/org/repo.git',
+            'https://github.com/Org/Repo.GIT',
             'github.com/org/repo',
             'org/repo',
             ' org/repo ',
@@ -591,6 +592,7 @@ class ControllerGitHubProjectTestCase(base.AsyncTestCase):
             max_concurrency=5,
             exit_on_error=False,
             github_repository=value,
+            include_archived=False,
         )
         return controller.Automation(args, self.config, self.workflow)
 
@@ -648,6 +650,19 @@ class ControllerGitHubProjectTestCase(base.AsyncTestCase):
 
         self.assertFalse(result)
         mock_process.assert_not_called()
+
+    async def test_passes_include_archived(self) -> None:
+        automation = self._automation('org/match')
+        automation.args.include_archived = True
+        with mock.patch.object(
+            clients.Imbi,
+            'search_projects_by_github_url',
+            new=mock.AsyncMock(return_value=[]),
+        ) as mock_search:
+            await automation._process_github_project()
+        mock_search.assert_awaited_once_with(
+            'https://github.com/org/match', include_archived=True
+        )
 
     async def test_unimplemented_targets_raise(self) -> None:
         automation = self._automation('org/repo')

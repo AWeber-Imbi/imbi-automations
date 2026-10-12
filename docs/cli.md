@@ -175,7 +175,8 @@ Imbi project ID.
 **Matching:** The URL is compared against each project's link
 (configured via `imbi.github_link`) ignoring scheme, case, trailing slash,
 and a `.git` suffix. Bare `org/repo` resolves against `github.host`. The
-run fails if no project links to the repository.
+run fails if no project links to the repository. Archived projects are only
+matched with `--include-archived`.
 
 **Example:**
 ```bash
@@ -238,7 +239,8 @@ imbi-automations config.toml workflows/security-update \
 
 ### --include-archived
 
-Include archived projects when you use `--all-projects` or `--project-type`.
+Include archived projects when you use `--all-projects`, `--project-type`,
+or `--github-repository`.
 Without this flag, the Imbi API returns only active projects.
 `--project-id` always fetches the project, archived or not.
 

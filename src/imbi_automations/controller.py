@@ -12,7 +12,6 @@ import datetime
 import enum
 import logging
 import pathlib
-import re
 import shutil
 import tempfile
 
@@ -32,31 +31,33 @@ from imbi_automations import (
 
 LOGGER = logging.getLogger(__name__)
 
-URL_SCHEME_PATTERN = re.compile(r'^[a-z][a-z0-9+.-]*://', re.IGNORECASE)
-
 
 def github_repository_url(value: str, default_host: str) -> str:
     """Canonicalize a repository reference to ``https://host/owner/repo``.
 
     Accepts ``https://host/owner/repo``, ``host/owner/repo``, and
-    ``owner/repo``. A trailing ``.git`` is dropped.
+    ``owner/repo``. The result is lowercased and a trailing ``.git`` is
+    dropped.
 
     Raises:
         ValueError: If ``value`` does not contain an owner and repository
 
     """
-    stripped, has_scheme = URL_SCHEME_PATTERN.subn('', value.strip())
+    stripped, has_scheme = clients.imbi.URL_SCHEME_PATTERN.subn(
+        '', value.strip()
+    )
     segments = [segment for segment in stripped.split('/') if segment]
     if len(segments) >= 3:
-        host, owner, repo = segments[0], segments[1], segments[2]
+        segments = segments[:3]
     elif len(segments) == 2 and not has_scheme:
-        host, (owner, repo) = default_host, segments
+        segments = [default_host, *segments]
     else:
         raise ValueError(
             f'Invalid GitHub repository {value!r}: expected '
             'https://host/owner/repo or owner/repo'
         )
-    return f'https://{host}/{owner}/{repo.removesuffix(".git")}'
+    normalized = clients.imbi.normalize_repository_url('/'.join(segments))
+    return f'https://{normalized}'
 
 
 class AutomationIterator(enum.Enum):
@@ -484,7 +485,9 @@ class Automation(mixins.WorkflowLoggerMixin):
             return False
 
         client = clients.Imbi.get_instance(config=self.configuration.imbi)
-        projects = await client.search_projects_by_github_url(url)
+        projects = await client.search_projects_by_github_url(
+            url, include_archived=self.args.include_archived
+        )
         if not projects:
             self.logger.error('No Imbi project links to %s', url)
             return False
