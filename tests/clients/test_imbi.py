@@ -431,6 +431,65 @@ class ImbiClientReadsTestCase(base.AsyncTestCase):
         )
         self.assertEqual([p.slug for p in result], ['match'])
 
+    async def test_search_projects_by_github_url_normalizes(self) -> None:
+        client, _ = self._client(
+            [
+                _resp(
+                    http.HTTPStatus.OK,
+                    json_body=[
+                        project_payload(
+                            project_id='1',
+                            slug='match',
+                            links={
+                                'github-repository': (
+                                    'https://github.com/Org/Match.GIT'
+                                )
+                            },
+                        )
+                    ],
+                )
+            ]
+        )
+        result = await client.search_projects_by_github_url(
+            'http://github.com/org/match/'
+        )
+        self.assertEqual([p.slug for p in result], ['match'])
+
+    async def test_search_projects_by_github_url_ignores_other_links(
+        self,
+    ) -> None:
+        client, _ = self._client(
+            [
+                _resp(
+                    http.HTTPStatus.OK,
+                    json_body=[
+                        project_payload(
+                            project_id='1',
+                            slug='docs',
+                            links={'docs': 'https://github.com/org/match'},
+                        )
+                    ],
+                )
+            ]
+        )
+        result = await client.search_projects_by_github_url(
+            'https://github.com/org/match'
+        )
+        self.assertEqual(result, [])
+
+    async def test_search_projects_by_github_url_include_archived(
+        self,
+    ) -> None:
+        client, recorder = self._client(
+            [_resp(http.HTTPStatus.OK, json_body=[])]
+        )
+        await client.search_projects_by_github_url(
+            'https://github.com/org/match', include_archived=True
+        )
+        self.assertEqual(
+            recorder.requests[0].url.params.get('include_archived'), 'true'
+        )
+
     async def test_get_project_schema(self) -> None:
         client, recorder = self._client(
             [

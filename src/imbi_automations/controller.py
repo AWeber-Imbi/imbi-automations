@@ -32,6 +32,34 @@ from imbi_automations import (
 LOGGER = logging.getLogger(__name__)
 
 
+def github_repository_url(value: str, default_host: str) -> str:
+    """Canonicalize a repository reference to ``https://host/owner/repo``.
+
+    Accepts ``https://host/owner/repo``, ``host/owner/repo``, and
+    ``owner/repo``. The result is lowercased and a trailing ``.git`` is
+    dropped.
+
+    Raises:
+        ValueError: If ``value`` does not contain an owner and repository
+
+    """
+    stripped, has_scheme = clients.imbi.URL_SCHEME_PATTERN.subn(
+        '', value.strip()
+    )
+    segments = [segment for segment in stripped.split('/') if segment]
+    if len(segments) >= 3:
+        segments = segments[:3]
+    elif len(segments) == 2 and not has_scheme:
+        segments = [default_host, *segments]
+    else:
+        raise ValueError(
+            f'Invalid GitHub repository {value!r}: expected '
+            'https://host/owner/repo or owner/repo'
+        )
+    normalized = clients.imbi.normalize_repository_url('/'.join(segments))
+    return f'https://{normalized}'
+
+
 class AutomationIterator(enum.Enum):
     """Enumeration of automation target types.
 
@@ -436,11 +464,36 @@ class Automation(mixins.WorkflowLoggerMixin):
         client = clients.GitHub.get_instance(config=self.configuration)
         return await client.get_repository(project)
 
-    async def _process_github_repositories(self) -> bool: ...
+    async def _process_github_repositories(self) -> bool:
+        raise RuntimeError('--all-github-repositories is not implemented yet')
 
-    async def _process_github_organization(self) -> bool: ...
+    async def _process_github_organization(self) -> bool:
+        raise RuntimeError('--github-organization is not implemented yet')
 
-    async def _process_github_project(self) -> bool: ...
+    async def _process_github_project(self) -> bool:
+        default_host = (
+            self.configuration.github.host
+            if self.configuration.github
+            else 'github.com'
+        )
+        try:
+            url = github_repository_url(
+                self.args.github_repository, default_host
+            )
+        except ValueError as error:
+            self.logger.error('%s', error)
+            return False
+
+        client = clients.Imbi.get_instance(config=self.configuration.imbi)
+        projects = await client.search_projects_by_github_url(
+            url, include_archived=self.args.include_archived
+        )
+        if not projects:
+            self.logger.error('No Imbi project links to %s', url)
+            return False
+        return await self._process_imbi_projects_common(
+            projects, apply_filter=False
+        )
 
     async def _process_imbi_project(self) -> bool:
         client = clients.Imbi.get_instance(config=self.configuration.imbi)

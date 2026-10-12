@@ -209,8 +209,9 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         '--include-archived',
         action='store_true',
-        help='Include archived projects with --all-projects or '
-        '--project-type (default: active projects only)',
+        help='Include archived projects with --all-projects, '
+        '--project-type, or --github-repository '
+        '(default: active projects only)',
     )
 
     parser.add_argument(

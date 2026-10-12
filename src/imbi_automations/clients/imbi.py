@@ -12,16 +12,27 @@ import base64
 import datetime
 import json
 import logging
+import re
 import typing
 
 import async_lru
 import httpx
+import pydantic
 
 from imbi_automations import models
 
 from . import http
 
 LOGGER = logging.getLogger(__name__)
+
+URL_SCHEME_PATTERN = re.compile(r'^[a-z][a-z0-9+.-]*://', re.IGNORECASE)
+
+
+def normalize_repository_url(url: str | pydantic.AnyUrl) -> str:
+    """Strip scheme, trailing slash, and ``.git`` and lowercase a URL."""
+    stripped = URL_SCHEME_PATTERN.sub('', str(url).strip()).lower()
+    return stripped.rstrip('/').removesuffix('.git')
+
 
 _TOKEN_SKEW = datetime.timedelta(seconds=30)
 
@@ -359,23 +370,23 @@ class Imbi(http.BaseURLHTTPClient):
         return models.ImbiProjectSchema.model_validate(response.json())
 
     async def search_projects_by_github_url(
-        self, github_url: str
+        self, github_url: str, include_archived: bool = False
     ) -> list[models.ImbiProject]:
-        """Find projects whose links dict contains ``github_url``.
+        """Find projects whose ``github_link`` link matches ``github_url``.
 
-        Imbi has no server-side search endpoint, so this lists every
-        project in the org and filters client-side. Cost is O(N) per
-        call; cache results in the workflow when scanning many URLs.
+        Comparison ignores scheme, case, trailing slashes, and a ``.git``
+        suffix. Imbi has no server-side search endpoint, so this lists
+        every project in the org and filters client-side. Cost is O(N)
+        per call; cache results in the workflow when scanning many URLs.
         """
-        normalized = github_url.rstrip('/')
-        projects = await self.get_projects()
-        matches: list[models.ImbiProject] = []
-        for project in projects:
-            for url in project.links.values():
-                if str(url).rstrip('/') == normalized:
-                    matches.append(project)
-                    break
-        return matches
+        normalized = normalize_repository_url(github_url)
+        projects = await self.get_projects(include_archived=include_archived)
+        return [
+            project
+            for project in projects
+            if (link := project.links.get(self._config.github_link))
+            and normalize_repository_url(link) == normalized
+        ]
 
     # -- Project attribute writes ---------------------------------------
 
