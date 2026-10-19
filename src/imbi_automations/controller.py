@@ -555,20 +555,20 @@ class Automation(mixins.WorkflowLoggerMixin):
                 return_exceptions=True,
             )
 
-        # Count successes and failures
-        successes = sum(1 for r in results if r is True)
-        failures = sum(
-            1 for r in results if r is False or isinstance(r, Exception)
+        succeeded = sum(1 for r in results if r is True)
+        skipped = sum(1 for r in results if r is False)
+        failed = sum(1 for r in results if isinstance(r, BaseException))
+
+        self.logger.log(
+            logging.WARNING if failed else logging.INFO,
+            'Completed batch processing: %d succeeded, %d skipped '
+            '(conditions not met), %d failed',
+            succeeded,
+            skipped,
+            failed,
         )
 
-        if failures > 0:
-            self.logger.warning(
-                'Completed batch processing: %d succeeded, %d failed',
-                successes,
-                failures,
-            )
-
-        return all(r is True for r in results)
+        return failed == 0
 
     async def _process_workflow_from_imbi_project(
         self, project: models.ImbiProject
@@ -589,10 +589,11 @@ class Automation(mixins.WorkflowLoggerMixin):
                 project, github_repository
             )
             if not result:
-                if self.args.exit_on_error:
-                    raise RuntimeError(
-                        f'Workflow failed for {project.name} ({project.id})'
-                    )
+                self.logger.info(
+                    'Skipped %s (%s): workflow conditions not met',
+                    project.name,
+                    project.id,
+                )
                 return False
 
             self.logger.info(
