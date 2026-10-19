@@ -391,7 +391,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
         with mock.patch.object(
             automation, '_process_workflow_from_imbi_project'
         ) as mock_process:
-            mock_process.return_value = False
+            mock_process.side_effect = RuntimeError('boom')
 
             result = await automation._process_imbi_project()
 
@@ -845,7 +845,7 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             ) as mock_github,
         ):
             mock_filter.return_value = projects
-            mock_execute.side_effect = [True, False]
+            mock_execute.side_effect = [True, RuntimeError('boom')]
             mock_github.return_value = None
 
             result = await automation._process_imbi_projects()
@@ -853,10 +853,10 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             self.assertFalse(result)
             self.assertEqual(mock_execute.call_count, 2)
 
-    async def test_process_imbi_projects_success_failure_counting(
+    async def test_process_imbi_projects_success_skip_failure_counting(
         self,
     ) -> None:
-        """Test success and failure counting."""
+        """Test skipped projects are counted separately from failures."""
         args = argparse.Namespace(
             verbose=False,
             max_concurrency=5,
@@ -886,12 +886,55 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             ) as mock_github,
         ):
             mock_filter.return_value = projects
-            mock_execute.side_effect = [True, False, True]
+            mock_execute.side_effect = [True, False, RuntimeError('boom')]
+            mock_github.return_value = None
+
+            with self.assertLogs(automation.logger, 'INFO') as logs:
+                result = await automation._process_imbi_projects()
+
+            self.assertFalse(result)
+            self.assertIn(
+                '1 succeeded, 1 skipped (conditions not met), 1 failed',
+                logs.output[-1],
+            )
+
+    async def test_process_imbi_projects_skips_are_not_failures(self) -> None:
+        """Test skipped projects do not fail the run or exit on error."""
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=True,
+            all_projects=True,
+            include_archived=False,
+        )
+
+        automation = controller.Automation(args, self.config, self.workflow)
+
+        projects = [
+            create_test_project(id=i, slug=f'project-{i}', name=f'Project {i}')
+            for i in range(2)
+        ]
+
+        with (
+            mock.patch.object(automation, '_filter_projects') as mock_filter,
+            mock.patch.object(
+                automation.workflow_engine, 'execute'
+            ) as mock_execute,
+            mock.patch.object(
+                automation, '_get_github_repository', new=mock.AsyncMock()
+            ) as mock_github,
+            mock.patch.object(
+                self.instance, 'get_projects', new=mock.AsyncMock()
+            ),
+        ):
+            mock_filter.return_value = projects
+            mock_execute.side_effect = [True, False]
             mock_github.return_value = None
 
             result = await automation._process_imbi_projects()
 
-            self.assertFalse(result)
+            self.assertTrue(result)
+            self.assertEqual(mock_execute.call_count, 2)
 
     async def test_process_imbi_projects_include_archived(self) -> None:
         """Test --include-archived is passed to the project listing."""
