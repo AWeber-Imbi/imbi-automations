@@ -647,7 +647,7 @@ ai_commit = true  # AI-generated commit message
 
 #### commit_message (optional)
 
-Specify a custom commit message for this action's changes. Only valid when `ai_commit` is `false` (or unset) and `committable` is `true`.
+Specify a custom commit message for this action's changes. Only valid when `ai_commit` is `false` (or unset) and `committable` is `true`. Supports Jinja2 templating with the workflow context (e.g. `{{ imbi_project.slug }}`).
 
 **Type:** `string`  
 
