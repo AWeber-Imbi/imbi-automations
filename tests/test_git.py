@@ -179,6 +179,31 @@ class GitModuleTestCase(base.AsyncTestCase):
         self.assertEqual(author, 'Test User <test@example.com>')
 
     @mock.patch('imbi_automations.git._run_git_command')
+    async def test_commit_changes_trailers(
+        self, mock_run_git: mock.AsyncMock
+    ) -> None:
+        """Test each trailer is passed as its own --trailer argument."""
+        mock_run_git.return_value = (0, '[main abc1234] message', '')
+
+        await git.commit_changes(
+            self.working_directory / 'repository',
+            'message',
+            trailers=['Co-Authored-By: A <a@x.com>', 'Imbi-Project: demo'],
+        )
+
+        command = mock_run_git.call_args[0][0]
+        start = command.index('--trailer')
+        self.assertEqual(
+            command[start : start + 4],
+            [
+                '--trailer',
+                'Co-Authored-By: A <a@x.com>',
+                '--trailer',
+                'Imbi-Project: demo',
+            ],
+        )
+
+    @mock.patch('imbi_automations.git._run_git_command')
     async def test_push_changes_success(
         self, mock_run_git: mock.AsyncMock
     ) -> None:

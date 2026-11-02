@@ -94,7 +94,8 @@ GIT_COMMITTER_NAME="{{ commit_author_name }}" \
 GIT_COMMITTER_EMAIL="{{ commit_author_address }}" \
 git commit -F "${COMMIT_MSG_FILE}" {{ configuration.git.commit_args }} \
   --trailer "Authored-By: {{ commit_author }}" \
-  --trailer "Co-Authored-By: Claude <noreply@anthropic.com>"
+  --trailer "Co-Authored-By: Claude <noreply@anthropic.com>"{% for trailer in commit_trailers %} \
+  --trailer {{ trailer }}{% endfor %}
 
 # Cleanup
 rm "${COMMIT_MSG_FILE}"

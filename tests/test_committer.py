@@ -386,6 +386,78 @@ class ClaudeCommitTestCase(base.AsyncTestCase):
         self.assertIs(kwargs['context'], self.context)
         self.assertEqual(kwargs['action_name'], self.action.name)
 
+    @mock.patch('imbi_automations.committer.claude.Claude')
+    async def test_renders_shell_quoted_trailers(
+        self, mock_claude_class: mock.MagicMock
+    ) -> None:
+        """_claude_commit adds quoted user trailers after the built-ins."""
+        mock_client = mock.MagicMock()
+        mock_claude_class.return_value = mock_client
+        mock_client.prompt_kwargs = {
+            'commit_author': 'Test <test@example.com>',
+            'commit_author_name': 'Test',
+            'commit_author_address': 'test@example.com',
+            'configuration': self.config,
+            'workflow_name': 'test-workflow',
+        }
+        prompts_sent: list[str] = []
+
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            prompts_sent.append(prompt)
+            return models.ClaudeAgentResponse(message='Done')
+
+        mock_client.agent_query = mock_agent_query
+
+        action = models.WorkflowAction(
+            name='test-action',
+            ai_commit=True,
+            trailers={
+                'Co-Authored-By': ["O'Brien <ob@x.com>", 'B <b@x.com>'],
+                'Imbi-Project': '{{ imbi_project.slug }}',
+            },
+        )
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._claude_commit(self.context, action)
+
+        self.assertIn(
+            '  --trailer "Co-Authored-By: Claude <noreply@anthropic.com>" \\\n'
+            "  --trailer 'Co-Authored-By: O'\"'\"'Brien <ob@x.com>' \\\n"
+            "  --trailer 'Co-Authored-By: B <b@x.com>' \\\n"
+            "  --trailer 'Imbi-Project: test-project'\n",
+            prompts_sent[0],
+        )
+
+    @mock.patch('imbi_automations.committer.claude.Claude')
+    async def test_renders_no_extra_trailers_by_default(
+        self, mock_claude_class: mock.MagicMock
+    ) -> None:
+        """_claude_commit leaves the built-in trailers unchanged."""
+        mock_client = mock.MagicMock()
+        mock_claude_class.return_value = mock_client
+        mock_client.prompt_kwargs = {
+            'commit_author': 'Test <test@example.com>',
+            'commit_author_name': 'Test',
+            'commit_author_address': 'test@example.com',
+            'configuration': self.config,
+            'workflow_name': 'test-workflow',
+        }
+        prompts_sent: list[str] = []
+
+        async def mock_agent_query(prompt: str) -> models.ClaudeAgentResponse:
+            prompts_sent.append(prompt)
+            return models.ClaudeAgentResponse(message='Done')
+
+        mock_client.agent_query = mock_agent_query
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._claude_commit(self.context, self.action)
+
+        self.assertIn(
+            '  --trailer "Co-Authored-By: Claude <noreply@anthropic.com>"\n\n',
+            prompts_sent[0],
+        )
+
 
 class ManualCommitTestCase(base.AsyncTestCase):
     """Test cases for Committer._manual_commit()."""
@@ -555,6 +627,55 @@ class ManualCommitTestCase(base.AsyncTestCase):
         message = mock_commit_changes.call_args.kwargs['message']
         self.assertIn('Update test-project via test-workflow', message)
         self.assertNotIn('{{', message)
+
+    @mock.patch('imbi_automations.committer.git.commit_changes')
+    @mock.patch('imbi_automations.committer.git.add_files')
+    async def test_passes_rendered_trailers(
+        self,
+        mock_add_files: mock.MagicMock,
+        mock_commit_changes: mock.MagicMock,
+    ) -> None:
+        """Test _manual_commit renders trailers and repeats list keys."""
+        mock_add_files.return_value = None
+        mock_commit_changes.return_value = 'abc123'
+
+        action = models.WorkflowAction(
+            name='test-action',
+            trailers={
+                'Co-Authored-By': ['A <a@x.com>', 'B <b@x.com>'],
+                'Imbi-Project': '{{ imbi_project.slug }}',
+            },
+        )
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._manual_commit(self.context, action)
+
+        self.assertEqual(
+            mock_commit_changes.call_args.kwargs['trailers'],
+            [
+                'Co-Authored-By: A <a@x.com>',
+                'Co-Authored-By: B <b@x.com>',
+                'Imbi-Project: test-project',
+            ],
+        )
+
+    @mock.patch('imbi_automations.committer.git.commit_changes')
+    @mock.patch('imbi_automations.committer.git.add_files')
+    async def test_passes_no_trailers_by_default(
+        self,
+        mock_add_files: mock.MagicMock,
+        mock_commit_changes: mock.MagicMock,
+    ) -> None:
+        """Test _manual_commit passes an empty trailer list by default."""
+        mock_add_files.return_value = None
+        mock_commit_changes.return_value = 'abc123'
+
+        action = models.WorkflowAction(name='test-action')
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._manual_commit(self.context, action)
+
+        self.assertEqual(mock_commit_changes.call_args.kwargs['trailers'], [])
 
     @mock.patch('imbi_automations.committer.git.commit_changes')
     @mock.patch('imbi_automations.committer.git.add_files')

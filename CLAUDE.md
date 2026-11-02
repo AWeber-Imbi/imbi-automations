@@ -114,6 +114,9 @@ name = "update-code"
 type = "claude"
 stage = "primary"  # Default - before PR
 task_prompt = "prompts/task.md.j2"
+# Git trailers on this action's commits (manual and AI). Values are
+# Jinja2-rendered; a list repeats the key. Requires committable = true.
+trailers = { "Co-Authored-By" = ["A <a@x.com>", "B <b@x.com>"], "Imbi-Project" = "{{ imbi_project.slug }}" }
 
 [[actions]]
 name = "monitor-ci"
