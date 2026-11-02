@@ -661,6 +661,30 @@ class ManualCommitTestCase(base.AsyncTestCase):
 
     @mock.patch('imbi_automations.committer.git.commit_changes')
     @mock.patch('imbi_automations.committer.git.add_files')
+    async def test_collapses_line_breaks_in_trailer_values(
+        self,
+        mock_add_files: mock.MagicMock,
+        mock_commit_changes: mock.MagicMock,
+    ) -> None:
+        """Test _manual_commit keeps each trailer value on one line."""
+        mock_add_files.return_value = None
+        mock_commit_changes.return_value = 'abc123'
+
+        action = models.WorkflowAction(
+            name='test-action',
+            trailers={'Imbi-Note': 'line one\nCo-Authored-By: M <m@x.com>'},
+        )
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._manual_commit(self.context, action)
+
+        self.assertEqual(
+            mock_commit_changes.call_args.kwargs['trailers'],
+            ['Imbi-Note: line one Co-Authored-By: M <m@x.com>'],
+        )
+
+    @mock.patch('imbi_automations.committer.git.commit_changes')
+    @mock.patch('imbi_automations.committer.git.add_files')
     async def test_passes_no_trailers_by_default(
         self,
         mock_add_files: mock.MagicMock,

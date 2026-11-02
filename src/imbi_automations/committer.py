@@ -30,7 +30,7 @@ def _render_trailers(
     A list value repeats the key once per item.
     """
     return [
-        f'{key}: {_render_value(context, value)}'
+        f'{key}: {" ".join(_render_value(context, value).splitlines())}'
         for key, values in trailers.items()
         for value in ([values] if isinstance(values, str) else values)
     ]
