@@ -8,6 +8,7 @@ for execution state management.
 
 import enum
 import pathlib
+import re
 import typing
 
 import pydantic
@@ -39,6 +40,8 @@ ResourceUrl: type[AnyUrl] = typing.Annotated[
         ]
     ),
 ]
+
+TRAILER_KEY_PATTERN = re.compile(r'[A-Za-z0-9][A-Za-z0-9-]*')
 
 
 class ProjectFieldFilter(pydantic.BaseModel):
@@ -210,6 +213,23 @@ class WorkflowAction(pydantic.BaseModel):
     recovery_behavior: ErrorRecoveryBehavior = ErrorRecoveryBehavior.skip
     max_retry_attempts: int = 3
     error_filter: ErrorFilter | None = None
+    trailers: dict[str, str | list[str]] = {}
+
+    @pydantic.field_validator('trailers')
+    @classmethod
+    def validate_trailer_keys(
+        cls, value: dict[str, str | list[str]]
+    ) -> dict[str, str | list[str]]:
+        """Validate that trailer keys are valid git trailer tokens."""
+        invalid = [
+            key for key in value if not TRAILER_KEY_PATTERN.fullmatch(key)
+        ]
+        if invalid:
+            raise ValueError(
+                f'Invalid trailer keys {invalid}: keys may only contain '
+                'letters, digits, and hyphens, and cannot start with a hyphen'
+            )
+        return value
 
     @pydantic.field_validator('timeout')
     @classmethod
@@ -251,6 +271,15 @@ class WorkflowAction(pydantic.BaseModel):
                 raise ValueError(
                     'commit_message cannot be set when committable is False'
                 )
+        return self
+
+    @pydantic.model_validator(mode='after')
+    def validate_trailers(self) -> WorkflowAction:
+        """Validate that trailers are only set when committable=True."""
+        if self.trailers and not self.committable:
+            raise ValueError(
+                'trailers cannot be set when committable is False'
+            )
         return self
 
     @pydantic.model_validator(mode='after')
@@ -471,19 +500,32 @@ class WorkflowGitAction(WorkflowAction):
     search_strategy: WorkflowGitActionCommitMatchStrategy | None = None
     committable: bool = False
 
+    @pydantic.model_validator(mode='before')
+    @classmethod
+    def force_non_committable(cls, data: typing.Any) -> typing.Any:
+        """Force committable=False for extract and clone commands.
+
+        Runs before field validation so base-class validators see the
+        final committable value.
+        """
+        if isinstance(data, dict) and data.get('command') in {
+            WorkflowGitActionCommand.extract,
+            WorkflowGitActionCommand.clone,
+        }:
+            return {**data, 'committable': False}
+        return data
+
     @pydantic.model_validator(mode='after')
     def validate_git_action_fields(self) -> WorkflowGitAction:
         """Validate required fields based on command type."""
-        if self.command == WorkflowGitActionCommand.extract:
-            self.committable = False
-            if not self.source or not self.destination:
-                raise ValueError(
-                    'extract command requires source and destination'
-                )
-        elif self.command == WorkflowGitActionCommand.clone:
-            self.committable = False
-            if not self.url or not self.destination:
-                raise ValueError('clone command requires url and destination')
+        if self.command == WorkflowGitActionCommand.extract and (
+            not self.source or not self.destination
+        ):
+            raise ValueError('extract command requires source and destination')
+        if self.command == WorkflowGitActionCommand.clone and (
+            not self.url or not self.destination
+        ):
+            raise ValueError('clone command requires url and destination')
         return self
 
 

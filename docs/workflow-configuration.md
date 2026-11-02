@@ -685,6 +685,29 @@ commit_message = "Update Python dependencies to latest versions"
 - Custom formatting for automated changelogs
 - Descriptive messages for significant updates
 
+#### trailers (optional)
+
+Add [git trailers](https://git-scm.com/docs/git-interpret-trailers) to the commits this action produces. Applies to both manual and AI-generated commits. A list value repeats the key once per item. Values support Jinja2 templating with the workflow context; keys are literal.
+
+**Type:** `table` of `string` or `array` of `string`  
+
+**Default:** `{}`  
+
+**Validation:**
+
+- Keys may only contain letters, digits, and hyphens, and cannot start with a hyphen
+- Cannot be set when `committable = false` (including `stage = "on_error"` actions and Git `extract`/`clone` actions)
+
+```toml
+[[actions]]
+name = "update-dependencies"
+type = "claude"
+task_prompt = "prompts/task.md.j2"
+trailers = { "Co-Authored-By" = ["A <a@example.com>", "B <b@example.com>"], "Imbi-Project" = "{{ imbi_project.slug }}" }
+```
+
+Trailers are appended after the commit message. AI commits keep their built-in `Authored-By` and `Co-Authored-By: Claude` trailers, and the action's trailers follow them.
+
 #### committable (optional)
 
 Whether this action's changes should be included in git commits.

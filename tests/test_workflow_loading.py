@@ -235,6 +235,80 @@ class WorkflowLoadingTestCase(unittest.TestCase):
             str(exc_context.exception),
         )
 
+    def test_trailers_validation(self) -> None:
+        """Test that trailers validation works correctly."""
+        from imbi_automations.models.workflow import (
+            WorkflowFileAction,
+            WorkflowGitAction,
+            WorkflowShellAction,
+        )
+
+        file_action = {
+            'name': 'test-action',
+            'type': 'file',
+            'command': 'copy',
+            'source': 'file:///src',
+            'destination': 'file:///dst',
+        }
+
+        valid_action = WorkflowFileAction(
+            **file_action,
+            ai_commit=True,
+            trailers={
+                'Co-Authored-By': ['A <a@x.com>', 'B <b@x.com>'],
+                'Imbi-Project': '{{ imbi_project.slug }}',
+            },
+        )
+        self.assertEqual(
+            valid_action.trailers['Co-Authored-By'],
+            ['A <a@x.com>', 'B <b@x.com>'],
+        )
+
+        for key in ['', 'Has Space', 'Has:Colon', '-Leading', 'Under_score']:
+            with self.subTest(key=key):
+                with self.assertRaises(pydantic.ValidationError) as exc:
+                    WorkflowFileAction(**file_action, trailers={key: 'value'})
+                self.assertIn('Invalid trailer keys', str(exc.exception))
+
+        with self.assertRaises(pydantic.ValidationError) as exc_context:
+            WorkflowFileAction(
+                **file_action, committable=False, trailers={'Key': 'value'}
+            )
+        self.assertIn(
+            'trailers cannot be set when committable is False',
+            str(exc_context.exception),
+        )
+
+        with self.assertRaises(pydantic.ValidationError) as exc_context:
+            WorkflowShellAction(
+                name='recover',
+                type='shell',
+                command='true',
+                stage='on_error',
+                committable=False,
+                error_filter={'action_types': ['shell']},
+                trailers={'Key': 'value'},
+            )
+        self.assertIn(
+            'trailers cannot be set when committable is False',
+            str(exc_context.exception),
+        )
+
+        with self.assertRaises(pydantic.ValidationError) as exc_context:
+            WorkflowGitAction(
+                name='extract',
+                type='git',
+                command='extract',
+                source='file.txt',
+                destination='extracted:///file.txt',
+                committable=True,
+                trailers={'Key': 'value'},
+            )
+        self.assertIn(
+            'trailers cannot be set when committable is False',
+            str(exc_context.exception),
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -7,12 +7,33 @@ messages.
 
 import logging
 import pathlib
+import shlex
 
 from imbi_automations import claude, git, mixins, models, prompts
 
 LOGGER = logging.getLogger(__name__)
 
 BASE_PATH = pathlib.Path(__file__).parent
+
+
+def _render_value(context: models.WorkflowContext, value: str) -> str:
+    if prompts.has_template_syntax(value):
+        return prompts.render(context, template=value)
+    return value
+
+
+def _render_trailers(
+    context: models.WorkflowContext, trailers: dict[str, str | list[str]]
+) -> list[str]:
+    """Render action trailers into ``Key: value`` strings.
+
+    A list value repeats the key once per item.
+    """
+    return [
+        f'{key}: {" ".join(_render_value(context, value).splitlines())}'
+        for key, values in trailers.items()
+        for value in ([values] if isinstance(values, str) else values)
+    ]
 
 
 class Committer(mixins.WorkflowLoggerMixin):
@@ -70,6 +91,10 @@ class Committer(mixins.WorkflowLoggerMixin):
             context=context,
             source=commit_template,
             action_name=action.name,
+            commit_trailers=[
+                shlex.quote(trailer)
+                for trailer in _render_trailers(context, action.trailers)
+            ],
             **client.prompt_kwargs,
         )
 
@@ -107,9 +132,7 @@ class Committer(mixins.WorkflowLoggerMixin):
         await git.add_files(working_directory=repo_dir)
 
         # Build commit message
-        commit_message = action.commit_message or ''
-        if prompts.has_template_syntax(commit_message):
-            commit_message = prompts.render(context, template=commit_message)
+        commit_message = _render_value(context, action.commit_message or '')
         body = f'{commit_message}\n\n' if commit_message else ''
         message = (
             f'imbi-automations: {context.workflow.configuration.name} '
@@ -123,6 +146,7 @@ class Committer(mixins.WorkflowLoggerMixin):
                 message=message,
                 user_name=self.configuration.git.user_name,
                 user_email=self.configuration.git.user_email,
+                trailers=_render_trailers(context, action.trailers),
             )
         except RuntimeError as exc:
             self.logger.error(

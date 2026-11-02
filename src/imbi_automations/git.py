@@ -265,6 +265,7 @@ async def commit_changes(
     message: str,
     user_name: str | None = None,
     user_email: str | None = None,
+    trailers: list[str] | None = None,
 ) -> str:
     """Commit staged changes to git repository.
 
@@ -273,6 +274,7 @@ async def commit_changes(
         message: Commit message
         user_name: Commit author name (default: None)
         user_email: Commit author email (default: None)
+        trailers: ``Key: value`` trailers to append (default: None)
 
     Returns:
         Commit SHA hash
@@ -293,6 +295,9 @@ async def commit_changes(
     # Add author information if provided
     if user_name and user_email:
         command.extend(['--author', f'{user_name} <{user_email}>'])
+
+    for trailer in trailers or []:
+        command.extend(['--trailer', trailer])
 
     command += ['--all']
 

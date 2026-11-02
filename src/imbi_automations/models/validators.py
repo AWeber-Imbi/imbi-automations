@@ -52,6 +52,7 @@ class CommandRulesMixin:
         'on_error',
         'timeout',
         'data',
+        'trailers',
     }
 
     # --- small helpers to reduce complexity and clarify intent ---
