@@ -107,7 +107,10 @@ class Committer(mixins.WorkflowLoggerMixin):
         await git.add_files(working_directory=repo_dir)
 
         # Build commit message
-        body = f'{action.commit_message}\n\n' if action.commit_message else ''
+        commit_message = action.commit_message or ''
+        if prompts.has_template_syntax(commit_message):
+            commit_message = prompts.render(context, template=commit_message)
+        body = f'{commit_message}\n\n' if commit_message else ''
         message = (
             f'imbi-automations: {context.workflow.configuration.name} '
             f'- {action.name}\n\n{body}'

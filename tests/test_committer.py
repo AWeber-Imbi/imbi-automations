@@ -531,6 +531,61 @@ class ManualCommitTestCase(base.AsyncTestCase):
 
     @mock.patch('imbi_automations.committer.git.commit_changes')
     @mock.patch('imbi_automations.committer.git.add_files')
+    async def test_renders_templated_commit_message(
+        self,
+        mock_add_files: mock.MagicMock,
+        mock_commit_changes: mock.MagicMock,
+    ) -> None:
+        """Test _manual_commit renders Jinja2 in action.commit_message."""
+        mock_add_files.return_value = None
+        mock_commit_changes.return_value = 'abc123'
+
+        action = models.WorkflowAction(
+            name='test-action',
+            ai_commit=False,
+            commit_message=(
+                'Update {{ imbi_project.slug }} via '
+                '{{ workflow.configuration.name }}'
+            ),
+        )
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._manual_commit(self.context, action)
+
+        message = mock_commit_changes.call_args.kwargs['message']
+        self.assertIn('Update test-project via test-workflow', message)
+        self.assertNotIn('{{', message)
+
+    @mock.patch('imbi_automations.committer.git.commit_changes')
+    @mock.patch('imbi_automations.committer.git.add_files')
+    async def test_omits_body_when_templated_message_renders_empty(
+        self,
+        mock_add_files: mock.MagicMock,
+        mock_commit_changes: mock.MagicMock,
+    ) -> None:
+        """Test _manual_commit omits body when template renders empty."""
+        mock_add_files.return_value = None
+        mock_commit_changes.return_value = 'abc123'
+
+        action = models.WorkflowAction(
+            name='test-action',
+            ai_commit=False,
+            commit_message='{% if false %}never{% endif %}',
+        )
+
+        c = committer.Committer(self.config, verbose=False)
+        await c._manual_commit(self.context, action)
+
+        message = mock_commit_changes.call_args.kwargs['message']
+        self.assertEqual(
+            message,
+            'imbi-automations: test-workflow - test-action\n\n'
+            '🤖 Generated with [Imbi Automations]'
+            '(https://github.com/AWeber-Imbi/).',
+        )
+
+    @mock.patch('imbi_automations.committer.git.commit_changes')
+    @mock.patch('imbi_automations.committer.git.add_files')
     async def test_omits_body_when_commit_message_empty(
         self,
         mock_add_files: mock.MagicMock,
