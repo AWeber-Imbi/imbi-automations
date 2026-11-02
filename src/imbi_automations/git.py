@@ -292,7 +292,7 @@ async def commit_changes(
 
     # Add author information if provided
     if user_name and user_email:
-        command.extend(['--author', f'"{user_name} <{user_email}>"'])
+        command.extend(['--author', f'{user_name} <{user_email}>'])
 
     command += ['--all']
 

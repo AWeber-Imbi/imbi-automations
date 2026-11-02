@@ -160,8 +160,23 @@ class GitModuleTestCase(base.AsyncTestCase):
 
         self.assertIn('Git add failed', str(exc_context.exception))
 
-    # Note: commit_changes has been moved to Claude-powered commits
-    # These tests are removed as the function signature has changed
+    @mock.patch('imbi_automations.git._run_git_command')
+    async def test_commit_changes_author_unquoted(
+        self, mock_run_git: mock.AsyncMock
+    ) -> None:
+        """Test commit author is passed without literal quotes."""
+        mock_run_git.return_value = (0, '[main abc1234] message', '')
+
+        await git.commit_changes(
+            self.working_directory / 'repository',
+            'message',
+            user_name='Test User',
+            user_email='test@example.com',
+        )
+
+        command = mock_run_git.call_args[0][0]
+        author = command[command.index('--author') + 1]
+        self.assertEqual(author, 'Test User <test@example.com>')
 
     @mock.patch('imbi_automations.git._run_git_command')
     async def test_push_changes_success(
