@@ -555,6 +555,18 @@ class Automation(mixins.WorkflowLoggerMixin):
                 return_exceptions=True,
             )
 
+        # gather(return_exceptions=True) hands back exceptions instead of
+        # raising them, so log each one with its traceback; otherwise the
+        # only trace of a failure is the count below.
+        for project, result in zip(filtered, results, strict=True):
+            if isinstance(result, BaseException):
+                self.logger.error(
+                    'Workflow failed for %s: %s',
+                    project.slug,
+                    result,
+                    exc_info=result,
+                )
+
         succeeded = sum(1 for r in results if r is True)
         skipped = sum(1 for r in results if r is False)
         failed = sum(1 for r in results if isinstance(r, BaseException))

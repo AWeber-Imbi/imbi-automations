@@ -897,6 +897,15 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
                 '1 succeeded, 1 skipped (conditions not met), 1 failed',
                 logs.output[-1],
             )
+            # The failure is logged with its traceback, not just counted.
+            errors = [r for r in logs.records if r.levelname == 'ERROR']
+            self.assertEqual(len(errors), 1)
+            self.assertRegex(
+                errors[0].getMessage(),
+                r'^Workflow failed for project-\d: boom$',
+            )
+            self.assertIsNotNone(errors[0].exc_info)
+            self.assertIsInstance(errors[0].exc_info[1], RuntimeError)
 
     async def test_process_imbi_projects_skips_are_not_failures(self) -> None:
         """Test skipped projects do not fail the run or exit on error."""
