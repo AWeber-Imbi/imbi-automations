@@ -700,12 +700,14 @@ class Claude(mixins.WorkflowLoggerMixin):
         self, prompt: str, model: str | None = None
     ) -> str:
         """Use the Anthropic API to run one-off tasks"""
+        # Pass the message as a plain dict. In anthropic SDK 2.x,
+        # MessageParam is a Union of role-specific TypedDicts and calling
+        # it raises "TypeError: 'typing.Union' object is not callable".
+        # A dict matches the TypedDict shape in every SDK version.
         message = await self.anthropic.messages.create(
             model=model or self.configuration.anthropic.model,
             max_tokens=8192,
-            messages=[
-                anthropic_types.MessageParam(role='user', content=prompt)
-            ],
+            messages=[{'role': 'user', 'content': prompt}],
         )
         if isinstance(message.content[0], anthropic_types.TextBlock):
             return message.content[0].text
