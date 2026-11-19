@@ -1,12 +1,15 @@
 """Comprehensive tests for the claude module."""
 
 import asyncio
+import importlib
 import json
 import pathlib
 import tempfile
+import typing
 import unittest
 from unittest import mock
 
+import anthropic
 import claude_agent_sdk
 import pydantic
 
@@ -938,6 +941,101 @@ class ClaudeTestCase(base.AsyncTestCase):
             claude_instance.get_agent_prompt(models.ClaudeAgentType.planning)
 
         self.assertIn('No agent definition', str(exc_context.exception))
+
+    def _claude_with_messages_api(
+        self, content: list[dict[str, object]], requests: list[dict]
+    ) -> claude.Claude:
+        """Build a Claude whose Anthropic client talks to a mock API.
+
+        The real SDK client builds and parses the HTTP exchange, so the
+        tests exercise whichever anthropic SDK version is installed.
+        SDK 2.x uses ``httpx2`` instead of ``httpx`` and rejects clients
+        from the other package, so use the module its default client
+        is built on.
+        """
+        sdk_httpx = importlib.import_module(
+            anthropic.DefaultAsyncHttpxClient.__mro__[1].__module__.split('.')[
+                0
+            ]
+        )
+
+        def handler(request: typing.Any) -> typing.Any:
+            requests.append(json.loads(request.content))
+            return sdk_httpx.Response(
+                200,
+                json={
+                    'id': 'msg_test',
+                    'type': 'message',
+                    'role': 'assistant',
+                    'model': 'claude-haiku-4-5',
+                    'content': content,
+                    'stop_reason': 'end_turn',
+                    'stop_sequence': None,
+                    'usage': {'input_tokens': 1, 'output_tokens': 1},
+                },
+            )
+
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+        claude_instance.anthropic = anthropic.AsyncAnthropic(
+            api_key='sk-test',
+            http_client=sdk_httpx.AsyncClient(
+                transport=sdk_httpx.MockTransport(handler)
+            ),
+        )
+        return claude_instance
+
+    async def test_anthropic_query_sends_plain_user_message(self) -> None:
+        """anthropic_query sends a plain dict message and returns text.
+
+        anthropic SDK 2.x made MessageParam a non-callable Union, so the
+        message must not be built by calling it.
+        """
+        requests: list[dict] = []
+        claude_instance = self._claude_with_messages_api(
+            [{'type': 'text', 'text': 'Generated PR body'}], requests
+        )
+
+        result = await claude_instance.anthropic_query('Summarize this')
+
+        self.assertEqual(result, 'Generated PR body')
+        self.assertEqual(len(requests), 1)
+        self.assertEqual(
+            requests[0]['messages'],
+            [{'role': 'user', 'content': 'Summarize this'}],
+        )
+        self.assertEqual(requests[0]['model'], self.config.anthropic.model)
+
+    async def test_anthropic_query_non_text_block_returns_empty(self) -> None:
+        """anthropic_query returns '' when the first block is not text."""
+        requests: list[dict] = []
+        claude_instance = self._claude_with_messages_api(
+            [
+                {
+                    'type': 'tool_use',
+                    'id': 'toolu_test',
+                    'name': 'noop',
+                    'input': {},
+                }
+            ],
+            requests,
+        )
+
+        result = await claude_instance.anthropic_query(
+            'Summarize this', model='claude-sonnet-5-5'
+        )
+
+        self.assertEqual(result, '')
+        self.assertEqual(requests[0]['model'], 'claude-sonnet-5-5')
 
 
 class InstallPluginsTestCase(base.AsyncTestCase):
