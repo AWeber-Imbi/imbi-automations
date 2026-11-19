@@ -853,6 +853,55 @@ class ControllerAllProjectsTestCase(base.AsyncTestCase):
             self.assertFalse(result)
             self.assertEqual(mock_execute.call_count, 2)
 
+    async def test_debug_log_written_only_for_failed_project(self) -> None:
+        """Only the failed project writes a debug log, to its own path."""
+        config = self.config.model_copy(
+            update={
+                'preserve_on_error': True,
+                'error_dir': pathlib.Path('/tmp/errors'),
+            }
+        )
+        args = argparse.Namespace(
+            verbose=False,
+            max_concurrency=5,
+            exit_on_error=False,
+            all_projects=True,
+            include_archived=False,
+        )
+        automation = controller.Automation(args, config, self.workflow)
+
+        failed = create_test_project(id=1, slug='failed', name='Failed')
+        succeeded = create_test_project(id=2, slug='ok', name='OK')
+        error_path = config.error_dir / 'failed-20260101-000000'
+
+        async def execute(
+            project: models.ImbiProject, _repository: typing.Any
+        ) -> bool:
+            if project.id == failed.id:
+                automation.workflow_engine.error_paths[project.id] = error_path
+                raise RuntimeError('boom')
+            return True
+
+        with (
+            mock.patch.object(
+                automation.workflow_engine, 'execute', side_effect=execute
+            ),
+            mock.patch.object(
+                automation, '_get_github_repository', new=mock.AsyncMock()
+            ),
+            mock.patch(
+                'imbi_automations.per_project_logging.ProjectLogCapture'
+                '.write_to_file'
+            ) as mock_write,
+        ):
+            with self.assertRaises(RuntimeError):
+                await automation._process_workflow_from_imbi_project(failed)
+            self.assertTrue(
+                await automation._process_workflow_from_imbi_project(succeeded)
+            )
+
+        mock_write.assert_called_once_with(error_path / 'debug.log')
+
     async def test_process_imbi_projects_success_skip_failure_counting(
         self,
     ) -> None:

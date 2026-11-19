@@ -577,7 +577,7 @@ class WorkflowEnginePrimaryStageTestCase(base.AsyncTestCase):
 
             mock_preserve.assert_called_once()
             self.assertEqual(
-                engine.get_last_error_path(), pathlib.Path('/error')
+                engine.pop_error_path(self.project.id), pathlib.Path('/error')
             )
 
     async def test_execute_returns_false_when_remote_conditions_not_met(

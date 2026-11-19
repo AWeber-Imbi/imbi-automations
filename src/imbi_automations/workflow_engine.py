@@ -49,7 +49,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         )
         self.configuration = config
         self.github = clients.GitHub.get_instance(config=config)
-        self.last_error_path: pathlib.Path | None = None
+        self.error_paths: dict[str, pathlib.Path] = {}
         self.registry = registry
         self.resume_state = resume_state
         self.tracker = tracker.Tracker.get_instance()
@@ -293,7 +293,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                                     self.resume_state.failed_action_index, idx
                                 )
                             )
-                        self.last_error_path = (
+                        self.error_paths[context.imbi_project.id] = (
                             self._preserve_working_directory(
                                 context,
                                 working_directory,
@@ -587,7 +587,7 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                             exc,
                         )
                         if self.configuration.preserve_on_error:
-                            self.last_error_path = (
+                            self.error_paths[context.imbi_project.id] = (
                                 self._preserve_working_directory(
                                     context,
                                     working_directory,
@@ -700,14 +700,22 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
         await self.actions.execute(context, action)
         return True
 
-    def get_last_error_path(self) -> pathlib.Path | None:
-        """Return path where error state was last preserved.
+    def pop_error_path(self, project_id: str) -> pathlib.Path | None:
+        """Return and forget the path where a project's error state was
+        preserved.
+
+        Projects run concurrently against one engine, so the preserved
+        paths are kept per project and consumed by the caller that
+        processed that project.
+
+        Args:
+            project_id: Imbi project ID whose preserved path to return
 
         Returns:
             Path to error directory, or None if no error preserved
 
         """
-        return self.last_error_path
+        return self.error_paths.pop(project_id, None)
 
     def _build_error_handler_maps(self) -> None:
         """Build lookup structures for error handlers."""
@@ -944,17 +952,19 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
             self.tracker.incr(f'error_handler_failed_{handler.name}')
 
             if self.configuration.preserve_on_error:
-                self.last_error_path = self._preserve_working_directory(
-                    context,
-                    working_directory,
-                    self.configuration.error_dir,
-                    failed_action_index=failed_idx,
-                    failed_action_name=failed_action.name,
-                    completed_action_indices=list(range(0, failed_idx)),
-                    error_message=(
-                        f'Original: {exception}\nHandler: {handler_exc}'
-                    ),
-                    current_stage=stage_name,
+                self.error_paths[context.imbi_project.id] = (
+                    self._preserve_working_directory(
+                        context,
+                        working_directory,
+                        self.configuration.error_dir,
+                        failed_action_index=failed_idx,
+                        failed_action_name=failed_action.name,
+                        completed_action_indices=list(range(0, failed_idx)),
+                        error_message=(
+                            f'Original: {exception}\nHandler: {handler_exc}'
+                        ),
+                        current_stage=stage_name,
+                    )
                 )
 
             return 'failed'
