@@ -603,7 +603,7 @@ class Automation(mixins.WorkflowLoggerMixin):
         finally:
             # Write debug logs if error occurred (error_path set by engine)
             if log_capture and token:
-                error_path = self.workflow_engine.get_last_error_path()
+                error_path = self.workflow_engine.pop_error_path(project.id)
                 if error_path:
                     log_capture.write_to_file(error_path / 'debug.log')
                     self.logger.info(
