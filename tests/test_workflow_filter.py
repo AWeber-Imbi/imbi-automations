@@ -3,6 +3,8 @@
 import pathlib
 import typing
 
+import pydantic
+
 from imbi_automations import models, workflow_filter
 from tests import base, factories
 
@@ -141,6 +143,10 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
         result = await self.filter.filter_project(project, wf)
         self.assertIsNotNone(result)
         self.assertEqual(result.id, 'proj_123')
+
+    def test_unknown_filter_key_rejected(self) -> None:
+        with self.assertRaises(pydantic.ValidationError):
+            models.WorkflowFilter(github_identifier_required=True)
 
     async def test_github_integration_required_custom_slug(self) -> None:
         self.configuration.imbi.github_integration = 'github'

@@ -91,6 +91,8 @@ class WorkflowFilter(pydantic.BaseModel):
     ``exclude_project_ids`` hold Nano-ID strings.
     """
 
+    model_config = pydantic.ConfigDict(extra='forbid')
+
     project_ids: set[str] = set()
     exclude_project_ids: set[str] = set()
     project_types: set[str] = set()

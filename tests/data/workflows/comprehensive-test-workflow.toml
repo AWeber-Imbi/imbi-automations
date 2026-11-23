@@ -17,6 +17,7 @@
 
 name = "Comprehensive Test Workflow"
 description = "A test workflow that exercises all action types and validation branches"
+condition_type = "all"
 
 # Git configuration
 [git]
@@ -41,8 +42,6 @@ github_integration_required = true
 github_workflow_status_exclude = ["success", "completed"]
 
 # Workflow conditions (both local and remote)
-condition_type = "all"
-
 [[conditions]]
 file_exists = "pyproject.toml"
 

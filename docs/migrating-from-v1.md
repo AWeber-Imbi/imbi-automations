@@ -201,8 +201,8 @@ The exact slug depends on your org's blueprints; the metadata cache
 will validate at parse time and emit fuzzy suggestions for typos.
 
 `github_identifier_required` is renamed to `github_integration_required`.
-The old key is ignored, so a workflow that still uses it runs without
-the GitHub check:
+The old key now fails workflow validation at load time instead of being
+ignored:
 
 ```toml
 # v1
