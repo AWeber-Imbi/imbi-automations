@@ -1,16 +1,15 @@
 """Comprehensive tests for the claude module."""
 
 import asyncio
-import importlib
 import json
 import pathlib
 import tempfile
-import typing
 import unittest
 from unittest import mock
 
 import anthropic
 import claude_agent_sdk
+import httpx2
 import pydantic
 
 from imbi_automations import claude, models
@@ -947,21 +946,12 @@ class ClaudeTestCase(base.AsyncTestCase):
     ) -> claude.Claude:
         """Build a Claude whose Anthropic client talks to a mock API.
 
-        The real SDK client builds and parses the HTTP exchange, so the
-        tests exercise whichever anthropic SDK version is installed.
-        SDK 2.x uses ``httpx2`` instead of ``httpx`` and rejects clients
-        from the other package, so use the module its default client
-        is built on.
+        The real SDK client builds and parses the HTTP exchange.
         """
-        sdk_httpx = importlib.import_module(
-            anthropic.DefaultAsyncHttpxClient.__mro__[1].__module__.split('.')[
-                0
-            ]
-        )
 
-        def handler(request: typing.Any) -> typing.Any:
+        def handler(request: httpx2.Request) -> httpx2.Response:
             requests.append(json.loads(request.content))
-            return sdk_httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     'id': 'msg_test',
@@ -988,18 +978,14 @@ class ClaudeTestCase(base.AsyncTestCase):
             )
         claude_instance.anthropic = anthropic.AsyncAnthropic(
             api_key='sk-test',
-            http_client=sdk_httpx.AsyncClient(
-                transport=sdk_httpx.MockTransport(handler)
+            http_client=httpx2.AsyncClient(
+                transport=httpx2.MockTransport(handler)
             ),
         )
         return claude_instance
 
     async def test_anthropic_query_sends_plain_user_message(self) -> None:
-        """anthropic_query sends a plain dict message and returns text.
-
-        anthropic SDK 2.x made MessageParam a non-callable Union, so the
-        message must not be built by calling it.
-        """
+        """anthropic_query sends a plain dict message and returns text."""
         requests: list[dict] = []
         claude_instance = self._claude_with_messages_api(
             [{'type': 'text', 'text': 'Generated PR body'}], requests
