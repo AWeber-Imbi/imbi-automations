@@ -444,7 +444,7 @@ class MainExecutionTestCase(unittest.TestCase):
 organization = "test-org"
 base_url = "https://imbi.example.com"
 api_key = "ik_test"
-github_identifier = "github"
+github_integration = "ghec"
 github_link = "github-repository"
 
 [github]

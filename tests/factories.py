@@ -27,6 +27,18 @@ def auth_response(
     return payload
 
 
+def make_service(
+    identifier: str = '12345', integration_slug: str = 'ghec'
+) -> dict[str, str]:
+    """Return a project ``services`` entry for an integration."""
+    return {
+        'integration_slug': integration_slug,
+        'integration_name': integration_slug.upper(),
+        'identifier': identifier,
+        'canonical_url': f'https://api.github.com/repositories/{identifier}',
+    }
+
+
 def make_project(
     *,
     id: str = 'proj_test',
@@ -38,7 +50,7 @@ def make_project(
     project_type_slugs: typing.Sequence[str] = ('api',),
     environments: typing.Sequence[models.ImbiEnvironment] | None = None,
     links: dict[str, str] | None = None,
-    identifiers: dict[str, int | str] | None = None,
+    services: typing.Sequence[dict[str, str]] = (),
     score: float | None = None,
     attributes: dict[str, typing.Any] | None = None,
 ) -> models.ImbiProject:
@@ -62,7 +74,7 @@ def make_project(
         ],
         'environments': [env.model_dump() for env in environments or ()],
         'links': links or {},
-        'identifiers': identifiers or {},
+        'services': list(services),
         'score': score,
     }
     if attributes:

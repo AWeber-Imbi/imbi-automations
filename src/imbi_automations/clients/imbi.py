@@ -525,27 +525,6 @@ class Imbi(http.BaseURLHTTPClient):
         )
         return True
 
-    async def set_project_identifier(
-        self, project_id: str, name: str, value: int | str | None
-    ) -> bool:
-        """Set or remove a project identifier."""
-        project = await self.get_project(project_id)
-        if project is None:
-            raise ValueError(f'Project not found: {project_id}')
-        current = project.identifiers.get(name)
-        # Identifiers are compared as strings (server stores int|str).
-        normalized_current = str(current) if current is not None else None
-        normalized_value = str(value) if value is not None else None
-        op = _patch_op(
-            f'/identifiers/{name}', normalized_current, normalized_value
-        )
-        if op is None:
-            return False
-        if op['op'] != 'remove':
-            op['value'] = value
-        await self._patch_project(project_id, [op])
-        return True
-
     async def set_project_types(
         self, project_id: str, slugs: list[str]
     ) -> bool:

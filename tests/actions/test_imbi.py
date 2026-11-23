@@ -40,7 +40,7 @@ class ImbiActionsTestCase(base.AsyncTestCase):
             slug='test-project',
             name='Test Project',
             project_type_slugs=['api'],
-            identifiers={'github': 'test-org/test-project'},
+            services=[factories.make_service()],
             attributes={'programming_language': 'Python 3.11'},
         )
 

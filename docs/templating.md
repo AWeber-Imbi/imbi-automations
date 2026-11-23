@@ -56,7 +56,7 @@ Complete project metadata from Imbi project management system.
 - `imbi_project.dependencies` - List of dependent project IDs
 - `imbi_project.environments` - List of environment names (e.g., `["development", "production"]`)
 - `imbi_project.facts` - Dictionary of project facts (key-value pairs)
-- `imbi_project.identifiers` - External system identifiers (GitHub, GitLab, etc.)
+- `imbi_project.services` - Integrations the project exists in, each with `integration_slug`, `integration_name`, `identifier`, `canonical_url`, and `dashboard_url`
 - `imbi_project.links` - Dictionary of external links
 - `imbi_project.urls` - Dictionary of project URLs
 - `imbi_project.project_score` - Project health score
@@ -80,7 +80,7 @@ Facts:
 ```
 
 #### `github_repository` (GitHubRepository | None)
-GitHub repository metadata (only available when GitHub identifier exists).
+GitHub repository metadata (only available when the project has a GitHub integration).
 
 **Core fields:**
 

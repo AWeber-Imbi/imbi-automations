@@ -40,7 +40,6 @@ class JiraActionsTestCase(base.AsyncTestCase):
                 description='Test project',
                 environments=None,
                 attributes={},
-                identifiers={},
                 links=None,
                 name='Test Project',
                 team_name='ns',

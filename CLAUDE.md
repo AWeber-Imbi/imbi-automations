@@ -97,7 +97,7 @@ max_followup_cycles = 5  # For followup stage cycling
 [filter]
 project_types = ["apis", "consumers"]
 project_facts = {"Programming Language" = "Python 3.12"}
-github_identifier_required = true
+github_integration_required = true
 exclude_open_workflow_prs = true  # Skip projects with open PRs
 exclude_project_ids = ["proj_456abc", "proj_789def"]  # Blocklist specific project IDs
 # If an ID appears in both project_ids and exclude_project_ids,
@@ -383,6 +383,10 @@ State saved in `.state` file (MessagePack format) with:
 - Caches per-org: environments, project types, link definitions
 - Cache file carries a `schema_version`; mismatches are discarded
 - Blueprint-defined project attribute schemas are NOT cached here — they vary per project and are resolved against `GET /projects/{id}/schema` at runtime
+
+### GitHub Repository Resolution
+- A project's GitHub repo ID comes from its `services` entry whose `integration_slug` matches `[imbi].github_integration` (default `ghec`)
+- `GitHub.get_repository` and the `github_integration_required` filter both read it via `ImbiProject.service_identifier`
 
 ### GitHub Actions (`actions/github.py`)
 - `sync_environments`: Syncs Imbi environments to GitHub

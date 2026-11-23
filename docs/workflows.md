@@ -176,7 +176,7 @@ Target specific project subsets efficiently:
 [filter]
 project_types = ["api", "consumer"]
 project_facts = {"Programming Language" = "Python 3.12"}
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]  # Only failing/missing workflows
 ```
 

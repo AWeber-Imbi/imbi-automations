@@ -24,7 +24,7 @@ project_ids = [123, 456, 789]
 project_types = ["api", "consumer"]
 project_facts = {"Programming Language" = "Python 3.12"}
 project_environments = ["production", "staging"]
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]
 
 # New: Flexible field filtering
@@ -190,9 +190,12 @@ project_environments = ["PRODUCTION"]
 
 The filter checks against both the original environment name and the auto-generated slug.
 
-### github_identifier_required
+### github_integration_required
 
-Require projects to have a GitHub repository identifier.
+Require projects to have a GitHub integration. A project passes when
+its `services` list has an entry whose `integration_slug` matches
+`[imbi].github_integration` (default `ghec`) and whose `identifier` is
+not empty.
 
 **Type:** `boolean`  
 
@@ -201,7 +204,7 @@ Require projects to have a GitHub repository identifier.
 
 ```toml
 [filter]
-github_identifier_required = true
+github_integration_required = true
 ```
 
 **Use cases:**
@@ -213,7 +216,7 @@ github_identifier_required = true
 **Real-world example:**
 ```toml
 [filter]
-github_identifier_required = true
+github_integration_required = true
 ```
 
 **Why this filter?** Workflow creates pull requests, so GitHub integration is required.
@@ -384,7 +387,7 @@ Projects with open PRs for this workflow will be skipped.
 # Prevent duplicate PRs for same workflow
 [filter]
 project_types = ["api", "consumer"]
-github_identifier_required = true
+github_integration_required = true
 exclude_open_workflow_prs = true  # Skip if PR already exists
 ```
 
@@ -402,7 +405,7 @@ exclude_open_workflow_prs = "primary-workflow"
 [filter]
 project_types = ["api"]
 project_facts = {"Programming Language" = "Python 3.12"}
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]
 exclude_open_workflow_prs = true  # Skip projects with pending PRs
 ```
@@ -456,7 +459,7 @@ This is the actual filter from the example-workflow workflow:
 
 ```toml
 [filter]
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]
 project_facts = {"programming_language" = "Python 3.9"}
 project_types = [
@@ -473,7 +476,7 @@ project_types = [
 
 **What this filter does:**
 
-1. ✅ **Must have GitHub** (`github_identifier_required = true`)
+1. ✅ **Must have GitHub** (`github_integration_required = true`)
    - Excludes projects without GitHub integration
    - Ensures PR creation will work
 
@@ -496,7 +499,7 @@ project_types = [
 ```
 All Projects (1000)
     ↓
-github_identifier_required = true
+github_integration_required = true
     ↓ (excludes 200 projects without GitHub)
 800 projects remain
     ↓
@@ -534,7 +537,7 @@ project_facts = {
 [filter]
 project_types = ["api", "consumer", "daemon"]
 project_facts = {"Programming Language" = "Python 3.12"}
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]
 ```
 
@@ -543,7 +546,7 @@ github_workflow_status_exclude = ["success"]
 ```toml
 [filter]
 project_types = ["backend-libraries"]
-# No github_identifier_required - includes non-GitHub projects
+# No github_integration_required - includes non-GitHub projects
 ```
 
 ### Testing Filter (Small Subset)
@@ -569,7 +572,7 @@ project_facts = {"Programming Language" = "Python"}  # Won't work - needs exact 
 
 ```toml
 [filter]
-github_identifier_required = true
+github_integration_required = true
 # Then use conditions to check for specific workflow files
 ```
 
@@ -665,7 +668,7 @@ imbi-automations config.toml workflows/update-python --project-type api
 # Workflow filter: Further refinement
 [filter]
 project_facts = {"Programming Language" = "Python 3.12"}
-github_identifier_required = true
+github_integration_required = true
 ```
 
 **Result:** Python 3.12 APIs with GitHub integration

@@ -721,7 +721,7 @@ This is the actual condition strategy from example-workflow:
 [filter]
 project_types = ["apis", "consumers", ...]
 project_facts = {"programming_language" = "Python 3.9"}
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]
 
 # Workflow conditions: Migration applicability

@@ -63,8 +63,8 @@ api_key = "ik_your_imbi_api_key"          # convenience for [imbi.auth] = api_ke
 # email = "user@example.com"
 # password = "..."
 
-# Slug defaults for identifiers/links, override to match your blueprints.
-github_identifier = "github"
+# Slug defaults for integrations/links, override to match your org.
+github_integration = "ghec"
 github_link = "github-repository"
 ```
 
@@ -611,17 +611,21 @@ memory; the client transparently refreshes via
 `POST /api/auth/token/refresh` on a 401 response and retries the
 original request once before failing.
 
-### [imbi].*_identifier
+### [imbi].github_integration
 
-Project identifier slugs in Imbi for external systems.
+Slug of the Imbi integration that holds each project's GitHub
+repository ID. Imbi returns a project's integrations in its `services`
+list; the entry whose `integration_slug` matches this value supplies
+the repository ID used to fetch the repository from the GitHub API and
+to evaluate the `github_integration_required` filter.
 
 **Type:** `string`
-**Defaults:**
+**Default:** `"ghec"`
 
-- `github_identifier = "github"`
-- `pagerduty_identifier = "pagerduty"`
-- `sonarqube_identifier = "sonarqube"`
-- `sentry_identifier = "sentry"`
+```toml
+[imbi]
+github_integration = "github"
+```
 
 ### [imbi].*_link
 

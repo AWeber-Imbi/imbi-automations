@@ -191,7 +191,7 @@ class ImbiConfiguration(pydantic_settings.BaseSettings):
     ``IMBI_API_KEY`` in the environment) is interpreted as
     ``auth = {type = "api_key", value = "..."}``.
 
-    ``identifier`` / ``link`` slugs are blueprint-defined.
+    ``integration`` / ``link`` slugs are organization-defined.
     """
 
     model_config = pydantic_settings.SettingsConfigDict(
@@ -208,10 +208,7 @@ class ImbiConfiguration(pydantic_settings.BaseSettings):
     api_key: pydantic.SecretStr | None = pydantic.Field(
         default=None, exclude=True, repr=False
     )
-    github_identifier: str = 'github'
-    pagerduty_identifier: str = 'pagerduty'
-    sonarqube_identifier: str = 'sonarqube'
-    sentry_identifier: str = 'sentry'
+    github_integration: str = 'ghec'
     github_link: str = 'github-repository'
     grafana_link: str = 'grafana-dashboard'
     pagerduty_link: str = 'pagerduty'

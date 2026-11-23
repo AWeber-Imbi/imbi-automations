@@ -28,6 +28,9 @@ the [CLI](#cli) and [resume state](#resume-state) sections too.
 | Filter `project_facts` keys | Display names ("Programming Language") | Blueprint attribute slugs ("programming_language") |
 | Project facts in templates | `imbi_project.facts["Programming Language"]` | `imbi_project.programming_language` (blueprint extras) |
 | Resume state schema | `schema_version = 1` | `schema_version = 2` — old `.state` files rejected |
+| GitHub repository lookup | `identifiers["github"]` or the `github-repository` link | The `[imbi].github_integration` service on the project |
+| Filter `github_identifier_required` | `github_identifier_required = true` | `github_integration_required = true` |
+| `[imbi].*_identifier` config | `github_identifier`, `pagerduty_identifier`, `sonarqube_identifier`, `sentry_identifier` | Removed; `github_integration = "ghec"` added |
 
 ## Configuration file
 
@@ -82,6 +85,23 @@ password = "..."
 ```
 
 If both `api_key` and `[imbi.auth]` are set, `[imbi.auth]` wins.
+
+### Replace `*_identifier` keys with `github_integration`
+
+Imbi v2 stores a project's GitHub repository ID on the project's
+relationship to an integration, returned in the project's `services`
+list. The project-level `identifiers` map is no longer read, and the
+GitHub repository is no longer resolved from the `github-repository`
+link.
+
+Remove `github_identifier`, `pagerduty_identifier`,
+`sonarqube_identifier`, and `sentry_identifier` from `[imbi]`. If your
+GitHub integration's slug is not `ghec`, set `github_integration`:
+
+```toml
+[imbi]
+github_integration = "github"
+```
 
 JWTs from `client_credentials` and `password` auth are refreshed in the
 background; on a 401 the client calls `POST /api/auth/token/refresh`
@@ -179,6 +199,22 @@ project_facts = {"programming_language" = "Python 3.12"}
 
 The exact slug depends on your org's blueprints; the metadata cache
 will validate at parse time and emit fuzzy suggestions for typos.
+
+`github_identifier_required` is renamed to `github_integration_required`.
+The old key is ignored, so a workflow that still uses it runs without
+the GitHub check:
+
+```toml
+# v1
+[filter]
+github_identifier_required = true
+```
+
+```toml
+# v2
+[filter]
+github_integration_required = true
+```
 
 ### Project fact access in Jinja2 templates
 
@@ -281,6 +317,8 @@ configured:
 - [ ] Update `[imbi].hostname` → `[imbi].base_url` (full URL, no `/api`)
 - [ ] Add `[imbi].organization`
 - [ ] (Optional) Switch to `[imbi.auth]` block for OAuth2 / password auth
+- [ ] Remove `[imbi].*_identifier` keys; set `[imbi].github_integration`
+      if your GitHub integration's slug is not `ghec`
 - [ ] In each workflow TOML:
     - [ ] Rename `fact_name` → `attribute_name` (and update values to
           slug form if they were display names)
@@ -292,11 +330,15 @@ configured:
           `[filter].exclude_project_ids` to Nano-ID strings
     - [ ] Update `[filter].project_facts` keys to blueprint attribute
           slugs
+    - [ ] Rename `[filter].github_identifier_required` →
+          `github_integration_required`
 - [ ] In each Jinja2 prompt/template:
     - [ ] Replace `imbi_project.facts["..."]` lookups with
           `imbi_project.<slug>` (or `model_extra.get(...)`)
     - [ ] Replace `imbi_project.project_type` with
           `imbi_project.project_types[*]`
+    - [ ] Replace `imbi_project.identifiers` with
+          `imbi_project.services`
 - [ ] Update any scripts that pass `--project-id` to use Nano-IDs
 - [ ] Delete or accept loss of old `.state` files under `./errors/`
 - [ ] Bump the installed version: `pip install -U imbi-automations` or

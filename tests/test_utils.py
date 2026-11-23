@@ -32,7 +32,6 @@ class UtilsTestCase(unittest.TestCase):
                 description='Test project',
                 environments=None,
                 attributes=None,
-                identifiers=None,
                 links=None,
                 name='test-project',
                 team_name='test-namespace',
@@ -666,7 +665,7 @@ packages = ["my.package"]
             id='proj_123',
             description='Test project',
             attributes={'language': 'Python', 'framework': 'FastAPI'},
-            identifiers={'github': 'org/repo', 'jira': 'PROJ'},
+            services=[factories.make_service()],
             links={
                 'docs': 'https://example.com',
                 'wiki': 'https://wiki.com',
@@ -684,7 +683,7 @@ packages = ["my.package"]
             id='proj_123',
             description='Test project',
             attributes={'framework': 'FastAPI', 'language': 'Python'},
-            identifiers={'jira': 'PROJ', 'github': 'org/repo'},
+            services=[factories.make_service()],
             links={
                 'wiki': 'https://wiki.com',
                 'docs': 'https://example.com',

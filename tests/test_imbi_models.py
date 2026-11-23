@@ -78,3 +78,47 @@ class ImbiEnvironmentTestCase(unittest.TestCase):
             name='Prod (US/East)', slug='prod-us-east', icon_class='fa-test'
         )
         self.assertEqual(env.slug, 'prod-us-east')
+
+
+class ImbiProjectServicesTestCase(unittest.TestCase):
+    """Test cases for ImbiProject integration services."""
+
+    def make_project(self, services: list[dict]) -> models.ImbiProject:
+        return models.ImbiProject.model_validate(
+            {
+                'id': 'proj_1',
+                'name': 'Example',
+                'slug': 'example',
+                'team': {'name': 'Platform', 'slug': 'platform'},
+                'services': services,
+            }
+        )
+
+    def test_parses_api_services(self) -> None:
+        project = self.make_project(
+            [
+                {
+                    'integration_slug': 'ghec',
+                    'integration_name': 'GitHub Enterprise Cloud',
+                    'identifier': '123456',
+                    'canonical_url': (
+                        'https://api.github.example.com/repositories/123456'
+                    ),
+                    'dashboard_url': 'https://github.example.com/org/repo',
+                }
+            ]
+        )
+        self.assertEqual(project.services[0].integration_slug, 'ghec')
+        self.assertEqual(project.service_identifier('ghec'), '123456')
+
+    def test_service_identifier_missing_integration(self) -> None:
+        project = self.make_project(
+            [{'integration_slug': 'sonarqube', 'identifier': 'key'}]
+        )
+        self.assertIsNone(project.service_identifier('ghec'))
+
+    def test_service_identifier_empty(self) -> None:
+        project = self.make_project(
+            [{'integration_slug': 'ghec', 'identifier': ''}]
+        )
+        self.assertIsNone(project.service_identifier('ghec'))
