@@ -102,14 +102,8 @@ def _load_workflow(path: pathlib.Path | None) -> models.Workflow:
             ),
         )
     except pydantic.ValidationError as exc:
-        # Extract the most relevant part of Pydantic validation errors
-        error_msg = str(exc)
-        lines = error_msg.split('\n')
-        main_error = next(
-            (line for line in lines if 'Input should be' in line), error_msg
-        )
         raise argparse.ArgumentTypeError(
-            f'Invalid workflow configuration in {path}:\n{main_error}'
+            f'Invalid workflow configuration in {path}:\n{exc}'
         ) from exc
 
 

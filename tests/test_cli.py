@@ -201,12 +201,14 @@ name = "Test Workflow"
 actions = []
 
 [filter]
+project_ids = [123]
 github_identifier_required = true
 """)
 
         with self.assertRaises(argparse.ArgumentTypeError) as ctx:
             cli.workflow(str(self.workflow_dir))
 
+        self.assertIn('filter.project_ids', str(ctx.exception))
         self.assertIn('filter.github_identifier_required', str(ctx.exception))
 
 
