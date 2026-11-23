@@ -194,6 +194,23 @@ actions = []
 
         self.assertIn('Invalid workflow configuration', str(ctx.exception))
 
+    def test_workflow_unknown_filter_key(self) -> None:
+        config_file = self.workflow_dir / 'workflow.toml'
+        config_file.write_text("""
+name = "Test Workflow"
+actions = []
+
+[filter]
+project_ids = [123]
+github_identifier_required = true
+""")
+
+        with self.assertRaises(argparse.ArgumentTypeError) as ctx:
+            cli.workflow(str(self.workflow_dir))
+
+        self.assertIn('filter.project_ids', str(ctx.exception))
+        self.assertIn('filter.github_identifier_required', str(ctx.exception))
+
 
 class ParseArgsTestCase(unittest.TestCase):
     """Test command-line argument parsing."""

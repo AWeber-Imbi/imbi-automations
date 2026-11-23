@@ -37,6 +37,8 @@ regex = "^api-.*"
 
 **Filter Logic:** ALL filter criteria must match (AND logic). A project must satisfy every filter to be included.
 
+**Unknown keys:** The workflow fails validation at load time if `[filter]` contains a key not listed below, so a misspelled filter stops the run instead of being silently ignored.
+
 ## Filter Fields
 
 ### project_ids
