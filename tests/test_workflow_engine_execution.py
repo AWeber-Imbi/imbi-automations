@@ -570,9 +570,12 @@ class WorkflowEnginePrimaryStageTestCase(base.AsyncTestCase):
             )
             mock_setup.return_value = mock_context
 
-            with self.assertRaisesRegex(ValueError, 'Test error'):
+            with self.assertRaisesRegex(ValueError, 'Test error') as raised:
                 await engine.execute(self.project)
 
+            self.assertRegex(
+                raised.exception.__notes__[-1], r'^Raised by action "'
+            )
             mock_preserve.assert_called_once()
             self.assertEqual(
                 engine.pop_error_path(self.project.id), pathlib.Path('/error')
@@ -1401,9 +1404,14 @@ class WorkflowEngineFollowupStageTestCase(base.AsyncTestCase):
             )
             mock_setup.return_value = mock_context
 
-            with self.assertRaisesRegex(ValueError, 'Followup error'):
+            with self.assertRaisesRegex(
+                ValueError, 'Followup error'
+            ) as raised:
                 await engine.execute(self.project)
 
+            self.assertRegex(
+                raised.exception.__notes__[-1], r'^Raised by followup action "'
+            )
             # Check that preserve was called with followup stage info
             call_kwargs = mock_preserve.call_args.kwargs
             self.assertEqual(call_kwargs['current_stage'], 'followup')

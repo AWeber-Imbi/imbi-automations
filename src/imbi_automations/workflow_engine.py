@@ -274,12 +274,13 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                         ) from exc
                 else:
                     # No handler - use existing error handling
-                    self.logger.error(
+                    self.logger.debug(
                         '%s error executing action "%s": %s',
                         context.imbi_project.slug,
                         action.name,
                         exc,
                     )
+                    exc.add_note(f'Raised by action "{action.name}"')
                     if self.configuration.preserve_on_error:
                         # Calculate completed indices for this execution
                         if not self.resume_state:
@@ -580,11 +581,14 @@ class WorkflowEngine(mixins.WorkflowLoggerMixin):
                             ) from exc
                     else:
                         # No handler - use existing error handling
-                        self.logger.error(
+                        self.logger.debug(
                             '%s error in followup action "%s": %s',
                             context.imbi_project.slug,
                             action.name,
                             exc,
+                        )
+                        exc.add_note(
+                            f'Raised by followup action "{action.name}"'
                         )
                         if self.configuration.preserve_on_error:
                             self.error_paths[context.imbi_project.id] = (

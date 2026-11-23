@@ -7,7 +7,9 @@ import tempfile
 import unittest
 from unittest import mock
 
+import anthropic
 import claude_agent_sdk
+import httpx2
 import pydantic
 
 from imbi_automations import claude, models
@@ -937,6 +939,88 @@ class ClaudeTestCase(base.AsyncTestCase):
             claude_instance.get_agent_prompt(models.ClaudeAgentType.planning)
 
         self.assertIn('No agent definition', str(exc_context.exception))
+
+    def _claude_with_messages_api(
+        self, content: list[dict[str, object]], requests: list[dict]
+    ) -> claude.Claude:
+        """Build a Claude whose Anthropic client talks to a mock API.
+
+        The real SDK client builds and parses the HTTP exchange.
+        """
+
+        def handler(request: httpx2.Request) -> httpx2.Response:
+            requests.append(json.loads(request.content))
+            return httpx2.Response(
+                200,
+                json={
+                    'id': 'msg_test',
+                    'type': 'message',
+                    'role': 'assistant',
+                    'model': 'claude-haiku-4-5',
+                    'content': content,
+                    'stop_reason': 'end_turn',
+                    'stop_sequence': None,
+                    'usage': {'input_tokens': 1, 'output_tokens': 1},
+                },
+            )
+
+        with (
+            mock.patch('claude_agent_sdk.ClaudeSDKClient'),
+            mock.patch(
+                'builtins.open',
+                new_callable=mock.mock_open,
+                read_data='Mock system prompt',
+            ),
+        ):
+            claude_instance = claude.Claude(
+                config=self.config, context=self.context
+            )
+        claude_instance.anthropic = anthropic.AsyncAnthropic(
+            api_key='sk-test',
+            http_client=httpx2.AsyncClient(
+                transport=httpx2.MockTransport(handler)
+            ),
+        )
+        return claude_instance
+
+    async def test_anthropic_query_sends_plain_user_message(self) -> None:
+        """anthropic_query sends a plain dict message and returns text."""
+        requests: list[dict] = []
+        claude_instance = self._claude_with_messages_api(
+            [{'type': 'text', 'text': 'Generated PR body'}], requests
+        )
+
+        result = await claude_instance.anthropic_query('Summarize this')
+
+        self.assertEqual(result, 'Generated PR body')
+        self.assertEqual(len(requests), 1)
+        self.assertEqual(
+            requests[0]['messages'],
+            [{'role': 'user', 'content': 'Summarize this'}],
+        )
+        self.assertEqual(requests[0]['model'], self.config.anthropic.model)
+
+    async def test_anthropic_query_non_text_block_returns_empty(self) -> None:
+        """anthropic_query returns '' when the first block is not text."""
+        requests: list[dict] = []
+        claude_instance = self._claude_with_messages_api(
+            [
+                {
+                    'type': 'tool_use',
+                    'id': 'toolu_test',
+                    'name': 'noop',
+                    'input': {},
+                }
+            ],
+            requests,
+        )
+
+        result = await claude_instance.anthropic_query(
+            'Summarize this', model='claude-sonnet-5-5'
+        )
+
+        self.assertEqual(result, '')
+        self.assertEqual(requests[0]['model'], 'claude-sonnet-5-5')
 
 
 class InstallPluginsTestCase(base.AsyncTestCase):

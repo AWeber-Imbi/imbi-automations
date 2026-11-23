@@ -568,6 +568,15 @@ class Automation(mixins.WorkflowLoggerMixin):
             failed,
         )
 
+        for project, result in zip(filtered, results, strict=True):
+            if isinstance(result, BaseException):
+                self.logger.error(
+                    'Workflow failed for %s: %s',
+                    project.slug,
+                    result,
+                    exc_info=result,
+                )
+
         return failed == 0
 
     async def _process_workflow_from_imbi_project(

@@ -703,9 +703,7 @@ class Claude(mixins.WorkflowLoggerMixin):
         message = await self.anthropic.messages.create(
             model=model or self.configuration.anthropic.model,
             max_tokens=8192,
-            messages=[
-                anthropic_types.MessageParam(role='user', content=prompt)
-            ],
+            messages=[{'role': 'user', 'content': prompt}],
         )
         if isinstance(message.content[0], anthropic_types.TextBlock):
             return message.content[0].text
