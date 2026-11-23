@@ -354,7 +354,7 @@ class ControllerSingleProjectTestCase(base.AsyncTestCase):
             id=123,
             slug='test-api',
             name='Test API',
-            identifiers={'github': 'org/repo'},
+            services=[factories.make_service()],
         )
 
         self.http_client_side_effect = httpx.Response(

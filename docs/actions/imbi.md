@@ -442,7 +442,7 @@ context.imbi_project.facts        # Current project facts
 # Standardize environments across all frontend projects
 [filter]
 project_types = ["frontend-applications"]
-github_identifier_required = true
+github_integration_required = true
 
 [[actions]]
 name = "set-environments"

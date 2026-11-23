@@ -43,7 +43,6 @@ def project_payload(
     project_type_slugs: list[str] | None = None,
     environments: list[str] | None = None,
     links: dict[str, str] | None = None,
-    identifiers: dict[str, int | str] | None = None,
     extras: dict[str, typing.Any] | None = None,
     description: str | None = None,
 ) -> dict[str, typing.Any]:
@@ -69,7 +68,6 @@ def project_payload(
             for slug in (environments or [])
         ],
         'links': links or {},
-        'identifiers': identifiers or {},
     }
     if extras:
         payload.update(extras)
@@ -635,53 +633,6 @@ class ImbiClientPatchesTestCase(base.AsyncTestCase):
         client, _ = self._client([_resp(http.HTTPStatus.OK, json_body=[])])
         with self.assertRaises(ValueError):
             await client.add_project_link('proj_x', 'unknown', 'https://x')
-
-    async def test_set_project_identifier_add(self) -> None:
-        project = project_payload(project_id='proj_x', identifiers={})
-        client, recorder = self._client(
-            [
-                _resp(http.HTTPStatus.OK, json_body=project),
-                _resp(http.HTTPStatus.OK, json_body=project),
-            ]
-        )
-        await client.set_project_identifier('proj_x', 'github', 12345)
-        ops = self._patch_ops(recorder.requests[1])
-        self.assertEqual(
-            ops, [{'op': 'add', 'path': '/identifiers/github', 'value': 12345}]
-        )
-
-    async def test_set_project_identifier_replace(self) -> None:
-        project = project_payload(
-            project_id='proj_x', identifiers={'github': 999}
-        )
-        client, recorder = self._client(
-            [
-                _resp(http.HTTPStatus.OK, json_body=project),
-                _resp(http.HTTPStatus.OK, json_body=project),
-            ]
-        )
-        await client.set_project_identifier('proj_x', 'github', 12345)
-        ops = self._patch_ops(recorder.requests[1])
-        self.assertEqual(
-            ops,
-            [{'op': 'replace', 'path': '/identifiers/github', 'value': 12345}],
-        )
-
-    async def test_set_project_identifier_remove(self) -> None:
-        project = project_payload(
-            project_id='proj_x', identifiers={'github': 999}
-        )
-        client, recorder = self._client(
-            [
-                _resp(http.HTTPStatus.OK, json_body=project),
-                _resp(http.HTTPStatus.OK, json_body=project),
-            ]
-        )
-        await client.set_project_identifier('proj_x', 'github', None)
-        ops = self._patch_ops(recorder.requests[1])
-        self.assertEqual(
-            ops, [{'op': 'remove', 'path': '/identifiers/github'}]
-        )
 
     async def test_set_project_types_replaces_full_list(self) -> None:
         project = project_payload(

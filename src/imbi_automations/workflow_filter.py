@@ -1,7 +1,7 @@
 """Project filtering and targeting logic for workflow execution.
 
 Provides filtering capabilities to target specific subsets of projects
-based on IDs, types, facts, GitHub identifiers, and workflow statuses for
+based on IDs, types, facts, GitHub integrations, and workflow statuses for
 efficient batch processing.
 """
 
@@ -40,7 +40,7 @@ class Filter(mixins.WorkflowLoggerMixin):
             pydantic.Field(default_factory=dict)
         )
         project_environments: set[str] = pydantic.Field(default_factory=set)
-        github_identifier_required: bool = False
+        github_integration_required: bool = False
         exclude_github_workflow_status: set[str] = pydantic.Field(
             default_factory=set
         )
@@ -65,13 +65,10 @@ class Filter(mixins.WorkflowLoggerMixin):
 
         if (
             (
-                workflow_filter.github_identifier_required
+                workflow_filter.github_integration_required
                 and self.configuration.imbi
-                and (
-                    not project.identifiers
-                    or not project.identifiers.get(
-                        self.configuration.imbi.github_identifier
-                    )
+                and not project.service_identifier(
+                    self.configuration.imbi.github_integration
                 )
             )
             or (

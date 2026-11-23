@@ -96,6 +96,16 @@ class ImbiRelationships(base.BaseModel):
     inbound_count: int = 0
 
 
+class ImbiProjectService(base.BaseModel):
+    """A project's identity in an integration (e.g. its GitHub repo)."""
+
+    integration_slug: str
+    integration_name: str | None = None
+    identifier: str
+    canonical_url: str | None = None
+    dashboard_url: str | None = None
+
+
 class ImbiProject(base.BaseModel):
     """Imbi project.
 
@@ -119,9 +129,21 @@ class ImbiProject(base.BaseModel):
     project_types: list[ImbiProjectType] = []
     environments: list[ImbiEnvironment] = []
     links: dict[str, pydantic.AnyUrl] = {}
-    identifiers: dict[str, int | str] = {}
+    services: list[ImbiProjectService] = []
     score: float | None = None
     relationships: ImbiRelationships | None = None
+
+    def service_identifier(self, integration_slug: str) -> str | None:
+        """Return the project's identifier in the given integration."""
+        return next(
+            (
+                service.identifier
+                for service in self.services
+                if service.integration_slug == integration_slug
+                and service.identifier
+            ),
+            None,
+        )
 
 
 class ImbiDocument(base.BaseModel):

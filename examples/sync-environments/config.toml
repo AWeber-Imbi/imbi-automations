@@ -5,7 +5,7 @@ description = "Synchronize GitHub repository environments to match Imbi project 
 clone = false
 
 [filter]
-github_identifier_required = true
+github_integration_required = true
 
 [[actions]]
 name = "sync-environments"

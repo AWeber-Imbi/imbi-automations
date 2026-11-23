@@ -169,89 +169,72 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
                 organization='test-org',
                 base_url='https://imbi.example.com',
                 api_key='ik_test',
-                github_identifier='github',
-                github_link='github-repository',
             ),
         )
         self.client = github.GitHub(
             self.config, transport=self.http_client_transport
         )
 
-    async def test_get_repository_by_identifier(self) -> None:
-        """Test repository retrieval via project identifier."""
-        project = create_test_project(identifiers={'github': 12345})
-
-        repo_data = create_github_repo_response_data()
-
-        self.http_client_side_effect = httpx.Response(200, json=repo_data)
-
-        result = await self.client.get_repository(project)
-
-        self.assertIsNotNone(result)
-        self.assertEqual(result.name, 'test-repo')
-        self.assertEqual(result.full_name, 'org/test-repo')
-        self.assertEqual(result.default_branch, 'main')
-
-    async def test_get_repository_by_link(self) -> None:
-        """Test repository retrieval via project link URL fallback."""
-        project = create_test_project(
-            links={'github-repository': 'https://github.com/org/test-repo'}
-        )
-
-        repo_data = create_github_repo_response_data()
-
-        self.http_client_side_effect = httpx.Response(200, json=repo_data)
-
-        result = await self.client.get_repository(project)
-
-        self.assertIsNotNone(result)
-        self.assertEqual(result.full_name, 'org/test-repo')
-
-    async def test_get_repository_by_link_strips_git_suffix(self) -> None:
-        """Test repository link URLs with a .git suffix resolve cleanly."""
-        captured: dict[str, str] = {}
-
+    def capturing_client(self, captured: dict[str, str]) -> github.GitHub:
         def handler(request: httpx.Request) -> httpx.Response:
             captured['path'] = request.url.path
             return httpx.Response(200, json=create_github_repo_response_data())
 
-        client = github.GitHub(
+        return github.GitHub(
             self.config, transport=httpx.MockTransport(handler)
         )
-        result = await client.get_repository_by_url(
-            'https://github.com/org/test-repo.git'
+
+    async def test_get_repository_by_integration(self) -> None:
+        """Test repository retrieval via the GitHub integration ID."""
+        captured: dict[str, str] = {}
+        client = self.capturing_client(captured)
+        project = create_test_project(services=[factories.make_service()])
+
+        result = await client.get_repository(project)
+
+        self.assertEqual(captured['path'], '/repositories/12345')
+        self.assertEqual(result.full_name, 'org/test-repo')
+        self.assertEqual(result.default_branch, 'main')
+
+    async def test_get_repository_uses_configured_integration(self) -> None:
+        """Test the configured github_integration slug selects the ID."""
+        self.config.imbi.github_integration = 'github'
+        project = create_test_project(
+            services=[
+                factories.make_service('111'),
+                factories.make_service('222', integration_slug='github'),
+            ]
+        )
+        captured: dict[str, str] = {}
+        client = self.capturing_client(captured)
+
+        await client.get_repository(project)
+
+        self.assertEqual(captured['path'], '/repositories/222')
+
+    async def test_get_repository_no_github_integration(self) -> None:
+        """Test retrieval returns None without a GitHub integration."""
+        project = create_test_project(
+            services=[factories.make_service('abc', 'sonarqube')]
         )
 
-        self.assertIsNotNone(result)
-        self.assertEqual(captured['path'], '/repos/org/test-repo')
-
-    async def test_get_repository_by_link_unparseable(self) -> None:
-        """Test an unparseable link URL returns None."""
-        result = await self.client.get_repository_by_url(
-            'https://github.com/org'
-        )
+        result = await self.client.get_repository(project)
 
         self.assertIsNone(result)
 
-    async def test_get_repository_by_link_invalid_url(self) -> None:
-        """Test a URL that urlparse rejects returns None."""
-        result = await self.client.get_repository_by_url(
-            'https://[github.com/org/test-repo'
-        )
+    async def test_get_repository_empty_identifier(self) -> None:
+        """Test retrieval returns None for an empty integration ID."""
+        project = create_test_project(services=[factories.make_service('')])
+
+        result = await self.client.get_repository(project)
 
         self.assertIsNone(result)
 
-    async def test_get_repository_by_link_wrong_host(self) -> None:
-        """Test a link URL on a different host returns None."""
-        result = await self.client.get_repository_by_url(
-            'https://gitlab.example.com/org/test-repo'
+    async def test_get_repository_ignores_github_link(self) -> None:
+        """Test a github-repository link alone does not resolve a repo."""
+        project = create_test_project(
+            links={'github-repository': 'https://github.com/org/test-repo'}
         )
-
-        self.assertIsNone(result)
-
-    async def test_get_repository_no_identifier_or_link(self) -> None:
-        """Test retrieval returns None with no identifier or link."""
-        project = create_test_project()  # No identifiers or links
 
         result = await self.client.get_repository(project)
 
@@ -259,7 +242,9 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
 
     async def test_get_repository_not_found(self) -> None:
         """Test repository not found returns None."""
-        project = create_test_project(identifiers={'github': 99999})
+        project = create_test_project(
+            services=[factories.make_service('99999')]
+        )
 
         self.http_client_side_effect = httpx.Response(404, json={})
 
@@ -269,7 +254,7 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
 
     async def test_get_repository_rate_limit(self) -> None:
         """Test rate limit error handling."""
-        project = create_test_project(identifiers={'github': 12345})
+        project = create_test_project(services=[factories.make_service()])
 
         self.http_client_side_effect = httpx.Response(
             403, json={'message': 'API rate limit exceeded'}
@@ -280,7 +265,7 @@ class GitHubRepositoryTestCase(base.AsyncTestCase):
 
     async def test_get_repository_forbidden(self) -> None:
         """Test forbidden access error handling."""
-        project = create_test_project(identifiers={'github': 12345})
+        project = create_test_project(services=[factories.make_service()])
 
         self.http_client_side_effect = httpx.Response(
             403, json={'message': 'Access forbidden'}

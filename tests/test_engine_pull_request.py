@@ -50,7 +50,6 @@ class WorkflowEnginePullRequestTestCase(base.AsyncTestCase):
                 description='Test project',
                 environments=None,
                 attributes=None,
-                identifiers=None,
                 links=None,
                 name='test-project',
                 team_name='test-namespace',

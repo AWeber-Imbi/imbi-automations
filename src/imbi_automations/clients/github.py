@@ -8,10 +8,8 @@ remote file checking.
 
 import logging
 import typing
-import urllib.parse
 
 import httpx
-import pydantic
 
 from imbi_automations import errors, models
 
@@ -48,77 +46,17 @@ class GitHub(http.BaseURLHTTPClient):
     async def get_repository(
         self, project: models.ImbiProject
     ) -> models.GitHubRepository | None:
-        """Get a repository by name/slug in a specific organization."""
+        """Get a project's repository via its GitHub integration ID."""
         if not self.configuration.imbi:
             raise errors.ConfigurationError('Imbi configuration missing')
 
-        project_id = (
-            project.identifiers.get(self.configuration.imbi.github_identifier)
-            if project.identifiers
-            else None
+        repository_id = project.service_identifier(
+            self.configuration.imbi.github_integration
         )
-        if project_id:
-            return await self._get_repository_by_id(project_id)
-        if project.links:
-            link = project.links.get(self.configuration.imbi.github_link)
-            if link:
-                return await self.get_repository_by_url(link)
-        return None
-
-    async def _get_repository_by_id(
-        self, repo_id: int
-    ) -> models.GitHubRepository | None:
-        """Get a repository by its GitHub repository ID.
-
-        Args:
-            repo_id: GitHub repository ID
-
-        Returns:
-            GitHubRepository object or None if not found
-
-        Raises:
-            httpx.HTTPError: If API request fails (except 404)
-
-        """
-        response = await self.get(f'/repositories/{repo_id}')
-        return self._parse_repository_response(response, f'ID {repo_id}')
-
-    async def get_repository_by_url(
-        self, url: pydantic.AnyUrl | str
-    ) -> models.GitHubRepository | None:
-        """Get a repository from an Imbi project link URL.
-
-        Parses the owner and repository name from a GitHub repository URL
-        (e.g. ``https://github.com/org/repo``) and resolves it via the
-        GitHub API.
-
-        Args:
-            url: GitHub repository URL from an Imbi project link
-
-        Returns:
-            GitHubRepository object or None if the URL cannot be parsed,
-            is not on the configured GitHub host, or the repository is
-            not found
-
-        Raises:
-            httpx.HTTPError: If API request fails (except 404)
-
-        """
-        try:
-            parsed = urllib.parse.urlparse(str(url))
-        except ValueError:
-            LOGGER.warning('Could not parse owner/repo from URL: %s', url)
+        if not repository_id:
             return None
-        segments = [segment for segment in parsed.path.split('/') if segment]
-        if (
-            parsed.hostname != self.configuration.github.host.lower()
-            or len(segments) < 2
-        ):
-            LOGGER.warning('Could not parse owner/repo from URL: %s', url)
-            return None
-        owner, repo = segments[0], segments[1].removesuffix('.git')
-        response = await self.get(f'/repos/{owner}/{repo}')
-        return self._parse_repository_response(response, f'{owner}/{repo}')
+        response = await self.get(f'/repositories/{repository_id}')
+        return self._parse_repository_response(response, f'ID {repository_id}')
 
     def _parse_repository_response(
         self, response: httpx.Response, identifier: str

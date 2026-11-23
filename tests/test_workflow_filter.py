@@ -4,7 +4,7 @@ import pathlib
 import typing
 
 from imbi_automations import models, workflow_filter
-from tests import base
+from tests import base, factories
 
 
 def make_project(
@@ -16,7 +16,7 @@ def make_project(
     project_type_slugs: tuple[str, ...] = ('api',),
     environments: list[models.ImbiEnvironment] | None = None,
     links: dict[str, str] | None = None,
-    identifiers: dict[str, int | str] | None = None,
+    services: list[dict[str, str]] | None = None,
     extras: dict[str, typing.Any] | None = None,
 ) -> models.ImbiProject:
     """Build an :class:`ImbiProject` populated with sensible v2 defaults."""
@@ -30,7 +30,7 @@ def make_project(
         ],
         'environments': [env.model_dump() for env in environments or []],
         'links': links or {},
-        'identifiers': identifiers or {},
+        'services': services or [],
     }
     if extras:
         payload.update(extras)
@@ -118,24 +118,32 @@ class WorkflowFilterTestCase(base.AsyncTestCase):
         result = self.filter._filter_environments(project, wf)
         self.assertIsNotNone(result)
 
-    async def test_github_identifier_required_no_identifiers(self) -> None:
-        project = make_project(identifiers={})
-        wf = models.WorkflowFilter(github_identifier_required=True)
+    async def test_github_integration_required_no_services(self) -> None:
+        project = make_project()
+        wf = models.WorkflowFilter(github_integration_required=True)
         self.assertIsNone(await self.filter.filter_project(project, wf))
 
-    async def test_github_identifier_required_empty_identifiers(self) -> None:
-        project = make_project(identifiers={})
-        wf = models.WorkflowFilter(github_identifier_required=True)
+    async def test_github_integration_required_other_integration(self) -> None:
+        project = make_project(
+            services=[factories.make_service('abc', 'sonarqube')]
+        )
+        wf = models.WorkflowFilter(github_integration_required=True)
         self.assertIsNone(await self.filter.filter_project(project, wf))
 
-    async def test_github_identifier_required_missing_github(self) -> None:
-        project = make_project(identifiers={'gitlab': 'some-org/some-repo'})
-        wf = models.WorkflowFilter(github_identifier_required=True)
+    async def test_github_integration_required_empty_identifier(self) -> None:
+        project = make_project(services=[factories.make_service('')])
+        wf = models.WorkflowFilter(github_integration_required=True)
         self.assertIsNone(await self.filter.filter_project(project, wf))
 
-    async def test_github_identifier_required_has_github(self) -> None:
-        project = make_project(identifiers={'github': 'some-org/some-repo'})
-        wf = models.WorkflowFilter(github_identifier_required=True)
+    async def test_github_integration_required_has_github(self) -> None:
+        project = make_project(services=[factories.make_service()])
+        wf = models.WorkflowFilter(github_integration_required=True)
         result = await self.filter.filter_project(project, wf)
         self.assertIsNotNone(result)
         self.assertEqual(result.id, 'proj_123')
+
+    async def test_github_integration_required_custom_slug(self) -> None:
+        self.configuration.imbi.github_integration = 'github'
+        project = make_project(services=[factories.make_service()])
+        wf = models.WorkflowFilter(github_integration_required=True)
+        self.assertIsNone(await self.filter.filter_project(project, wf))

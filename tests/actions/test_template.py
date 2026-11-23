@@ -43,7 +43,7 @@ class TemplateActionsTestCase(base.AsyncTestCase):
                     ),
                 ],
                 attributes={'programming_language': 'Python 3.12'},
-                identifiers={'github': 'test-org/test-project'},
+                services=[factories.make_service()],
                 name='Test Project',
                 team_slug='test-namespace',
                 team_name='test-namespace',

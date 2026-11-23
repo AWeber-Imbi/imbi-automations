@@ -421,7 +421,7 @@ class Automation(mixins.WorkflowLoggerMixin):
             pydantic.Field(default_factory=dict)
         )
         project_environments: set[str] = pydantic.Field(default_factory=set)
-        github_identifier_required: bool = False
+        github_integration_required: bool = False
         exclude_github_workflow_status: set[str] = pydantic.Field(
             default_factory=set
         )

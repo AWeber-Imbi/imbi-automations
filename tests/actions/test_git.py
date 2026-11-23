@@ -38,7 +38,7 @@ class GitActionsTestCase(base.AsyncTestCase):
                 description='Test project',
                 environments=None,
                 attributes=None,
-                identifiers={'github': 'test-org/test-project'},
+                services=[factories.make_service()],
                 links=None,
                 name='Test Project',
                 team_name='test-namespace',

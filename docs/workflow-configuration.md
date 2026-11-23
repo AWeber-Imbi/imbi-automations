@@ -19,7 +19,7 @@ prompt = "workflow:///prompts/base.md"
 project_ids = [123, 456]
 project_types = ["api"]
 project_facts = {"Programming Language" = "Python 3.12"}
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]
 
 # Git Configuration
@@ -917,7 +917,7 @@ prompt = "workflow:///prompts/base-python.md"
 [filter]
 project_types = ["api", "consumer", "daemon"]
 project_facts = {"Programming Language" = "Python 3.11"}
-github_identifier_required = true
+github_integration_required = true
 github_workflow_status_exclude = ["success"]
 
 [git]

@@ -52,7 +52,7 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
         team_slug: str = 'platform',
         project_type_slugs: tuple[str, ...] = ('api',),
         environments: list[models.ImbiEnvironment] | None = None,
-        identifiers: dict[str, int | str] | None = None,
+        services: typing.Sequence[dict[str, str]] = (),
         score: float | None = None,
     ) -> models.ImbiProject:
         return factories.make_project(
@@ -63,7 +63,7 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
             team_slug=team_slug,
             project_type_slugs=project_type_slugs,
             environments=environments,
-            identifiers=identifiers,
+            services=services,
             score=score,
             attributes=attributes,
         )
@@ -403,14 +403,12 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
     # -- GitHub workflow status filtering -------------------------------
 
     async def test_filter_github_workflow_status_exclude_match(self) -> None:
-        project = self._create_project(
-            identifiers={'github': 'test-org/test-repo'}
-        )
+        project = self._create_project(services=[factories.make_service()])
         with mock.patch.object(
             self.filter, '_filter_github_action_status', return_value='failure'
         ):
             wf = models.WorkflowFilter(
-                github_identifier_required=True,
+                github_integration_required=True,
                 github_workflow_status_exclude={'failure'},
             )
             self.assertIsNone(await self.filter.filter_project(project, wf))
@@ -418,27 +416,25 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
     async def test_filter_github_workflow_status_no_exclude_match(
         self,
     ) -> None:
-        project = self._create_project(
-            identifiers={'github': 'test-org/test-repo'}
-        )
+        project = self._create_project(services=[factories.make_service()])
         with mock.patch.object(
             self.filter, '_filter_github_action_status', return_value='success'
         ):
             wf = models.WorkflowFilter(
-                github_identifier_required=True,
+                github_integration_required=True,
                 github_workflow_status_exclude={'failure'},
             )
             self.assertIsNotNone(await self.filter.filter_project(project, wf))
 
     async def test_filter_github_workflow_status_no_repository(self) -> None:
         project = self._create_project(
-            identifiers={'github': 'test-org/nonexistent-repo'}
+            services=[factories.make_service('99999')]
         )
         with mock.patch.object(
             self.filter, '_filter_github_action_status', return_value=None
         ):
             wf = models.WorkflowFilter(
-                github_identifier_required=True,
+                github_integration_required=True,
                 github_workflow_status_exclude={'failure'},
             )
             self.assertIsNotNone(await self.filter.filter_project(project, wf))
@@ -448,9 +444,7 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
     async def test_filter_exclude_open_workflow_prs_open_pr_excluded(
         self,
     ) -> None:
-        project = self._create_project(
-            identifiers={'github': 'test-org/test-repo'}
-        )
+        project = self._create_project(services=[factories.make_service()])
         with mock.patch.object(
             self.filter, '_filter_open_workflow_pr', return_value=True
         ):
@@ -460,9 +454,7 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
     async def test_filter_exclude_open_workflow_prs_no_pr_allowed(
         self,
     ) -> None:
-        project = self._create_project(
-            identifiers={'github': 'test-org/test-repo'}
-        )
+        project = self._create_project(services=[factories.make_service()])
         with mock.patch.object(
             self.filter, '_filter_open_workflow_pr', return_value=False
         ):
@@ -472,9 +464,7 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
     async def test_filter_exclude_open_workflow_prs_with_workflow_slug(
         self,
     ) -> None:
-        project = self._create_project(
-            identifiers={'github': 'test-org/test-repo'}
-        )
+        project = self._create_project(services=[factories.make_service()])
         with mock.patch.object(
             self.filter, '_filter_open_workflow_pr', return_value=True
         ):
@@ -484,9 +474,7 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
             self.assertIsNone(await self.filter.filter_project(project, wf))
 
     async def test_filter_exclude_open_workflow_prs_disabled(self) -> None:
-        project = self._create_project(
-            identifiers={'github': 'test-org/test-repo'}
-        )
+        project = self._create_project(services=[factories.make_service()])
         wf = models.WorkflowFilter(exclude_open_workflow_prs=False)
         with mock.patch.object(
             self.filter, '_filter_open_workflow_pr'
@@ -504,14 +492,14 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
             environments=[
                 models.ImbiEnvironment(name='Production', slug='production')
             ],
-            identifiers={'github': 'test-org/test-repo'},
+            services=[factories.make_service()],
             description='Python API service',
         )
         wf = models.WorkflowFilter(
             project_types={'api'},
             project_facts={'programming_language': 'Python 3.12'},
             project_environments={'production'},
-            github_identifier_required=True,
+            github_integration_required=True,
             project={
                 'description': workflow_models.ProjectFieldFilter(
                     contains='Python'
@@ -526,12 +514,12 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
         project = self._create_project(
             project_type_slugs=('consumer',),
             attributes={'programming_language': 'Python 3.12'},
-            identifiers={'github': 'test-org/test-repo'},
+            services=[factories.make_service()],
         )
         wf = models.WorkflowFilter(
             project_types={'api'},
             project_facts={'programming_language': 'Python 3.12'},
-            github_identifier_required=True,
+            github_integration_required=True,
         )
         self.assertIsNone(await self.filter.filter_project(project, wf))
 
@@ -539,12 +527,12 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
         project = self._create_project(
             project_type_slugs=('api',),
             attributes={'programming_language': 'Python 3.11'},
-            identifiers={'github': 'test-org/test-repo'},
+            services=[factories.make_service()],
         )
         wf = models.WorkflowFilter(
             project_types={'api'},
             project_facts={'programming_language': 'Python 3.12'},
-            github_identifier_required=True,
+            github_integration_required=True,
         )
         self.assertIsNone(await self.filter.filter_project(project, wf))
 
@@ -552,12 +540,11 @@ class WorkflowFilterAdvancedTestCase(base.AsyncTestCase):
         project = self._create_project(
             project_type_slugs=('api',),
             attributes={'programming_language': 'Python 3.12'},
-            identifiers={},
         )
         wf = models.WorkflowFilter(
             project_types={'api'},
             project_facts={'programming_language': 'Python 3.12'},
-            github_identifier_required=True,
+            github_integration_required=True,
         )
         self.assertIsNone(await self.filter.filter_project(project, wf))
 
