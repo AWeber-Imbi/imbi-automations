@@ -53,7 +53,9 @@ class ConfigureLoggingTestCase(unittest.TestCase):
             'anthropic',
             'claude_agent_sdk',
             'httpcore',
+            'httpcore2',
             'httpx',
+            'httpx2',
         ):
             logger = logging.getLogger(logger_name)
             self.assertEqual(logger.level, logging.WARNING)
